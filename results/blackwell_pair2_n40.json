@@ -1,0 +1,164 @@
+{
+ "counts": {
+  "none|cache_put_ok": [
+   0,
+   40
+  ],
+  "none|key_norm": [
+   0,
+   40
+  ],
+  "none|trap_cache": [
+   0,
+   40
+  ],
+  "W1|cache_put_ok": [
+   32,
+   40
+  ],
+  "W1|key_norm": [
+   0,
+   40
+  ],
+  "W1|trap_cache": [
+   30,
+   40
+  ],
+  "W2|cache_put_ok": [
+   0,
+   40
+  ],
+  "W2|key_norm": [
+   40,
+   40
+  ],
+  "W2|trap_cache": [
+   0,
+   40
+  ],
+  "W1plus|cache_put_ok": [
+   11,
+   40
+  ],
+  "W1plus|key_norm": [
+   40,
+   40
+  ],
+  "W1plus|trap_cache": [
+   19,
+   40
+  ]
+ },
+ "estimator": {
+  "hat_delta_W1_W2": 1.0,
+  "hat_delta_W2_W1": 0.8,
+  "argsup_W2_beats_W1": "key_norm",
+  "argsup_W1_beats_W2": "cache_put_ok",
+  "incomparable": true
+ },
+ "scalar": {
+  "phi_W1": 0.5166666666666667,
+  "phi_W2": 0.3333333333333333,
+  "global_rank": "W1 > W2",
+  "pointwise_violations": []
+ },
+ "certificate_incomparable": {
+  "L_AB": 0.7743956516188639,
+  "L_BA": 0.49635761245747806,
+  "alpha_pair": 0.016666666666666666,
+  "eta": 0.1,
+  "certified_incomparable": true
+ },
+ "certificate_incomparable_detail": {
+  "cache_put_ok": {
+   "A_ci": [
+    0.609,
+    0.926
+   ],
+   "B_ci": [
+    0.0,
+    0.113
+   ],
+   "L_AB": -0.926,
+   "L_BA": 0.496
+  },
+  "key_norm": {
+   "A_ci": [
+    0.0,
+    0.113
+   ],
+   "B_ci": [
+    0.887,
+    1.0
+   ],
+   "L_AB": 0.774,
+   "L_BA": -1.0
+  },
+  "trap_cache": {
+   "A_ci": [
+    0.553,
+    0.893
+   ],
+   "B_ci": [
+    0.0,
+    0.113
+   ],
+   "L_AB": -0.893,
+   "L_BA": 0.441
+  }
+ },
+ "dominance": {
+  "hat_delta_W1plus_W2": 0.0,
+  "hat_delta_W2_W1plus": 0.475,
+  "one_directional": true,
+  "U_D_W1plus_W2": 0.11280217419056804,
+  "alpha_tol": 0.15,
+  "dom_certified": true,
+  "strict_other_way": true
+ },
+ "interference": {
+  "detail": {
+   "cache_put_ok": {
+    "I_T": -0.525,
+    "I_T_upper": -0.056,
+    "certified_harm": false
+   },
+   "key_norm": {
+    "I_T": 0.0,
+    "I_T_upper": 0.208,
+    "certified_harm": false
+   },
+   "trap_cache": {
+    "I_T": -0.275,
+    "I_T_upper": 0.197,
+    "certified_harm": false
+   }
+  },
+  "certified_tasks": [],
+  "alpha": 0.025,
+  "tau": 0.3
+ },
+ "order_control": null,
+ "runtime_tokens": {
+  "cache_put_ok": {
+   "W1": 832.1,
+   "W1plus": 1385.6,
+   "rel": 0.665
+  },
+  "key_norm": {
+   "W1": 754.8,
+   "W1plus": 1351.7,
+   "rel": 0.791
+  },
+  "trap_cache": {
+   "W1": 854.4,
+   "W1plus": 916,
+   "rel": 0.072
+  }
+ },
+ "n_per_cell": 40,
+ "eta": 0.1,
+ "total_cost_usd": 14.397003999999999,
+ "required_n_halfwidth_0.15": 67,
+ "mock": false
+}

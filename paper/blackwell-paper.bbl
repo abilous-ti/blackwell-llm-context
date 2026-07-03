@@ -1,0 +1,185 @@
+\begin{thebibliography}{24}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Akdemir(2025)]{akdemir2025}
+Deniz Akdemir.
+\newblock {Le Cam} distortion: A decision-theoretic framework for robust
+  transfer learning.
+\newblock \emph{arXiv preprint arXiv:2512.23617}, 2025.
+\newblock domain-transfer deficiency; NO LLM/incomparability/certificate
+  content -- cite only as deficiency-in-ML lineage.
+
+\bibitem[Blackwell(1953)]{blackwell1953}
+David Blackwell.
+\newblock Equivalent comparisons of experiments.
+\newblock \emph{The Annals of Mathematical Statistics}, 24\penalty0
+  (2):\penalty0 265--272, 1953.
+\newblock \doi{10.1214/aoms/1177729032}.
+
+\bibitem[Bonferroni(1936)]{bonferroni1936}
+Carlo~Emilio Bonferroni.
+\newblock Teoria statistica delle classi e calcolo delle probabilit\`a.
+\newblock \emph{Pubblicazioni del R. Istituto Superiore di Scienze Economiche e
+  Commerciali di Firenze}, 8:\penalty0 3--62, 1936.
+
+\bibitem[Chan et~al.(2025)Chan, Ge, Dobriban, Hassani, and
+  Vidal]{conformalip2025}
+Kwan Ho~Ryan Chan, Yuyan Ge, Edgar Dobriban, Hamed Hassani, and Ren{\'e} Vidal.
+\newblock Conformal information pursuit for interactively guiding large
+  language models.
+\newblock \emph{arXiv preprint arXiv:2507.03279}, 2025.
+
+\bibitem[Choudhury et~al.(2025)Choudhury, Williamson, Goli{\'n}ski, Miao,
+  Bickford~Smith, Kirchhof, Zhang, and Rainforth]{bedllm2026}
+Deepro Choudhury, Sinead Williamson, Adam Goli{\'n}ski, Ning Miao, Freddie
+  Bickford~Smith, Michael Kirchhof, Yizhe Zhang, and Tom Rainforth.
+\newblock {BED-LLM}: Intelligent information gathering with {LLMs} and bayesian
+  experimental design.
+\newblock \emph{arXiv preprint arXiv:2508.21184}, 2025.
+\newblock id corrected from 2604.00414 (a different paper); consider key
+  bedllm2025.
+
+\bibitem[Clopper and Pearson(1934)]{clopperpearson1934}
+C.~J. Clopper and E.~S. Pearson.
+\newblock The use of confidence or fiducial limits illustrated in the case of
+  the binomial.
+\newblock \emph{Biometrika}, 26\penalty0 (4):\penalty0 404--413, 1934.
+\newblock \doi{10.1093/biomet/26.4.404}.
+
+\bibitem[Du et~al.(2025)Du, Tian, Ronanki, Rongali, Bodapati, Galstyan, Wells,
+  Schwartz, Huerta, and Peng]{contexthurts2025}
+Yufeng Du, Minyang Tian, Srikanth Ronanki, Subendhu Rongali, Sravan Bodapati,
+  Aram Galstyan, Azton Wells, Roy Schwartz, Eliu~A. Huerta, and Hao Peng.
+\newblock Context length alone hurts {LLM} performance despite perfect
+  retrieval.
+\newblock \emph{arXiv preprint arXiv:2510.05381}, 2025.
+
+\bibitem[Dvoretzky et~al.(1956)Dvoretzky, Kiefer, and Wolfowitz]{dvoretzky1956}
+A.~Dvoretzky, J.~Kiefer, and J.~Wolfowitz.
+\newblock Asymptotic minimax character of the sample distribution function and
+  of the classical multinomial estimator.
+\newblock \emph{The Annals of Mathematical Statistics}, 27\penalty0
+  (3):\penalty0 642--669, 1956.
+\newblock \doi{10.1214/aoms/1177728174}.
+
+\bibitem[Ethayarajh et~al.(2022)Ethayarajh, Choi, and
+  Swayamdipta]{ethayarajh2022}
+Kawin Ethayarajh, Yejin Choi, and Swabha Swayamdipta.
+\newblock Understanding dataset difficulty with $\mathcal{V}$-usable
+  information.
+\newblock In \emph{Proceedings of the 39th International Conference on Machine
+  Learning (ICML)}, volume 162 of \emph{PMLR}, pages 5988--6008, 2022.
+
+\bibitem[Fosse et~al.(2025)Fosse, Bechet, Favre, Damnati, Lecorv{\'e}, Darrin,
+  Formont, and Piantanida]{fosse2025}
+Lo{\"i}c Fosse, Frederic Bechet, Benoit Favre, G{\'e}raldine Damnati,
+  Gw{\'e}nol{\'e} Lecorv{\'e}, Maxime Darrin, Philippe Formont, and Pablo
+  Piantanida.
+\newblock Statistical deficiency for task inclusion estimation.
+\newblock In \emph{Proceedings of the 63rd Annual Meeting of the Association
+  for Computational Linguistics (ACL), Volume 1: Long Papers}, 2025.
+
+\bibitem[Joren et~al.(2024)Joren, Zhang, Ferng, Juan, Taly, and
+  Rashtchian]{sufficientcontext2024}
+Hailey Joren, Jianyi Zhang, Chun-Sung Ferng, Da-Cheng Juan, Ankur Taly, and
+  Cyrus Rashtchian.
+\newblock Sufficient context: A new lens on retrieval augmented generation
+  systems.
+\newblock \emph{arXiv preprint arXiv:2411.06037}, 2024.
+\newblock ICLR 2025.
+
+\bibitem[Le~Cam(1964)]{lecam1964}
+Lucien Le~Cam.
+\newblock Sufficiency and approximate sufficiency.
+\newblock \emph{The Annals of Mathematical Statistics}, 35\penalty0
+  (4):\penalty0 1419--1455, 1964.
+\newblock \doi{10.1214/aoms/1177700372}.
+
+\bibitem[Le~Cam(1986)]{lecam1986}
+Lucien Le~Cam.
+\newblock \emph{Asymptotic Methods in Statistical Decision Theory}.
+\newblock Springer Series in Statistics. Springer, New York, 1986.
+\newblock \doi{10.1007/978-1-4612-4946-7}.
+
+\bibitem[LeVine and Varjavand(2025)]{relevanceutility2025}
+Will LeVine and Bijan Varjavand.
+\newblock Relevance isn't all you need: Scaling {RAG} systems with
+  inference-time compute via multi-criteria reranking.
+\newblock \emph{arXiv preprint arXiv:2504.07104}, 2025.
+\newblock ICLR 2025.
+
+\bibitem[Liu(2026)]{longcontextdegrade2026}
+Ming Liu.
+\newblock More is not always better: Cross-component interference in {LLM}
+  agent scaffolding.
+\newblock \emph{arXiv preprint arXiv:2605.05716}, 2026.
+
+\bibitem[Paxton(2026)]{blackwellrep2026}
+Napoleon Paxton.
+\newblock The theorems of dr. david blackwell and their contributions to
+  artificial intelligence.
+\newblock \emph{arXiv preprint arXiv:2604.06621}, 2026.
+\newblock survey/tribute, NOT a technical sufficiency result -- verify it
+  supports the cited sentence.
+
+\bibitem[Qiu et~al.(2026)Qiu, Han, and Huang]{sureRAG2026}
+Jingxi Qiu, Zeyu Han, and Cheng Huang.
+\newblock {SURE-RAG}: Sufficiency and uncertainty-aware evidence verification
+  for selective retrieval-augmented generation.
+\newblock \emph{arXiv preprint arXiv:2605.03534}, 2026.
+
+\bibitem[Torgersen(1991)]{torgersen1991}
+Erik~N. Torgersen.
+\newblock \emph{Comparison of Statistical Experiments}, volume~36 of
+  \emph{Encyclopedia of Mathematics and its Applications}.
+\newblock Cambridge University Press, Cambridge, 1991.
+\newblock ISBN 9780521250306.
+\newblock \doi{10.1017/CBO9780511666353}.
+
+\bibitem[van Rooyen and Williamson(2014)]{vanrooyen2014}
+Brendan van Rooyen and Robert~C. Williamson.
+\newblock {Le Cam} meets {LeCun}: Deficiency and generic feature learning.
+\newblock \emph{arXiv preprint arXiv:1402.4884}, 2014.
+
+\bibitem[Vinay et~al.(2024)Vinay, Van, and Wu]{inficl2024}
+M.~S. Vinay, Minh-Hao Van, and Xintao Wu.
+\newblock In-context learning demonstration selection via influence analysis.
+\newblock \emph{arXiv preprint arXiv:2402.11750}, 2024.
+
+\bibitem[Wen et~al.(2025)]{paretoprompts2025}
+Guangzhao Wen et~al.
+\newblock Pareto prompt optimization.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2025.
+\newblock OpenReview HGCk5aaSvE; no arXiv preprint (do NOT attach 2402.11711 =
+  MORL-Prompt).
+
+\bibitem[Xie et~al.(2024)Xie, Luo, Stern, Du, and Cheng]{demoshapley2024}
+Shan Xie, Man Luo, Chadly~Daniel Stern, Mengnan Du, and Lu~Cheng.
+\newblock {DemoShapley}: Valuation of demonstrations for in-context learning.
+\newblock \emph{arXiv preprint arXiv:2410.07523}, 2024.
+
+\bibitem[Yu et~al.(2024)Yu, Ping, Liu, Wang, You, Zhang, Shoeybi, and
+  Catanzaro]{rankrag2024}
+Yue Yu, Wei Ping, Zihan Liu, Boxin Wang, Jiaxuan You, Chao Zhang, Mohammad
+  Shoeybi, and Bryan Catanzaro.
+\newblock {RankRAG}: Unifying context ranking with retrieval-augmented
+  generation in {LLMs}.
+\newblock \emph{arXiv preprint arXiv:2407.02485}, 2024.
+\newblock NeurIPS 2024.
+
+\bibitem[Yuan et~al.(2025)Yuan, Yang, Huang, Wang, Fan, Ju, Zhao, and
+  Liu]{cale2025}
+Xiaowei Yuan, Zhao Yang, Ziyang Huang, Yequan Wang, Siqi Fan, Yiming Ju, Jun
+  Zhao, and Kang Liu.
+\newblock Exploiting contextual knowledge in {LLMs} through {V}-usable
+  information based layer enhancement.
+\newblock \emph{arXiv preprint arXiv:2504.15630}, 2025.
+\newblock ACL 2025; method ``CaLE'' = Context-aware Layer Enhancement (NOT a
+  context-evaluation metric).
+
+\end{thebibliography}

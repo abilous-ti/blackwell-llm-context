@@ -1,0 +1,18 @@
+{
+ "generic|W=False": [
+  1,
+  0.0213349
+ ],
+ "generic|W=True": [
+  1,
+  0.022317000000000004
+ ],
+ "idiosyncratic|W=False": [
+  0,
+  0.025500349999999998
+ ],
+ "idiosyncratic|W=True": [
+  1,
+  0.0233151
+ ]
+}

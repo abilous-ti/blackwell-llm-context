@@ -1,0 +1,90 @@
+{
+ "counts": {
+  "none|api_argorder": [
+   1,
+   80
+  ],
+  "W1|api_argorder": [
+   80,
+   80
+  ],
+  "W2|api_argorder": [
+   0,
+   80
+  ],
+  "W1plus|api_argorder": [
+   1,
+   80
+  ]
+ },
+ "estimator": {
+  "hat_delta_W1_W2": 0.0,
+  "hat_delta_W2_W1": 1.0,
+  "argsup_W2_beats_W1": "api_argorder",
+  "argsup_W1_beats_W2": "api_argorder",
+  "incomparable": false
+ },
+ "scalar": {
+  "phi_W1": 0.9875,
+  "phi_W2": -0.0125,
+  "global_rank": "W1 > W2",
+  "pointwise_violations": []
+ },
+ "certificate_incomparable": {
+  "L_AB": -1.0,
+  "L_BA": 0.9098719298646156,
+  "alpha_pair": 0.05,
+  "eta": 0.1,
+  "certified_incomparable": false
+ },
+ "certificate_incomparable_detail": {
+  "api_argorder": {
+   "A_ci": [
+    0.955,
+    1.0
+   ],
+   "B_ci": [
+    0.0,
+    0.045
+   ],
+   "L_AB": -1.0,
+   "L_BA": 0.91
+  }
+ },
+ "dominance": {
+  "hat_delta_W1plus_W2": 0.0,
+  "hat_delta_W2_W1plus": 0.0125,
+  "one_directional": false,
+  "U_D_W1plus_W2": 0.04474761254005942,
+  "alpha_tol": 0.15,
+  "dom_certified": true,
+  "strict_other_way": false
+ },
+ "interference": {
+  "detail": {
+   "api_argorder": {
+    "I_T": -0.975,
+    "I_T_upper": -0.792,
+    "certified_harm": true
+   }
+  },
+  "certified_tasks": [
+   "api_argorder"
+  ],
+  "alpha": 0.025,
+  "tau": 0.3
+ },
+ "order_control": null,
+ "runtime_tokens": {
+  "api_argorder": {
+   "W1": 796.0,
+   "W1plus": 1683.1,
+   "rel": 1.114
+  }
+ },
+ "n_per_cell": 80,
+ "eta": 0.1,
+ "total_cost_usd": 10.4106288,
+ "required_n_halfwidth_0.15": 83,
+ "mock": false
+}

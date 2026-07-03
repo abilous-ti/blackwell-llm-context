@@ -1,0 +1,376 @@
+{
+ "model": "claude-haiku-4-5-20251001",
+ "mode": "real",
+ "runs": 3,
+ "alpha": 0.05,
+ "M_cert": 24,
+ "alpha_corr": 0.0020833333333333333,
+ "alpha_tol": 0.15,
+ "abs_D": 6,
+ "total_cost_usd": 0.1364,
+ "incomparability_note": "W1 (the call contract) and W2 (the wire encoding) are Blackwell-incomparable because they\nreveal logically independent coordinates of the latent module spec S. (1) W2 is not a\ngarbling of W1: no Markov kernel applied to the call-contract signal alone can output the\ncents-scale, the '#' separator, or the (sum-of-digits mod 10) check digit -- those are facts\nabsent from W1's sigma-algebra, so producing them would inject information the kernel does\nnot possess. (2) W1 is not a garbling of W2: no kernel on the wire-encoding signal alone can\noutput the private argument order (amount-first), the required keyword-only memo, or the\nLedgerRejection exception type. Neither signal refines the other, so neither sufficiency\ndirection holds -> incomparable. The dominance control is the contrast: W1plus = W2 ++ W1\nliterally contains W2's signal, so the projection 'drop the contract sentences' IS a valid\ngarbling W1plus -> W2, giving W1plus >=_B W2 one-directionally. CONFOUND DEFENSE: the two\nsources are matched on every nuisance axis (length, one-unguessable-fact-each, same module,\nsame short solution.py + snippet-verifier task shape); the ONLY thing varied is which\ncoordinate of S is revealed. Task difficulty is ruled out by the DOUBLE crossover at MATCHED\nNEAR-ZERO no-context floors (pre-registered and measured first): if the encode family were\nmerely 'harder', W1 would not lift it AND W2 would still not lift the api family -- but each\nsource lifts ONLY its own family from the same ~0 floor, so the lift is information-specific,\nnot difficulty-specific.",
+ "rows": [
+  {
+   "task": "api_record",
+   "family": "api",
+   "cond": "none",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0579
+  },
+  {
+   "task": "api_record",
+   "family": "api",
+   "cond": "W1",
+   "k": 3,
+   "n": 3,
+   "pass": 1.0,
+   "cost": 0.0592
+  },
+  {
+   "task": "api_record",
+   "family": "api",
+   "cond": "W2",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0192
+  },
+  {
+   "task": "api_record",
+   "family": "api",
+   "cond": "W1plus",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "api_reject",
+   "family": "api",
+   "cond": "none",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "api_reject",
+   "family": "api",
+   "cond": "W1",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "api_reject",
+   "family": "api",
+   "cond": "W2",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "api_reject",
+   "family": "api",
+   "cond": "W1plus",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "api_memo_kw",
+   "family": "api",
+   "cond": "none",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "api_memo_kw",
+   "family": "api",
+   "cond": "W1",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "api_memo_kw",
+   "family": "api",
+   "cond": "W2",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "api_memo_kw",
+   "family": "api",
+   "cond": "W1plus",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "api_argorder",
+   "family": "api",
+   "cond": "none",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "api_argorder",
+   "family": "api",
+   "cond": "W1",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "api_argorder",
+   "family": "api",
+   "cond": "W2",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "api_argorder",
+   "family": "api",
+   "cond": "W1plus",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "enc_encode",
+   "family": "enc",
+   "cond": "none",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "enc_encode",
+   "family": "enc",
+   "cond": "W1",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "enc_encode",
+   "family": "enc",
+   "cond": "W2",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "enc_encode",
+   "family": "enc",
+   "cond": "W1plus",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "enc_decode",
+   "family": "enc",
+   "cond": "none",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "enc_decode",
+   "family": "enc",
+   "cond": "W1",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "enc_decode",
+   "family": "enc",
+   "cond": "W2",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  },
+  {
+   "task": "enc_decode",
+   "family": "enc",
+   "cond": "W1plus",
+   "k": 0,
+   "n": 3,
+   "pass": 0.0,
+   "cost": 0.0
+  }
+ ],
+ "floors": {
+  "api_record": {
+   "k": 0,
+   "n": 3,
+   "rate": 0.0,
+   "upper_ci": 0.899
+  },
+  "api_reject": {
+   "k": 0,
+   "n": 3,
+   "rate": 0.0,
+   "upper_ci": 0.899
+  },
+  "api_memo_kw": {
+   "k": 0,
+   "n": 3,
+   "rate": 0.0,
+   "upper_ci": 0.899
+  },
+  "api_argorder": {
+   "k": 0,
+   "n": 3,
+   "rate": 0.0,
+   "upper_ci": 0.899
+  },
+  "enc_encode": {
+   "k": 0,
+   "n": 3,
+   "rate": 0.0,
+   "upper_ci": 0.899
+  },
+  "enc_decode": {
+   "k": 0,
+   "n": 3,
+   "rate": 0.0,
+   "upper_ci": 0.899
+  }
+ },
+ "scalar_bm25": [
+  {
+   "task": "api_record",
+   "family": "api",
+   "truth": "W1",
+   "bm25_W1": 9.746,
+   "bm25_W2": 6.654,
+   "bm25_pick": "W1",
+   "bm25_wrong": false,
+   "jac_W1": 0.237,
+   "jac_W2": 0.179,
+   "ovl_W1": 22.0,
+   "ovl_W2": 17.0
+  },
+  {
+   "task": "api_reject",
+   "family": "api",
+   "truth": "W1",
+   "bm25_W1": 13.719,
+   "bm25_W2": 6.186,
+   "bm25_pick": "W1",
+   "bm25_wrong": false,
+   "jac_W1": 0.255,
+   "jac_W2": 0.162,
+   "ovl_W1": 24.0,
+   "ovl_W2": 16.0
+  },
+  {
+   "task": "api_memo_kw",
+   "family": "api",
+   "truth": "W1",
+   "bm25_W1": 5.967,
+   "bm25_W2": 3.902,
+   "bm25_pick": "W1",
+   "bm25_wrong": false,
+   "jac_W1": 0.174,
+   "jac_W2": 0.129,
+   "ovl_W1": 16.0,
+   "ovl_W2": 12.0
+  },
+  {
+   "task": "api_argorder",
+   "family": "api",
+   "truth": "W1",
+   "bm25_W1": 8.015,
+   "bm25_W2": 4.901,
+   "bm25_pick": "W1",
+   "bm25_wrong": false,
+   "jac_W1": 0.202,
+   "jac_W2": 0.146,
+   "ovl_W1": 19.0,
+   "ovl_W2": 14.0
+  },
+  {
+   "task": "enc_encode",
+   "family": "enc",
+   "truth": "W2",
+   "bm25_W1": 7.885,
+   "bm25_W2": 6.246,
+   "bm25_pick": "W1",
+   "bm25_wrong": true,
+   "jac_W1": 0.187,
+   "jac_W2": 0.154,
+   "ovl_W1": 17.0,
+   "ovl_W2": 14.0
+  },
+  {
+   "task": "enc_decode",
+   "family": "enc",
+   "truth": "W2",
+   "bm25_W1": 6.907,
+   "bm25_W2": 14.798,
+   "bm25_pick": "W2",
+   "bm25_wrong": false,
+   "jac_W1": 0.147,
+   "jac_W2": 0.218,
+   "ovl_W1": 14.0,
+   "ovl_W2": 19.0
+  }
+ ],
+ "deficiencies": {
+  "W1_W2": 1.0,
+  "W2_W1": 0.0,
+  "W1plus_W2": 0.0,
+  "W2_W1plus": 0.0
+ },
+ "verdicts": {
+  "incomparable_point": false,
+  "incomparable_certified": false,
+  "cert_W2_beats_W1": [],
+  "cert_W1_beats_W2": [],
+  "dominance_point": false,
+  "dominance_robust": false,
+  "dominance_full_certified": false,
+  "dom_sup_point": 0.0,
+  "dom_sup_upper": 0.8986,
+  "cert_W1plus_beats_W2": [],
+  "cert_W1_lift_over_none": [],
+  "cert_W2_lift_over_none": [],
+  "misrank": false,
+  "misrank_tasks": [],
+  "floor_ok": true,
+  "verdict": "C2 anchor NOT established on this run -- see failed criteria above"
+ },
+ "required_n": {
+  "n_incomparability": 14,
+  "n_dominance_full_cert": 162
+ }
+}

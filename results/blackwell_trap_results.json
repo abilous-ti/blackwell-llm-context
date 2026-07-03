@@ -1,0 +1,66 @@
+{
+ "counts": {
+  "none|trap_store_wire": [
+   0,
+   10
+  ],
+  "W1|trap_store_wire": [
+   8,
+   10
+  ],
+  "W2|trap_store_wire": [
+   0,
+   10
+  ]
+ },
+ "estimator": {
+  "hat_delta_W1_W2": 0.0,
+  "hat_delta_W2_W1": 0.8,
+  "argsup_W2_beats_W1": "trap_store_wire",
+  "argsup_W1_beats_W2": "trap_store_wire",
+  "incomparable": false
+ },
+ "scalar": {
+  "phi_W1": 0.8,
+  "phi_W2": 0.0,
+  "global_rank": "W1 > W2",
+  "pointwise_violations": [
+   "trap_store_wire"
+  ]
+ },
+ "certificate_incomparable": {
+  "L_AB": -0.9747892736731667,
+  "L_BA": 0.13540742987359788,
+  "alpha_pair": 0.05,
+  "eta": 0.1,
+  "certified_incomparable": false
+ },
+ "certificate_incomparable_detail": {
+  "trap_store_wire": {
+   "A_ci": [
+    0.444,
+    0.975
+   ],
+   "B_ci": [
+    0.0,
+    0.308
+   ],
+   "L_AB": -0.975,
+   "L_BA": 0.135
+  }
+ },
+ "dominance": {
+  "hat_delta_W1plus_W2": null,
+  "hat_delta_W2_W1plus": null,
+  "one_directional": false,
+  "U_D_W1plus_W2": null,
+  "alpha_tol": 0.15,
+  "dom_certified": false,
+  "strict_other_way": false
+ },
+ "n_per_cell": 10,
+ "eta": 0.1,
+ "total_cost_usd": 0.9714670999999999,
+ "required_n_halfwidth_0.15": 83,
+ "mock": false
+}
