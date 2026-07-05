@@ -1,0 +1,31 @@
+BLACKWELL S6 anchor REAL | n=10/cell | arms=['none', 'W1', 'W2'] tasks=['trap_store_wire'] | 30 claude runs | eta=0.1
+
+  arm=none   trap_store_wire  PASS 0/10=0%  $0.0353
+  arm=W1     trap_store_wire  PASS 8/10=80%  $0.0285
+  arm=W2     trap_store_wire  PASS 0/10=0%  $0.0334
+
+total measured spend = $0.9715  (n=10/cell, 30 runs)
+==============================================================================
+(A) INCOMPARABILITY (estimator)
+    hat_delta_D(W1,W2) = +0.00  (sup at task 'trap_store_wire': W2 beats W1)
+    hat_delta_D(W2,W1) = +0.80  (sup at task 'trap_store_wire': W1 beats W2)
+    both > 0 ? False  -> NOT shown
+    CERTIFICATE (uniform, alpha_pair=eta/2|D|=0.0500):
+      L_D(W1,W2) lower bound on sup[PASS(W2)-PASS(W1)] = -0.975
+      L_D(W2,W1) lower bound on sup[PASS(W1)-PASS(W2)] = +0.135
+      certified incomparable at >= 90% ? False
+
+(B) SCALAR MIS-RANK (Theorem 3 instantiated)
+  (B1) outcome-aggregate phi (mean PASS lift, CIRCULAR/contrast only): phi(W1)=+0.80, phi(W2)=+0.00 -> ranks W1 > W2 globally
+  (B2) query-conditioned lexical relevance phi_lex(W,T) vs realized PASS:
+      trap_store_wire  relevance(W1,W2)=(0.36,0.44)->W2>W1  PASS(W1,W2)=(80%,0%)->W1>W2   <== RELEVANCE MIS-RANKS
+    [OK] STRONG Thm-3: on 'trap_store_wire' relevance prefers W2 but PASS prefers W1 -> no query-conditioned relevance score can rank these sources correctly for all tasks.
+
+(C) DOMINANCE control: SKIPPED (W1plus not in --arms)
+
+==============================================================================
+sample-size (alpha_pair=eta/2|D|, |D|=7):
+  worst case (p~0.5, CP half-width<=0.15): n >= 83/cell.
+  STARK crossover (clean ~0% vs ~100%, as designed): n >= 9/cell -> START HERE; raise n only if the real split is noisy.
+==============================================================================
+wrote C:\Users\AndriyBilous\Documents\GitHub\tokenguard\blackwell_trap_results.json

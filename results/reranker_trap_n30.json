@@ -1,0 +1,66 @@
+{
+ "model": "claude-haiku-4-5-20251001",
+ "n_per_order": 15,
+ "results": {
+  "trap_store_wire": {
+   "W1_first": 30,
+   "W2_first": 0,
+   "null": 0,
+   "by_order": {
+    "W1A": {
+     "W1": 15,
+     "W2": 0,
+     "null": 0
+    },
+    "W1B": {
+     "W1": 15,
+     "W2": 0,
+     "null": 0
+    }
+   },
+   "reranker_top": "W1",
+   "pass_truth": "W1",
+   "agrees_with_PASS": true
+  },
+  "api_post_ok": {
+   "W1_first": 30,
+   "W2_first": 0,
+   "null": 0,
+   "by_order": {
+    "W1A": {
+     "W1": 15,
+     "W2": 0,
+     "null": 0
+    },
+    "W1B": {
+     "W1": 15,
+     "W2": 0,
+     "null": 0
+    }
+   },
+   "reranker_top": "W1",
+   "pass_truth": "W1",
+   "agrees_with_PASS": true
+  },
+  "enc_amount": {
+   "W1_first": 0,
+   "W2_first": 30,
+   "null": 0,
+   "by_order": {
+    "W1A": {
+     "W1": 0,
+     "W2": 15,
+     "null": 0
+    },
+    "W1B": {
+     "W1": 0,
+     "W2": 15,
+     "null": 0
+    }
+   },
+   "reranker_top": "W2",
+   "pass_truth": "W2",
+   "agrees_with_PASS": true
+  }
+ }
+}

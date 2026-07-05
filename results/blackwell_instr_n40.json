@@ -1,0 +1,136 @@
+{
+ "counts": {
+  "none|api_post_ok": [
+   0,
+   40
+  ],
+  "none|api_argorder": [
+   2,
+   40
+  ],
+  "W1|api_post_ok": [
+   20,
+   40
+  ],
+  "W1|api_argorder": [
+   40,
+   40
+  ],
+  "W2|api_post_ok": [
+   0,
+   40
+  ],
+  "W2|api_argorder": [
+   0,
+   40
+  ],
+  "W1plus|api_post_ok": [
+   9,
+   40
+  ],
+  "W1plus|api_argorder": [
+   1,
+   40
+  ],
+  "W1plus_instr|api_post_ok": [
+   27,
+   40
+  ],
+  "W1plus_instr|api_argorder": [
+   32,
+   40
+  ]
+ },
+ "estimator": {
+  "hat_delta_W1_W2": 0.0,
+  "hat_delta_W2_W1": 1.0,
+  "argsup_W2_beats_W1": "api_post_ok",
+  "argsup_W1_beats_W2": "api_argorder",
+  "incomparable": false
+ },
+ "scalar": {
+  "phi_W1": 0.725,
+  "phi_W2": -0.025,
+  "global_rank": "W1 > W2",
+  "pointwise_violations": []
+ },
+ "certificate_incomparable": {
+  "L_AB": -0.6821156461992741,
+  "L_BA": 0.7924735091993695,
+  "alpha_pair": 0.025,
+  "eta": 0.1,
+  "certified_incomparable": false
+ },
+ "certificate_incomparable_detail": {
+  "api_post_ok": {
+   "A_ci": [
+    0.318,
+    0.682
+   ],
+   "B_ci": [
+    0.0,
+    0.104
+   ],
+   "L_AB": -0.682,
+   "L_BA": 0.214
+  },
+  "api_argorder": {
+   "A_ci": [
+    0.896,
+    1.0
+   ],
+   "B_ci": [
+    0.0,
+    0.104
+   ],
+   "L_AB": -1.0,
+   "L_BA": 0.792
+  }
+ },
+ "dominance": {
+  "hat_delta_W1plus_W2": 0.0,
+  "hat_delta_W2_W1plus": 0.225,
+  "one_directional": false,
+  "U_D_W1plus_W2": 0.1034488252855117,
+  "alpha_tol": 0.15,
+  "dom_certified": true,
+  "strict_other_way": false
+ },
+ "interference": {
+  "detail": {
+   "api_post_ok": {
+    "I_T": -0.275,
+    "I_T_upper": 0.193,
+    "certified_harm": false
+   },
+   "api_argorder": {
+    "I_T": -0.925,
+    "I_T_upper": -0.559,
+    "certified_harm": true
+   }
+  },
+  "certified_tasks": [
+   "api_argorder"
+  ],
+  "alpha": 0.025,
+  "tau": 0.3
+ },
+ "order_control": null,
+ "runtime_tokens": {
+  "api_post_ok": {
+   "W1": 476.9,
+   "W1plus": 841.5,
+   "rel": 0.764
+  },
+  "api_argorder": {
+   "W1": 474.7,
+   "W1plus": 1176.9,
+   "rel": 1.479
+  }
+ },
+ "n_per_cell": 40,
+ "eta": 0.1,
+ "total_cost_usd": 7.904432,
+ "required_n_halfwidth_0.15": 83,
+ "mock": false
+}

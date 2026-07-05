@@ -1,0 +1,77 @@
+BLACKWELL S6 anchor REAL | n=8/cell | arms=['none', 'W1', 'W2', 'W1plus', 'W1plus_rev'] tasks=['api_post_ok', 'api_argorder', 'api_error_type', 'api_memo_required'] | 160 claude runs | eta=0.1
+
+  arm=none   api_post_ok      PASS 0/8=0%  $0.0286
+  arm=none   api_argorder     PASS 1/8=12%  $0.0307
+  arm=none   api_error_type   PASS 3/8=38%  $0.0353
+  arm=none   api_memo_required PASS 2/8=25%  $0.0344
+  arm=W1     api_post_ok      PASS 5/8=62%  $0.0275
+  arm=W1     api_argorder     PASS 8/8=100%  $0.0272
+  arm=W1     api_error_type   PASS 7/8=88%  $0.0284
+  arm=W1     api_memo_required PASS 7/8=88%  $0.0277
+  arm=W2     api_post_ok      PASS 0/8=0%  $0.0361
+  arm=W2     api_argorder     PASS 0/8=0%  $0.0365
+  arm=W2     api_error_type   PASS 8/8=100%  $0.0386
+  arm=W2     api_memo_required PASS 0/8=0%  $0.0357
+  arm=W1plus api_post_ok      PASS 2/8=25%  $0.0312
+  arm=W1plus api_argorder     PASS 3/8=38%  $0.0327
+  arm=W1plus api_error_type   PASS 8/8=100%  $0.0356
+  arm=W1plus api_memo_required PASS 2/8=25%  $0.0306
+  arm=W1plus_rev api_post_ok      PASS 0/8=0%  $0.0352
+  arm=W1plus_rev api_argorder     PASS 6/8=75%  $0.0294
+  arm=W1plus_rev api_error_type   PASS 7/8=88%  $0.0314
+  arm=W1plus_rev api_memo_required PASS 0/8=0%  $0.0352
+
+total measured spend = $5.1833  (n=8/cell, 160 runs)
+==============================================================================
+(A) INCOMPARABILITY (estimator)
+    hat_delta_D(W1,W2) = +0.12  (sup at task 'api_error_type': W2 beats W1)
+    hat_delta_D(W2,W1) = +1.00  (sup at task 'api_argorder': W1 beats W2)
+    both > 0 ? True  -> MUTUAL positive deficiency = EMPIRICAL INCOMPARABILITY
+    CERTIFICATE (uniform, alpha_pair=eta/2|D|=0.0125):
+      L_D(W1,W2) lower bound on sup[PASS(W2)-PASS(W1)] = -0.469
+      L_D(W2,W1) lower bound on sup[PASS(W1)-PASS(W2)] = +0.061
+      certified incomparable at >= 90% ? False
+
+(B) SCALAR MIS-RANK (Theorem 3 instantiated)
+  (B1) outcome-aggregate phi (mean PASS lift, CIRCULAR/contrast only): phi(W1)=+0.66, phi(W2)=+0.06 -> ranks W1 > W2 globally
+  (B2) query-conditioned lexical relevance phi_lex(W,T) vs realized PASS:
+      api_post_ok      relevance(W1,W2)=(0.42,0.25)->W1>W2  PASS(W1,W2)=(62%,0%)->W1>W2 
+      api_argorder     relevance(W1,W2)=(0.27,0.17)->W1>W2  PASS(W1,W2)=(100%,0%)->W1>W2 
+      api_error_type   relevance(W1,W2)=(0.43,0.19)->W1>W2  PASS(W1,W2)=(88%,100%)->W2>W1   <== RELEVANCE MIS-RANKS
+      api_memo_required relevance(W1,W2)=(0.44,0.25)->W1>W2  PASS(W1,W2)=(88%,0%)->W1>W2 
+    [OK] STRONG Thm-3: on 'api_error_type' relevance prefers W1 but PASS prefers W2 -> no query-conditioned relevance score can rank these sources correctly for all tasks.
+
+(C) DOMINANCE control: W1plus = W2 ++ W1 (literal superset of W2's signal)
+    hat_delta_D(W1plus,W2) = +0.00  (expect 0: no task where W2 beats W1plus)
+    hat_delta_D(W2,W1plus) = +0.38  (expect >0: W1plus wins API tasks)
+    CERTIFICATE (uniform, alpha_pair=(eta/2)/|D|=0.0125, margin alpha_tol=0.15):
+      U_D(W1plus,W2) upper bound on sup[PASS(W2)-PASS(W1plus)] = 0.470
+      delta_D(W1plus,W2) <= 0.15 certified ? False   AND W1plus strictly beats W2 somewhere (certified) ? False
+    one-directional (W1plus dominates W2) ? False  -> not clean at this n -- raise --runs
+
+(D) INTERFERENCE I_T = PASS(W1plus)-PASS(W1)-PASS(W2)+PASS(none) (certify harm I_T<=-0.3, alpha=eta/4):
+      api_post_ok      I_T=-0.38  upper=+0.91
+      api_argorder     I_T=-0.50  upper=+0.79
+      api_error_type   I_T=-0.50  upper=+0.79
+      api_memo_required I_T=-0.38  upper=+0.96
+    certified-harm tasks: NONE at this n (I_T compounds 4 cells; needs ~n>=80/cell -- the harm is real in the point estimates but not yet CERTIFIED here)
+
+(E) ORDER control: W1plus (W2++W1, W1 last) vs W1plus_rev (W1++W2, W1 first)
+      api_post_ok      W1plus=25%  W1plus_rev=0%  gap=-25%
+      api_argorder     W1plus=38%  W1plus_rev=75%  gap=+38%
+      api_error_type   W1plus=100%  W1plus_rev=88%  gap=-12%
+      api_memo_required W1plus=25%  W1plus_rev=0%  gap=-25%
+    max |gap| = 38% -> ORDER MATTERS (reorder changes PASS) -> harm is partly positional
+
+(F) RUNTIME tell: paired output_tokens W1plus vs W1 (same task)
+      api_post_ok      W1=812tok  W1plus=1441tok  (+78%)
+      api_argorder     W1=717tok  W1plus=1447tok  (+102%)
+      api_error_type   W1=844tok  W1plus=1823tok  (+116%)
+      api_memo_required W1=788tok  W1plus=1214tok  (+54%)
+
+==============================================================================
+sample-size (alpha_pair=eta/2|D|, |D|=7):
+  worst case (p~0.5, CP half-width<=0.15): n >= 83/cell.
+  STARK crossover (clean ~0% vs ~100%, as designed): n >= 9/cell -> START HERE; raise n only if the real split is noisy.
+==============================================================================
+wrote C:\Users\AndriyBilous\Documents\GitHub\tokenguard\blackwell_orderC_results.json

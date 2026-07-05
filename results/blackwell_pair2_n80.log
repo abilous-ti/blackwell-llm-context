@@ -1,0 +1,46 @@
+BLACKWELL S6 anchor REAL | n=80/cell | arms=['none', 'W1', 'W2', 'W1plus'] tasks=['cache_put_ok'] | 320 claude runs | eta=0.1
+
+  model = claude-haiku-4-5-20251001
+  arm=none   cache_put_ok     PASS 0/80=0%  $0.0337
+  arm=W1     cache_put_ok     PASS 64/80=80%  $0.0261
+  arm=W2     cache_put_ok     PASS 0/80=0%  $0.0367
+  arm=W1plus cache_put_ok     PASS 23/80=29%  $0.0291
+
+total measured spend = $10.0493  (n=80/cell, 320 runs)
+==============================================================================
+(A) INCOMPARABILITY (estimator)
+    hat_delta_D(W1,W2) = +0.00  (sup at task 'cache_put_ok': W2 beats W1)
+    hat_delta_D(W2,W1) = +0.80  (sup at task 'cache_put_ok': W1 beats W2)
+    both > 0 ? False  -> NOT shown
+    CERTIFICATE (uniform, alpha_pair=eta/2|D|=0.0500):
+      L_D(W1,W2) lower bound on sup[PASS(W2)-PASS(W1)] = -0.881
+      L_D(W2,W1) lower bound on sup[PASS(W1)-PASS(W2)] = +0.651
+      certified incomparable at >= 90% ? False
+
+(B) SCALAR MIS-RANK (Theorem 3 instantiated)
+  (B1) outcome-aggregate phi (mean PASS lift, CIRCULAR/contrast only): phi(W1)=+0.80, phi(W2)=+0.00 -> ranks W1 > W2 globally
+  (B2) query-conditioned lexical relevance phi_lex(W,T) vs realized PASS:
+      cache_put_ok     relevance(W1,W2)=(0.45,0.26)->W1>W2  PASS(W1,W2)=(80%,0%)->W1>W2 
+    [--] no query-conditioned relevance mis-rank at this n -- the STRONG claim is NOT demonstrated on this sample (honest null; raise --runs or revisit the trap task). The source-level incomparability in (A) still holds for query-INDEPENDENT ranking.
+
+(C) DOMINANCE control: W1plus = W2 ++ W1 (literal superset of W2's signal)
+    hat_delta_D(W1plus,W2) = +0.00  (expect 0: no task where W2 beats W1plus)
+    hat_delta_D(W2,W1plus) = +0.29  (expect >0: W1plus wins API tasks)
+    CERTIFICATE (uniform, alpha_pair=(eta/2)/|D|=0.0500, margin alpha_tol=0.15):
+      U_D(W1plus,W2) upper bound on sup[PASS(W2)-PASS(W1plus)] = 0.000
+      delta_D(W1plus,W2) <= 0.15 certified ? True   AND W1plus strictly beats W2 somewhere (certified) ? True
+    one-directional (W1plus dominates W2) ? True  -> for-all-tasks dominance REALIZED
+
+(D) INTERFERENCE I_T = PASS(W1plus)-PASS(W1)-PASS(W2)+PASS(none) (certify harm I_T<=-0.3, alpha=eta/4):
+      cache_put_ok     I_T=-0.51  upper=-0.21
+    certified-harm tasks: NONE at this n (I_T compounds 4 cells; needs ~n>=80/cell -- the harm is real in the point estimates but not yet CERTIFIED here)
+
+(F) RUNTIME tell: paired output_tokens W1plus vs W1 (same task)
+      cache_put_ok     W1=796tok  W1plus=1265tok  (+59%)
+
+==============================================================================
+sample-size (alpha_pair=eta/2|D|, |D|=3):
+  worst case (p~0.5, CP half-width<=0.15): n >= 67/cell.
+  STARK crossover (clean ~0% vs ~100%, as designed): n >= 7/cell -> START HERE; raise n only if the real split is noisy.
+==============================================================================
+wrote C:\Users\AndriyBilous\Documents\GitHub\tokenguard\tokenbench\blackwell_pair2_n80.json

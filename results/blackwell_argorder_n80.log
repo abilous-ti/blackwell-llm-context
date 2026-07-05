@@ -1,0 +1,45 @@
+BLACKWELL S6 anchor REAL | n=80/cell | arms=['none', 'W1', 'W2', 'W1plus'] tasks=['api_argorder'] | 320 claude runs | eta=0.1
+
+  arm=none   api_argorder     PASS 1/80=1%  $0.0318
+  arm=W1     api_argorder     PASS 80/80=100%  $0.0279
+  arm=W2     api_argorder     PASS 0/80=0%  $0.0362
+  arm=W1plus api_argorder     PASS 1/80=1%  $0.0342
+
+total measured spend = $10.4106  (n=80/cell, 320 runs)
+==============================================================================
+(A) INCOMPARABILITY (estimator)
+    hat_delta_D(W1,W2) = +0.00  (sup at task 'api_argorder': W2 beats W1)
+    hat_delta_D(W2,W1) = +1.00  (sup at task 'api_argorder': W1 beats W2)
+    both > 0 ? False  -> NOT shown
+    CERTIFICATE (uniform, alpha_pair=eta/2|D|=0.0500):
+      L_D(W1,W2) lower bound on sup[PASS(W2)-PASS(W1)] = -1.000
+      L_D(W2,W1) lower bound on sup[PASS(W1)-PASS(W2)] = +0.910
+      certified incomparable at >= 90% ? False
+
+(B) SCALAR MIS-RANK (Theorem 3 instantiated)
+  (B1) outcome-aggregate phi (mean PASS lift, CIRCULAR/contrast only): phi(W1)=+0.99, phi(W2)=-0.01 -> ranks W1 > W2 globally
+  (B2) query-conditioned lexical relevance phi_lex(W,T) vs realized PASS:
+      api_argorder     relevance(W1,W2)=(0.30,0.20)->W1>W2  PASS(W1,W2)=(100%,0%)->W1>W2 
+    [--] no query-conditioned relevance mis-rank at this n -- the STRONG claim is NOT demonstrated on this sample (honest null; raise --runs or revisit the trap task). The source-level incomparability in (A) still holds for query-INDEPENDENT ranking.
+
+(C) DOMINANCE control: W1plus = W2 ++ W1 (literal superset of W2's signal)
+    hat_delta_D(W1plus,W2) = +0.00  (expect 0: no task where W2 beats W1plus)
+    hat_delta_D(W2,W1plus) = +0.01  (expect >0: W1plus wins API tasks)
+    CERTIFICATE (uniform, alpha_pair=(eta/2)/|D|=0.0500, margin alpha_tol=0.15):
+      U_D(W1plus,W2) upper bound on sup[PASS(W2)-PASS(W1plus)] = 0.045
+      delta_D(W1plus,W2) <= 0.15 certified ? True   AND W1plus strictly beats W2 somewhere (certified) ? False
+    one-directional (W1plus dominates W2) ? False  -> not clean at this n -- raise --runs
+
+(D) INTERFERENCE I_T = PASS(W1plus)-PASS(W1)-PASS(W2)+PASS(none) (certify harm I_T<=-0.3, alpha=eta/4):
+      api_argorder     I_T=-0.97  upper=-0.79  <== CERTIFIED HARM
+    certified-harm tasks: ['api_argorder']
+
+(F) RUNTIME tell: paired output_tokens W1plus vs W1 (same task)
+      api_argorder     W1=796tok  W1plus=1683tok  (+111%)
+
+==============================================================================
+sample-size (alpha_pair=eta/2|D|, |D|=7):
+  worst case (p~0.5, CP half-width<=0.15): n >= 83/cell.
+  STARK crossover (clean ~0% vs ~100%, as designed): n >= 9/cell -> START HERE; raise n only if the real split is noisy.
+==============================================================================
+wrote C:\Users\AndriyBilous\Documents\GitHub\tokenguard\blackwell_argorder_n80.json

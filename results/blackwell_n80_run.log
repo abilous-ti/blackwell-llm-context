@@ -1,0 +1,77 @@
+BLACKWELL S6 anchor REAL | n=80/cell | arms=['none', 'W1', 'W2', 'W1plus', 'W1plus_rev'] tasks=['api_post_ok', 'api_argorder', 'enc_amount', 'trap_store_wire'] | 1600 claude runs | eta=0.1
+
+  arm=none   api_post_ok      PASS 0/80=0%  $0.0293
+  arm=none   api_argorder     PASS 32/80=40%  $0.0323
+  arm=none   enc_amount       PASS 0/80=0%  $0.0252
+  arm=none   trap_store_wire  PASS 0/80=0%  $0.0340
+  arm=W1     api_post_ok      PASS 78/80=98%  $0.0271
+  arm=W1     api_argorder     PASS 80/80=100%  $0.0277
+  arm=W1     enc_amount       PASS 0/80=0%  $0.0236
+  arm=W1     trap_store_wire  PASS 77/80=96%  $0.0291
+  arm=W2     api_post_ok      PASS 0/80=0%  $0.0350
+  arm=W2     api_argorder     PASS 6/80=8%  $0.0359
+  arm=W2     enc_amount       PASS 80/80=100%  $0.0379
+  arm=W2     trap_store_wire  PASS 0/80=0%  $0.0335
+  arm=W1plus api_post_ok      PASS 19/80=24%  $0.0333
+  arm=W1plus api_argorder     PASS 19/80=24%  $0.0325
+  arm=W1plus enc_amount       PASS 80/80=100%  $0.0395
+  arm=W1plus trap_store_wire  PASS 78/80=98%  $0.0305
+  arm=W1plus_rev api_post_ok      PASS 1/80=1%  $0.0340
+  arm=W1plus_rev api_argorder     PASS 35/80=44%  $0.0316
+  arm=W1plus_rev enc_amount       PASS 80/80=100%  $0.0391
+  arm=W1plus_rev trap_store_wire  PASS 79/80=99%  $0.0313
+
+total measured spend = $51.4009  (n=80/cell, 1600 runs)
+==============================================================================
+(A) INCOMPARABILITY (estimator)
+    hat_delta_D(W1,W2) = +1.00  (sup at task 'enc_amount': W2 beats W1)
+    hat_delta_D(W2,W1) = +0.97  (sup at task 'api_post_ok': W1 beats W2)
+    both > 0 ? True  -> MUTUAL positive deficiency = EMPIRICAL INCOMPARABILITY
+    CERTIFICATE (uniform, alpha_pair=eta/2|D|=0.0125):
+      L_D(W1,W2) lower bound on sup[PASS(W2)-PASS(W1)] = +0.877
+      L_D(W2,W1) lower bound on sup[PASS(W1)-PASS(W2)] = +0.831
+      certified incomparable at >= 90% ? True
+
+(B) SCALAR MIS-RANK (Theorem 3 instantiated)
+  (B1) outcome-aggregate phi (mean PASS lift, CIRCULAR/contrast only): phi(W1)=+0.63, phi(W2)=+0.17 -> ranks W1 > W2 globally
+  (B2) query-conditioned lexical relevance phi_lex(W,T) vs realized PASS:
+      api_post_ok      relevance(W1,W2)=(0.42,0.25)->W1>W2  PASS(W1,W2)=(98%,0%)->W1>W2 
+      api_argorder     relevance(W1,W2)=(0.27,0.17)->W1>W2  PASS(W1,W2)=(100%,8%)->W1>W2 
+      enc_amount       relevance(W1,W2)=(0.21,0.27)->W2>W1  PASS(W1,W2)=(0%,100%)->W2>W1 
+      trap_store_wire  relevance(W1,W2)=(0.36,0.44)->W2>W1  PASS(W1,W2)=(96%,0%)->W1>W2   <== RELEVANCE MIS-RANKS
+    [OK] STRONG Thm-3: on 'trap_store_wire' relevance prefers W2 but PASS prefers W1 -> no query-conditioned relevance score can rank these sources correctly for all tasks.
+
+(C) DOMINANCE control: W1plus = W2 ++ W1 (literal superset of W2's signal)
+    hat_delta_D(W1plus,W2) = +0.00  (expect 0: no task where W2 beats W1plus)
+    hat_delta_D(W2,W1plus) = +0.97  (expect >0: W1plus wins API tasks)
+    CERTIFICATE (uniform, alpha_pair=(eta/2)/|D|=0.0125, margin alpha_tol=0.15):
+      U_D(W1plus,W2) upper bound on sup[PASS(W2)-PASS(W1plus)] = 0.061
+      delta_D(W1plus,W2) <= 0.15 certified ? True   AND W1plus strictly beats W2 somewhere (certified) ? True
+    one-directional (W1plus dominates W2) ? True  -> for-all-tasks dominance REALIZED
+
+(D) INTERFERENCE I_T = PASS(W1plus)-PASS(W1)-PASS(W2)+PASS(none) (certify harm I_T<=-0.3, alpha=eta/4):
+      api_post_ok      I_T=-0.74  upper=-0.49  <== CERTIFIED HARM
+      api_argorder     I_T=-0.44  upper=-0.08
+      enc_amount       I_T=+0.00  upper=+0.11
+      trap_store_wire  I_T=+0.01  upper=+0.17
+    certified-harm tasks: ['api_post_ok']
+
+(E) ORDER control: does REORDERING RECOVER the collapse? (W1plus=W2++W1 [W1 last] vs W1plus_rev=W1++W2 [W1 first]; ref = W1-alone)
+      api_post_ok      W1plus=24%  W1plus_rev=1%  W1=98%  gap=-22%  <== collapse persists in BOTH orders
+      api_argorder     W1plus=24%  W1plus_rev=44%  W1=100%  gap=+20%  <== collapse persists in BOTH orders
+      enc_amount       W1plus=100%  W1plus_rev=100%  W1=0%  gap=+0%
+      trap_store_wire  W1plus=98%  W1plus_rev=99%  W1=96%  gap=+1%
+    -> ORDER-ROBUST HARM: reordering does NOT recover W1-alone PASS on 2/4 tasks -> NOT a lost-in-the-middle artifact -> HARDENS anti-monotonicity  (note: per-task order gaps may be noisy at small n; recovery-vs-W1 is the decision-relevant test, not gap sign)
+
+(F) RUNTIME tell: paired output_tokens W1plus vs W1 (same task)
+      api_post_ok      W1=791tok  W1plus=1628tok  (+106%)
+      api_argorder     W1=767tok  W1plus=1433tok  (+87%)
+      enc_amount       W1=752tok  W1plus=2647tok  (+252%)
+      trap_store_wire  W1=966tok  W1plus=1078tok  (+12%)
+
+==============================================================================
+sample-size (alpha_pair=eta/2|D|, |D|=7):
+  worst case (p~0.5, CP half-width<=0.15): n >= 83/cell.
+  STARK crossover (clean ~0% vs ~100%, as designed): n >= 9/cell -> START HERE; raise n only if the real split is noisy.
+==============================================================================
+wrote C:\Users\AndriyBilous\Documents\GitHub\tokenguard\blackwell_n80_results.json

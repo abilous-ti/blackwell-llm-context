@@ -1,0 +1,14 @@
+LLM listwise reranker probe | model=claude-haiku-4-5-20251001 | n=15 per order | tasks=['trap_store_wire', 'api_post_ok', 'enc_amount']
+  trap_store_wire  order=W1A  W1-top 15/15  W2-top 0/15  null 0
+  trap_store_wire  order=W1B  W1-top 15/15  W2-top 0/15  null 0
+  trap_store_wire  POOLED W1-top 30/30  ->  reranker says W1, realized PASS says W1  [AGREE]
+  api_post_ok      order=W1A  W1-top 15/15  W2-top 0/15  null 0
+  api_post_ok      order=W1B  W1-top 15/15  W2-top 0/15  null 0
+  api_post_ok      POOLED W1-top 30/30  ->  reranker says W1, realized PASS says W1  [AGREE]
+  enc_amount       order=W1A  W1-top 0/15  W2-top 15/15  null 0
+  enc_amount       order=W1B  W1-top 0/15  W2-top 15/15  null 0
+  enc_amount       POOLED W1-top 0/30  ->  reranker says W2, realized PASS says W2  [AGREE]
+
+VERDICT:
+  The LLM listwise reranker gets the trap RIGHT -> honest null; the mis-rank claim stays scoped to lexical relevance.
+wrote tokenbench/reranker_trap_n30.json

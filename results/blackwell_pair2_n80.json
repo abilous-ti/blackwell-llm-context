@@ -1,0 +1,88 @@
+{
+ "counts": {
+  "none|cache_put_ok": [
+   0,
+   80
+  ],
+  "W1|cache_put_ok": [
+   64,
+   80
+  ],
+  "W2|cache_put_ok": [
+   0,
+   80
+  ],
+  "W1plus|cache_put_ok": [
+   23,
+   80
+  ]
+ },
+ "estimator": {
+  "hat_delta_W1_W2": 0.0,
+  "hat_delta_W2_W1": 0.8,
+  "argsup_W2_beats_W1": "cache_put_ok",
+  "argsup_W1_beats_W2": "cache_put_ok",
+  "incomparable": false
+ },
+ "scalar": {
+  "phi_W1": 0.8,
+  "phi_W2": 0.0,
+  "global_rank": "W1 > W2",
+  "pointwise_violations": []
+ },
+ "certificate_incomparable": {
+  "L_AB": -0.8811409135950139,
+  "L_BA": 0.6505670979268436,
+  "alpha_pair": 0.05,
+  "eta": 0.1,
+  "certified_incomparable": false
+ },
+ "certificate_incomparable_detail": {
+  "cache_put_ok": {
+   "A_ci": [
+    0.696,
+    0.881
+   ],
+   "B_ci": [
+    0.0,
+    0.045
+   ],
+   "L_AB": -0.881,
+   "L_BA": 0.651
+  }
+ },
+ "dominance": {
+  "hat_delta_W1plus_W2": 0.0,
+  "hat_delta_W2_W1plus": 0.2875,
+  "one_directional": true,
+  "U_D_W1plus_W2": 0.0,
+  "alpha_tol": 0.15,
+  "dom_certified": true,
+  "strict_other_way": true
+ },
+ "interference": {
+  "detail": {
+   "cache_put_ok": {
+    "I_T": -0.513,
+    "I_T_upper": -0.212,
+    "certified_harm": false
+   }
+  },
+  "certified_tasks": [],
+  "alpha": 0.025,
+  "tau": 0.3
+ },
+ "order_control": null,
+ "runtime_tokens": {
+  "cache_put_ok": {
+   "W1": 796.0,
+   "W1plus": 1264.7,
+   "rel": 0.589
+  }
+ },
+ "n_per_cell": 80,
+ "eta": 0.1,
+ "total_cost_usd": 10.049320799999998,
+ "required_n_halfwidth_0.15": 67,
+ "mock": false
+}

@@ -1,0 +1,67 @@
+BLACKWELL S6 anchor REAL | n=40/cell | arms=['none', 'W1', 'W2', 'W1plus'] tasks=['api_post_ok', 'api_argorder', 'enc_amount', 'trap_store_wire'] | 640 claude runs | eta=0.1
+
+  model = gpt-5.5
+  arm=none   api_post_ok      PASS 2/40=5%  $0.0000
+  arm=none   api_argorder     PASS 30/40=75%  $0.0000
+  arm=none   enc_amount       PASS 22/40=55%  $0.0000
+  arm=none   trap_store_wire  PASS 0/40=0%  $0.0000
+  arm=W1     api_post_ok      PASS 40/40=100%  $0.0000
+  arm=W1     api_argorder     PASS 40/40=100%  $0.0000
+  arm=W1     enc_amount       PASS 0/40=0%  $0.0000
+  arm=W1     trap_store_wire  PASS 40/40=100%  $0.0000
+  arm=W2     api_post_ok      PASS 0/40=0%  $0.0000
+  arm=W2     api_argorder     PASS 0/40=0%  $0.0000
+  arm=W2     enc_amount       PASS 40/40=100%  $0.0000
+  arm=W2     trap_store_wire  PASS 0/40=0%  $0.0000  ERR:HTTP Error 500: Internal Server Error
+  arm=W1plus api_post_ok      PASS 0/40=0%  $0.0000
+  arm=W1plus api_argorder     PASS 0/40=0%  $0.0000
+  arm=W1plus enc_amount       PASS 40/40=100%  $0.0000
+  arm=W1plus trap_store_wire  PASS 40/40=100%  $0.0000
+
+total measured spend = $0.0000  (n=40/cell, 640 runs)
+==============================================================================
+(A) INCOMPARABILITY (estimator)
+    hat_delta_D(W1,W2) = +1.00  (sup at task 'enc_amount': W2 beats W1)
+    hat_delta_D(W2,W1) = +1.00  (sup at task 'api_post_ok': W1 beats W2)
+    both > 0 ? True  -> MUTUAL positive deficiency = EMPIRICAL INCOMPARABILITY
+    CERTIFICATE (uniform, alpha_pair=eta/2|D|=0.0125):
+      L_D(W1,W2) lower bound on sup[PASS(W2)-PASS(W1)] = +0.762
+      L_D(W2,W1) lower bound on sup[PASS(W1)-PASS(W2)] = +0.762
+      certified incomparable at >= 90% ? True
+
+(B) SCALAR MIS-RANK (Theorem 3 instantiated)
+  (B1) outcome-aggregate phi (mean PASS lift, CIRCULAR/contrast only): phi(W1)=+0.41, phi(W2)=-0.09 -> ranks W1 > W2 globally
+  (B2) query-conditioned lexical relevance phi_lex(W,T) vs realized PASS:
+      api_post_ok      relevance(W1,W2)=(0.42,0.25)->W1>W2  PASS(W1,W2)=(100%,0%)->W1>W2 
+      api_argorder     relevance(W1,W2)=(0.30,0.20)->W1>W2  PASS(W1,W2)=(100%,0%)->W1>W2 
+      enc_amount       relevance(W1,W2)=(0.21,0.27)->W2>W1  PASS(W1,W2)=(0%,100%)->W2>W1 
+      trap_store_wire  relevance(W1,W2)=(0.36,0.44)->W2>W1  PASS(W1,W2)=(100%,0%)->W1>W2   <== RELEVANCE MIS-RANKS
+    [OK] STRONG Thm-3: on 'trap_store_wire' relevance prefers W2 but PASS prefers W1 -> no query-conditioned relevance score can rank these sources correctly for all tasks.
+
+(C) DOMINANCE control: W1plus = W2 ++ W1 (literal superset of W2's signal)
+    hat_delta_D(W1plus,W2) = +0.00  (expect 0: no task where W2 beats W1plus)
+    hat_delta_D(W2,W1plus) = +1.00  (expect >0: W1plus wins API tasks)
+    CERTIFICATE (uniform, alpha_pair=(eta/2)/|D|=0.0125, margin alpha_tol=0.15):
+      U_D(W1plus,W2) upper bound on sup[PASS(W2)-PASS(W1plus)] = 0.119
+      delta_D(W1plus,W2) <= 0.15 certified ? True   AND W1plus strictly beats W2 somewhere (certified) ? True
+    one-directional (W1plus dominates W2) ? True  -> for-all-tasks dominance REALIZED
+
+(D) INTERFERENCE I_T = PASS(W1plus)-PASS(W1)-PASS(W2)+PASS(none) (certify harm I_T<=-0.3, alpha=eta/4):
+      api_post_ok      I_T=-0.95  upper=-0.60  <== CERTIFIED HARM
+      api_argorder     I_T=-0.25  upper=+0.09
+      enc_amount       I_T=+0.55  upper=+0.83
+      trap_store_wire  I_T=+0.00  upper=+0.21
+    certified-harm tasks: ['api_post_ok']
+
+(F) RUNTIME tell: paired output_tokens W1plus vs W1 (same task)
+      api_post_ok      W1=76tok  W1plus=289tok  (+281%)
+      api_argorder     W1=82tok  W1plus=306tok  (+274%)
+      enc_amount       W1=3535tok  W1plus=959tok  (-73%)
+      trap_store_wire  W1=88tok  W1plus=92tok  (+4%)
+
+==============================================================================
+sample-size (alpha_pair=eta/2|D|, |D|=7):
+  worst case (p~0.5, CP half-width<=0.15): n >= 83/cell.
+  STARK crossover (clean ~0% vs ~100%, as designed): n >= 9/cell -> START HERE; raise n only if the real split is noisy.
+==============================================================================
+wrote C:\Users\AndriyBilous\Documents\GitHub\tokenguard\blackwell_gpt55_n40.json

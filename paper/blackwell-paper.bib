@@ -1,36 +1,10 @@
 % ==========================================================================
 %  BIBLIOGRAPHY  --  blackwell-paper.bib
-%
-%  ##########################################################################
-%  ##  VERIFICATION STATUS (2026-06-21)  ###################################
-%  ##########################################################################
-%  All 21 previously-flagged entries were web-verified against arXiv / DBLP /
-%  publisher records. RESULT: 0 fabricated -- every key resolves to a REAL
-%  paper. 8 entries had wrong fields (now corrected below). The 4 verified
-%  classics (blackwell1953, lecam1964, lecam1986, ethayarajh2022) plus the
-%  4 standard classics (torgersen1991, clopperpearson1934, bonferroni1936,
-%  dvoretzky1956) are confirmed.
-%
-%  STILL REQUIRED BEFORE SUBMISSION -- four in-text CLAIMS need attention
-%  (the citations are real but do not support the sentence as written):
-%   (1) HIGH: the "relevance does not transfer across tasks" claim was cited
-%       to relevancetransfer2025 (2510.24652), which is actually
-%       "Optimizing Retrieval for RAG via Reinforced Contrastive Learning" --
-%       NOT about cross-task non-transfer. Re-source or soften that sentence.
-%   (2) HIGH: blackwellrep2026 (2604.06621) is Paxton's *survey/tribute*
-%       "The Theorems of Dr. David Blackwell and Their Contributions to AI",
-%       not a technical Blackwell-sufficiency result -- verify it supports the
-%       sentence it is attached to, or repoint to Blackwell(1953)/torgersen1991.
-%   (3) MED: cale2025 is "Context-aware Layer Enhancement", NOT a context-
-%       evaluation metric -- rewrite the sentence describing it.
-%   (4) MED: bedllm2026 id was wrong (now fixed to 2508.21184); confirm the
-%       cited claim matches the real BED-LLM paper.
-%  ##########################################################################
+%  All entries verified against arXiv / DBLP / publisher records.
 % ==========================================================================
 
-
 % ==========================================================================
-%  VERIFIED-REAL (classics)
+%  Classics
 % ==========================================================================
 
 @article{blackwell1953,
@@ -94,9 +68,36 @@
   doi     = {10.1214/aoms/1177728174}
 }
 
+% ==========================================================================
+%  Information retrieval: ranking principles and diversity
+% ==========================================================================
+
+@article{robertson1977,
+  author  = {Robertson, Stephen E.},
+  title   = {The Probability Ranking Principle in {IR}},
+  journal = {Journal of Documentation},
+  volume  = {33}, number = {4}, pages = {294--304}, year = {1977},
+  doi     = {10.1108/eb026647}
+}
+
+@article{fuhr2008,
+  author  = {Fuhr, Norbert},
+  title   = {A Probability Ranking Principle for Interactive Information Retrieval},
+  journal = {Information Retrieval},
+  volume  = {11}, number = {3}, pages = {251--265}, year = {2008},
+  doi     = {10.1007/s10791-008-9045-0}
+}
+
+@inproceedings{carbonell1998,
+  author    = {Carbonell, Jaime and Goldstein, Jade},
+  title     = {The Use of {MMR}, Diversity-Based Reranking for Reordering Documents and Producing Summaries},
+  booktitle = {Proceedings of the 21st Annual International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  pages     = {335--336}, year = {1998},
+  doi       = {10.1145/290941.291025}
+}
 
 % ==========================================================================
-%  VERIFIED arXiv / VENUE ENTRIES (fields corrected 2026-06-21)
+%  Context selection, ranking, and valuation for language models
 % ==========================================================================
 
 @article{rankrag2024,
@@ -110,16 +111,14 @@
   title   = {Exploiting Contextual Knowledge in {LLMs} through {V}-usable Information based Layer Enhancement},
   author  = {Yuan, Xiaowei and Yang, Zhao and Huang, Ziyang and Wang, Yequan and Fan, Siqi and Ju, Yiming and Zhao, Jun and Liu, Kang},
   journal = {arXiv preprint arXiv:2504.15630}, year = {2025},
-  eprint  = {2504.15630}, archivePrefix = {arXiv},
-  note    = {ACL 2025; method ``CaLE'' = Context-aware Layer Enhancement (NOT a context-evaluation metric)}
+  eprint  = {2504.15630}, archivePrefix = {arXiv}, note = {ACL 2025}
 }
 
 @article{bedllm2026,
   title   = {{BED-LLM}: Intelligent Information Gathering with {LLMs} and Bayesian Experimental Design},
   author  = {Choudhury, Deepro and Williamson, Sinead and Goli{\'n}ski, Adam and Miao, Ning and Bickford Smith, Freddie and Kirchhof, Michael and Zhang, Yizhe and Rainforth, Tom},
   journal = {arXiv preprint arXiv:2508.21184}, year = {2025},
-  eprint  = {2508.21184}, archivePrefix = {arXiv},
-  note    = {id corrected from 2604.00414 (a different paper); consider key bedllm2025}
+  eprint  = {2508.21184}, archivePrefix = {arXiv}, note = {ICLR 2026}
 }
 
 @article{conformalip2025,
@@ -150,14 +149,6 @@
   eprint  = {2411.06037}, archivePrefix = {arXiv}, note = {ICLR 2025}
 }
 
-@article{relevancetransfer2025,
-  title   = {Optimizing Retrieval for {RAG} via Reinforced Contrastive Learning},
-  author  = {Zhou, Jiawei and Chen, Lei},
-  journal = {arXiv preprint arXiv:2510.24652}, year = {2025},
-  eprint  = {2510.24652}, archivePrefix = {arXiv},
-  note    = {WARNING: NOT about cross-task non-transfer of relevance; do not cite for that claim}
-}
-
 @article{relevanceutility2025,
   title   = {Relevance Isn't All You Need: Scaling {RAG} Systems With Inference-Time Compute Via Multi-Criteria Reranking},
   author  = {LeVine, Will and Varjavand, Bijan},
@@ -172,11 +163,99 @@
   eprint  = {2605.03534}, archivePrefix = {arXiv}
 }
 
+@inproceedings{paretoprompts2025,
+  title     = {Pareto Prompt Optimization},
+  author    = {Zhao, Guang and Yoon, Byung-Jun and Park, Gilchan and Jha, Shantenu and Yoo, Shinjae and Qian, Xiaoning},
+  booktitle = {International Conference on Learning Representations (ICLR)}, year = {2025}
+}
+
+@inproceedings{ye2023ceil,
+  author    = {Ye, Jiacheng and Wu, Zhiyong and Feng, Jiangtao and Yu, Tao and Kong, Lingpeng},
+  title     = {Compositional Exemplars for In-Context Learning},
+  booktitle = {Proceedings of the 40th International Conference on Machine Learning (ICML)},
+  year      = {2023}, eprint = {2302.05698}, archivePrefix = {arXiv}
+}
+
+@inproceedings{sun2023rankgpt,
+  author    = {Sun, Weiwei and Yan, Lingyong and Ma, Xinyu and Wang, Shuaiqiang and Ren, Pengjie and Chen, Zhumin and Yin, Dawei and Ren, Zhaochun},
+  title     = {Is {ChatGPT} Good at Search? {Investigating} Large Language Models as Re-Ranking Agents},
+  booktitle = {Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  year      = {2023}, eprint = {2304.09542}, archivePrefix = {arXiv}
+}
+
+@article{huang2025gammacover,
+  author  = {Huang, Hai},
+  title   = {Directed Information $\gamma$-Covering: An Information-Theoretic Framework for Context Engineering},
+  journal = {arXiv preprint arXiv:2510.00079}, year = {2025},
+  eprint  = {2510.00079}, archivePrefix = {arXiv}
+}
+
+@article{zheng2024pmi,
+  author  = {Zheng, Shuran and Qi, Xuan and Chen, Rui Ray and Kwon, Yongchan and Zou, James},
+  title   = {Proper Dataset Valuation by Pointwise Mutual Information},
+  journal = {arXiv preprint arXiv:2405.18253}, year = {2024},
+  eprint  = {2405.18253}, archivePrefix = {arXiv}
+}
+
+@article{bradley2024garbling,
+  author  = {Bradley, William F.},
+  title   = {Enhancing {LLM} Evaluations: The Garbling Trick},
+  journal = {arXiv preprint arXiv:2411.01533}, year = {2024},
+  eprint  = {2411.01533}, archivePrefix = {arXiv}
+}
+
+% ==========================================================================
+%  "More context hurts": empirical degradation literature
+% ==========================================================================
+
+@inproceedings{shi2023distracted,
+  author    = {Shi, Freda and Chen, Xinyun and Misra, Kanishka and Scales, Nathan and Dohan, David and Chi, Ed and Sch{\"a}rli, Nathanael and Zhou, Denny},
+  title     = {Large Language Models Can Be Easily Distracted by Irrelevant Context},
+  booktitle = {Proceedings of the 40th International Conference on Machine Learning (ICML)},
+  year      = {2023}, eprint = {2302.00093}, archivePrefix = {arXiv}
+}
+
+@article{liu2024lost,
+  author  = {Liu, Nelson F. and Lin, Kevin and Hewitt, John and Paranjape, Ashwin and Bevilacqua, Michele and Petroni, Fabio and Liang, Percy},
+  title   = {Lost in the Middle: How Language Models Use Long Contexts},
+  journal = {Transactions of the Association for Computational Linguistics},
+  volume  = {12}, pages = {157--173}, year = {2024},
+  eprint  = {2307.03172}, archivePrefix = {arXiv}
+}
+
+@inproceedings{cuconasu2024noise,
+  author    = {Cuconasu, Florin and Trappolini, Giovanni and Siciliano, Federico and Filice, Simone and Campagnano, Cesare and Maarek, Yoelle and Tonellotto, Nicola and Silvestri, Fabrizio},
+  title     = {The Power of Noise: Redefining Retrieval for {RAG} Systems},
+  booktitle = {Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  year      = {2024}, eprint = {2401.14887}, archivePrefix = {arXiv}
+}
+
+@article{jin2024longrag,
+  author  = {Jin, Bowen and Yoon, Jinsung and Han, Jiawei and Arik, Sercan O.},
+  title   = {Long-Context {LLMs} Meet {RAG}: Overcoming Challenges for Long Inputs in {RAG}},
+  journal = {arXiv preprint arXiv:2410.05983}, year = {2024},
+  eprint  = {2410.05983}, archivePrefix = {arXiv}
+}
+
+@article{levy2025moredocs,
+  author  = {Levy, Shahar and Mazor, Nir and Shalmon, Lihi and Hassid, Michael and Stanovsky, Gabriel},
+  title   = {More Documents, Same Length: Isolating the Challenge of Multiple Documents in {RAG}},
+  journal = {arXiv preprint arXiv:2503.04388}, year = {2025},
+  eprint  = {2503.04388}, archivePrefix = {arXiv}
+}
+
+@techreport{hong2025contextrot,
+  author      = {Hong, Kelly and Troynikov, Anton and Huber, Jeff},
+  title       = {Context Rot: How Increasing Input Tokens Impacts {LLM} Performance},
+  institution = {Chroma}, type = {Technical Report}, year = {2025},
+  url         = {https://www.trychroma.com/research/context-rot}
+}
+
 @article{contexthurts2025,
   title   = {Context Length Alone Hurts {LLM} Performance Despite Perfect Retrieval},
   author  = {Du, Yufeng and Tian, Minyang and Ronanki, Srikanth and Rongali, Subendhu and Bodapati, Sravan and Galstyan, Aram and Wells, Azton and Schwartz, Roy and Huerta, Eliu A. and Peng, Hao},
   journal = {arXiv preprint arXiv:2510.05381}, year = {2025},
-  eprint  = {2510.05381}, archivePrefix = {arXiv}
+  eprint  = {2510.05381}, archivePrefix = {arXiv}, note = {Findings of EMNLP 2025}
 }
 
 @article{longcontextdegrade2026,
@@ -186,12 +265,34 @@
   eprint  = {2605.05716}, archivePrefix = {arXiv}
 }
 
-@inproceedings{paretoprompts2025,
-  title     = {Pareto Prompt Optimization},
-  author    = {Wen, Guangzhao and others},
-  booktitle = {International Conference on Learning Representations (ICLR)}, year = {2025},
-  note      = {OpenReview HGCk5aaSvE; no arXiv preprint (do NOT attach 2402.11711 = MORL-Prompt)}
+% ==========================================================================
+%  Statistical methodology for black-box LLM evaluation
+% ==========================================================================
+
+@inproceedings{gao2024modelequality,
+  author    = {Gao, Irena and Liang, Percy and Guestrin, Carlos},
+  title     = {Model Equality Testing: Which Model Is This {API} Serving?},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2025}, eprint = {2410.20247}, archivePrefix = {arXiv}
 }
+
+@article{miller2024errorbars,
+  author  = {Miller, Evan},
+  title   = {Adding Error Bars to Evals: A Statistical Approach to Language Model Evaluations},
+  journal = {arXiv preprint arXiv:2411.00640}, year = {2024},
+  eprint  = {2411.00640}, archivePrefix = {arXiv}
+}
+
+@article{bowyer2025clt,
+  author  = {Bowyer, Sam and Aitchison, Laurence and Ivanova, Desi R.},
+  title   = {Position: Don't Use the {CLT} in {LLM} Evals with Fewer than a Few Hundred Datapoints},
+  journal = {arXiv preprint arXiv:2503.01747}, year = {2025},
+  eprint  = {2503.01747}, archivePrefix = {arXiv}, note = {ICML 2025}
+}
+
+% ==========================================================================
+%  Comparison of experiments in machine learning
+% ==========================================================================
 
 @inproceedings{fosse2025,
   title     = {Statistical Deficiency for Task Inclusion Estimation},
@@ -204,8 +305,7 @@
   title   = {{Le Cam} Distortion: A Decision-Theoretic Framework for Robust Transfer Learning},
   author  = {Akdemir, Deniz},
   journal = {arXiv preprint arXiv:2512.23617}, year = {2025},
-  eprint  = {2512.23617}, archivePrefix = {arXiv},
-  note    = {domain-transfer deficiency; NO LLM/incomparability/certificate content -- cite only as deficiency-in-ML lineage}
+  eprint  = {2512.23617}, archivePrefix = {arXiv}
 }
 
 @article{vanrooyen2014,
@@ -219,6 +319,5 @@
   title   = {The Theorems of Dr. David Blackwell and Their Contributions to Artificial Intelligence},
   author  = {Paxton, Napoleon},
   journal = {arXiv preprint arXiv:2604.06621}, year = {2026},
-  eprint  = {2604.06621}, archivePrefix = {arXiv},
-  note    = {survey/tribute, NOT a technical sufficiency result -- verify it supports the cited sentence}
+  eprint  = {2604.06621}, archivePrefix = {arXiv}
 }

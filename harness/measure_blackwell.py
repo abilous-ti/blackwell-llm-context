@@ -64,6 +64,41 @@ W1plus = W2 + "\n\n" + W1
 # anti-monotonicity harm is ORDER-INVARIANT (not lost-in-the-middle), which HARDENS the result.
 W1plus_rev = W1 + "\n\n" + W2
 
+# Length-matched PADDING control (2026-07-03): W1pad = FILLER ++ W1 mirrors W1plus's structure
+# (added text FIRST, W1 last) with FILLER character-matched to W2 but carrying NO coordinate any
+# verifier checks. Du et al. (2510.05381) show added length ALONE can hurt; if W1pad holds W1's
+# ceiling on the collapse cells while W1plus craters, the anti-monotonicity harm is attributable
+# to W2's signal content, not to token count. Same register as W2 ("TEAM CONTEXT (private)") so
+# the only axes left differing vs W1plus are (a) signal content and (b) ledger-topicality.
+# Routing-instruction ablation (2026-07-03, reviewer request): does a one-line routing note
+# cure the superset collapse? NOTE the instruction itself presupposes knowing WHICH source is
+# decisive for WHICH task family -- i.e. exactly the coordinate structure the partial order
+# formalizes. Either outcome is informative: cure => the fix requires the diagnosis (selection-
+# time knowledge of decisiveness), no cure => the collapse is robust to cheap prompting.
+W1plus_instr = (W1plus + "\n\nROUTING NOTE: the two team conventions above serve different task "
+                "families. For tasks that CALL the ledger API (posting, transferring, logging), "
+                "use only the API call contract; the wire-encoding invariant applies only to "
+                "tasks that encode or decode amount strings. Do not mix them.")
+
+# Structured-context ablation (2026-07-04, reviewer mechanism-probe request): same two
+# conventions, same order as W1plus (W2 first, W1 last), but wrapped in labeled XML sections.
+# Tests whether STRUCTURE + section labels alone (no task-family routing statement) prevent the
+# convention interference. Discriminates "model cannot segment the two conventions" from
+# "model cannot route them to task families" (the latter is what W1plus_instr supplies).
+W1plus_xml = ("<team_context>\n<wire_encoding_invariant>\n" + W2 +
+              "\n</wire_encoding_invariant>\n<api_call_contract>\n" + W1 +
+              "\n</api_call_contract>\n</team_context>")
+
+W1PAD_FILLER = (
+    "TEAM CONTEXT (private), office logistics note: the quarterly all-hands is held in the "
+    "Maple room on the second Tuesday of the quarter at 10:00 local time; bring your own "
+    "laptop, coffee is available from 09:30. Desk booking opens fourteen days ahead in the "
+    "facilities portal and unclaimed desks are released again at 09:15 each morning. Guest "
+    "badges must be requested from reception one business day in advance and must be returned "
+    "before 18:00 on the same day. The bicycle cage code rotates monthly. Parcel lockers in "
+    "the lobby are cleared by facilities every Friday afternoon.")
+W1pad = W1PAD_FILLER + "\n\n" + W1
+
 # ============================================================================================
 # TASK SET D : 4 API-usage tasks (need W1) + 2 encode/decode tasks (need W2).
 # W1's family is deliberately larger -> aggregate scalar phi ranks W1 > W2 globally (part B).
@@ -175,7 +210,8 @@ TASKS = [
 ]
 
 # Map an arm label -> the context text prepended to the prompt (None = no context).
-ARMS = {"none": None, "W1": W1, "W2": W2, "W1plus": W1plus, "W1plus_rev": W1plus_rev}
+ARMS = {"none": None, "W1": W1, "W2": W2, "W1plus": W1plus, "W1plus_rev": W1plus_rev,
+        "W1pad": W1pad, "W1plus_instr": W1plus_instr, "W1plus_xml": W1plus_xml}
 
 
 # ============================================================================================
@@ -273,7 +309,14 @@ def run_one(task, arm, mock, i, model="claude-haiku-4-5-20251001", singleshot=Fa
                 # trap task is W1-decisive (needs the post contract), even though it READS
                 # like an encoding task -> W2 does not help despite high lexical relevance.
                 ("trap", "W1"): .90, ("trap", "W2"): .07, ("trap", "none"): .07,
-                ("trap", "W1plus"): .90}
+                ("trap", "W1plus"): .90,
+                # padding control: plant the no-length-harm hypothesis (W1pad == W1) so the
+                # mock exercises the plumbing; the real run decides the science.
+                ("api", "W1pad"): .92, ("enc", "W1pad"): .05, ("trap", "W1pad"): .90,
+                ("api", "W1plus_instr"): .90, ("enc", "W1plus_instr"): .90,
+                ("trap", "W1plus_instr"): .90,
+                ("api", "W1plus_xml"): .90, ("enc", "W1plus_xml"): .90,
+                ("trap", "W1plus_xml"): .90}
         # mock cannot model order effects: plant W1plus_rev == W1plus (plumbing test only).
         b = base.get((fam, arm if arm != "W1plus_rev" else "W1plus"))
         import random
@@ -295,30 +338,53 @@ def run_one(task, arm, mock, i, model="claude-haiku-4-5-20251001", singleshot=Fa
         if singleshot:
             # Claude in single-shot COMPLETION mode (max-turns 1, no tools): treat the returned
             # text as the completion, extract code, write the file ourselves -> same regime as Azure.
+            # Retry (3 attempts, backoff): the 2026-07-03 n=40 padding run lost 3 whole arms to a
+            # transient API failure window; a zero-token/empty result is a transport error, not a
+            # model answer, and must not be scored as PASS=0.
             sp = (prompt + " Return ONLY the raw Python file content, no markdown fences, no prose, "
                   "and do NOT use any tools or write any files.")
             cmd = claude_cmd(["-p", " ".join(sp.split()), "--model", model,
                               "--output-format", "json", "--max-turns", "1",
                               "--dangerously-skip-permissions"])
-            r = subprocess.run(cmd, cwd=str(wd), capture_output=True, text=True,
-                               encoding="utf-8", timeout=200)
-            out = json.loads((r.stdout or "").strip().splitlines()[-1])
-            (wd / "solution.py").write_text(_extract_code(out.get("result", "") or ""),
-                                            encoding="utf-8")
-            return {"solved": verify_in(wd, task["verify"]),
-                    "cost": out.get("total_cost_usd", 0.0),
-                    "out_tokens": (out.get("usage", {}) or {}).get("output_tokens", 0)}
+            last_err = None
+            for attempt in range(3):
+                try:
+                    r = subprocess.run(cmd, cwd=str(wd), capture_output=True, text=True,
+                                       encoding="utf-8", timeout=200)
+                    out = json.loads((r.stdout or "").strip().splitlines()[-1])
+                    toks = (out.get("usage", {}) or {}).get("output_tokens", 0)
+                    if out.get("is_error") or (not out.get("result") and toks == 0):
+                        raise RuntimeError(f"empty/error result: {str(out)[:120]}")
+                    (wd / "solution.py").write_text(_extract_code(out.get("result", "") or ""),
+                                                    encoding="utf-8")
+                    return {"solved": verify_in(wd, task["verify"]),
+                            "cost": out.get("total_cost_usd", 0.0), "out_tokens": toks}
+                except Exception as e:
+                    last_err = e
+                    import time as _time
+                    _time.sleep(5 * (attempt + 1) ** 2)
+            raise RuntimeError(f"singleshot failed after 3 attempts: {last_err}")
         cmd = claude_cmd(["-p", " ".join(prompt.split()), "--model", model,
                           "--output-format", "json",
                           "--max-turns", "6", "--dangerously-skip-permissions"])
-        r = subprocess.run(cmd, cwd=str(wd), capture_output=True, text=True,
-                           encoding="utf-8", timeout=200)
-        out = json.loads((r.stdout or "").strip().splitlines()[-1])
-        # lead D: persist output_tokens (the $9 run discarded this). num_turns is dead on this
-        # single-shot codegen harness, so only output_tokens can move -> capture just that.
-        toks = (out.get("usage", {}) or {}).get("output_tokens", 0)
-        return {"solved": verify_in(wd, task["verify"]),
-                "cost": out.get("total_cost_usd", 0.0), "out_tokens": toks}
+        last_err = None
+        for attempt in range(3):  # same transient-failure retry as the singleshot path
+            try:
+                r = subprocess.run(cmd, cwd=str(wd), capture_output=True, text=True,
+                                   encoding="utf-8", timeout=200)
+                out = json.loads((r.stdout or "").strip().splitlines()[-1])
+                # lead D: persist output_tokens (the $9 run discarded this). num_turns is dead on this
+                # single-shot codegen harness, so only output_tokens can move -> capture just that.
+                toks = (out.get("usage", {}) or {}).get("output_tokens", 0)
+                if out.get("is_error") or (not out.get("result") and toks == 0):
+                    raise RuntimeError(f"empty/error result: {str(out)[:120]}")
+                return {"solved": verify_in(wd, task["verify"]),
+                        "cost": out.get("total_cost_usd", 0.0), "out_tokens": toks}
+            except Exception as e:
+                last_err = e
+                import time as _time
+                _time.sleep(5 * (attempt + 1) ** 2)
+        raise RuntimeError(f"agentic run failed after 3 attempts: {last_err}")
     except Exception as e:
         return {"solved": False, "cost": 0.0, "out_tokens": 0, "error": str(e)[:80]}
     finally:

@@ -1,4 +1,4 @@
-\begin{thebibliography}{24}
+\begin{thebibliography}{41}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -10,8 +10,6 @@ Deniz Akdemir.
 \newblock {Le Cam} distortion: A decision-theoretic framework for robust
   transfer learning.
 \newblock \emph{arXiv preprint arXiv:2512.23617}, 2025.
-\newblock domain-transfer deficiency; NO LLM/incomparability/certificate
-  content -- cite only as deficiency-in-ML lineage.
 
 \bibitem[Blackwell(1953)]{blackwell1953}
 David Blackwell.
@@ -25,6 +23,27 @@ Carlo~Emilio Bonferroni.
 \newblock Teoria statistica delle classi e calcolo delle probabilit\`a.
 \newblock \emph{Pubblicazioni del R. Istituto Superiore di Scienze Economiche e
   Commerciali di Firenze}, 8:\penalty0 3--62, 1936.
+
+\bibitem[Bowyer et~al.(2025)Bowyer, Aitchison, and Ivanova]{bowyer2025clt}
+Sam Bowyer, Laurence Aitchison, and Desi~R. Ivanova.
+\newblock Position: Don't use the {CLT} in {LLM} evals with fewer than a few
+  hundred datapoints.
+\newblock \emph{arXiv preprint arXiv:2503.01747}, 2025.
+\newblock ICML 2025.
+
+\bibitem[Bradley(2024)]{bradley2024garbling}
+William~F. Bradley.
+\newblock Enhancing {LLM} evaluations: The garbling trick.
+\newblock \emph{arXiv preprint arXiv:2411.01533}, 2024.
+
+\bibitem[Carbonell and Goldstein(1998)]{carbonell1998}
+Jaime Carbonell and Jade Goldstein.
+\newblock The use of {MMR}, diversity-based reranking for reordering documents
+  and producing summaries.
+\newblock In \emph{Proceedings of the 21st Annual International ACM SIGIR
+  Conference on Research and Development in Information Retrieval}, pages
+  335--336, 1998.
+\newblock \doi{10.1145/290941.291025}.
 
 \bibitem[Chan et~al.(2025)Chan, Ge, Dobriban, Hassani, and
   Vidal]{conformalip2025}
@@ -40,8 +59,7 @@ Deepro Choudhury, Sinead Williamson, Adam Goli{\'n}ski, Ning Miao, Freddie
 \newblock {BED-LLM}: Intelligent information gathering with {LLMs} and bayesian
   experimental design.
 \newblock \emph{arXiv preprint arXiv:2508.21184}, 2025.
-\newblock id corrected from 2604.00414 (a different paper); consider key
-  bedllm2025.
+\newblock ICLR 2026.
 
 \bibitem[Clopper and Pearson(1934)]{clopperpearson1934}
 C.~J. Clopper and E.~S. Pearson.
@@ -50,6 +68,14 @@ C.~J. Clopper and E.~S. Pearson.
 \newblock \emph{Biometrika}, 26\penalty0 (4):\penalty0 404--413, 1934.
 \newblock \doi{10.1093/biomet/26.4.404}.
 
+\bibitem[Cuconasu et~al.(2024)Cuconasu, Trappolini, Siciliano, Filice,
+  Campagnano, Maarek, Tonellotto, and Silvestri]{cuconasu2024noise}
+Florin Cuconasu, Giovanni Trappolini, Federico Siciliano, Simone Filice, Cesare
+  Campagnano, Yoelle Maarek, Nicola Tonellotto, and Fabrizio Silvestri.
+\newblock The power of noise: Redefining retrieval for {RAG} systems.
+\newblock In \emph{Proceedings of the 47th International ACM SIGIR Conference
+  on Research and Development in Information Retrieval}, 2024.
+
 \bibitem[Du et~al.(2025)Du, Tian, Ronanki, Rongali, Bodapati, Galstyan, Wells,
   Schwartz, Huerta, and Peng]{contexthurts2025}
 Yufeng Du, Minyang Tian, Srikanth Ronanki, Subendhu Rongali, Sravan Bodapati,
@@ -57,6 +83,7 @@ Yufeng Du, Minyang Tian, Srikanth Ronanki, Subendhu Rongali, Sravan Bodapati,
 \newblock Context length alone hurts {LLM} performance despite perfect
   retrieval.
 \newblock \emph{arXiv preprint arXiv:2510.05381}, 2025.
+\newblock Findings of EMNLP 2025.
 
 \bibitem[Dvoretzky et~al.(1956)Dvoretzky, Kiefer, and Wolfowitz]{dvoretzky1956}
 A.~Dvoretzky, J.~Kiefer, and J.~Wolfowitz.
@@ -82,6 +109,38 @@ Lo{\"i}c Fosse, Frederic Bechet, Benoit Favre, G{\'e}raldine Damnati,
 \newblock Statistical deficiency for task inclusion estimation.
 \newblock In \emph{Proceedings of the 63rd Annual Meeting of the Association
   for Computational Linguistics (ACL), Volume 1: Long Papers}, 2025.
+
+\bibitem[Fuhr(2008)]{fuhr2008}
+Norbert Fuhr.
+\newblock A probability ranking principle for interactive information
+  retrieval.
+\newblock \emph{Information Retrieval}, 11\penalty0 (3):\penalty0 251--265,
+  2008.
+\newblock \doi{10.1007/s10791-008-9045-0}.
+
+\bibitem[Gao et~al.(2025)Gao, Liang, and Guestrin]{gao2024modelequality}
+Irena Gao, Percy Liang, and Carlos Guestrin.
+\newblock Model equality testing: Which model is this {API} serving?
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2025.
+
+\bibitem[Hong et~al.(2025)Hong, Troynikov, and Huber]{hong2025contextrot}
+Kelly Hong, Anton Troynikov, and Jeff Huber.
+\newblock Context rot: How increasing input tokens impacts {LLM} performance.
+\newblock Technical report, Chroma, 2025.
+\newblock URL \url{https://www.trychroma.com/research/context-rot}.
+
+\bibitem[Huang(2025)]{huang2025gammacover}
+Hai Huang.
+\newblock Directed information $\gamma$-covering: An information-theoretic
+  framework for context engineering.
+\newblock \emph{arXiv preprint arXiv:2510.00079}, 2025.
+
+\bibitem[Jin et~al.(2024)Jin, Yoon, Han, and Arik]{jin2024longrag}
+Bowen Jin, Jinsung Yoon, Jiawei Han, and Sercan~O. Arik.
+\newblock Long-context {LLMs} meet {RAG}: Overcoming challenges for long inputs
+  in {RAG}.
+\newblock \emph{arXiv preprint arXiv:2410.05983}, 2024.
 
 \bibitem[Joren et~al.(2024)Joren, Zhang, Ferng, Juan, Taly, and
   Rashtchian]{sufficientcontext2024}
@@ -112,25 +171,68 @@ Will LeVine and Bijan Varjavand.
 \newblock \emph{arXiv preprint arXiv:2504.07104}, 2025.
 \newblock ICLR 2025.
 
+\bibitem[Levy et~al.(2025)Levy, Mazor, Shalmon, Hassid, and
+  Stanovsky]{levy2025moredocs}
+Shahar Levy, Nir Mazor, Lihi Shalmon, Michael Hassid, and Gabriel Stanovsky.
+\newblock More documents, same length: Isolating the challenge of multiple
+  documents in {RAG}.
+\newblock \emph{arXiv preprint arXiv:2503.04388}, 2025.
+
 \bibitem[Liu(2026)]{longcontextdegrade2026}
 Ming Liu.
 \newblock More is not always better: Cross-component interference in {LLM}
   agent scaffolding.
 \newblock \emph{arXiv preprint arXiv:2605.05716}, 2026.
 
+\bibitem[Liu et~al.(2024)Liu, Lin, Hewitt, Paranjape, Bevilacqua, Petroni, and
+  Liang]{liu2024lost}
+Nelson~F. Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua,
+  Fabio Petroni, and Percy Liang.
+\newblock Lost in the middle: How language models use long contexts.
+\newblock \emph{Transactions of the Association for Computational Linguistics},
+  12:\penalty0 157--173, 2024.
+
+\bibitem[Miller(2024)]{miller2024errorbars}
+Evan Miller.
+\newblock Adding error bars to evals: A statistical approach to language model
+  evaluations.
+\newblock \emph{arXiv preprint arXiv:2411.00640}, 2024.
+
 \bibitem[Paxton(2026)]{blackwellrep2026}
 Napoleon Paxton.
 \newblock The theorems of dr. david blackwell and their contributions to
   artificial intelligence.
 \newblock \emph{arXiv preprint arXiv:2604.06621}, 2026.
-\newblock survey/tribute, NOT a technical sufficiency result -- verify it
-  supports the cited sentence.
 
 \bibitem[Qiu et~al.(2026)Qiu, Han, and Huang]{sureRAG2026}
 Jingxi Qiu, Zeyu Han, and Cheng Huang.
 \newblock {SURE-RAG}: Sufficiency and uncertainty-aware evidence verification
   for selective retrieval-augmented generation.
 \newblock \emph{arXiv preprint arXiv:2605.03534}, 2026.
+
+\bibitem[Robertson(1977)]{robertson1977}
+Stephen~E. Robertson.
+\newblock The probability ranking principle in {IR}.
+\newblock \emph{Journal of Documentation}, 33\penalty0 (4):\penalty0 294--304,
+  1977.
+\newblock \doi{10.1108/eb026647}.
+
+\bibitem[Shi et~al.(2023)Shi, Chen, Misra, Scales, Dohan, Chi, Sch{\"a}rli, and
+  Zhou]{shi2023distracted}
+Freda Shi, Xinyun Chen, Kanishka Misra, Nathan Scales, David Dohan, Ed~Chi,
+  Nathanael Sch{\"a}rli, and Denny Zhou.
+\newblock Large language models can be easily distracted by irrelevant context.
+\newblock In \emph{Proceedings of the 40th International Conference on Machine
+  Learning (ICML)}, 2023.
+
+\bibitem[Sun et~al.(2023)Sun, Yan, Ma, Wang, Ren, Chen, Yin, and
+  Ren]{sun2023rankgpt}
+Weiwei Sun, Lingyong Yan, Xinyu Ma, Shuaiqiang Wang, Pengjie Ren, Zhumin Chen,
+  Dawei Yin, and Zhaochun Ren.
+\newblock Is {ChatGPT} good at search? {Investigating} large language models as
+  re-ranking agents.
+\newblock In \emph{Proceedings of the 2023 Conference on Empirical Methods in
+  Natural Language Processing (EMNLP)}, 2023.
 
 \bibitem[Torgersen(1991)]{torgersen1991}
 Erik~N. Torgersen.
@@ -150,18 +252,16 @@ M.~S. Vinay, Minh-Hao Van, and Xintao Wu.
 \newblock In-context learning demonstration selection via influence analysis.
 \newblock \emph{arXiv preprint arXiv:2402.11750}, 2024.
 
-\bibitem[Wen et~al.(2025)]{paretoprompts2025}
-Guangzhao Wen et~al.
-\newblock Pareto prompt optimization.
-\newblock In \emph{International Conference on Learning Representations
-  (ICLR)}, 2025.
-\newblock OpenReview HGCk5aaSvE; no arXiv preprint (do NOT attach 2402.11711 =
-  MORL-Prompt).
-
 \bibitem[Xie et~al.(2024)Xie, Luo, Stern, Du, and Cheng]{demoshapley2024}
 Shan Xie, Man Luo, Chadly~Daniel Stern, Mengnan Du, and Lu~Cheng.
 \newblock {DemoShapley}: Valuation of demonstrations for in-context learning.
 \newblock \emph{arXiv preprint arXiv:2410.07523}, 2024.
+
+\bibitem[Ye et~al.(2023)Ye, Wu, Feng, Yu, and Kong]{ye2023ceil}
+Jiacheng Ye, Zhiyong Wu, Jiangtao Feng, Tao Yu, and Lingpeng Kong.
+\newblock Compositional exemplars for in-context learning.
+\newblock In \emph{Proceedings of the 40th International Conference on Machine
+  Learning (ICML)}, 2023.
 
 \bibitem[Yu et~al.(2024)Yu, Ping, Liu, Wang, You, Zhang, Shoeybi, and
   Catanzaro]{rankrag2024}
@@ -179,7 +279,19 @@ Xiaowei Yuan, Zhao Yang, Ziyang Huang, Yequan Wang, Siqi Fan, Yiming Ju, Jun
 \newblock Exploiting contextual knowledge in {LLMs} through {V}-usable
   information based layer enhancement.
 \newblock \emph{arXiv preprint arXiv:2504.15630}, 2025.
-\newblock ACL 2025; method ``CaLE'' = Context-aware Layer Enhancement (NOT a
-  context-evaluation metric).
+\newblock ACL 2025.
+
+\bibitem[Zhao et~al.(2025)Zhao, Yoon, Park, Jha, Yoo, and
+  Qian]{paretoprompts2025}
+Guang Zhao, Byung-Jun Yoon, Gilchan Park, Shantenu Jha, Shinjae Yoo, and
+  Xiaoning Qian.
+\newblock Pareto prompt optimization.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2025.
+
+\bibitem[Zheng et~al.(2024)Zheng, Qi, Chen, Kwon, and Zou]{zheng2024pmi}
+Shuran Zheng, Xuan Qi, Rui~Ray Chen, Yongchan Kwon, and James Zou.
+\newblock Proper dataset valuation by pointwise mutual information.
+\newblock \emph{arXiv preprint arXiv:2405.18253}, 2024.
 
 \end{thebibliography}
