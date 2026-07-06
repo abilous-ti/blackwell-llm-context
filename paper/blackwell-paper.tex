@@ -1575,10 +1575,8 @@ of it ($\to80\%$), locating the operative variable in convention-to-task \emph{r
 than formatting or segmentation. We state these as interpretations, not findings; every certified
 claim in the paper is independent of which reading is true.
 
-% ==========================================================================
-\section{Limitations and threats to validity}
+\subsection{Limitations and threats to validity}
 \label{sec:limitations}
-% ==========================================================================
 
 We collect the scope restrictions here; each is stated once and sized to its weight.
 
@@ -1615,8 +1613,8 @@ document pairs is the direct next experiment.
 draws per cell (Assumption~\ref{ass:iid}); the assumption is most delicate for the agentic arm,
 where each draw is a fresh multi-turn trajectory (protocol in Appendix~\ref{app:repro}).
 Interference is certifiable only on cells whose \texttt{none} baseline floors near zero, stated
-as a protocol (Remark~\ref{rem:leaky}), and each certificate is marginal at $\eta=0.10$, not
-family-wise across claims.
+as a protocol (Remark~\ref{rem:leaky}); marginal-versus-joint control is discussed in
+\S\ref{sec:disc-bridge}.
 
 \paragraph{Ranker spectrum and synergy.} The trap mis-rank spans lexical cosine and three
 production-family learned rankers, with an LLM listwise reranker escaping as predicted, but the
