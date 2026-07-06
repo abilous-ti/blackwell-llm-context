@@ -71,8 +71,7 @@ Blackwell's comparison of experiments~\citep{blackwell1953} to context
 selection: when two sources are Blackwell-incomparable, no query-independent
 scalar can rank them correctly across all tasks, a formal account of the
 field's ``relevance-does-not-transfer'' folklore. To make the order measurable
-on real models behind executable verifiers, we define a decision-restricted
-deficiency \emph{surrogate} and equip it with a distribution-free finite-sample
+on real models behind executable verifiers, we define a decision-restricted value-deficiency \emph{surrogate} and equip it with a distribution-free finite-sample
 \emph{certificate}. On six language models across four vendors we certify
 ($\geq 90\%$ confidence, both directions) that two private context sources are
 empirically incomparable. Representative lexical, dense bi-encoder, and
@@ -604,6 +603,11 @@ separation hypothesis, witnesses only the sub-optimality of $\delta_M$
 (Theorem~\ref{thm:antimono}).
 \end{lemma}
 
+Intuitively: a fixed-rule crossover proves structural incomparability only when each winning
+source reveals a coordinate the losing source genuinely lacks; otherwise the crossover may
+witness nothing more than the rule's own incoherence.
+
+
 \begin{assumption}[Value attainment on the witnessing tasks]
 \label{ass:attain}
 There exist tasks $T_a, T_b$ and a margin $\gamma>0$ such that $\delta_M$ attains
@@ -728,8 +732,7 @@ treat the defeat of query-conditioned relevance as an \emph{empirical} result, d
 concrete lexical-cosine score practitioners use. In \S\ref{sec:experiments} the
 \texttt{trap\_store\_wire} task realizes $T_c$: bag-of-words cosine gives $\varphi(W_1)=0.36 <
 \varphi(W_2)=0.44$ (ranking $W_2\succ W_1$), yet realized PASS ranks $W_1$ at $96\%$--$100\%$ versus
-$W_2$ at $0$--$10\%$ across all six models. The same mis-rank is realized by production-family learned
-rankers: two dense bi-encoders (BGE, E5) and a cross-encoder reranker all prefer $W_2$ on the trap
+$W_2$ at $0$--$10\%$ across all six models. The same mis-rank is realized by representative open-weight learned rankers: two dense bi-encoders (BGE, E5) and a cross-encoder reranker all prefer $W_2$ on the trap
 (\S\ref{sec:results-misrank}, Table~\ref{tab:rankers}), so the topical class is not a lexical strawman: its failure mode is shared by the ranker
 families retrieval systems actually deploy. We also measure the
 boundary from the other side: an LLM \emph{listwise} reranker, which reads both documents and can
@@ -1162,7 +1165,7 @@ useless there.
 \paragraph{The ranker spectrum: dense retrievers and a cross-encoder fall for the trap; a
 listwise reranker escapes it.}
 To test whether the mis-rank extends beyond bag-of-words, we scored $\{W_1,W_2\}$ against the
-probe tasks with production-family open-weight rankers, two dense bi-encoders
+probe tasks with representative open-weight rankers, two dense bi-encoders
 (\texttt{bge-small-en-v1.5}, \texttt{e5-small-v2}) and a cross-encoder reranker
 (\texttt{ms-marco-MiniLM-L-6-v2}), and with a RankGPT-style LLM \emph{listwise} reranker (Haiku
 single-shot, seeing the task and \emph{both} sources; both presentation orders; $n=30$ judgments
@@ -1632,7 +1635,7 @@ as a protocol (Remark~\ref{rem:leaky}); marginal-versus-joint control is discuss
 \S\ref{sec:disc-bridge}.
 
 \paragraph{Ranker spectrum and synergy.} The trap mis-rank spans lexical cosine and three
-production-family learned rankers, with an LLM listwise reranker escaping as predicted, but the
+representative open-weight learned rankers, with an LLM listwise reranker escaping as predicted, but the
 learned checkpoints are the small members of their families and the evidence is one trap in one
 domain. Positive interference (synergy) is untested by construction: $W_1, W_2$ are
 task-disjoint, so a complementary pair would be needed to test whether a superset can also
