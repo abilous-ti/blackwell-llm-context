@@ -93,6 +93,21 @@ corpus retrieval is the central problem we leave open.
 \label{sec:intro}
 % ==========================================================================
 
+Suppose a coding assistant is handed one of two short notes about a software module. The first
+note says how to \emph{call} its main function: the order of the arguments, a keyword that is
+mandatory, and the error it raises on failure. The second note says how the module \emph{encodes}
+numbers: a digit format ending in a checksum. For a task that calls the function the first note is
+decisive and the second is useless; for a task that encodes a number it is the reverse; and
+neither note can be reconstructed from the other. This everyday situation is the entire paper in
+miniature. It has a precise name, the two notes are \emph{incomparable} in the sense of Blackwell's
+comparison of experiments~\citep{blackwell1953}, and a precise consequence: no single relevance
+score can rank the two notes so that the ranking is right for every task, because a score must crown
+one winner and here neither note wins outright. The body makes this exact, gives a statistical test
+that \emph{certifies} it from ordinary pass/fail runs on a live model, and finds that six production
+language models across four vendors all exhibit it. A reader who keeps these two notes in mind can
+read every symbol below as a statement about the first note versus the second (in the body they are
+the sources $W_1$ and $W_2$).
+
 Production language-model systems spend much of their budget deciding
 \emph{what context to place in the prompt}. Retrieval-augmented generation ranks
 passages, in-context learning selects demonstrations, and agentic coding tools
