@@ -192,7 +192,7 @@ we obtain, on \emph{real} model calls with no modeled numbers:
   \item \textbf{A supporting observation: private-context value is model-relative.}
   The \texttt{none}-arm baselines span $0\%$--$75\%$ guessability across vendors
   (\S\ref{sec:results-moat}), an empirical instance of the theory's
-  $\theta$-dependence; we report it as supporting evidence, it caps which cells
+  $\theta$-dependence; we report it as supporting evidence that caps which cells
   can be certified per model, not as a headline claim.
 \end{itemize}
 
@@ -509,8 +509,6 @@ a randomized garbling, no loss of generality is incurred by allowing randomized 
 \textup{(ii)}.
 \end{theorem}
 
-The proof is deferred to Appendix~\ref{app:proofs}.
-
 \begin{corollary}[Universal context dominance, C1]
 \label{cor:c1}
 If $W_1 \Bord W_2$ then, for the \emph{optimal} user, supplying $W_1$ is at least as good as
@@ -545,8 +543,6 @@ some full-support prior and each $S_j$ non-degenerate. Then:
     other hides.
 \end{enumerate}
 \end{lemma}
-
-The proof is deferred to Appendix~\ref{app:proofs}.
 
 Lemma~\ref{lem:noref} is the formal version of the garbling argument used in
 \S\ref{sec:experiments}: from the wire format ($W_2$, revealing $S_2$) one cannot manufacture the
@@ -618,8 +614,6 @@ Assumption~\ref{ass:attain} with $\{T_a,T_b\}\subseteq \Dcal$, $W_1$ and $W_2$ a
 $(M,\Dcal)$-incomparable.
 \end{assumption}
 
-The proof is deferred to Appendix~\ref{app:proofs}.
-
 Lemma~\ref{lem:bridge} is the keystone. In the direction the empirical program needs, it says: a
 certified $(M,\Dcal)$-crossover on tasks whose decisive coordinates are \emph{separated} across
 the two sources, with the deprived side's optimal value capped below the measured pass rates,
@@ -688,8 +682,6 @@ and the predictor family $\Vcal$ is closed under pre-composition with measurable
 $I_{\Vcal}(W_1\!\to\! S) \ge I_{\Vcal}(W_2\!\to\! S)$. Hence $I_{\Vcal}$ is a Blackwell-monotone
 scalar: it respects $\Bord$ but collapses it to one real number.
 \end{proposition}
-
-The proof is deferred to Appendix~\ref{app:proofs}.
 
 \begin{remark}[Scope of Proposition~\ref{prop:vinfo-monotone}]
 \label{rem:vinfo-scope}
@@ -807,12 +799,11 @@ event, a $(1-\eta)$ \emph{upper} confidence bound on the same supremum; the domi
 uses it to certify $\dhat_{\Dcal}(W_1,W_2)=0$ up to the equivalence margin.
 \end{proposition}
 
-The proof is deferred to Appendix~\ref{app:proofs}.
-
-A naive single-sample DKW bound under-covers this supremum because the object is a maximum of differences of binomial means across distinct cells and the certificate selects the argmax-gap cell; the multiplicity must be paid explicitly (Appendix~\ref{app:proofs}).
-
-
-The construction aligns with recent statistical guidance for black-box LLM evaluation (Appendix~\ref{app:proofs}).
+A naive single-sample DKW bound under-covers this supremum, because the object is a maximum of
+differences of binomial means across distinct cells and the certificate selects the argmax-gap
+cell, so the multiplicity must be paid explicitly rather than absorbed into a single-sample
+envelope (Appendix~\ref{app:proofs}); the resulting construction aligns with recent statistical
+guidance for black-box LLM evaluation (Appendix~\ref{app:proofs}).
 
 
 \begin{assumption}[Sampling regime]
@@ -859,8 +850,6 @@ this is the same selection correction the certificate applies to the deficiency 
 (Remark~\ref{rem:dkw}), and omitting it would repeat the multiplicity error we criticize.
 \end{proposition}
 
-The proof is deferred to Appendix~\ref{app:proofs}.
-
 \begin{remark}[The leaky-baseline limitation, stated as a protocol]
 \label{rem:leaky}
 The upper bound \eqref{eq:psiupper} includes $+\mathrm{CP}_{\mathrm{hi}}(p_{\texttt{none}})$, so it
@@ -893,8 +882,6 @@ $\delta_M$ has a task $T^\star$ with $\PASS_M(W_{1+},T^\star) <
 monotonicity under the garbling order on $T^\star$. In particular no monotone-submodular scalar
 context-value score can predict $\delta_M$'s behaviour on $T^\star$.
 \end{theorem}
-
-The proof is deferred to Appendix~\ref{app:proofs}.
 
 Theorem~\ref{thm:antimono} converts the empirical collapse into a structural statement: the harm is
 not noise but a witness that real LLM decision rules are not Blackwell-coherent, which is precisely
@@ -1419,9 +1406,6 @@ comparison is the part most exposed to the agentic-vs-single-shot confound (\S\r
 vendor and harness are not separated in the present runs.
 
 \paragraph{Auditable per-cell record.} The full per-arm PASS record for every carrying cell is Table~\ref{tab:percell} in Appendix~\ref{app:record}, so each certificate can be reconstructed from the reported counts.
-
-
-
 
 \subsection{Generality and controls (summary)}
 \label{sec:results-generality}
