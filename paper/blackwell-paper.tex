@@ -369,7 +369,9 @@ certificate.
 \label{sec:formalization}
 % ==========================================================================
 
-We model the choice of \emph{what context to supply} a language model as a comparison of
+\S\ref{sec:related} placed the contribution against prior work; the next four sections make it
+precise, beginning here with the objects. We model the choice of \emph{what context to supply} a
+language model as a comparison of
 statistical experiments on the task's latent requirement. This section fixes the objects and,
 crucially, separates two decision rules that the informal literature silently
 conflates: the \emph{Bayes-optimal} rule, against which the classical
@@ -479,6 +481,12 @@ it except where the model-relativity is the point.
 \section{The Blackwell order over context sources}
 \label{sec:order}
 % ==========================================================================
+
+With sources modeled as experiments (\S\ref{sec:formalization}), the classical comparison of
+experiments applies to them directly. We state the order, record that it is genuinely partial
+(the regime our experiments target), and, because those experiments measure a fixed model rather
+than the idealized decision-maker the classical theorem assumes, build an explicit bridge between
+its two registers.
 
 \subsection{The order and its two registers}
 
@@ -632,7 +640,8 @@ task design enforces and our measurements verify.
 \label{sec:incomparability}
 % ==========================================================================
 
-We now establish that no scalar can rank Blackwell-incomparable sources. We \emph{split} the
+\S\ref{sec:order} showed the order is genuinely partial; we now establish the consequence that
+motivates the whole paper: no scalar can rank a Blackwell-incomparable pair. We \emph{split} the
 claim into a clean theorem for query-\emph{independent} source scores $\varphi(W)$ and a separate,
 explicitly empirical statement for query-\emph{conditioned} scores $\varphi(W,T)$ (the relevance
 score practitioners actually use); the two must not be conflated.
@@ -737,6 +746,11 @@ outside the impossibility class.
 \section{The decision-restricted deficiency surrogate and its uniform certificate}
 \label{sec:estimator}
 % ==========================================================================
+
+The impossibility of \S\ref{sec:incomparability} concerns the idealized user of a source; every
+quantity we report, by contrast, comes from a single fixed model. This section builds the
+instrument that connects the two: a surrogate that measures the order on the fixed rule, and a
+distribution-free certificate that makes each comparison auditable on a live model.
 
 \subsection{The surrogate and its correct name}
 \label{subsec:estimator-name}
@@ -911,8 +925,9 @@ as marginal.
 \label{sec:experiments}
 % ==========================================================================
 
-We instantiate the theory of \S\S\ref{sec:order}--\ref{sec:estimator} on real language models. The
-design has three commitments. First, every reported number is an empirical PASS rate from live model
+With the order (\S\ref{sec:order}), its impossibility consequence (\S\ref{sec:incomparability}),
+and the certificate that measures it (\S\ref{sec:estimator}) in hand, we now instantiate the
+theory on real language models. The design has three commitments. First, every reported number is an empirical PASS rate from live model
 calls verified by an executable test harness; no value is modeled, simulated, or extrapolated.
 Second, the two context sources are constructed to be \emph{Blackwell-incomparable by construction}
 (\S\ref{sec:design}), so the incomparability theorem (Theorem~\ref{thm:incomparable}) has a
@@ -1440,7 +1455,8 @@ convention-to-task routing rather than in convention segmentation.
 \label{sec:discussion}
 % ==========================================================================
 
-Our results recast a piece of practitioner folklore, ``relevance does not transfer across
+With the evidence in hand, we step back to what it licenses. Our results recast a piece of
+practitioner folklore, ``relevance does not transfer across
 tasks'', as a structural fact about context sources. When two sources are Blackwell-incomparable, the
 order over them is genuinely partial, and any scalar score, by imposing a total order, must mis-rank
 them on some task. The empirical program does not merely illustrate this; it instantiates a single
