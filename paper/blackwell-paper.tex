@@ -356,7 +356,7 @@ reference, and the fact that the order is a non-lattice partial order with genui
 pairs is classical as well~\citep{torgersen1991}. Theorem~\ref{thm:incomparable} is,
 mathematically, a short corollary of Blackwell's theorem applied to a constructed pair of decision
 problems; we state it as an application-level result about language-model context, not as new
-structure in the order. The genuinely new pieces are the framing, the surrogate, and the
+structure in the order. The new pieces are the framing, the surrogate, and the
 verification.
 
 % ==========================================================================
@@ -478,7 +478,7 @@ it except where the model-relativity is the point.
 % ==========================================================================
 
 With sources modeled as experiments (\S\ref{sec:formalization}), the classical comparison of
-experiments applies to them directly. We state the order, record that it is genuinely partial
+experiments applies to them directly. We state the order, record that it is partial
 (the regime our experiments target), and, because those experiments measure a fixed model rather
 than the idealized decision-maker the classical theorem assumes, build an explicit bridge between
 its two registers.
@@ -603,7 +603,7 @@ separation hypothesis, witnesses only the sub-optimality of $\delta_M$
 \end{lemma}
 
 Intuitively: a fixed-rule crossover proves structural incomparability only when each winning
-source reveals a coordinate the losing source genuinely lacks; otherwise the crossover may
+source reveals a coordinate the losing source lacks; otherwise the crossover may
 witness nothing more than the rule's own incoherence.
 
 
@@ -635,7 +635,7 @@ task design enforces and our measurements verify.
 \label{sec:incomparability}
 % ==========================================================================
 
-\S\ref{sec:order} showed the order is genuinely partial; we now establish the consequence that
+\S\ref{sec:order} showed the order is partial; we now establish the consequence that
 motivates the whole paper: no scalar can rank a Blackwell-incomparable pair. We \emph{split} the
 claim into a clean theorem for query-\emph{independent} source scores $\varphi(W)$ and a separate,
 explicitly empirical statement for query-\emph{conditioned} scores $\varphi(W,T)$ (the relevance
@@ -910,7 +910,7 @@ is the one exception that is genuinely joint at $\eta$ on a single event, as pro
 Proposition~\ref{prop:certificate}; all other cross-claim conjunctions on a shared run are reported
 as marginal.
 
-\noindent The two verifications have genuinely different effective-$n$ requirements, which is why the consolidated record marks Opus incomparability as verified and Opus interference as reproduced but not verified; the power analysis is in Appendix~\ref{app:proofs}.
+\noindent The two verifications have different effective-$n$ requirements, which is why the consolidated record marks Opus incomparability as verified and Opus interference as reproduced but not verified; the power analysis is in Appendix~\ref{app:proofs}.
 
 % ==========================================================================
 \section{Experiments}
@@ -1142,7 +1142,7 @@ with PASS, on the API cells relevance ranks $W_1 > W_2$ and so does PASS, and on
 relevance ranks $W_2 > W_1$ and so does PASS, so the score fails \emph{only} where utility diverges
 from topicality, exactly the regime Theorem~\ref{thm:incomparable} and
 Proposition~\ref{prop:trap-constrained} isolate. The \texttt{none} floor on the trap is $0\%$ on
-all six models, and $W_2$ scores $0\%$ there too, confirming both that the convention is genuinely
+all six models, and $W_2$ scores $0\%$ there too, confirming both that the convention is
 unguessable and that encoding knowledge is useless on this task.
 
 \paragraph{The ranker spectrum: dense retrievers and a cross-encoder fall for the trap; a
@@ -1427,7 +1427,7 @@ convention-to-task routing rather than in convention segmentation.
 With the evidence in hand, we step back to what it licenses. Our results recast a piece of
 practitioner folklore, ``relevance does not transfer across
 tasks'', as a structural fact about context sources. When two sources are Blackwell-incomparable, the
-order over them is genuinely partial, and any scalar score, by imposing a total order, must mis-rank
+order over them is partial, and any scalar score, by imposing a total order, must mis-rank
 them on some task. The empirical program does not merely illustrate this; it instantiates a single
 hand-built incomparable pair (a private API-call contract $W_1$ versus a private wire-encoding
 invariant $W_2$ on the same \texttt{ledger} module) and shows that the resulting double crossover, the
@@ -1475,7 +1475,7 @@ collapse is $100\to5\%$ (Haiku), $100\to0\%$ (Sonnet), and $100\to15\%$ (Opus); 
 across the capability ladder, \emph{not} a capability trend.
 \textbf{(ii) The interference verification is structurally cell-selected.} Its upper bound includes
 $+\mathrm{CP}_{\mathrm{hi}}(p_{\text{none}})$, so it can only verify harm on cells whose none-baseline
-floors near zero. This is exactly the set of cells that are unguessable for the model under test, which
+floors near zero. This is precisely the set of cells unguessable for the model under test, which
 couples the verifiable-harm set to the model-relative value of private context (\S\ref{sec:disc-moat}).
 We treat this as a protocol (Remark~\ref{rem:leaky}): we verify anti-monotonicity only on
 floor-baseline cells, because a leaky baseline
@@ -1775,7 +1775,7 @@ precisely what the exact Clopper--Pearson construction provides.
 \subsection*{Power and the role of \texorpdfstring{$n$}{n}}
 \label{subsec:power}
 
-The two verifications have genuinely different effective-$n$ requirements, which is why at a common
+The two verifications have different effective-$n$ requirements, which is why at a common
 $n=40$ Opus verifies incomparability but not interference. For a stark cell with empirical
 proportion at an endpoint ($\hat p\in\{0,1\}$), the Clopper--Pearson interval collapses to a
 one-sided bound that clears $0$ even at small $n$: the incomparability verification \eqref{eq:LD} is
@@ -1921,8 +1921,8 @@ dropping the dominated signal, locates the failure in convention-to-task routing
 % ==========================================================================
 
 All reported numbers come from real model calls whose outputs are checked by executable verifiers; there
-are no modeled or aspirational figures. The complete artifact bundle---the measurement harness, the
-executable verifiers, and every per-model run log and result JSON cited below---is available at
+are no modeled or aspirational figures. The complete artifact bundle (the measurement harness, the
+executable verifiers, and every per-model run log and result JSON cited below) is available at
 \url{https://github.com/abilous-ti/blackwell-llm-context}. The harness (\texttt{tokenbench/measure\_blackwell.py}) is
 Python-standard-library only (no third-party dependencies; the Clopper--Pearson endpoints use a stdlib
 regularized incomplete beta), is cross-OS, and implements the surrogate $\dhat_{\Dcal}$, the uniform
