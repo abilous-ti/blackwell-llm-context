@@ -63,29 +63,27 @@ A Blackwell Framework and Certified LLM Evidence}
 % ==========================================================================
 \begin{abstract}
 % ==========================================================================
-Context selection for language models is almost universally posed as a
-\emph{scalar} ranking problem: score each candidate source, take the top-$k$.
-We argue this collapses a partial order. Modeling each context source as a
-statistical \emph{experiment} on the task's latent requirement, we transport
-Blackwell's comparison of experiments~\citep{blackwell1953} to context
-selection: when two sources are Blackwell-incomparable, no query-independent
-scalar can rank them correctly across all tasks, a formal account of the
-field's ``relevance-does-not-transfer'' folklore. To make the order measurable
-on real models behind executable verifiers, we define a decision-restricted value-deficiency \emph{surrogate} and equip it with a distribution-free finite-sample
-\emph{certificate}. On six language models across four vendors we certify
-($\geq 90\%$ confidence, both directions) that two private context sources are
-empirically incomparable. Representative lexical, dense bi-encoder, and
-cross-encoder rankers all prefer the wrong source on a confound-controlled
-trap, while an LLM listwise reranker that reads the decisive content escapes,
-the topicality boundary the theory predicts. We also show that supplying a strict
-\emph{superset} of a sufficient source collapses certified pass rates from
-$100\%$ to as low as $0\%$, with order, length-padding, and
-routing-instruction controls attributing the harm to the added signal, not
-position or length. The conclusion is methodological: context
-selection is a partial-order problem, and the right operational object is a
-certified deficiency surrogate, not a scalar. The constructive selection rule
-this implies is developed in a companion paper; scaling certified selection to
-corpus retrieval is the central problem we leave open.
+Choosing what to put in a language model's prompt is almost always done by
+scoring each candidate source with a single number and keeping the top few. We
+argue this is the wrong tool. The best context for one task is often useless
+for another. Two sources can be \emph{incomparable}, in the exact sense of
+Blackwell's 1953 comparison of experiments~\citep{blackwell1953}, and when they
+are, no single relevance score can rank them correctly for every task. To test
+this on real systems we use a simple check: run each source through a battery of
+pass/fail tasks, compare the pass rates, and attach confidence intervals so the
+comparison is auditable (a distribution-free \emph{certificate}). On six
+language models from four vendors we confirm ($\geq 90\%$ confidence, both
+directions) that two hand-built sources are incomparable. On a designed trap
+task a lexical score, two dense
+retrievers, and a cross-encoder reranker all prefer the wrong source; only a
+listwise LLM reranker, which reads the deciding detail, gets it right, exactly
+the boundary the theory predicts. We also find that adding a strictly larger
+source can \emph{hurt}: pass rates fall from $100\%$ to as low as $0\%$, and
+controls rule out word order and length as the cause. The lesson is practical:
+treat context selection as a partial-order problem, not a scalar ranking, and
+compare sources by a certified pass-rate test rather than a relevance number. A
+companion paper gives the selection rule this implies; scaling it to large
+corpora is the main open problem.
 \end{abstract}
 
 % ==========================================================================
@@ -120,51 +118,45 @@ argue it is also the wrong abstraction, and that a classical apparatus from
 statistical decision theory says precisely why.
 
 \paragraph{A folklore observation, restated as structure.}
-A persistent, informal observation undercuts the scalar paradigm: \emph{relevance
-does not transfer across tasks}. A source that helps one task hurts another;
-``the best context'' is task-dependent. This is usually treated as a modeling
-nuisance to be engineered around with better rankers. We show it is the
-signature of a \emph{partial order}. We model a context source $W$ as a
-statistical experiment on the task's latent requirement $S$ (the object a
-verifier checks; \S\ref{sec:formalization}), which lets us import two classical
-tools. Blackwell's order ranks experiments by garbling: $W_1 \Bord W_2$ iff
-$W_2$'s signal is a noised (garbled) version of $W_1$'s, and, by the
-Blackwell--Sherman--Stein theorem, this holds \emph{iff} an idealized
-decision-maker does at least as well with $W_1$ as with $W_2$ on
-\emph{every} decision problem~\citep{blackwell1953,torgersen1991}. The order is
-\emph{partial}: many source pairs are incomparable, neither garbling the other.
-Incomparability is exactly the regime in which no scalar summary can be faithful,
-because a scalar is a total order and a total order extending a strict partial
-order must invert at least one incomparable pair on some task.
+Practitioners already know the phenomenon: \emph{relevance does not transfer across tasks}. A
+source that helps one task hurts another, so ``the best context'' depends on the task, and this is
+usually treated as a nuisance to engineer away with better rankers. We show it is instead the
+signature of a \emph{partial order}. Model a context source $W$ as a statistical experiment on what
+the task actually needs, $S$ (the thing a verifier checks; \S\ref{sec:formalization}). Blackwell
+compares two experiments by asking whether one is a blurred copy of the other: we write
+$W_1 \Bord W_2$ when $W_2$'s signal is a noised version of $W_1$'s, and by the
+Blackwell--Sherman--Stein theorem this holds exactly when an ideal decision-maker does at least as
+well with $W_1$ as with $W_2$ on \emph{every} task~\citep{blackwell1953,torgersen1991}. The catch
+is that the order is only \emph{partial}: often neither source is a blurred copy of the other, so
+the two are \emph{incomparable}. A single score cannot capture a partial order. A score forces
+every source into one line, but two incomparable sources each win on some task, so whichever way
+the score orders them, it is wrong on one.
 
 \paragraph{What is and is not new.}
-The machinery, the garbling order, the Blackwell--Sherman--Stein equivalence, Le~Cam's
-deficiency, is classical; our contribution is the application, the incomparability framing, and a
-certified estimator (\S\ref{sec:related}). One gap the framing must respect, and that we close,
-concerns the decision rule: Blackwell's theorem is about the \emph{optimal} (Bayes) use of an
-experiment, whereas every quantity we measure, $\PASS_M(W,T) =
-\mathbb{E}[v_T(\delta_M(T,w))]$, is evaluated at a single fixed sub-optimal rule $\delta_M$. We
-therefore develop the order in a $\delta_M$-restricted register with a one-way bridge to the
-idealized order (\S\ref{sec:order}), confine every empirical claim to the restricted object, and
-name the estimator a decision-restricted \emph{value-deficiency surrogate}, not a Le~Cam
-deficiency (\S\ref{sec:estimator}).
+The mathematics is classical, the garbling order, the Blackwell--Sherman--Stein equivalence,
+Le~Cam's deficiency; what is new is applying it to context selection, reading cross-task
+non-transfer as a partial order, and giving a test that checks it on a real model
+(\S\ref{sec:related}). One gap needs care. Blackwell's theorem is about the \emph{best possible} use
+of a source, but every number we measure comes from one fixed model: $\PASS_M(W,T) =
+\mathbb{E}[v_T(\delta_M(T,w))]$, the pass rate of a single rule $\delta_M$ that is not optimal. So
+we state the order twice, once for the ideal user and once for the fixed model, and prove a one-way
+bridge from what we measure to what the theorem is about (\S\ref{sec:order}); and we call our
+estimator a \emph{value-deficiency surrogate}, not a Le~Cam deficiency (\S\ref{sec:estimator}).
 
 \paragraph{A latent-coordinate model that makes the order non-vacuous.}
-Fixed strings would naively be Blackwell-trivial constant experiments. We model the latent
-requirement as a vector of coordinates and each source as a deterministic experiment observing a
-\emph{projection}; comparison reduces to refinement of the projections' $\sigma$-algebras, and
-incomparability is mutual non-refinement, a property we establish for our concrete pair (Lemma~\ref{lem:noref}).
+One technical point keeps the framing from being empty. A fixed string of text looks like a
+constant, and a constant carries no information in Blackwell's sense. We avoid this by treating the
+hidden requirement as a list of separate facts and each source as revealing some of them; two
+sources are then incomparable exactly when each reveals a fact the other hides, which is easy to
+check and holds for our pair (Lemma~\ref{lem:noref}).
 
 \paragraph{Empirical findings.}
-We instantiate the theory on two private, equally on-topic conventions about the
-same module: an API call contract $W_1$ and a wire-encoding invariant $W_2$
-(\S\ref{sec:experiments}), with a four-cell verifier battery using executable
-PASS$/$FAIL judgments (return code $0$ is PASS). This imposes a
-restriction: the battery is a fixed, adversarially constructed
-opposition, not a sampled task distribution, and the certified incomparability is
-carried by one API cell and one encoding cell; we report the effective support
-explicitly and do not call $\Dcal$ a ``distribution.'' On this instrument
-we obtain, on \emph{real} model calls with no modeled numbers:
+We test the theory on the two notes from the opening example: an API call contract $W_1$ and a
+wire-encoding rule $W_2$ for the same module (\S\ref{sec:experiments}), graded by a small battery
+of tasks whose verifier returns pass or fail (exit code $0$ is pass). The battery is a fixed,
+hand-built opposition, not a random sample of tasks, and the certified result rests on one API task
+and one encoding task; we say so plainly and do not call it a ``distribution.'' On this setup, from
+\emph{real} model calls with no invented numbers, we find:
 
 \begin{itemize}
   \item \textbf{Certified empirical incomparability on all six models.} The
@@ -212,15 +204,11 @@ we obtain, on \emph{real} model calls with no modeled numbers:
 \end{itemize}
 
 \paragraph{Methodological asymmetry.}
-The Anthropic models run agentically (\texttt{claude -p}, up to six turns); the
-non-Anthropic models run single-shot (completion plus code extraction via an
-OpenAI-style API). We flag this throughout: vendor is confounded with harness, so
-every \emph{cross-vendor magnitude} comparison (the value spectrum, the
-interference ladder) inherits that confound, whereas the binary within-model
-claims do not. The single-shot setting is arguably a \emph{cleaner} probe of
-whether a model uses supplied context, since it removes the agentic-exploration
-confound; we treat the asymmetry as a limitation to be reported, not explained
-away.
+One caveat about how we ran the models. The Anthropic models run as agents (\texttt{claude -p}, up
+to six turns); the others run in a single shot (one completion, then we extract the code). So
+vendor and run-mode are tangled together: any comparison of \emph{how large} an effect is across
+vendors inherits this, though the yes/no claims within a single model do not. We flag it wherever
+it matters and treat it as a limitation, not something to explain away.
 
 \paragraph{Contributions.} The paper makes one claim, context selection is a partial-order
 problem rather than a scalar-ranking problem, and contributes exactly the three pieces that
@@ -284,23 +272,18 @@ against arXiv/DBLP/publisher records.
 % ==========================================================================
 
 \paragraph{Positioning.}
-The machinery we use, Blackwell's garbling order~\citep{blackwell1953} and Le~Cam's
-deficiency~\citep{lecam1964,lecam1986}, is classical, and we claim no new core mathematics.
-Our contribution is an \emph{application}, a \emph{framing}, and an \emph{estimator}:
-(i) we treat each candidate context source for a language model as a statistical experiment
-on the task's latent requirement and rank sources by the Blackwell order, with a
-decision-independent, for-all-tasks dominance guarantee (\S\ref{sec:order});
-(ii) we observe, as an application-level corollary of Blackwell's theorem, that
-Blackwell-\emph{incomparable} sources cannot be ranked by any scalar score for all tasks
-(\S\ref{sec:incomparability}), which converts the empirical folklore that ``relevance does
-not transfer across tasks'' into a theorem, formalizing within the Blackwell frame a
-limitation that information retrieval has long recognized for interacting documents
-(\S\ref{sec:related-ir}); and
-(iii) we supply a Le~Cam-inspired, decision-restricted value-deficiency \emph{surrogate} with a
-distribution-free finite-sample certificate that is auditable on a real model with a real
-verifier (\S\ref{sec:estimator}). To our knowledge,
-no prior work applies the comparison of experiments to selecting inference-time context for
-language models.
+The tools we use are classical, Blackwell's garbling order~\citep{blackwell1953} and Le~Cam's
+deficiency~\citep{lecam1964,lecam1986}; we add no new core mathematics. Our contribution is to
+apply, frame, and measure. (i) We treat each candidate source as a statistical experiment on what
+the task needs and rank sources by the Blackwell order, which gives a guarantee that holds for
+every task at once, not just one (\S\ref{sec:order}). (ii) We point out a direct consequence of
+Blackwell's theorem, that \emph{incomparable} sources cannot be ranked by any scalar score for all
+tasks (\S\ref{sec:incomparability}), turning the folklore ``relevance does not transfer across
+tasks'' into a theorem and tying it to a limit information retrieval has long known for interacting
+documents (\S\ref{sec:related-ir}). (iii) We supply a value-deficiency \emph{surrogate} with a
+certificate that can be checked on a real model with a real verifier (\S\ref{sec:estimator}). We
+know of no prior work that uses the comparison of experiments to choose a language model's context
+at inference time.
 
 \subsection{Scalar selection and its limits in information retrieval}
 \label{sec:related-scalar}\label{sec:related-ir}
@@ -770,10 +753,10 @@ distribution-free certificate that makes each comparison auditable on a live mod
 \subsection{The surrogate and its correct name}
 \label{subsec:estimator-name}
 
-Exact garblings over text are uncomputable and $\Bord$ is partial, so we measure the
-$\delta_M$-restricted order of Definition~\ref{def:dmorder}. Fix the model rule $\delta_M$ and a
-finite task set $\Dcal$ and define the \emph{decision-restricted value-deficiency} (a one-sided
-worst-case regret of $W_1$ relative to $W_2$ on $\Dcal$):
+Exact garblings over text cannot be computed, and $\Bord$ is only partial, so instead we measure the
+fixed-rule order of Definition~\ref{def:dmorder}. Fix the model rule $\delta_M$ and a finite task
+set $\Dcal$, and define the \emph{decision-restricted value-deficiency}, the worst amount by which
+$W_1$ trails $W_2$ across the tasks in $\Dcal$:
 \begin{equation}
 \label{eq:estimator}
 \dhat_{\Dcal}(W_1,W_2) \;:=\; \max\!\Big(0,\ \sup_{T\in \Dcal}\big[\PASS_M(W_2,T)-\PASS_M(W_1,T)\big]\Big),
@@ -974,23 +957,20 @@ candidates, the precondition for Theorem~\ref{thm:incomparable} to apply.
 \end{description}
 
 \paragraph{Why incomparable (garbling argument).}
-A garbling acts on the \emph{signal alone}. From $W_2$'s wire format one cannot manufacture the
-private argument order, the required keyword-only \texttt{memo}, or the exception type; from $W_1$'s
-contract one cannot manufacture the cents scale, the \texttt{\#} separator, or the mod-10 check. The
-two facts are logically independent coordinates of the latent requirement $S$, so neither signal's
-$\sigma$-algebra refines the other's, neither sufficiency direction holds, and $W_1, W_2$ are
-Blackwell-incomparable. This is the concrete instance of the coordinate/projection construction of
-\S\ref{sec:formalization}: $W_1$ and $W_2$ are deterministic experiments observing distinct,
-mutually non-refining projections of $S$ (Lemma~\ref{lem:noref}).
+The argument is simple. From $W_2$'s wire format you cannot recover $W_1$'s private argument order,
+its required \texttt{memo} keyword, or its error type; from $W_1$'s contract you cannot recover
+$W_2$'s cents scale, its \texttt{\#} separator, or its mod-10 check. Each source states a fact the
+other leaves out, so neither is a blurred copy of the other, and $W_1, W_2$ are incomparable. This
+is exactly the coordinate picture of \S\ref{sec:formalization}: $W_1$ and $W_2$ reveal different,
+non-overlapping facts about $S$ (Lemma~\ref{lem:noref}).
 
 \paragraph{Confound defense: the double crossover.}
-The experiment's signature is a \emph{double crossover} measured against a \texttt{none} baseline (no
-convention supplied): $W_1$ lifts the API tasks but \emph{not} the encoding task, while $W_2$ lifts
-the encoding task but \emph{not} the API tasks. If the encoding family were merely ``harder,'' $W_1$
-would not lift it and $W_2$ would still have to lift its own family from the same floor. Matched
-\texttt{none} baselines that floor near zero on both families therefore establish equal intrinsic
-hardness, so any divergence is attributable to the matching private fact, not to a difficulty
-asymmetry.
+The key pattern is a \emph{double crossover}, measured against a \texttt{none} baseline (no note
+supplied): $W_1$ raises the API tasks but \emph{not} the encoding task, while $W_2$ raises the
+encoding task but \emph{not} the API tasks. If encoding were simply ``harder,'' $W_1$ would fail to
+help it and $W_2$ would still have to raise it from the same floor. Because both baselines sit near
+zero, the two task families are equally hard on their own, so any difference comes from the matching
+private fact, not from one family being harder.
 
 \subsection{Tasks}
 \label{sec:tasks}
@@ -1484,25 +1464,22 @@ formalization is a model rather than a proof of the realized object.
 \subsection{Scope of the claims}
 \label{sec:disc-bridge}\label{sec:disc-deficiency}\label{sec:disc-certificate}
 
-Three scope statements govern everything above. \textbf{(i) Two registers.} The theorems concern
-the idealized Bayes-optimal user of a source; every measured quantity is PASS at one fixed,
-sub-optimal rule $\delta_M$. Lemma~\ref{lem:bridge} supplies the direction the program needs,
-certified $(M,\Dcal)$-incomparability on separated decisive coordinates with capped
-deprived-side value implies Blackwell incomparability, and the converse requires the
-value-attainment hypothesis (Assumption~\ref{ass:attain}); both hypotheses are enforced by the
-task design and checked against the measured floors; we therefore read the contribution as a
-$\delta_M$-restricted, $\Dcal$-restricted incomparability statement that \emph{earns} the
-structural conclusion via the bridge rather than assuming it. \textbf{(ii) The estimator's name.}
-$\dhat_{\Dcal}$ performs no garbling minimization and ranges over a fixed finite battery; it is a
-one-sided, decision-restricted \emph{value-deficiency surrogate}, not a Le~Cam deficiency, and no
-two-sided inequality relates the two for a fixed sub-optimal rule (Remark~\ref{rem:notlecam}).
-What is rigorous is the certificate, which we regard as the most robust contribution and which
-survives independently of the deficiency analogy. \textbf{(iii) What the certificate covers.} Its
-correctness rests on paying the $\sup_T$ multiplicity via exact intervals and a union bound; its
-effective support is small (one API cell and one encoding cell carry pair-1 incomparability), each
-certified claim is controlled \emph{marginally} at $\eta$ rather than jointly across claims
-(\S\ref{subsec:fwer}), and we describe $\Dcal$ as a fixed adversarial battery, not a task
-distribution.
+Three limits of scope govern everything above. \textbf{(i) Two registers.} The theorems are about
+the ideal user of a source; every number we measure is the pass rate of one fixed, non-optimal
+rule $\delta_M$. Lemma~\ref{lem:bridge} connects the two in the direction we need: a certified
+crossover on tasks where each source supplies its own decisive fact implies genuine Blackwell
+incomparability, and the reverse needs an extra assumption (Assumption~\ref{ass:attain}) that our
+task design builds in and our measurements confirm. So we read the result as a statement about the
+fixed model on a fixed battery that \emph{earns} the structural conclusion through the bridge
+rather than assuming it. \textbf{(ii) The estimator's name.} $\dhat_{\Dcal}$ does no minimization
+over garblings and ranges over a fixed set of tasks; it is a one-sided \emph{value-deficiency
+surrogate}, not a Le~Cam deficiency, and the two are not interchangeable for a fixed rule
+(Remark~\ref{rem:notlecam}). What is rigorous is the certificate, which we regard as the most
+robust part and which stands whether or not the deficiency analogy holds. \textbf{(iii) What the
+certificate covers.} It is correct because it pays for picking the worst task with exact intervals
+and a union bound; its support is small (one API task and one encoding task carry the pair-1
+result), each claim is controlled on its own at level $\eta$ rather than all at once
+(\S\ref{subsec:fwer}), and we call $\Dcal$ a fixed adversarial battery, not a task distribution.
 
 \subsection{Anti-monotonicity is real, certified, but not capability-ordered}
 \label{sec:disc-antimono}
@@ -1661,18 +1638,16 @@ task-disjoint, so a complementary pair would be needed to test whether a superse
 \label{sec:conclusion}
 % ==========================================================================
 
-Context selection for language models is, structurally, a partial-order problem rather than a scalar
-one. When two context sources are Blackwell-incomparable, no scalar score can rank them correctly for
-all tasks (Theorem~\ref{thm:incomparable}), which gives a formal account of the field's ``relevance does
-not transfer'' folklore. We made the order measurable with a decision-restricted value-deficiency
-surrogate $\dhat_{\Dcal}$ equipped with a distribution-free uniform Clopper--Pearson/Bonferroni
-certificate, and we instantiated the theory on six models across four vendors. On every model we certify
-($\ge 90\%$) that two private context sources are empirically incomparable; on every model a real
-query-conditioned lexical relevance score mis-ranks them; and on five of six models we certify a superset
-of a sufficient source sharply degrading PASS (a collapse as deep as $100\%\to 0\%$), a certified
-falsification of superset-monotonicity for these fixed rules. The value of private context
-$I(S;W\mid\theta)$ is itself model-relative, forming a continuous $0\%$--$75\%$ spectrum that tracks
-vendor training rather than raw capability.
+Context selection is, at bottom, a partial-order problem, not a scalar one. When two sources are
+incomparable, no scalar score can rank them correctly for all tasks (Theorem~\ref{thm:incomparable}),
+which explains the field's ``relevance does not transfer'' folklore. We made the order measurable
+with a value-deficiency surrogate $\dhat_{\Dcal}$ and a distribution-free certificate, and we ran
+the theory on six models across four vendors. On every model we certify ($\ge 90\%$) that two
+private sources are incomparable; on every model a real relevance score ranks them the wrong way;
+and on five of six we certify that adding a strictly larger source sharply lowers the pass rate (as
+deep as $100\%\to 0\%$), which no ``more-is-better'' scalar can predict. How much a private source
+is worth turns out to depend on the model: guessability runs from $0\%$ to $75\%$ across vendors and
+tracks a vendor's training rather than raw capability.
 
 On scope: the theorems concern the idealized Bayes-optimal user of a source; the
 realized crossover, anti-monotonicity, and value-of-private-context are properties of \emph{fixed} models
