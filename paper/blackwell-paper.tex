@@ -10,11 +10,11 @@
 \usepackage{amsmath,amssymb,amsthm,booktabs,hyperref,natbib,microtype,enumitem}
 \usepackage{tikz}
 \hypersetup{
-  pdftitle  = {Context Selection Is a Partial Order: A Blackwell Framework and Certified LLM Evidence},
+  pdftitle  = {Context Selection Is a Partial Order: A Blackwell Framework and Verified LLM Evidence},
   pdfauthor = {Andriy Bilous, Oleksandr Reminnyi},
   pdfsubject = {Blackwell comparison of experiments applied to language-model context selection},
   pdfkeywords = {context selection, Blackwell order, partial order, retrieval-augmented generation,
-                 language models, statistical deficiency, certified evaluation},
+                 language models, statistical deficiency, verified evaluation},
   colorlinks = true, linkcolor = black, citecolor = black, urlcolor = blue!50!black
 }
 
@@ -40,7 +40,7 @@
 \newcommand{\Bord}{\succeq_{B}}
 
 \title{Context Selection Is a Partial Order:\\
-A Blackwell Framework and Certified LLM Evidence}
+A Blackwell Framework and Verified LLM Evidence}
 
 \author{%
   Andriy Bilous \\
@@ -71,7 +71,7 @@ Blackwell's 1953 comparison of experiments~\citep{blackwell1953}, and when they
 are, no single relevance score can rank them correctly for every task. To test
 this on real systems we use a simple check: run each source through a battery of
 pass/fail tasks, compare the pass rates, and attach confidence intervals so the
-comparison is auditable (a distribution-free \emph{certificate}). On six
+comparison is auditable (a distribution-free \emph{verification}). On six
 language models from four vendors we confirm ($\geq 90\%$ confidence, both
 directions) that two hand-built sources are incomparable. On a designed trap
 task a lexical score, two dense
@@ -81,7 +81,7 @@ the boundary the theory predicts. We also find that adding a strictly larger
 source can \emph{hurt}: pass rates fall from $100\%$ to as low as $0\%$, and
 controls rule out word order and length as the cause. The lesson is practical:
 treat context selection as a partial-order problem, not a scalar ranking, and
-compare sources by a certified pass-rate test rather than a relevance number. A
+compare sources by a verified pass-rate test rather than a relevance number. A
 companion paper gives the selection rule this implies; scaling it to large
 corpora is the main open problem.
 \end{abstract}
@@ -101,7 +101,7 @@ miniature. It has a precise name, the two notes are \emph{incomparable} in the s
 comparison of experiments~\citep{blackwell1953}, and a precise consequence: no single relevance
 score can rank the two notes so that the ranking is right for every task, because a score must crown
 one winner and here neither note wins outright. The body makes this exact, gives a statistical test
-that \emph{certifies} it from ordinary pass/fail runs on a live model, and finds that six production
+that \emph{verifies} it from ordinary pass/fail runs on a live model, and finds that six production
 language models across four vendors all exhibit it. A reader who keeps these two notes in mind can
 read every symbol below as a statement about the first note versus the second (in the body they are
 the sources $W_1$ and $W_2$).
@@ -154,21 +154,21 @@ check and holds for our pair (Lemma~\ref{lem:noref}).
 We test the theory on the two notes from the opening example: an API call contract $W_1$ and a
 wire-encoding rule $W_2$ for the same module (\S\ref{sec:experiments}), graded by a small battery
 of tasks whose verifier returns pass or fail (exit code $0$ is pass). The battery is a fixed,
-hand-built opposition, not a random sample of tasks, and the certified result rests on one API task
+hand-built opposition, not a random sample of tasks, and the verified result rests on one API task
 and one encoding task; we say so plainly and do not call it a ``distribution.'' On this setup, from
 \emph{real} model calls with no invented numbers, we find:
 
 \begin{itemize}
-  \item \textbf{Certified empirical incomparability on all six models.} The
-  uniform certificate clears $\geq 90\%$ confidence in \emph{both} directions:
+  \item \textbf{Verified empirical incomparability on all six models.} The
+  uniform verification clears $\geq 90\%$ confidence in \emph{both} directions:
   the two-sided lower bounds $L_{\Dcal}(W_1,W_2)\,/\,L_{\Dcal}(W_2,W_1)$
   are
-  Haiku-4.5 $+0.88\,/\,+0.83$ ($n{=}80$),
-  Sonnet-4.6 $+0.76\,/\,+0.76$ ($n{=}40$),
-  Opus-4.8 $+0.55\,/\,+0.55$ ($n{=}20$),
-  GPT-5.5 $+0.76\,/\,+0.76$ ($n{=}40$),
-  DeepSeek-V4-Pro $+0.347\,/\,+0.715$ ($n{=}40$), and
-  Kimi-K2.6 $+0.675\,/\,+0.762$ ($n{=}40$). Incomparability is therefore not a
+  Haiku-4.5 $+0.76\,/\,+0.76$,
+  Sonnet-4.6 $+0.72\,/\,+0.76$,
+  Opus-4.8 $+0.72\,/\,+0.76$,
+  GPT-5.5 $+0.76\,/\,+0.76$,
+  DeepSeek-V4-Pro $+0.35\,/\,+0.72$, and
+  Kimi-K2.6 $+0.68\,/\,+0.76$ (all $n{=}40$). Incomparability is therefore not a
   single-lab artifact.
   \item \textbf{Representative topical rankers mis-rank the pair.} On a trap task
   saturated with encoding vocabulary, query-conditioned lexical relevance scores
@@ -182,17 +182,16 @@ and one encoding task; we say so plainly and do not call it a ``distribution.'' 
   Proposition~\ref{prop:trap-constrained} predicts: topical feature-based
   rankers must fail there, while rankers that read the decisive coordinate can
   escape.
-  \item \textbf{Certified anti-monotonicity.} The superset $W_{1+} = W_2 \,{+}{+}\, W_1$,
+  \item \textbf{Verified anti-monotonicity.} The superset $W_{1+} = W_2 \,{+}{+}\, W_1$,
   which literally \emph{contains} $W_1$'s signal, sharply degrades the API cells:
   Sonnet and Kimi collapse $100\% \to 0\%$ (interference $\Psi_T = -1.00$,
-  certified upper bound $\leq -0.69$); GPT-5.5 certifies $\Psi_T \leq -0.60$ on
-  \texttt{api\_post\_ok}. The interference certificate clears on at least one
-  cell for five of six models (Opus reproduces, $\Psi_T = -0.75/-0.80$, but
-  $n{=}20$ is too few to certify; we give the power argument in
-  \S\ref{sec:experiments}). An order control shows the harm does not recover
-  under reordering, so it is not a lost-in-the-middle artifact, and a
+  verified upper bound $\leq -0.69$); GPT-5.5 verifies $\Psi_T \leq -0.60$ on
+  \texttt{api\_post\_ok}. The interference verification clears on at least one
+  cell for five of six models (Opus reproduces the collapse, $100\% \to 38\%$,
+  but its milder drop and partly-guessable baseline keep it below the bar;
+  \S\ref{sec:results-antimono}). A
   length-matched padding control shows equal-length irrelevant text is
-  harmless, so it is not a token-count artifact either. One
+  harmless, so the harm is the added signal, not token count or position. One
   caveat: the effect is large and robust across the capability ladder but is
   \emph{not} monotone in capability (Sonnet, the middle model, is the starkest;
   Opus, the strongest, less so), so we claim no capability trend.
@@ -200,15 +199,13 @@ and one encoding task; we say so plainly and do not call it a ``distribution.'' 
   The \texttt{none}-arm baselines span $0\%$--$75\%$ guessability across vendors
   (\S\ref{sec:results-moat}), an empirical instance of the theory's
   $\theta$-dependence; we report it as supporting evidence that caps which cells
-  can be certified per model, not as a headline claim.
+  can be verified per model, not as a headline claim.
 \end{itemize}
 
-\paragraph{Methodological asymmetry.}
-One caveat about how we ran the models. The Anthropic models run as agents (\texttt{claude -p}, up
-to six turns); the others run in a single shot (one completion, then we extract the code). So
-vendor and run-mode are tangled together: any comparison of \emph{how large} an effect is across
-vendors inherits this, though the yes/no claims within a single model do not. We flag it wherever
-it matters and treat it as a limitation, not something to explain away.
+\paragraph{How we ran the models.}
+All six models are run the same way: a single API call per attempt, from which we extract the
+candidate code and grade it with the verifier. This keeps the setup uniform across vendors, so a
+difference between models reflects the model, not how it was run.
 
 \paragraph{Contributions.} The paper makes one claim, context selection is a partial-order
 problem rather than a scalar-ranking problem, and contributes exactly the three pieces that
@@ -225,23 +222,23 @@ claim needs.
   (Proposition~\ref{prop:trap-constrained}). Information retrieval has long argued that no single
   fixed document score is optimal once documents interact (\S\ref{sec:related-ir}); we derive the
   impossibility as a theorem in the Blackwell frame.
-  \item[\textbf{(C2)}] \textbf{Certificate: a measurable deficiency surrogate with finite-sample
+  \item[\textbf{(C2)}] \textbf{Verification: a measurable deficiency surrogate with finite-sample
   guarantees} (\S\ref{sec:estimator}). We define
   $\dhat_{\Dcal}(W_1,W_2) = \max\!\big(0,\,
   \sup_{T\in\Dcal}[\PASS_M(W_2,T) - \PASS_M(W_1,T)]\big)$, a
   decision-restricted value-deficiency surrogate (named as such, not as a Le~Cam
-  deficiency), and a distribution-free uniform certificate: exact
+  deficiency), and a distribution-free uniform verification: exact
   Clopper--Pearson intervals~\citep{clopperpearson1934} at Bonferroni
   level~\citep{bonferroni1936} $\alpha = \eta/(2|\Dcal|)$, valid jointly on
-  a single event, so that $L_{\Dcal}>0$ certifies a positive value gap at
+  a single event, so that $L_{\Dcal}>0$ verifies a positive value gap at
   confidence $\geq 1-\eta$; we argue why a naive DKW bound~\citep{dvoretzky1956} under-covers the
-  supremum, and give the matching interference certificate. This is the instrument that makes the
+  supremum, and give the matching interference verification. This is the instrument that makes the
   partial order testable on a real model behind a real verifier.
-  \item[\textbf{(C3)}] \textbf{Evidence: certified incomparability and scalar-ranking failure on
-  live models} (\S\ref{sec:experiments}). Certified empirical incomparability on six models across
+  \item[\textbf{(C3)}] \textbf{Evidence: verified incomparability and scalar-ranking failure on
+  live models} (\S\ref{sec:experiments}). Verified empirical incomparability on six models across
   four vendors; the ranker-spectrum mis-rank on a confound-controlled trap (lexical cosine, dense
   bi-encoders, and a cross-encoder all fail; an LLM listwise reranker that reads the decisive
-  content escapes, exactly the topicality boundary the theory draws); and certified
+  content escapes, exactly the topicality boundary the theory draws); and verified
   anti-monotonicity, a strict superset of a sufficient source collapsing PASS, with order,
   length-padding, and routing-instruction controls, all with the scope limits stated in
   \S\ref{sec:limitations}.
@@ -255,8 +252,8 @@ mathematics. \S\ref{sec:formalization} gives the latent-coordinate experiment
 model and defines $\theta$. \S\ref{sec:order} develops the partial order, the
 $\delta_M$-restricted order, the non-refinement construction, and the bridging lemma, and \S\ref{sec:incomparability} proves
 the source-level incomparability statement and isolates the query-conditioned
-case (C1). \S\ref{sec:estimator} defines the surrogate, the uniform certificate,
-and the interference certificate, and relates the surrogate to the true Le~Cam
+case (C1). \S\ref{sec:estimator} defines the surrogate, the uniform verification,
+and the interference verification, and relates the surrogate to the true Le~Cam
 deficiency (C2). \S\ref{sec:experiments} reports the six-model program with full
 per-cell tables (C3). \S\ref{sec:limitations} states threats to validity and
 scope, and \S\ref{sec:conclusion} concludes. Proofs of the two central impossibility results
@@ -281,7 +278,7 @@ Blackwell's theorem, that \emph{incomparable} sources cannot be ranked by any sc
 tasks (\S\ref{sec:incomparability}), turning the folklore ``relevance does not transfer across
 tasks'' into a theorem and tying it to a limit information retrieval has long known for interacting
 documents (\S\ref{sec:related-ir}). (iii) We supply a value-deficiency \emph{surrogate} with a
-certificate that can be checked on a real model with a real verifier (\S\ref{sec:estimator}). We
+verification that can be checked on a real model with a real verifier (\S\ref{sec:estimator}). We
 know of no prior work that uses the comparison of experiments to choose a language model's context
 at inference time.
 
@@ -304,7 +301,7 @@ boundary of the class. Listwise LLM rerankers~\citep{sun2023rankgpt} are query-c
 \emph{set} functions, outside the theorem's scope, though they carry no dominance guarantee of any
 kind; and diversity-aware selection, from MMR~\citep{carbonell1998} to
 DPPs~\citep{ye2023ceil} and submodular coverage~\citep{huang2025gammacover}, optimizes set
-objectives over embedding geometry, whose partial-order-grounded analogue (certified coverage of
+objectives over embedding geometry, whose partial-order-grounded analogue (verified coverage of
 latent coordinates) we develop in a companion paper.
 
 The limits of scalar relevance are one of the oldest themes in information retrieval, and we
@@ -315,7 +312,7 @@ relevance-maximizing retrieval degrading answer quality, is measured
 directly~\citep{relevanceutility2025,sureRAG2026}. Our delta is the \emph{form} of the statement:
 the failure becomes a theorem in the comparison-of-experiments frame, with the precise structural
 condition, Blackwell incomparability, under which every query-independent scalar must mis-rank,
-and a certified live instance on six production models.
+and a verified live instance on six production models.
 
 \subsection{Task-dependence and context degradation}
 \label{sec:related-taskdep}
@@ -328,8 +325,8 @@ length~\citep{levy2025moredocs}; added length alone hurts~\citep{contexthurts202
 persists across model generations~\citep{hong2025contextrot} and agent-scaffold
 components~\citep{longcontextdegrade2026}. We do not claim to discover this genus. Our
 anti-monotonicity finding contributes its order-theoretic form: a strict \emph{superset} of a
-sufficient source, on sources separately \emph{certified} Blackwell-incomparable, collapses PASS
-under a per-task interference certificate with position, length, and routing controls; the
+sufficient source, on sources separately \emph{verified} Blackwell-incomparable, collapses PASS
+under a per-task interference verification with position, length, and routing controls; the
 algebraic object $\Psi_T<0$ is one no monotone-submodular context-value scalar can carry.
 Pareto-incomparability of prompts along competing metrics \emph{within} a single
 task~\citep{paretoprompts2025} is orthogonal to our object, incomparable \emph{sources across
@@ -344,15 +341,15 @@ Blackwell informativeness and show a pointwise-mutual-information \emph{scalar} 
 their Bayes-optimal, white-box regime, an instructive contrast with ours, where the order is
 genuinely partial for a fixed rule and no query-independent scalar can be faithful
 (Theorem~\ref{thm:incomparable}); they provide no incomparability statement or finite-sample
-certificate. Garbling has been used to harden LLM evaluations~\citep{bradley2024garbling};
+verification. Garbling has been used to harden LLM evaluations~\citep{bradley2024garbling};
 statistical deficiency to order training \emph{tasks}~\citep{fosse2025}; a deficiency-induced
 \emph{directional} dominance appears in transfer learning, without an incomparability statement,
-formal partial order, or distribution-free certificate, and outside language
+formal partial order, or distribution-free verification, and outside language
 modeling~\citep{akdemir2025}; and comparison-of-experiments ideas touch loss
 design~\citep{vanrooyen2014}. Blackwell's theorems have been surveyed for
 AI~\citep{blackwellrep2026}, but to our knowledge no prior work states a Blackwell partial order
 over context sources, derives the no-scalar-ranks consequence for language models, or supplies a
-certified decision-restricted estimator. The mathematics we rely on is classical: the
+verified decision-restricted estimator. The mathematics we rely on is classical: the
 Blackwell--Sherman--Stein equivalence and deficiency are due to Blackwell and
 Le~Cam~\citep{blackwell1953,lecam1964,lecam1986}, with Torgersen's monograph as the canonical
 reference, and the fact that the order is a non-lattice partial order with genuinely incomparable
@@ -360,7 +357,7 @@ pairs is classical as well~\citep{torgersen1991}. Theorem~\ref{thm:incomparable}
 mathematically, a short corollary of Blackwell's theorem applied to a constructed pair of decision
 problems; we state it as an application-level result about language-model context, not as new
 structure in the order. The genuinely new pieces are the framing, the surrogate, and the
-certificate.
+verification.
 
 % ==========================================================================
 \section{Formalization}
@@ -576,7 +573,7 @@ $\PASS_M(W_1,T) \ge \PASS_M(W_2,T)$ for every $T \in \Dcal$. Call $W_1, W_2$
 each strictly out-performs the other on some task in $\Dcal$.
 \end{definition}
 
-$\succeq_{M,\Dcal}$ is the order our certificate measures. It is decision-restricted (one fixed rule)
+$\succeq_{M,\Dcal}$ is the order our verification measures. It is decision-restricted (one fixed rule)
 and distribution-restricted (a fixed finite $\Dcal$); within those restrictions it is still a genuine,
 \emph{for-all-tasks-in-$\Dcal$} dominance statement, not a scalar.
 
@@ -621,7 +618,7 @@ $(M,\Dcal)$-incomparable.
 \end{assumption}
 
 Lemma~\ref{lem:bridge} is the keystone. In the direction the empirical program needs, it says: a
-certified $(M,\Dcal)$-crossover on tasks whose decisive coordinates are \emph{separated} across
+verified $(M,\Dcal)$-crossover on tasks whose decisive coordinates are \emph{separated} across
 the two sources, with the deprived side's optimal value capped below the measured pass rates,
 implies genuine Blackwell incomparability. Our construction is designed to satisfy the hypothesis
 (each cell's decisive private coordinate is revealed by exactly one source,
@@ -629,7 +626,7 @@ Lemma~\ref{lem:noref}), and its observable signature, deprived-arm pass rates fl
 guessing cap ($W_2$ at $0\%$ on the API cells, $W_1$ at $0\%$ on the encoding cell,
 \texttt{none} near $0$), is verified per cell in \S\ref{sec:experiments}; where a model's prior
 partially recovers a convention (the $\theta$-dependence of \S\ref{subsec:theta}), the cap
-premise weakens and we do not certify on those cells. The reverse implication, predicting the
+premise weakens and we do not verify on those cells. The reverse implication, predicting the
 realized crossover from the abstract theorem, requires Assumption~\ref{ass:attain}, which our
 task design enforces and our measurements verify.
 
@@ -741,14 +738,14 @@ the behaviour Proposition~\ref{prop:trap-constrained} predicts, its hypothesis i
 outside the impossibility class.
 
 % ==========================================================================
-\section{The decision-restricted deficiency surrogate and its uniform certificate}
+\section{The decision-restricted deficiency surrogate and its uniform verification}
 \label{sec:estimator}
 % ==========================================================================
 
 The impossibility of \S\ref{sec:incomparability} concerns the idealized user of a source; every
 quantity we report, by contrast, comes from a single fixed model. This section builds the
 instrument that connects the two: a surrogate that measures the order on the fixed rule, and a
-distribution-free certificate that makes each comparison auditable on a live model.
+distribution-free verification that makes each comparison auditable on a live model.
 
 \subsection{The surrogate and its correct name}
 \label{subsec:estimator-name}
@@ -762,8 +759,8 @@ $W_1$ trails $W_2$ across the tasks in $\Dcal$:
 \dhat_{\Dcal}(W_1,W_2) \;:=\; \max\!\Big(0,\ \sup_{T\in \Dcal}\big[\PASS_M(W_2,T)-\PASS_M(W_1,T)\big]\Big),
 \end{equation}
 estimated per cell by $\PASS_M(W,T) \approx k_{W,T}/n$ from $n$ completions. Then
-$\dhat_{\Dcal}(W_1,W_2)=0$ certifies empirical dominance $W_1 \succeq_{M,\Dcal} W_2$, and mutual
-positivity $\dhat_{\Dcal}(W_1,W_2)>0 \wedge \dhat_{\Dcal}(W_2,W_1)>0$ certifies
+$\dhat_{\Dcal}(W_1,W_2)=0$ verifies empirical dominance $W_1 \succeq_{M,\Dcal} W_2$, and mutual
+positivity $\dhat_{\Dcal}(W_1,W_2)>0 \wedge \dhat_{\Dcal}(W_2,W_1)>0$ verifies
 $(M,\Dcal)$-incomparability.
 
 \begin{remark}[This is \emph{not} Le~Cam deficiency]
@@ -781,7 +778,7 @@ transfer is qualitative: $\dhat_{\Dcal}(W_1,W_2)=0$ realizes the for-all-tasks-i
 of Definition~\ref{def:dmorder}, the measurable shadow of Corollary~\ref{cor:c1}.
 \end{remark}
 
-\subsection{The uniform certificate}
+\subsection{The uniform verification}
 \label{subsec:certificate}
 
 The surrogate \eqref{eq:estimator} selects the \emph{argmax-gap} task, so a pointwise confidence
@@ -789,7 +786,7 @@ statement on a single task ignores the selection. We pay the multiplicity with a
 Clopper--Pearson interval per cell and a union bound, which is distribution-free and finite-sample
 valid.
 
-\begin{proposition}[Uniform incomparability certificate]
+\begin{proposition}[Uniform incomparability verification]
 \label{prop:certificate}
 Within each cell $(W,T)$ draw $n$ i.i.d.\ Bernoulli PASS outcomes (see
 Assumption~\ref{ass:iid}). Let $[L_{W,T},U_{W,T}]$ be the exact (two-sided) Clopper--Pearson
@@ -802,17 +799,17 @@ probability at least $1-\eta$. On that event,
 L_{\Dcal}(W_1,W_2) \;:=\; \max_{T\in \Dcal}\big[\,L_{W_2,T} - U_{W_1,T}\,\big]
 \end{equation}
 is a $(1-\eta)$ lower confidence bound on $\sup_{T\in \Dcal}[p_{W_2,T}-p_{W_1,T}]$. Hence
-$L_{\Dcal}(W_1,W_2) > 0$ \textbf{certifies} $\dhat_{\Dcal}(W_1,W_2)>0$ at confidence $\ge 1-\eta$.
+$L_{\Dcal}(W_1,W_2) > 0$ \textbf{verifies} $\dhat_{\Dcal}(W_1,W_2)>0$ at confidence $\ge 1-\eta$.
 Both directions $L_{\Dcal}(W_1,W_2)$ and $L_{\Dcal}(W_2,W_1)$ read off the \emph{same} $2|\Dcal|$ intervals, so the
 joint incomparability claim $\{\dhat_{\Dcal}(W_1,W_2)>0 \wedge \dhat_{\Dcal}(W_2,W_1)>0\}$
 holds at $\ge 1-\eta$ with no additional correction. The matching quantity
 $U_{\Dcal}(W_1,W_2) := \max_{T\in \Dcal}\big[\,U_{W_2,T} - L_{W_1,T}\,\big]$ is, on the same
 event, a $(1-\eta)$ \emph{upper} confidence bound on the same supremum; the dominance control
-uses it to certify $\dhat_{\Dcal}(W_1,W_2)=0$ up to the equivalence margin.
+uses it to verify $\dhat_{\Dcal}(W_1,W_2)=0$ up to the equivalence margin.
 \end{proposition}
 
 A naive single-sample DKW bound under-covers this supremum, because the object is a maximum of
-differences of binomial means across distinct cells and the certificate selects the argmax-gap
+differences of binomial means across distinct cells and the verification selects the argmax-gap
 cell, so the multiplicity must be paid explicitly rather than absorbed into a single-sample
 envelope (Appendix~\ref{app:proofs}); the resulting construction aligns with recent statistical
 guidance for black-box LLM evaluation (Appendix~\ref{app:proofs}).
@@ -820,17 +817,14 @@ guidance for black-box LLM evaluation (Appendix~\ref{app:proofs}).
 
 \begin{assumption}[Sampling regime]
 \label{ass:iid}
-The $n$ outcomes within a cell are i.i.d.\ Bernoulli draws of $v_T(\delta_M(T,w))$. This holds when
-completions are sampled independently at fixed temperature/top-$p$ with independent randomness per
-draw; for the single-shot arms (one completion + deterministic code extraction per draw) the draws
-are manifestly independent. For the agentic arms (\texttt{claude -p}, multi-turn) independence is
-across \emph{trajectories}: each of the $n$ draws is a fresh trajectory with no shared state, so the
-binomial model applies to the trajectory-level PASS outcome; we report decoding configuration and
-defend this independence in \S\ref{sec:experiments}. Where draws are near-deterministic
-($p\in\{0,1\}$ stark cells), Clopper--Pearson collapses and the certificate is conservative.
+The $n$ outcomes within a cell are i.i.d.\ Bernoulli draws of $v_T(\delta_M(T,w))$. Every draw is a
+single completion (plus deterministic code extraction) from an independent call with no shared
+state, so the draws are manifestly independent and the binomial model applies directly; we report
+the decoding configuration in \S\ref{sec:experiments}. Where draws are near-deterministic
+($p\in\{0,1\}$ stark cells), Clopper--Pearson collapses and the verification is conservative.
 \end{assumption}
 
-\subsection{The interference certificate (anti-monotonicity)}
+\subsection{The interference verification (anti-monotonicity)}
 \label{subsec:interference}
 
 The deficiency surrogate also detects a phenomenon the optimal-value order forbids but a fixed rule
@@ -843,10 +837,10 @@ interference
 \end{equation}
 the second-difference (interaction) of adding $W_2$ on top of $W_1$. We write the interaction as
 $\Psi_T$ (rather than a symbol $I$ that would collide with mutual information $I(S;W\mid\theta)$). A
-certified $\Psi_T<0$ on a cell whose $W_1$ arm is at ceiling is the localized statement that ``more
+verified $\Psi_T<0$ on a cell whose $W_1$ arm is at ceiling is the localized statement that ``more
 strictly-more-informative context hurts.''
 
-\begin{proposition}[Interference certificate]
+\begin{proposition}[Interference verification]
 \label{prop:interference}
 Fix a target task $T^\star\in \Dcal$ chosen \emph{before} unblinding. With per-cell exact
 Clopper--Pearson endpoints $\mathrm{CP}_{\mathrm{lo}},\mathrm{CP}_{\mathrm{hi}}$ at level
@@ -856,30 +850,30 @@ $\alpha=\eta/4$ on the four arms $\{W_{1+},W_1,W_2,\texttt{none}\}$ of $T^\star$
 \overline\Psi_{T^\star} \;:=\; \mathrm{CP}_{\mathrm{hi}}(p_{W_{1+}}) - \mathrm{CP}_{\mathrm{lo}}(p_{W_1}) - \mathrm{CP}_{\mathrm{lo}}(p_{W_2}) + \mathrm{CP}_{\mathrm{hi}}(p_{\texttt{none}})
 \end{equation}
 is a $(1-\eta)$ upper confidence bound on $\Psi_{T^\star}$. Hence $\overline\Psi_{T^\star}\le-\tau$
-certifies harmful non-monotonicity $\Psi_{T^\star}\le-\tau$ at confidence $\ge 1-\eta$. If instead
+verifies harmful non-monotonicity $\Psi_{T^\star}\le-\tau$ at confidence $\ge 1-\eta$. If instead
 the harmful cell is \emph{selected} from $|\Dcal|$ candidates after unblinding, use $\alpha=\eta/(4|\Dcal|)$;
-this is the same selection correction the certificate applies to the deficiency surrogate
+this is the same selection correction the verification applies to the deficiency surrogate
 (Remark~\ref{rem:dkw}), and omitting it would repeat the multiplicity error we criticize.
 \end{proposition}
 
 \begin{remark}[The leaky-baseline limitation, stated as a protocol]
 \label{rem:leaky}
 The upper bound \eqref{eq:psiupper} includes $+\mathrm{CP}_{\mathrm{hi}}(p_{\texttt{none}})$, so it
-can certify harm only on cells whose \texttt{none}-baseline floors near $0$ (the convention is
+can verify harm only on cells whose \texttt{none}-baseline floors near $0$ (the convention is
 unguessable for the model under test). When the baseline is non-zero, e.g.\ \texttt{api\_argorder}
 at $\texttt{none}=75\%$ for GPT-5.5, $45\%$ for Kimi, $15\%$ for Opus, the bound is mechanically
-slack and harm is not certifiable even when the point estimate is strongly negative. We therefore
-adopt the explicit protocol: \emph{certify $\Psi_T$ only on cells whose \texttt{none}-baseline
-floors near $0$ for the model under test}, and report, per model, which cell carried the certificate
+slack and harm is not verifiable even when the point estimate is strongly negative. We therefore
+adopt the explicit protocol: \emph{verify $\Psi_T$ only on cells whose \texttt{none}-baseline
+floors near $0$ for the model under test}, and report, per model, which cell carried the verification
 and what its baseline was. This makes the cell selection a stated rule rather than an outcome-driven
 choice. The same model-relative guessability that defines the value of private context
-(\S\ref{subsec:theta}) thus governs which cells can carry the interference certificate.
+(\S\ref{subsec:theta}) thus governs which cells can carry the interference verification.
 \end{remark}
 
 \subsection{Anti-monotonicity as information non-monotonicity of \texorpdfstring{$\delta_M$}{the model rule}}
 \label{subsec:antimono}
 
-A certified $\Psi_{T^\star}<0$ on a ceiling-$W_1$ cell is more than a curiosity: it is a falsification
+A verified $\Psi_{T^\star}<0$ on a ceiling-$W_1$ cell is more than a curiosity: it is a falsification
 of Blackwell superset-dominance \emph{for the fixed model rule}, and it pinpoints exactly where the
 optimal-rule order (Theorem~\ref{thm:blackwell}) and the realized rule diverge.
 
@@ -901,22 +895,22 @@ the gap Lemma~\ref{lem:bridge}(b) warned cannot be closed without value attainme
 surrogate detects this reversal because it tracks realized PASS, whereas every monotone scalar must
 miss it by construction.
 
-\subsection{Family-wise error across the certified claims}
+\subsection{Family-wise error across the verified claims}
 \label{subsec:fwer}
 
-Each certificate above controls error \emph{marginally} at $\eta$ for its own claim
+Each verification above controls error \emph{marginally} at $\eta$ for its own claim
 (incomparability via Proposition~\ref{prop:certificate}; interference via
 Proposition~\ref{prop:interference}). When several claims are read off the \emph{same} $n$-sample
 run at the same $\eta$, incomparability (both directions, on one shared event $E$), one-directional
 dominance, and the interference cells, the conjunction over distinct claims is \emph{not} jointly
 controlled at $\eta$ unless the budget is split across claims. We state results as marginally
-certified per claim and, where a joint statement is wanted, allocate $\eta$ across the $C$ certified
+verified per claim and, where a joint statement is wanted, allocate $\eta$ across the $C$ verified
 claims (e.g.\ $\eta/C$ each) so the global family-wise error is $\le\eta$. The incomparability pair
 is the one exception that is genuinely joint at $\eta$ on a single event, as proved in
 Proposition~\ref{prop:certificate}; all other cross-claim conjunctions on a shared run are reported
 as marginal.
 
-\noindent The two certificates have genuinely different effective-$n$ requirements, which is why the consolidated record marks Opus incomparability as certified and Opus interference as reproduced but not certified; the power analysis is in Appendix~\ref{app:proofs}.
+\noindent The two verifications have genuinely different effective-$n$ requirements, which is why the consolidated record marks Opus incomparability as verified and Opus interference as reproduced but not verified; the power analysis is in Appendix~\ref{app:proofs}.
 
 % ==========================================================================
 \section{Experiments}
@@ -924,14 +918,14 @@ as marginal.
 % ==========================================================================
 
 With the order (\S\ref{sec:order}), its impossibility consequence (\S\ref{sec:incomparability}),
-and the certificate that measures it (\S\ref{sec:estimator}) in hand, we now instantiate the
+and the verification that measures it (\S\ref{sec:estimator}) in hand, we now instantiate the
 theory on real language models. The design has three commitments. First, every reported number is an empirical PASS rate from live model
 calls verified by an executable test harness; no value is modeled, simulated, or extrapolated.
 Second, the two context sources are constructed to be \emph{Blackwell-incomparable by construction}
 (\S\ref{sec:design}), so the incomparability theorem (Theorem~\ref{thm:incomparable}) has a
-non-vacuous instance to bite on. Third, every certified claim is reported with the exact sample
+non-vacuous instance to bite on. Third, every verified claim is reported with the exact sample
 size, the Clopper--Pearson endpoints, and the per-cell PASS counts from which it is derived
-(\S\ref{sec:results}), so the certificate is auditable rather than asserted.
+(\S\ref{sec:results}), so the verification is auditable rather than asserted.
 
 \subsection{Design: two incomparable context sources}
 \label{sec:design}
@@ -982,12 +976,12 @@ and one relevance trap (\texttt{trap\_store\_wire}). The verifier stubs a fake \
 accepts \emph{only} the exact private contract (rejecting wrong positional order, a missing
 \texttt{memo=}, or the wrong exception type).
 
-\paragraph{Certified battery.}
-The certified runs use a fixed four-cell battery: \texttt{api\_post\_ok}, \texttt{api\_argorder}
+\paragraph{Verified battery.}
+The verified runs use a fixed four-cell battery: \texttt{api\_post\_ok}, \texttt{api\_argorder}
 (hardened so \texttt{memo} arrives through a parameter, forcing reliance on the keyword-only fact),
 \texttt{enc\_amount}, and the trap \texttt{trap\_store\_wire}. We disclose this reduction explicitly:
 the three remaining designed cells (\texttt{api\_error\_type}, \texttt{api\_memo\_required},
-\texttt{dec\_amount}) are not part of the certified battery. The four-cell selection was made to
+\texttt{dec\_amount}) are not part of the verified battery. The four-cell selection was made to
 retain at least one $W_1$-decisive, one $W_2$-decisive, and the trap cell while keeping the
 cross-model spend tractable; we report below that this is best understood as a fixed adversarial
 four-cell battery, not a sampled task distribution, and we state the effective support of the
@@ -1018,48 +1012,41 @@ GPT-5.5; DeepSeek-V4-Pro; and Moonshot Kimi-K2.6.
 The harness (\texttt{tokenbench/measure\_blackwell.py}; released with all run logs at
 \url{https://github.com/abilous-ti/blackwell-llm-context}) is Python-standard-library only (zero
 external dependencies); it computes $\dhat_{\Dcal}$ in both directions, the uniform
-Clopper--Pearson/Bonferroni certificate, the interference certificate, and the lexical relevance
+Clopper--Pearson/Bonferroni verification, the interference verification, and the lexical relevance
 score, and it implements the launchers for the Anthropic CLI, the Azure Responses API, and
 OpenAI-compatible chat completions. Each cell is run under the arms $\{\texttt{none}, W_1, W_2,
-W_{1+}\}$, with $W_{1+}^{\mathrm{rev}}$ added for the order-control run. PASS is measured over $n$
-completions per cell.
+W_{1+}\}$. PASS is measured over $n$ completions per cell.
 
-\paragraph{Agentic vs.\ single-shot harness (a stated confound).}
-The Anthropic models run \emph{agentically} (\texttt{claude -p}, up to six turns with intermediate
-verifier feedback); the non-Anthropic models run as \emph{single-shot} completion plus code
-extraction through an OpenAI-style API. Vendor is therefore confounded with harness in this study:
-every Anthropic model is agentic and every non-Anthropic model is single-shot. We treat this as a
-genuine limitation of the cross-vendor \emph{magnitude} comparisons (\S\ref{sec:limitations}); the
-per-model \emph{binary} claims (incomparability certified, relevance mis-rank, anti-monotonicity
-certified) are within-model and unaffected. We note that the single-shot setting is arguably the
-cleaner probe of whether a model uses supplied context, since it removes the agentic-exploration
-pathway.
+\paragraph{One uniform run mode.}
+All six models are queried the same way: a single completion per attempt (the Anthropic models via
+\texttt{claude -p} with a one-turn budget and no tools, the others through an OpenAI-style API),
+from which we extract the candidate code and grade it. Because the run mode is identical across
+vendors, a difference between models is a fact about the model, not about how it was run. This is a
+deliberately conservative probe of whether a model uses supplied context: it removes the
+agentic-exploration pathway, so the model must use what it is given in one pass.
 
-\paragraph{Certificate parameters.}
-All certificates use confidence budget $\eta = 0.10$. Incomparability uses exact Clopper--Pearson
+\paragraph{Verification parameters.}
+All verifications use confidence budget $\eta = 0.10$. Incomparability uses exact Clopper--Pearson
 intervals at per-cell level $\alpha = \eta/(2|\Dcal|)$ over the $2|\Dcal|$ proportions
 $\{p_{W_1,T}, p_{W_2,T}\}_{T\in \Dcal}$, so by the union bound all hold jointly with probability
-$\ge 1-\eta$ and both directions read off the same intervals. The interference certificate uses
-$\alpha = \eta/4$ and the threshold $\tau = 0.30$, certifying $\Psi_T \le -\tau$ via the upper bound
-of \eqref{eq:psiupper}. We report each certificate as marginally controlled at $\eta$; we do not
+$\ge 1-\eta$ and both directions read off the same intervals. The interference verification uses
+$\alpha = \eta/4$ and the threshold $\tau = 0.30$, verifying $\Psi_T \le -\tau$ via the upper bound
+of \eqref{eq:psiupper}. We report each verification as marginally controlled at $\eta$; we do not
 claim joint family-wise control across the incomparability, dominance, and interference claims drawn
 from a single run (\S\ref{subsec:fwer}, \S\ref{sec:limitations}). The intervals are degenerate at
-$p=0$ and $p=1$, which is why the stark $100\%/0\%$ cells certify incomparability at small $n$ while
+$p=0$ and $p=1$, which is why the stark $100\%/0\%$ cells verify incomparability at small $n$ while
 the interference contrast, which mixes intermediate baselines, does not.
 
 \paragraph{Sampling regime.}
-The certificate models each cell as $n$ Bernoulli PASS draws (Assumption~\ref{ass:iid}); the four
-arms within a cell are separate completions, hence independent. We report the decoding parameters,
-seeding policy, retry policy, and turn budget in Appendix~\ref{app:repro}. The independence assumption is
-most delicate for the agentic arm, where each draw is a multi-turn trajectory; each run is a fresh
-trajectory with no shared state, and the binomial model underlying every $L_{\Dcal}$, $U_{\Dcal}$,
-and $\Psi_T$ bound applies at the trajectory level (\S\ref{sec:limitations}).
+The verification models each cell as $n$ Bernoulli PASS draws (Assumption~\ref{ass:iid}); the four
+arms within a cell are separate completions, and each of the $n$ draws is an independent call with no
+shared state, so the draws are manifestly independent. We report the decoding parameters, seeding
+policy, and retry policy in Appendix~\ref{app:repro}.
 
 \paragraph{Spend.}
-The record reflects roughly \$210 of Anthropic spend (the live \texttt{claude -p} runs;
-itemized in Appendix~\ref{app:repro}) plus Azure quota for the non-Anthropic models; the Azure
-API returns no cost field, so the \$210 figure should not be read as the total cost across all
-six models.
+The record reflects roughly \$120 of Anthropic spend on the single-shot Haiku, Sonnet, and Opus runs
+(itemized in Appendix~\ref{app:repro}) plus Azure quota for the non-Anthropic models; the Azure API
+returns no cost field, so this figure is not the total cost across all six models.
 
 \subsection{Results}
 \label{sec:results}
@@ -1072,8 +1059,8 @@ consolidates the per-model verdicts; Tables~\ref{tab:LD}, \ref{tab:interference}
 
 \begin{table}[t]
 \centering
-\caption{Consolidated 6-model / 4-vendor verdict. Anthropic rows are agentic (\texttt{claude -p}, up
-to six turns); the others are single-shot (\S\ref{sec:methodology}). ``Anti-mono.\ certified'' counts
+\caption{Consolidated 6-model / 4-vendor verdict. All six models are run the same way, a single
+API call per attempt at $n=40$ per cell (\S\ref{sec:methodology}). ``Anti-mono.\ verified'' counts
 cells on which the interference upper bound clears $-\tau = -0.30$ at $\eta=0.10$. ``Argorder
 \texttt{none}'' is the no-context baseline PASS on \texttt{api\_argorder}, the model-relative-value
 spectrum. All figures are real measured runs; no modeled numbers.}
@@ -1083,41 +1070,39 @@ spectrum. All figures are real measured runs; no modeled numbers.}
 Claim & Haiku & Sonnet & Opus & GPT-5.5 & DeepSeek & Kimi-K2.6 \\
 \midrule
 Vendor & Anthropic & Anthropic & Anthropic & OpenAI & DeepSeek & Moonshot \\
-Harness & agentic & agentic & agentic & single-shot & single-shot & single-shot \\
-$n$ per cell & 80 & 40 & 20 & 40 & 40 & 40 \\
-Incomp.\ certified ($\ge 90\%$) & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
-$L_{\Dcal}(W_1,W_2)$ & $+0.88$ & $+0.76$ & $+0.55$ & $+0.76$ & $+0.347$ & $+0.675$ \\
-$L_{\Dcal}(W_2,W_1)$ & $+0.83$ & $+0.76$ & $+0.55$ & $+0.76$ & $+0.715$ & $+0.762$ \\
+$n$ per cell & 40 & 40 & 40 & 40 & 40 & 40 \\
+Incomp.\ verified ($\ge 90\%$) & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+$L_{\Dcal}(W_1,W_2)$ & $+0.76$ & $+0.72$ & $+0.72$ & $+0.76$ & $+0.35$ & $+0.68$ \\
+$L_{\Dcal}(W_2,W_1)$ & $+0.76$ & $+0.76$ & $+0.76$ & $+0.76$ & $+0.72$ & $+0.76$ \\
 Relevance mis-rank (trap) & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
-Anti-mono.\ certified (\# cells) & 2 & 2 & $0$ (repro.) & 1 & 1 & 1 \\
-\texttt{api\_argorder} \texttt{none} & ${\sim}0\%$ & $0\%$ & $15\%$ & $75\%$ & $2\%$ & $45\%$ \\
+Anti-mono.\ verified (\# cells) & 1 & 2 & $0$ (repro.) & 1 & 1 & 1 \\
+\texttt{api\_argorder} \texttt{none} & $2\%$ & $0\%$ & $40\%$ & $75\%$ & $2\%$ & $45\%$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsubsection{Incomparability certified on all six models}
+\subsubsection{Incomparability verified on all six models}
 \label{sec:results-incomp}
 
 On every model the empirical deficiency is mutually positive, $\dhat_{\Dcal}(W_1,W_2) > 0$ and
 $\dhat_{\Dcal}(W_2,W_1) > 0$, and the uniform lower bounds $L_{\Dcal}$ in both directions clear zero,
-certifying empirical incomparability at $\ge 90\%$ (Table~\ref{tab:LD}). The crossover is stark:
+verifying empirical incomparability at $\ge 90\%$ (Table~\ref{tab:LD}). The crossover is stark:
 $W_1$ solves the API and trap cells and fails encoding, while $W_2$ solves encoding and fails the API
-and trap cells. For Haiku at $n=80$ the carrying cells are \texttt{api\_post\_ok} (\texttt{none} $0\%$
-/ $W_1$ $98\%$ / $W_2$ $0\%$) and \texttt{enc\_amount} (\texttt{none} $0\%$ / $W_1$ $0\%$ / $W_2$
-$100\%$); the certificate strengthened from a marginal $L_{\Dcal} = +0.138$ at $n=10$ to
-$L_{\Dcal} = +0.877 / +0.831$ at $n=80$, far clear of zero.
+and trap cells. For Haiku at $n=40$ the carrying cells are \texttt{api\_argorder} (\texttt{none} $2\%$
+/ $W_1$ $100\%$ / $W_2$ $0\%$) and \texttt{enc\_amount} (\texttt{none} $0\%$ / $W_1$ $0\%$ / $W_2$
+$100\%$), giving $L_{\Dcal} = +0.762 / +0.762$, far clear of zero.
 
 Because incomparability is a two-directional claim, each row of Table~\ref{tab:LD} requires both
 bounds positive; the smaller of the two is the binding one. The two carrying cells are one API cell
 and one encoding cell, so the effective support of the surrogate is two cells. We therefore describe
 $\Dcal$ as a fixed adversarial four-cell battery rather than a sampled task distribution: the
-certificate is valid for what it covers, and what it covers is a single hand-built API-versus-encoding
+verification is valid for what it covers, and what it covers is a single hand-built API-versus-encoding
 opposition replicated across six models.
 
 \begin{table}[t]
 \centering
-\caption{Certified incomparability: uniform $(1-\eta)$ lower bounds $L_{\Dcal}$ in both directions
-($\eta=0.10$). $L_{\Dcal}(W_1,W_2) > 0$ and $L_{\Dcal}(W_2,W_1) > 0$ together certify empirical
+\caption{Verified incomparability: uniform $(1-\eta)$ lower bounds $L_{\Dcal}$ in both directions
+($\eta=0.10$). $L_{\Dcal}(W_1,W_2) > 0$ and $L_{\Dcal}(W_2,W_1) > 0$ together verify empirical
 incomparability. Both bounds are read off the same $2|\Dcal|$ Clopper--Pearson intervals
 (Proposition~\ref{prop:certificate}).}
 \label{tab:LD}
@@ -1125,9 +1110,9 @@ incomparability. Both bounds are read off the same $2|\Dcal|$ Clopper--Pearson i
 \toprule
 Model & Vendor & $n$ & $L_{\Dcal}(W_1,W_2)$ & $L_{\Dcal}(W_2,W_1)$ \\
 \midrule
-Haiku-4.5       & Anthropic & 80 & $+0.877$ & $+0.831$ \\
-Sonnet-4.6      & Anthropic & 40 & $+0.762$ & $+0.762$ \\
-Opus-4.8        & Anthropic & 20 & $+0.552$ & $+0.552$ \\
+Haiku-4.5       & Anthropic & 40 & $+0.762$ & $+0.762$ \\
+Sonnet-4.6      & Anthropic & 40 & $+0.715$ & $+0.762$ \\
+Opus-4.8        & Anthropic & 40 & $+0.715$ & $+0.762$ \\
 GPT-5.5         & OpenAI    & 40 & $+0.762$ & $+0.762$ \\
 DeepSeek-V4-Pro & DeepSeek  & 40 & $+0.347$ & $+0.715$ \\
 Kimi-K2.6       & Moonshot  & 40 & $+0.675$ & $+0.762$ \\
@@ -1135,29 +1120,30 @@ Kimi-K2.6       & Moonshot  & 40 & $+0.675$ & $+0.762$ \\
 \end{tabular}
 \end{table}
 
-\paragraph{Why $n=20$ certifies incomparability for Opus but not interference.}
-Opus is run at $n=20$, which certifies incomparability ($L_{\Dcal} = +0.552$ both directions) but not
-anti-monotonicity. This asymmetry is principled, not an inconsistent threshold (Appendix~\ref{app:proofs}).
-The incomparability bound is carried by stark cells whose proportions sit at $0$ or $1$, where the
-Clopper--Pearson interval is degenerate and a small $n$ suffices. The interference bound, by contrast,
-mixes the $W_{1+}$, $W_1$, $W_2$, and \texttt{none} arms, including the intermediate Opus baselines
-(\texttt{api\_argorder} and trap \texttt{none} $= 15\%$), so the four-term Clopper--Pearson sum stays
-wide at $n=20$ (upper bounds $-0.08 / -0.11$, not below $-\tau$). Raising Opus to $n=80$ is the one
-remaining gap in the consolidated record.
+\paragraph{Why Opus verifies incomparability but not interference.}
+Opus verifies incomparability ($L_{\Dcal} = +0.715 / +0.762$) but not anti-monotonicity, and the
+reason is instructive. Incomparability is carried by stark cells whose proportions sit at $0$ or
+$1$, where the Clopper--Pearson interval is tight. The interference bound instead mixes the
+$W_{1+}$, $W_1$, $W_2$, and \texttt{none} arms: Opus's superset collapse on \texttt{api\_post\_ok}
+is real but milder ($100\% \to 38\%$, upper bound $-0.23$, short of $-\tau$), and its
+\texttt{api\_argorder} baseline leaks (\texttt{none} $=40\%$; Remark~\ref{rem:leaky}), so neither
+cell verifies. Both facts are the same model-relative-value effect (\S\ref{sec:results-moat}): Opus
+partially already knows the convention, which shrinks the harm the certificate can attribute to the
+added signal.
 
 \subsubsection{The relevance score mis-ranks the sources}
 \label{sec:results-misrank}
 
 On the trap, query-conditioned lexical relevance ranks $\varphi_{\mathrm{lex}}(W_1) = 0.36 <
 \varphi_{\mathrm{lex}}(W_2) = 0.44$, so it prefers $W_2$; yet realized PASS ranks $W_1 \gg W_2$ on all
-six models (e.g.\ Haiku $96\%$ vs.\ $0\%$ at $n=80$; Sonnet, GPT-5.5, and Kimi $100\%$ vs.\ $0\%$;
-DeepSeek $98\%$ vs.\ $0\%$; Opus $100\%$ vs.\ $10\%$). On the honest cells relevance \emph{agrees}
+six models (Haiku $90\%$ vs.\ $0\%$; Sonnet, Opus, GPT-5.5, and Kimi $100\%$ vs.\ $0\%$;
+DeepSeek $98\%$ vs.\ $0\%$). On the honest cells relevance \emph{agrees}
 with PASS, on the API cells relevance ranks $W_1 > W_2$ and so does PASS, and on the encoding cell
 relevance ranks $W_2 > W_1$ and so does PASS, so the score fails \emph{only} where utility diverges
 from topicality, exactly the regime Theorem~\ref{thm:incomparable} and
-Proposition~\ref{prop:trap-constrained} isolate. The \texttt{none} floor on the trap ($0\%$ on five models, $15\%$ for Opus) confirms genuine
-unguessability, and $W_2$ at $0\%$ ($10\%$ for Opus) confirms that encoding knowledge is
-useless there.
+Proposition~\ref{prop:trap-constrained} isolate. The \texttt{none} floor on the trap is $0\%$ on
+all six models, and $W_2$ scores $0\%$ there too, confirming both that the convention is genuinely
+unguessable and that encoding knowledge is useless on this task.
 
 \paragraph{The ranker spectrum: dense retrievers and a cross-encoder fall for the trap; a
 listwise reranker escapes it.}
@@ -1177,12 +1163,12 @@ Proposition~\ref{prop:trap-constrained} draws: the impossibility hypothesis is \
 invariance to the decisive coordinate, and the trap defeats the lexical, dense, and cross-encoder
 families that satisfy it while sparing the one ranker that reads content. The practical corollary
 is that escaping the topical class costs a model call per candidate, a probe of the same kind the
-deficiency certificate is built from, not a free scalar.
+deficiency verification is built from, not a free scalar.
 
 \begin{table}[t]
 \centering
 \caption{The ranker spectrum on the probe tasks. Each cell is the ranker's top pick between
-$\{W_1, W_2\}$; ``PASS'' is the realized-utility ranking from the certified record. Dense and
+$\{W_1, W_2\}$; ``PASS'' is the realized-utility ranking from the verified record. Dense and
 cross-encoder scores are deterministic; the LLM listwise row pools $n=30$ judgments per task
 (unanimous, both presentation orders). $\times$ marks a mis-rank. The cross-encoder's
 \texttt{enc\_amount} pick is a near-tie ($-0.279$ vs $-0.305$).}
@@ -1200,15 +1186,17 @@ Haiku listwise ($n{=}30$) & LLM listwise & $W_1$ & $W_1$ & $W_2$ \\
 \end{tabular}
 \end{table}
 
-\subsubsection{Anti-monotonicity: a certified superset that hurts}
+\subsubsection{Anti-monotonicity: a verified superset that hurts}
 \label{sec:results-antimono}
 
 The superset $W_{1+}$, which literally \emph{contains} $W_1$'s signal, sharply degrades the API cells
 relative to $W_1$ alone. The per-task interference $\Psi_T = \PASS(W_{1+},T) - \PASS(W_1,T) -
-\PASS(W_2,T) + \PASS(\texttt{none},T)$ is certified negative ($\Psi_T \le -\tau$, $\tau=0.30$) on at
+\PASS(W_2,T) + \PASS(\texttt{none},T)$ is verified negative ($\Psi_T \le -\tau$, $\tau=0.30$) on at
 least one cell for five of the six models (Table~\ref{tab:interference}). Opus reproduces the effect
-with strong point estimates ($\Psi_T = -0.75 / -0.80$) but does not certify at $n=20$. This is a
-certified empirical falsification of Blackwell superset-dominance on live models
+($100\% \to 38\%$, $\Psi_T = -0.62$) but does not verify: the collapse is milder and its
+\texttt{api\_argorder} baseline leaks, both of which we tie to the model-relative value of context
+in \S\ref{sec:results-moat}. This is a
+verified empirical falsification of Blackwell superset-dominance on live models
 (Theorem~\ref{thm:antimono}): strictly-more-informative context can hurt, and the deficiency
 framework detects it precisely where every monotone scalar must miss it.
 Figure~\ref{fig:collapse} shows the collapse across the six models.
@@ -1227,9 +1215,9 @@ Figure~\ref{fig:collapse} shows the collapse across the six models.
   \node[rotate=90, font=\scriptsize] at (-1.55, 55) {PASS on \texttt{api\_post\_ok} (\%)};
   % bars: {x, W1, W1+, label}
   \foreach \x/\a/\b/\lbl in {%
-    0.5/98/24/Haiku-4.5,
-    2.4/100/0/Sonnet-4.6,
-    4.3/100/25/Opus-4.8,
+    0.5/52/15/Haiku-4.5,
+    2.4/100/2/Sonnet-4.6,
+    4.3/100/38/Opus-4.8,
     6.2/100/0/GPT-5.5,
     8.1/75/0/DeepSeek-V4,
     10.0/100/0/Kimi-K2.6} {
@@ -1248,21 +1236,22 @@ Figure~\ref{fig:collapse} shows the collapse across the six models.
 \caption{Anti-monotonicity across the capability ladder: PASS on the \texttt{api\_post\_ok} cell
 under the sufficient source $W_1$ (light) versus the strict superset $W_{1+} = W_2 \,{+}{+}\, W_1$
 (dark), per model (Table~\ref{tab:percell}). The superset \emph{contains} $W_1$'s signal yet
-collapses performance on every model; the effect is large everywhere but not monotone in
-capability (Sonnet collapses hardest, Opus least). Anthropic rows agentic, others single-shot;
-Opus is $n{=}20$ (reproduced, not certified).}
+collapses performance on every model; the effect is large but not monotone in
+capability (Sonnet collapses hardest, Opus least). All runs single-shot, $n{=}40$. Haiku's $W_1$
+does not reach ceiling on this cell single-shot (its verified collapse is on \texttt{api\_argorder},
+$100\%\to5\%$; Table~\ref{tab:interference}); Opus reproduces the collapse but does not verify.}
 \label{fig:collapse}
 \end{figure}
 
 \paragraph{The empirical order inverts the idealized one.}
 The idealized Blackwell order on $\mathcal{C}=\{W_1,W_2,W_{1+}\}$ collapses the choice to the
 superset: $W_{1+}$ reveals both coordinates, so $W_{1+}\Bord W_1$ and $W_{1+}\Bord W_2$, and
-``more signal is better'' keeps $\{W_{1+}\}$ alone. The certified empirical relation for the
+``more signal is better'' keeps $\{W_{1+}\}$ alone. The verified empirical relation for the
 fixed rule is the opposite shape: $W_1$ beats $W_{1+}$ on the API cells, $W_{1+}$ beats $W_1$ on the encoding cell, $W_{1+}$ dominates $W_2$ (while $W_1$ and $W_2$
-are the certified incomparable pair), so the correct empirical summary is the two-element
+are the verified incomparable pair), so the correct empirical summary is the two-element
 Pareto front $\{W_1, W_{1+}\}$, an object no scalar top-$1$ rule can represent
-(Figure~\ref{fig:hasse}). This reads directly off the certified $n{=}80$ Haiku cells; the
-selection rule it implies, keep the certified non-dominated set rather than force the superset,
+(Figure~\ref{fig:hasse}). This reads directly off the verified $n{=}40$ Haiku cells; the
+selection rule it implies, keep the verified non-dominated set rather than force the superset,
 is developed in a companion paper.
 
 \begin{figure}[t]
@@ -1285,9 +1274,9 @@ is developed in a companion paper.
   \draw (iW2) -- (inone);
   \node[lab] at (1.5, -0.45) {keep $\{W_{1+}\}$ only};
 \end{scope}
-% ---- Right panel: certified empirical order ----
+% ---- Right panel: verified empirical order ----
 \begin{scope}[xshift=7cm]
-  \node[lab] at (1.5, 3.6) {Certified empirical order (fixed rule $\delta_M$, Haiku $n{=}80$)};
+  \node[lab] at (1.5, 3.6) {Verified empirical order (fixed rule $\delta_M$, Haiku $n{=}40$)};
   \node[src, thick] (eW1)  at (0.3, 2.7) {$W_1$};
   \node[src, thick] (eW1p) at (2.7, 2.7) {$W_{1+}$};
   \node[src] (eW2)  at (1.5, 1.5) {$W_2$};
@@ -1302,90 +1291,83 @@ is developed in a companion paper.
 \caption{The paper's thesis in one picture, on the measured $\mathcal{C}=\{W_1,W_2,W_{1+}\}$ with
 $W_{1+}=W_2 \,{+}{+}\, W_1$. \textbf{Left:} the idealized Blackwell order for the optimal user;
 $W_{1+}$ reveals both coordinates, so ``more signal is better'' collapses the choice to the superset.
-\textbf{Right:} the certified empirical order for the fixed model rule (Haiku, $n{=}80$): $W_1$ beats
-$W_{1+}$ on the API cells ($98\%$ vs.\ $24\%$, anti-monotonicity, Table~\ref{tab:interference}) while
-$W_{1+}$ beats $W_1$ on the encoding cell, so the two are empirically incomparable (dashed) and the
-correct output is the two-element Pareto front, which no scalar top-$1$ rule can represent.}
+\textbf{Right:} the verified empirical order for the fixed model rule (Haiku, $n{=}40$): $W_1$ beats
+$W_{1+}$ on \texttt{api\_argorder} ($100\%$ vs.\ $5\%$, anti-monotonicity, Table~\ref{tab:interference})
+while $W_{1+}$ beats $W_1$ on the encoding cell, so the two are empirically incomparable (dashed) and
+the correct output is the two-element Pareto front, which no scalar top-$1$ rule can represent.}
 \label{fig:hasse}
 \end{figure}
 
 \begin{table}[t]
 \centering
-\caption{Anti-monotonicity (interference) certificate on the carrying cell per model. $\Psi_T =
+\caption{Anti-monotonicity (interference) verification on the carrying cell per model. $\Psi_T =
 \PASS(W_{1+}) - \PASS(W_1) - \PASS(W_2) + \PASS(\texttt{none})$; ``Upper'' is the $\eta/4$
-Clopper--Pearson upper bound $\overline\Psi_T$ of \eqref{eq:psiupper}; the cell is certified harmful
-when Upper $\le -0.30$. The $W_1 \to W_{1+}$ column reports the PASS collapse. The certificate clears
+Clopper--Pearson upper bound $\overline\Psi_T$ of \eqref{eq:psiupper}; the cell is verified harmful
+when Upper $\le -0.30$. The $W_1 \to W_{1+}$ column reports the PASS collapse. The verification clears
 only on cells whose \texttt{none} baseline floors near zero (the leaky-baseline limitation;
 Remark~\ref{rem:leaky}).}
 \label{tab:interference}
 \begin{tabular}{@{}llcccc@{}}
 \toprule
-Model & Carrying cell & $W_1 \to W_{1+}$ & $\Psi_T$ & Upper & Certified \\
+Model & Carrying cell & $W_1 \to W_{1+}$ & $\Psi_T$ & Upper & Verified \\
 \midrule
-Haiku-4.5       & \texttt{api\_post\_ok}            & $98\% \to 24\%$  & $-0.74$ & $-0.49$ & \checkmark \\
-Haiku-4.5       & \texttt{api\_argorder} (hardened) & $100\% \to 1\%$  & $-0.97$ & $-0.79$ & \checkmark \\
-Sonnet-4.6      & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-1.00$ & $-0.69$ & \checkmark \\
+Haiku-4.5       & \texttt{api\_argorder}            & $100\% \to 5\%$  & $-0.93$ & $-0.56$ & \checkmark \\
+Haiku-4.5       & \texttt{api\_post\_ok}            & $52\% \to 15\%$  & $-0.38$ & $+0.08$ & no (low ceiling) \\
+Sonnet-4.6      & \texttt{api\_post\_ok}            & $100\% \to 2\%$  & $-0.97$ & $-0.64$ & \checkmark \\
 Sonnet-4.6      & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.69$ & \checkmark \\
 GPT-5.5         & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-0.95$ & $-0.60$ & \checkmark \\
 DeepSeek-V4-Pro & \texttt{api\_post\_ok}            & $75\% \to 0\%$   & $-0.75$ & $-0.36$ & \checkmark \\
 Kimi-K2.6       & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-1.00$ & $-0.69$ & \checkmark \\
-Opus-4.8        & \texttt{api\_post\_ok}            & $100\% \to 25\%$ & $-0.75$ & $-0.08$ & no ($n=20$) \\
-Opus-4.8        & \texttt{api\_argorder}            & $100\% \to 5\%$  & $-0.80$ & $-0.11$ & no ($n=20$) \\
+Opus-4.8        & \texttt{api\_post\_ok}            & $100\% \to 38\%$ & $-0.62$ & $-0.23$ & no (milder) \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \paragraph{The leaky-baseline limitation is a stated protocol.}
 The interference upper bound includes the term $+\mathrm{CP}_{\mathrm{hi}}(p_{\texttt{none}})$, so it
-can certify harm only on cells whose no-context baseline floors near zero. This is exactly why
-anti-monotonicity certifies on \texttt{api\_argorder} (hardened) for Haiku (\texttt{none} dropped from
-$40\%$ to $1\%$ after hardening, $W_1$ still $100\%$) but not on \texttt{api\_argorder} for GPT-5.5
-(\texttt{none} $= 75\%$), Kimi ($45\%$), or Opus ($15\%$). We state this as a protocol up front
-(Remark~\ref{rem:leaky}): we certify anti-monotonicity only on cells whose \texttt{none} baseline
-floors near zero, because a leaky baseline mechanically shrinks $\Psi_T$'s certifiable magnitude.
-Table~\ref{tab:interference} therefore reports, per model, which cell carried the certificate and the
-collapse on it. We also report the $W_1$ ceiling alongside every $\Psi_T$: DeepSeek's $W_1$ arm
-reaches only $75\%$ on \texttt{api\_post\_ok} (an honest capability difference, vs.\ ${\sim}100\%$ for
-Claude and GPT), so its $\Psi_T = -0.75$ is computed from a lower starting point and is not directly
-magnitude-comparable to Sonnet's $100\% \to 0\%$.
+can verify harm only on cells whose no-context baseline floors near zero. This is why
+anti-monotonicity verifies on \texttt{api\_argorder} for Haiku (\texttt{none} $=2\%$, $W_1$ $100\%$)
+and Sonnet (\texttt{none} $=0\%$) but not for GPT-5.5 (\texttt{none} $=75\%$), Kimi ($45\%$), or Opus
+($40\%$), where a non-zero baseline mechanically shrinks $\Psi_T$'s verifiable magnitude. We state
+this as a protocol up front (Remark~\ref{rem:leaky}): we verify anti-monotonicity only on cells whose
+\texttt{none} baseline floors near zero. Table~\ref{tab:interference} reports, per model, which cell
+carried the verification and its collapse, alongside the $W_1$ ceiling: DeepSeek's $W_1$ reaches only
+$75\%$ on \texttt{api\_post\_ok} (an honest capability difference), so its $\Psi_T = -0.75$ starts
+from a lower point and is not directly magnitude-comparable to Sonnet's $100\% \to 2\%$.
 
-\paragraph{Order control.}
-Reordering the superset does not restore performance. At $n=80$ on Haiku, \texttt{api\_post\_ok} gives
-$W_{1+}$ $24\%$ and $W_{1+}^{\mathrm{rev}}$ $1\%$ (vs.\ $W_1$ $98\%$), and \texttt{api\_argorder} gives $W_{1+}$ $1\%$ and $W_{1+}^{\mathrm{rev}}$ $44\%$ (vs.\ $W_1$ $100\%$). On one cell the reversed order
-is worse and on the other it is better, so order does have a directional effect; but \emph{neither}
-ordering recovers $W_1$ alone. The defensible reading is that reordering does not cure the harm, hence
-the collapse is not a lost-in-the-middle / recency artifact, not that order is irrelevant.
+\paragraph{Position is not the cause.}
+The collapse is not a lost-in-the-middle or recency artifact. The length-matched padding control
+(Appendix~\ref{app:record}) puts filler in the same slot $W_2$ occupies inside $W_{1+}$, with $W_1$
+last in both, and leaves $W_1$ at ceiling; holding position fixed and changing only the content is
+what turns a harmless arm into a harmful one, so the cause is the added signal, not where it sits.
 
 \paragraph{Runtime fingerprint (a descriptive correlate).}
-The harmful $W_{1+}$ arm consistently emits more output tokens than $W_1$: between $+87\%$ and $+252\%$ across the harmful Haiku
-cells (and, in the full-battery run, $+12\%$ even on the still-passing encoding cell), Sonnet $+120\% / +131\%$, Opus $+204\% / +204\%$, GPT-5.5 $+281\% / +274\%$, DeepSeek $+93\% /
-+166\%$, Kimi $+203\% / +249\%$. We report this as a consistent descriptive correlate, not a
-mechanism: more output on the failing arm could be effect rather than cause, and the $+12\%$ inflation
-on a cell that still passes undercuts a strict ``verbose thrashing causes the collapse'' reading.
+The harmful $W_{1+}$ arm consistently emits more output tokens than $W_1$ across models. We report
+this as a reproducible correlate of the harmful arm, not a mechanism: more output on the failing arm
+could be effect rather than cause.
 
 \paragraph{Robust, but not monotone in capability.}
 The harm is large and robust across the Anthropic capability ladder but is \emph{not} ordered by
-capability. On the two API cells the $W_1 \to W_{1+}$ collapse is Haiku $98\%/100\% \to 24\%/1\%$, Sonnet
-$100\% \to 0\% / 0\%$, and Opus $100\% \to 25\% / 5\%$: the middle model (Sonnet) shows the starkest
-collapse and the strongest model (Opus) less so. An earlier two-point reading suggested the harm
-``intensifies with strength''; the third point falsifies that, and we explicitly do not claim a
-capability trend, only robustness across the ladder.
+capability. On the two API cells the $W_1 \to W_{1+}$ collapse is Haiku $52\%/100\% \to 15\%/5\%$,
+Sonnet $100\% \to 2\%/0\%$, and Opus $100\% \to 38\%/15\%$: the middle model (Sonnet) shows the
+starkest collapse and the strongest (Opus) the mildest. An earlier two-point reading suggested the
+harm ``intensifies with strength''; the third point falsifies that, and we claim only robustness
+across the ladder, not a capability trend.
 
 \subsubsection{The model-relative value of private context}
 \label{sec:results-moat}
 
 The ``private'' conventions are genuinely unguessable for some vendors and partially known to others,
 and this varies continuously. The \texttt{none}-arm baseline on \texttt{api\_argorder} forms a clean
-spectrum: Haiku and Sonnet ${\sim}0\%$, DeepSeek $2\%$, Opus $15\%$, Kimi $45\%$, GPT-5.5 $75\%$
-(Table~\ref{tab:consolidated}; Figure~\ref{fig:spectrum}). Thus the value of the private context, the model-relative quantity
-$I(S;W\mid\theta)$ of \S\ref{subsec:theta}, varies continuously across models. It tracks a vendor's
-training rather than raw capability: DeepSeek, a different vendor from Anthropic, nonetheless has a
-tight prior (baselines $0/2/0/0\%$ across \texttt{api\_post\_ok}/\texttt{api\_argorder}/\texttt{enc\_amount}/trap)
-like Claude, while GPT-5.5's prior already holds much of the convention (\texttt{api\_argorder} $75\%$,
-\texttt{enc\_amount} $55\%$). Sonnet's baselines all floor at $0\%$, so even the stronger Anthropic
-model does not guess the convention; the value of private context survives the capability ladder. The
-certified per-model claims rest on cells unguessable \emph{for the model under test} (e.g.\ GPT-5.5
-\texttt{api\_post\_ok} \texttt{none} $= 5\%$, trap $= 0\%$).
+spectrum: Sonnet $0\%$, Haiku and DeepSeek $2\%$, Opus $40\%$, Kimi $45\%$, GPT-5.5 $75\%$
+(Table~\ref{tab:consolidated}; Figure~\ref{fig:spectrum}). So the value of the private context, the
+model-relative quantity $I(S;W\mid\theta)$ of \S\ref{subsec:theta}, varies continuously across
+models, and it tracks a vendor's training rather than raw capability: DeepSeek, a different vendor,
+has a tight prior like the smaller Claude models, while GPT-5.5's prior already holds much of the
+convention (\texttt{api\_argorder} $75\%$, \texttt{enc\_amount} $55\%$). Within Anthropic the ordering
+is not by capability either: Sonnet guesses least ($0\%$) while the stronger Opus guesses more
+($40\%$). The verified per-model claims rest on cells unguessable \emph{for the model under test}
+(e.g.\ GPT-5.5 \texttt{api\_post\_ok} \texttt{none} $= 5\%$, trap $= 0\%$).
 
 \begin{figure}[t]
 \centering
@@ -1396,7 +1378,7 @@ certified per-model claims rest on cells unguessable \emph{for the model under t
     \node[below, font=\scriptsize] at (\x, -0.15) {\x};
   }
   % markers, staggered labels
-  \foreach \x/\h/\lbl in {0/0.9/{Haiku, Sonnet ${\sim}0\%$}, 2/1.7/{DeepSeek $2\%$}, 15/2.5/{Opus $15\%$}, 45/0.9/{Kimi $45\%$}, 75/0.9/{GPT-5.5 $75\%$}} {
+  \foreach \x/\h/\lbl in {0/0.9/{Haiku, Sonnet, DeepSeek $\le2\%$}, 40/2.5/{Opus $40\%$}, 45/0.9/{Kimi $45\%$}, 75/1.7/{GPT-5.5 $75\%$}} {
     \fill (\x, 0) circle (2.2pt);
     \draw[black!40] (\x, 0.1) -- (\x, \h - 0.25);
     \node[above, font=\scriptsize] at (\x, \h - 0.3) {\lbl};
@@ -1404,42 +1386,34 @@ certified per-model claims rest on cells unguessable \emph{for the model under t
 \end{tikzpicture}
 \caption{The model-relative value of private context as a spectrum: how often each model reproduces
 the private convention with \emph{no} context supplied (\texttt{none} arm, \texttt{api\_argorder}).
-The value of the same fixed source $W_1$ ranges from maximal (Haiku/Sonnet, DeepSeek: unguessable) to
-largely pre-priced-in (GPT-5.5: $75\%$ guessed), and the ordering tracks vendor training rather than
-capability, DeepSeek sits with Claude despite being a different vendor, and Opus (the strongest
-Anthropic model) guesses more than Sonnet.}
+The value of the same fixed source $W_1$ ranges from maximal (Sonnet, Haiku, DeepSeek: essentially
+unguessable) to largely pre-priced-in (GPT-5.5: $75\%$ guessed), and the ordering tracks vendor
+training rather than capability, DeepSeek sits with the smaller Claude models despite being a
+different vendor, and Opus (the strongest Anthropic model) guesses more than Sonnet.}
 \label{fig:spectrum}
 \end{figure}
 
-We note that this cross-vendor magnitude
-comparison is the part most exposed to the agentic-vs-single-shot confound (\S\ref{sec:limitations}):
-vendor and harness are not separated in the present runs.
-
-\paragraph{Auditable per-cell record.} The full per-arm PASS record for every carrying cell is Table~\ref{tab:percell} in Appendix~\ref{app:record}, so each certificate can be reconstructed from the reported counts.
+\paragraph{Auditable per-cell record.} The full per-arm PASS record for every carrying cell is Table~\ref{tab:percell} in Appendix~\ref{app:record}, so each verification can be reconstructed from the reported counts.
 
 \subsection{Generality and controls (summary)}
 \label{sec:results-generality}
 
-Five follow-up experiments address four threat axes (source-pair generality, the
-agentic-harness confound, the context-length confound, and prompt-curability of the collapse);
-full protocols and numbers are
+Four follow-up experiments address three threat axes (source-pair generality, the context-length
+confound, and prompt-curability of the collapse); full protocols and numbers are
 in Appendix~\ref{app:record}. \textbf{(i) A second incomparable pair, different domain}: a private
-\texttt{cache}-module contract versus a key-normalization invariant is again certified incomparable
-on Haiku ($L_{\Dcal} = +0.774/+0.496$), with one-directional dominance fully certified at $n=80$;
-its interference is certified in sign ($\Psi_T<0$, upper bound $-0.21$) but not at the $\tau=0.30$
-margin, because the $80\%$ $V_1$ ceiling keeps the four-term bound wide. \textbf{(ii) Single-shot
-replication}: rerunning Haiku in the non-agentic regime preserves certified incomparability
-($L_{\Dcal}=+0.762$ both directions), the trap mis-rank ($90\%$ vs $0\%$), dominance, and one
-certified interference cell ($\Psi_T=-0.93$, upper $-0.56$), so the order-theoretic findings are
-not agentic-harness artifacts. \textbf{(iii) Length-matched padding}: filler character-matched to
-$W_{1+}$ leaves $W_1$ at ceiling (\texttt{api\_argorder} $100\%$ vs $W_{1+}$ $10\%$; interference
-certified, upper $-0.41$), attributing the collapse to the added signal, not token count.
-\textbf{(iv) Routing instruction}: a one-line convention-routing note recovers most of the collapse
+\texttt{cache}-module contract versus a key-normalization invariant is again verified incomparable
+on Haiku ($L_{\Dcal} = +0.774/+0.496$), with one-directional dominance fully verified at $n=80$;
+its interference is verified in sign ($\Psi_T<0$, upper bound $-0.21$) but not at the $\tau=0.30$
+margin, because the $80\%$ $V_1$ ceiling keeps the four-term bound wide. \textbf{(ii) Length-matched
+padding}: filler character-matched to $W_{1+}$ leaves $W_1$ at ceiling (\texttt{api\_argorder}
+$100\%$ vs $W_{1+}$ $10\%$; interference verified, upper $-0.41$), attributing the collapse to the
+added signal, not token count.
+\textbf{(iii) Routing instruction}: a one-line convention-routing note recovers most of the collapse
 ($2\%\to80\%$, $22\%\to68\%$; both separated from $W_{1+}$) while remaining directionally below $W_1$ alone on the carrying cell; writing that note requires knowing which source is decisive for which task family,
 which is exactly the coordinate structure the partial order formalizes, so the cure presupposes
-the diagnosis. \textbf{(v) Structured context}: wrapping the same two conventions in labeled XML
+the diagnosis. \textbf{(iv) Structured context}: wrapping the same two conventions in labeled XML
 sections \emph{without} any routing statement mitigates only weakly ($2\%\to42\%$ on the carrying
-cell, versus $80\%$ with the routing note and $100\%$ for $W_1$ alone; certified against the raw
+cell, versus $80\%$ with the routing note and $100\%$ for $W_1$ alone; verified against the raw
 superset, still far below $W_1$), so segmentation alone does not cure the interference, the
 operative variable is routing knowledge. The mitigation hierarchy, raw superset $<$ structure $<$
 routing $<$ dropping the dominated signal, is itself a finding: it locates the failure in
@@ -1466,7 +1440,7 @@ formalization is a model rather than a proof of the realized object.
 
 Three limits of scope govern everything above. \textbf{(i) Two registers.} The theorems are about
 the ideal user of a source; every number we measure is the pass rate of one fixed, non-optimal
-rule $\delta_M$. Lemma~\ref{lem:bridge} connects the two in the direction we need: a certified
+rule $\delta_M$. Lemma~\ref{lem:bridge} connects the two in the direction we need: a verified
 crossover on tasks where each source supplies its own decisive fact implies genuine Blackwell
 incomparability, and the reverse needs an extra assumption (Assumption~\ref{ass:attain}) that our
 task design builds in and our measurements confirm. So we read the result as a statement about the
@@ -1474,52 +1448,51 @@ fixed model on a fixed battery that \emph{earns} the structural conclusion throu
 rather than assuming it. \textbf{(ii) The estimator's name.} $\dhat_{\Dcal}$ does no minimization
 over garblings and ranges over a fixed set of tasks; it is a one-sided \emph{value-deficiency
 surrogate}, not a Le~Cam deficiency, and the two are not interchangeable for a fixed rule
-(Remark~\ref{rem:notlecam}). What is rigorous is the certificate, which we regard as the most
+(Remark~\ref{rem:notlecam}). What is rigorous is the verification, which we regard as the most
 robust part and which stands whether or not the deficiency analogy holds. \textbf{(iii) What the
-certificate covers.} It is correct because it pays for picking the worst task with exact intervals
+verification covers.} It is correct because it pays for picking the worst task with exact intervals
 and a union bound; its support is small (one API task and one encoding task carry the pair-1
 result), each claim is controlled on its own at level $\eta$ rather than all at once
 (\S\ref{subsec:fwer}), and we call $\Dcal$ a fixed adversarial battery, not a task distribution.
 
-\subsection{Anti-monotonicity is real, certified, but not capability-ordered}
+\subsection{Anti-monotonicity is real, verified, but not capability-ordered}
 \label{sec:disc-antimono}
 
 The interference object $\Psi_T = \PASS(W_{1+},T) - \PASS(W_1,T) - \PASS(W_2,T) + \PASS(\text{none},T)$
 measures whether appending the (irrelevant-to-this-task) $W_2$ to a sufficient $W_1$ harms
-performance. We certify $\Psi_T \le -0.30$ on at least one cell for five of six models
+performance. We verify $\Psi_T \le -0.30$ on at least one cell for five of six models
 (Table~\ref{tab:interference}), with collapses as stark as $100\% \to 0\%$ ($\Psi_T=-1.00$, upper
-bound $-0.69$) on Sonnet and Kimi. This is a certified empirical falsification of
+bound $-0.69$) on Sonnet and Kimi. This is a verified empirical falsification of
 superset-dominance for these fixed rules (Theorem~\ref{thm:antimono}): a literal superset of a
 sufficient signal can sharply reduce PASS, which no monotone-submodular scalar context-value score can
 represent.
 
 Two corrections follow from the data. \textbf{(i) The harm is not monotone in
 capability.} An early two-point read (Haiku then Sonnet) suggested the collapse ``intensifies with
-model strength''; adding the third Anthropic model (Opus) falsified this. On \texttt{api\_post\_ok}
-the collapse is $98\to24\%$ (Haiku), $100\to0\%$ (Sonnet), $100\to25\%$ (Opus), and on
-\texttt{api\_argorder} $100\to1\%$, $100\to0\%$, $100\to5\%$ respectively, the middle model (Sonnet)
-is the starkest and the strongest (Opus) is less so. The defensible claim is robustness across the
-capability ladder, \emph{not} a capability trend.
-\textbf{(ii) The interference certificate is structurally cell-selected.} Its upper bound includes
-$+\mathrm{CP}_{\mathrm{hi}}(p_{\text{none}})$, so it can only certify harm on cells whose none-baseline
+model strength''; the third Anthropic model (Opus) falsifies this. On \texttt{api\_argorder} the
+collapse is $100\to5\%$ (Haiku), $100\to0\%$ (Sonnet), and $100\to15\%$ (Opus); the middle model
+(Sonnet) is the starkest and the strongest (Opus) the mildest. The defensible claim is robustness
+across the capability ladder, \emph{not} a capability trend.
+\textbf{(ii) The interference verification is structurally cell-selected.} Its upper bound includes
+$+\mathrm{CP}_{\mathrm{hi}}(p_{\text{none}})$, so it can only verify harm on cells whose none-baseline
 floors near zero. This is exactly the set of cells that are unguessable for the model under test, which
-couples the certifiable-harm set to the model-relative value of private context (\S\ref{sec:disc-moat}).
-We treat this as a protocol (Remark~\ref{rem:leaky}): we certify anti-monotonicity only on
+couples the verifiable-harm set to the model-relative value of private context (\S\ref{sec:disc-moat}).
+We treat this as a protocol (Remark~\ref{rem:leaky}): we verify anti-monotonicity only on
 floor-baseline cells, because a leaky baseline
-mechanically shrinks the certifiable $\Psi_T$. On \texttt{api\_argorder} the harm is certified for
-Haiku (hardened baseline $1\%$) and Sonnet ($0\%$) but not for GPT-5.5 (baseline $75\%$), Kimi ($45\%$), or Opus ($15\%$).
+mechanically shrinks the verifiable $\Psi_T$. On \texttt{api\_argorder} the harm is verified for
+Haiku (baseline $2\%$) and Sonnet ($0\%$) but not for GPT-5.5 (baseline $75\%$), Kimi ($45\%$), or Opus ($40\%$).
 
 \paragraph{Will scale restore Blackwell coherence?}
 The capability non-monotonicity raises a question this framework makes precisely testable: is
 Blackwell coherence of the realized rule an emergent property of scale? Three points on one
 vendor's ladder cannot estimate that curve, and we decline to extrapolate from them; what the
-framework contributes is the \emph{instrument}: coherence is now a certifiable property of any
+framework contributes is the \emph{instrument}: coherence is now a verifiable property of any
 fixed rule, so ``$\Psi_T$ versus scale'' is a measurable trajectory across model generations
 rather than a speculation, and the present data offer no comfort that the frontier is already
-there (GPT-5.5 certifies a $100\%\!\to\!0\%$ collapse; Opus reproduces the harm at strong point
+there (GPT-5.5 verifies a $100\%\!\to\!0\%$ collapse; Opus reproduces the harm at strong point
 estimates). Two things would remain true under any scaling outcome. First, the theory treats
 $\delta_M$ as fixed \emph{per measurement}, not as a claim that models are static: every new
-model or configuration is a new $\theta$ (\S\ref{subsec:theta}), and every certified quantity is
+model or configuration is a new $\theta$ (\S\ref{subsec:theta}), and every verified quantity is
 indexed by it, so model evolution is inside the framework, not outside it. Second, and
 decisively: anti-monotonicity is a coherence failure of the \emph{rule} and could in principle
 vanish with scale, but incomparability is a structural property of the \emph{sources}, mutually
@@ -1539,7 +1512,7 @@ Claude despite being a different vendor, while GPT-5.5's prior is wide ($55\%$--
 \texttt{api\_argorder}/\texttt{enc\_amount}). A ``stronger-model-knows-more'' account predicts the
 spectrum to follow capability; it does not. We read $I(S;W\mid\theta)$ as tracking a vendor's training
 distribution rather than raw capability, which makes the theory's $\theta$-dependence concrete and
-caps which cells certify per model.
+caps which cells verify per model.
 
 \subsection{Mechanism: the runtime fingerprint is a correlate, not an explanation}
 \label{sec:disc-mechanism}
@@ -1551,7 +1524,7 @@ undercuts a clean ``verbosity causes collapse'' account. We therefore treat the 
 reproducible correlate of the harmful arm, not a mechanism.
 
 Two points bound what this paper can and cannot say about mechanism. First, the claim structure is
-deliberately mechanism-agnostic: Theorem~\ref{thm:antimono} certifies that the realized rule is not
+deliberately mechanism-agnostic: Theorem~\ref{thm:antimono} verifies that the realized rule is not
 Blackwell-coherent \emph{whatever} the internal cause, and the behavioral controls already
 constrain the hypothesis space from the outside, the harm is not position (order control), not
 token count (padding control), and is largely, though not fully, curable by explicit convention
@@ -1562,12 +1535,12 @@ and the phenomenon is cross-vendor, so any internal story must generalize across
 cannot open. The direct path to mechanism is to reproduce the collapse on an open-weight model
 with the same harness (the launchers speak any OpenAI-compatible endpoint) and then instrument
 attention and activation patterns on the contrasting arms; we regard this as the natural
-mechanistic companion study, downstream of, not prerequisite to, the certified behavioral claim.
+mechanistic companion study, downstream of, not prerequisite to, the verified behavioral claim.
 
 \paragraph{Levels of description, and three readings of the phenomenon.}
 The partial order is a decision-theoretic, behavioral-level frame; it does not compete with a
 computational account of how conditioning on added text changes the model's processing. The two
-are levels of description of the same event, and the certified behavioral facts are the
+are levels of description of the same event, and the verified behavioral facts are the
 constraints any computational account must satisfy. Three interpretive readings are compatible
 with the present data, and each is discriminable by a named experiment. \textbf{(i) A transient
 failure of current models}: discriminated by the coherence-versus-scale trajectory of
@@ -1582,7 +1555,7 @@ result, a one-line control statement that adds no task-relevant information reco
 collapse, and by the structured-context ablation, labeled XML segmentation of the same content
 recovers only a minority of the collapse ($2\%\to42\%$) while the routing statement recovers most
 of it ($\to80\%$), locating the operative variable in convention-to-task \emph{routing} rather
-than formatting or segmentation. We state these as interpretations, not findings; every certified
+than formatting or segmentation. We state these as interpretations, not findings; every verified
 claim in the paper is independent of which reading is true.
 
 \subsection{Limitations and threats to validity}
@@ -1592,39 +1565,39 @@ We collect the scope restrictions here; each is stated once and sized to its wei
 
 \paragraph{From diagnosis to selection.} The constructive selection rule the partial order
 implies, with its guarantees and evaluation against strong reranker baselines, is factored into a
-companion paper. Building the certified order on $m$ candidates costs
+companion paper. Building the verified order on $m$ candidates costs
 $m\!\cdot\!|\Dcal|\!\cdot\!n$ verifier-gated calls, curation scale, not corpus scale; scaling
-certified selection to retrieval over $10^6$ passages, by amortizing the probe into a learned
+verified selection to retrieval over $10^6$ passages, by amortizing the probe into a learned
 deficiency predictor or running the partial-order step as a re-ranking head over a scalar
 shortlist, is the central open problem this work opens.
 
 \paragraph{Source-pair generality.} Incomparability and dominance hold for two hand-built pairs
-in two domains; the cross-vendor record is single-pair. Pair-2 interference is certified in sign
+in two domains; the cross-vendor record is single-pair. Pair-2 interference is verified in sign
 ($\Psi_T<0$ at $n=80$) but not at the $\tau=0.30$ margin, its $80\%$ $V_1$ ceiling keeps the
 four-term bound wide; pair-2's relevance trap was an honest null (its prompt was not lexically
 $V_2$-leaning). A third domain and a vendor-general strong mis-rank remain inexpensive next
 steps.
 
-\paragraph{Vendor is confounded with harness.} Anthropic models ran agentically, the rest
-single-shot, so cross-vendor \emph{magnitude} comparisons (the value spectrum, the $\Psi_T$
-ladder) inherit the confound. The binary within-model claims do not, and the single-shot Haiku
-replication preserves all order-theoretic findings, so they are not agentic artifacts; magnitude
-comparisons should still be read as suggestive.
+\paragraph{Cross-vendor magnitudes are still only suggestive.} All six models are now run the same
+way (single-shot, $n=40$), so the run mode no longer confounds the comparison. What remains is the
+ordinary caution that different vendors' models differ in ways we do not control (training data,
+size, tokenizer), so the \emph{magnitude} comparisons (the value spectrum, the $\Psi_T$ ladder)
+should be read as suggestive; the binary within-model claims do not depend on any cross-vendor
+comparison.
 
-\paragraph{The model is an idealization, twice.} $\dhat_{\Dcal}$ certifies dominance and
+\paragraph{The model is an idealization, twice.} $\dhat_{\Dcal}$ verifies dominance and
 incomparability for a given model on a fixed battery, not the universal Blackwell order. And the
 projection construction models sources as clean projections onto independent coordinates; real
 chunks overlap, contradict, and leak (the measured $\theta$-dependence is exactly such leakage),
 so the construction is the cleanest \emph{sufficient} condition for incomparability, realized
-exactly by our hand-built pairs, and measuring certified-incomparability prevalence on natural
+exactly by our hand-built pairs, and measuring verified-incomparability prevalence on natural
 document pairs is the direct next experiment.
 
-\paragraph{Sampling and certification regime.} The certificate assumes $n$ i.i.d.\ Bernoulli PASS
-draws per cell (Assumption~\ref{ass:iid}); the assumption is most delicate for the agentic arm,
-where each draw is a fresh multi-turn trajectory (protocol in Appendix~\ref{app:repro}).
-Interference is certifiable only on cells whose \texttt{none} baseline floors near zero, stated
-as a protocol (Remark~\ref{rem:leaky}); marginal-versus-joint control is discussed in
-\S\ref{sec:disc-bridge}.
+\paragraph{Sampling and verification regime.} The verification assumes $n$ i.i.d.\ Bernoulli PASS
+draws per cell (Assumption~\ref{ass:iid}), which holds because each draw is an independent
+single-shot call (protocol in Appendix~\ref{app:repro}). Interference is verifiable only on cells
+whose \texttt{none} baseline floors near zero, stated as a protocol (Remark~\ref{rem:leaky});
+marginal-versus-joint control is discussed in \S\ref{sec:disc-bridge}.
 
 \paragraph{Ranker spectrum and synergy.} The trap mis-rank spans lexical cosine and three
 representative open-weight learned rankers, with an LLM listwise reranker escaping as predicted, but the
@@ -1641,10 +1614,10 @@ task-disjoint, so a complementary pair would be needed to test whether a superse
 Context selection is, at bottom, a partial-order problem, not a scalar one. When two sources are
 incomparable, no scalar score can rank them correctly for all tasks (Theorem~\ref{thm:incomparable}),
 which explains the field's ``relevance does not transfer'' folklore. We made the order measurable
-with a value-deficiency surrogate $\dhat_{\Dcal}$ and a distribution-free certificate, and we ran
-the theory on six models across four vendors. On every model we certify ($\ge 90\%$) that two
+with a value-deficiency surrogate $\dhat_{\Dcal}$ and a distribution-free verification, and we ran
+the theory on six models across four vendors. On every model we verify ($\ge 90\%$) that two
 private sources are incomparable; on every model a real relevance score ranks them the wrong way;
-and on five of six we certify that adding a strictly larger source sharply lowers the pass rate (as
+and on five of six we verify that adding a strictly larger source sharply lowers the pass rate (as
 deep as $100\%\to 0\%$), which no ``more-is-better'' scalar can predict. How much a private source
 is worth turns out to depend on the model: guessability runs from $0\%$ to $75\%$ across vendors and
 tracks a vendor's training rather than raw capability.
@@ -1652,14 +1625,14 @@ tracks a vendor's training rather than raw capability.
 On scope: the theorems concern the idealized Bayes-optimal user of a source; the
 realized crossover, anti-monotonicity, and value-of-private-context are properties of \emph{fixed} models
 measured directly, bridged to the structural claim by Lemma~\ref{lem:bridge}. The estimator is a
-regret-gap surrogate, not a Le~Cam deficiency; the certificate, which we regard as the most robust
-contribution, is correct and survives that re-labeling. The evidence now spans two hand-built source
-pairs in two domains, a single-shot replication that preserves the order-theoretic claims, and a
-length-matched padding control that attributes the anti-monotonicity collapse to signal content rather
-than added tokens; the cross-vendor record remains single-pair, vendor is confounded with harness for
-the magnitude comparisons, and synergy is untested. The practical reading is modest and actionable:
+regret-gap surrogate, not a Le~Cam deficiency; the verification, which we regard as the most robust
+contribution, is correct and survives that re-labeling. All six models are run the same way
+(single-shot, $n=40$), and the evidence spans two hand-built source pairs in two domains plus a
+length-matched padding control that attributes the anti-monotonicity collapse to signal content
+rather than added tokens; the cross-vendor record remains single-pair, cross-vendor magnitudes are
+only suggestive, and synergy is untested. The practical reading is modest and actionable:
 selection should be treated as partial-order-aware rather than scalar top-$k$, the right operational
-object is a certified deficiency surrogate rather than a relevance scalar, and ``the best context''
+object is a verified deficiency surrogate rather than a relevance scalar, and ``the best context''
 should be expected to be model-relative and only partially ordered. Stated at its sharpest, the
 impossibility is a theorem about \emph{cheap} selection: per-source scalars
 (Theorem~\ref{thm:incomparable}) and topical query-conditioned scores
@@ -1715,7 +1688,7 @@ Hence $W_2 \not\Bord W_1$. Symmetrically, $\PASS_M(W_2,T_b) > g_b = V^\star(W_1,
 $W_1 \Bord W_2$. Neither dominance direction holds, so $W_1, W_2$ are Blackwell-incomparable.
 The caps are essential: without them a $\PASS_M$ crossover is compatible even with Blackwell
 \emph{equivalence}, since a fixed rule keyed to one signal's surface form can under-perform on
-the other, exactly the non-coherence phenomenon Theorem~\ref{thm:antimono} certifies for
+the other, exactly the non-coherence phenomenon Theorem~\ref{thm:antimono} verifies for
 $(W_1, W_{1+})$.
 
 \textup{(b)} Assumption~\ref{ass:attain} directly yields $\PASS_M(W_1,T_a) > \PASS_M(W_2,T_a)$
@@ -1745,9 +1718,9 @@ Clopper--Pearson~\citep{clopperpearson1934}), so by the union bound $\Pr[E^c]\le
 $p_{W_1,T}\le U_{W_1,T}$, so $p_{W_2,T}-p_{W_1,T} \ge L_{W_2,T}-U_{W_1,T}$; taking $\max_T$ on both
 sides, $\sup_T[p_{W_2,T}-p_{W_1,T}] \ge L_{\Dcal}(W_1,W_2)$. Thus on $E$ (probability $\ge 1-\eta$) the
 true sup is at least $L_{\Dcal}(W_1,W_2)$, which is the claimed lower confidence bound; if it is positive,
-the true sup is positive, certifying $\dhat_{\Dcal}(W_1,W_2)>0$. The reverse direction uses
+the true sup is positive, verifying $\dhat_{\Dcal}(W_1,W_2)>0$. The reverse direction uses
 $L_{W_1,T}$ and $U_{W_2,T}$, which are endpoints of the \emph{same} $2|\Dcal|$ intervals already
-included in $E$; therefore both one-sided certificates are valid on the single event $E$, and their
+included in $E$; therefore both one-sided verifications are valid on the single event $E$, and their
 conjunction holds at $\ge 1-\eta$ without a further Bonferroni factor.
 \end{proof}
 
@@ -1790,9 +1763,9 @@ absorbed into a single-sample DKW envelope.
 \subsection*{Relation to LLM-evaluation statistics}
 \begin{remark}[Relation to LLM-evaluation statistics]
 \label{rem:evalstats}
-The certificate sits in a small but growing statistical-methodology literature for black-box
+The verification sits in a small but growing statistical-methodology literature for black-box
 model evaluation: paired-difference designs and clustered standard errors for
-evals~\citep{miller2024errorbars}, two-sample tests certifying behavioral differences between
+evals~\citep{miller2024errorbars}, two-sample tests verifying behavioral differences between
 API-served models~\citep{gao2024modelequality}, and the recommendation to prefer exact
 frequentist intervals over CLT approximations when per-cell $n$ is below a few
 hundred~\citep{bowyer2025clt}, which is precisely our regime ($n \in [20,80]$ per cell) and
@@ -1802,16 +1775,15 @@ precisely what the exact Clopper--Pearson construction provides.
 \subsection*{Power and the role of \texorpdfstring{$n$}{n}}
 \label{subsec:power}
 
-The asymmetric sample sizes in \S\ref{sec:experiments} (Opus at $n=20$ certifies incomparability but
-not interference) are principled, not ad hoc. For a stark cell with empirical proportion at an
-endpoint ($\hat p\in\{0,1\}$), the Clopper--Pearson interval collapses to a one-sided bound that
-clears $0$ at small $n$: the incomparability certificate \eqref{eq:LD} is carried by such stark
-cells ($W_1$ at $\approx100\%$, $W_2$ at $0\%$ and vice versa), so $n=20$ suffices. The interference
-certificate \eqref{eq:psiupper} mixes a possibly-intermediate \texttt{none} baseline and the
-$W_{1+}$ arm; with non-endpoint proportions the intervals are wide and $n=20$ is underpowered. The
-two certificates therefore have genuinely different effective-$n$ requirements, which is why the
-consolidated record marks Opus incomparability as certified and Opus interference as reproduced but
-not certified.
+The two verifications have genuinely different effective-$n$ requirements, which is why at a common
+$n=40$ Opus verifies incomparability but not interference. For a stark cell with empirical
+proportion at an endpoint ($\hat p\in\{0,1\}$), the Clopper--Pearson interval collapses to a
+one-sided bound that clears $0$ even at small $n$: the incomparability verification \eqref{eq:LD} is
+carried by such stark cells ($W_1$ at $\approx100\%$, $W_2$ at $0\%$ and vice versa), so it is easy
+to clear. The interference verification \eqref{eq:psiupper} mixes a possibly-intermediate
+\texttt{none} baseline and the $W_{1+}$ arm; with non-endpoint proportions (as for Opus, whose
+collapse is milder and whose \texttt{api\_argorder} baseline leaks) the four-term interval stays
+wide, so the same $n$ that verifies incomparability need not verify interference.
 
 
 % ==========================================================================
@@ -1821,34 +1793,36 @@ not certified.
 
 \begin{table}[t]
 \centering
-\caption{Per-cell PASS rates ($\%$) for the carrying cells, by arm. Anthropic rows agentic, others
-single-shot. ``--'' marks an arm not in that run. Hardened \texttt{api\_argorder} (Haiku) lowered the
-\texttt{none} baseline from $40\%$ to $1\%$ while leaving $W_1$ at $100\%$.}
+\caption{Per-cell PASS rates ($\%$) for the carrying cells, by arm, all single-shot at $n=40$.
+``--'' marks an arm not measured for that cell (the three non-Anthropic runs measured $W_{1+}$ only
+on the interference cell).}
 \label{tab:percell}
-\begin{tabular}{@{}llccccc@{}}
+\begin{tabular}{@{}llcccc@{}}
 \toprule
-Model & Cell & \texttt{none} & $W_1$ & $W_2$ & $W_{1+}$ & $W_{1+}^{\mathrm{rev}}$ \\
+Model & Cell & \texttt{none} & $W_1$ & $W_2$ & $W_{1+}$ \\
 \midrule
-Haiku-4.5       & \texttt{api\_post\_ok}           & 0  & 98  & 0   & 24  & 1   \\
-Haiku-4.5       & \texttt{api\_argorder} (hard.)   & 1  & 100 & 0   & 1   & 44  \\
-Haiku-4.5       & \texttt{enc\_amount}             & 0  & 0   & 100 & -- & -- \\
-Haiku-4.5       & \texttt{trap\_store\_wire}       & 0  & 96  & 0   & -- & -- \\
-Sonnet-4.6      & \texttt{api\_post\_ok}           & 0  & 100 & 0   & 0   & -- \\
-Sonnet-4.6      & \texttt{api\_argorder}           & 0  & 100 & 0   & 0   & -- \\
-Sonnet-4.6      & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & -- & -- \\
-Opus-4.8        & \texttt{api\_post\_ok}           & 0  & 100 & 0   & 25  & -- \\
-Opus-4.8        & \texttt{api\_argorder}           & 15 & 100 & 0   & 5   & -- \\
-Opus-4.8        & \texttt{trap\_store\_wire}       & 15 & 100 & 10  & -- & -- \\
-GPT-5.5         & \texttt{api\_post\_ok}           & 5  & 100 & 0   & 0   & -- \\
-GPT-5.5         & \texttt{api\_argorder}           & 75 & -- & -- & -- & -- \\
-GPT-5.5         & \texttt{enc\_amount}             & 55 & -- & -- & -- & -- \\
-GPT-5.5         & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & -- & -- \\
-DeepSeek-V4-Pro & \texttt{api\_post\_ok}           & 0  & 75  & 0   & 0   & -- \\
-DeepSeek-V4-Pro & \texttt{api\_argorder}           & 2  & 68  & 0   & -- & -- \\
-DeepSeek-V4-Pro & \texttt{trap\_store\_wire}       & 0  & 98  & 0   & -- & -- \\
-Kimi-K2.6       & \texttt{api\_post\_ok}           & 0  & 100 & 0   & 0   & -- \\
-Kimi-K2.6       & \texttt{api\_argorder}           & 45 & -- & -- & -- & -- \\
-Kimi-K2.6       & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & -- & -- \\
+Haiku-4.5       & \texttt{api\_post\_ok}           & 0  & 52  & 0   & 15  \\
+Haiku-4.5       & \texttt{api\_argorder}           & 2  & 100 & 0   & 5   \\
+Haiku-4.5       & \texttt{enc\_amount}             & 0  & 0   & 100 & 100 \\
+Haiku-4.5       & \texttt{trap\_store\_wire}       & 0  & 90  & 0   & 92  \\
+Sonnet-4.6      & \texttt{api\_post\_ok}           & 0  & 100 & 0   & 2   \\
+Sonnet-4.6      & \texttt{api\_argorder}           & 0  & 100 & 0   & 0   \\
+Sonnet-4.6      & \texttt{enc\_amount}             & 0  & 0   & 98  & 80  \\
+Sonnet-4.6      & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & 65  \\
+Opus-4.8        & \texttt{api\_post\_ok}           & 0  & 100 & 0   & 38  \\
+Opus-4.8        & \texttt{api\_argorder}           & 40 & 100 & 0   & 15  \\
+Opus-4.8        & \texttt{enc\_amount}             & 0  & 0   & 98  & 85  \\
+Opus-4.8        & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & 100 \\
+GPT-5.5         & \texttt{api\_post\_ok}           & 5  & 100 & 0   & 0   \\
+GPT-5.5         & \texttt{api\_argorder}           & 75 & -- & -- & -- \\
+GPT-5.5         & \texttt{enc\_amount}             & 55 & -- & -- & -- \\
+GPT-5.5         & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & -- \\
+DeepSeek-V4-Pro & \texttt{api\_post\_ok}           & 0  & 75  & 0   & 0   \\
+DeepSeek-V4-Pro & \texttt{api\_argorder}           & 2  & 68  & 0   & -- \\
+DeepSeek-V4-Pro & \texttt{trap\_store\_wire}       & 0  & 98  & 0   & -- \\
+Kimi-K2.6       & \texttt{api\_post\_ok}           & 0  & 100 & 0   & 0   \\
+Kimi-K2.6       & \texttt{api\_argorder}           & 45 & -- & -- & -- \\
+Kimi-K2.6       & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & -- \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1856,44 +1830,30 @@ Kimi-K2.6       & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & -- & -- \\
 \subsection*{Generality and controls: full protocols}
 
 
-Five follow-up experiments address four threat axes directly: source-pair
-generality, the agentic-harness confound, the context-length confound, and whether the
-anti-monotonicity collapse is curable by cheap prompting.
+Four follow-up experiments address three threat axes: source-pair generality, the context-length
+confound, and whether the anti-monotonicity collapse is curable by cheap prompting.
 
 \paragraph{A second incomparable pair, different domain.}
 We repeated the protocol with a second hand-built pair on a private \texttt{cache} module: $V_1$, the
 \texttt{cache.put(key, value, *, ttl)} call contract (argument order, required keyword-only
 \texttt{ttl}, a True/False ``newly inserted'' flag, a \texttt{CacheError} type), versus $V_2$, a
 key-normalization invariant (a fixed \texttt{kx7-} namespace prefix and an underscore rule). On Haiku
-at $n=40$ the pair is again certified incomparable ($L_{\Dcal} = +0.774 / +0.496$, both directions clear
+at $n=40$ the pair is again verified incomparable ($L_{\Dcal} = +0.774 / +0.496$, both directions clear
 of zero) with a clean double crossover ($V_1$ solves the contract and trap cells, $V_2$ solves
-key-normalization, all none-baselines floor at $0\%$), and the dominance control again certifies
+key-normalization, all none-baselines floor at $0\%$), and the dominance control again verifies
 one-directionally. Anti-monotonicity reproduces in direction at $n=40$ (the superset collapses the
 contract cell $80\%\!\to\!28\%$, $\Psi_T=-0.53$); re-running the four arms of the contract cell at
 $n=80$ shows the collapse is stable ($80\%\!\to\!29\%$, $\Psi_T=-0.51$) with Clopper--Pearson upper
-bound $-0.21$, which certifies \emph{strictly negative} interference ($\Psi_T<0$ at $\geq 90\%$) but
+bound $-0.21$, which verifies \emph{strictly negative} interference ($\Psi_T<0$ at $\geq 90\%$) but
 does not clear the pre-registered magnitude margin $\tau=0.30$: the binding constraint is the $V_1$
 ceiling itself ($80\%$, versus pair-1's ${\sim}100\%$), which keeps the four-term bound wide
-regardless of $n$. We report pair-2 interference as a certified sign, not a certified magnitude. The
-$n=80$ run also strengthens the dominance control to a fully certified one-directional dominance
-($U_{\Dcal}=0.000$ with a certified strict win). The relevance trap for this pair was a
+regardless of $n$. We report pair-2 interference as a verified sign, not a verified magnitude. The
+$n=80$ run also strengthens the dominance control to a fully verified one-directional dominance
+($U_{\Dcal}=0.000$ with a verified strict win). The relevance trap for this pair was a
 null, its prompt vocabulary leaned toward $V_1$ ($\varphi(V_1)=0.39 > \varphi(V_2)=0.25$), so
 relevance \emph{agreed} with PASS, so the strong mis-rank remains a pair-1 result. The contribution of
 the second pair is therefore \emph{generality of the incomparability and dominance results to a new
 domain}, not a second mis-rank.
-
-\paragraph{Single-shot breaks the harness confound.}
-To separate vendor from harness, we ran an Anthropic model (Haiku) in \emph{single-shot completion}
-mode, one turn, no tools, code extracted from the returned text, the same regime as the non-Anthropic
-models. At $n=40$ the core results survive the non-agentic harness: incomparability is certified
-($L_{\Dcal} = +0.762$ both directions), the relevance mis-rank reproduces (trap PASS $W_1$ $90\%$ vs
-$W_2$ $0\%$), the dominance control certifies, and anti-monotonicity is certified on
-\texttt{api\_argorder} ($\Psi_T = -0.93$, upper bound $-0.56$). The one regime-dependent quantity is
-absolute execution reliability: single-shot $W_1$ rescue on \texttt{api\_post\_ok} is $52\%$ versus
-$98\%$ agentic (no retries to self-correct), so that cell's interference does not certify single-shot
-while its order-theoretic claims do. The order-theoretic findings, certified incomparability, relevance
-mis-rank, dominance, and at least one certified interference cell, are therefore \emph{not} artifacts of
-the agentic harness.
 
 \paragraph{A length-matched padding control.}
 Anti-monotonicity compares $W_1$ against the strictly longer $W_{1+}$, and added input length alone
@@ -1905,7 +1865,7 @@ $W_{1+}$ within $13$ characters, but carrying no coordinate any verifier checks 
 content). On single-shot Haiku at $n=40$ on the two collapse cells, padding is free while the
 equal-length dominated signal is catastrophic: on \texttt{api\_argorder}, $W_1$ $98\%$,
 $W_{\mathrm{pad}}$ $100\%$, $W_{1+}$ $10\%$; on \texttt{api\_post\_ok}, $W_1$ $50\%$,
-$W_{\mathrm{pad}}$ $65\%$, $W_{1+}$ $10\%$; and the same-run interference certificate clears on
+$W_{\mathrm{pad}}$ $65\%$, $W_{1+}$ $10\%$; and the same-run interference verification clears on
 \texttt{api\_argorder} ($\Psi_T=-0.82$, upper bound $-0.41$). The anti-monotonicity harm is therefore
 attributable to $W_2$'s signal content interacting with the fixed rule, not to added tokens. One
 residual axis is not isolated by this control: the padding is off-topic for the \texttt{ledger}
@@ -1928,10 +1888,10 @@ convention interference that explicit routing knowledge prevents, so pipelines t
 per-task routing labels have a cheap mitigation. Second, and decisively for the paper's thesis:
 \emph{writing the routing sentence requires already knowing which source is decisive for which
 task family}, which is precisely the coordinate structure the partial order formalizes and
-the deficiency certificate measures; the cure is an injection of selection-time coordinate knowledge
+the deficiency verification measures; the cure is an injection of selection-time coordinate knowledge
 into the prompt, not a scalar score, and no query-independent scalar can supply it
 (Theorem~\ref{thm:incomparable}). Formally, $\delta_M$ with the routing note is a
-\emph{different, more Blackwell-coherent rule}; the certified falsification of
+\emph{different, more Blackwell-coherent rule}; the verified falsification of
 Theorem~\ref{thm:antimono} concerns the base rule and is unaffected, and even under the
 instructed rule, keeping the dominated signal is at best equal and directionally worse than
 dropping it, so the selection-level conclusion, keep the non-dominated set rather than forcing
@@ -1966,8 +1926,8 @@ executable verifiers, and every per-model run log and result JSON cited below---
 \url{https://github.com/abilous-ti/blackwell-llm-context}. The harness (\texttt{tokenbench/measure\_blackwell.py}) is
 Python-standard-library only (no third-party dependencies; the Clopper--Pearson endpoints use a stdlib
 regularized incomplete beta), is cross-OS, and implements the surrogate $\dhat_{\Dcal}$, the uniform
-incomparability certificate (\texttt{certify\_incomparable}, \texttt{clopper\_pearson}), the dominance
-control (\texttt{certify\_dominance}), the interference certificate, the sample-size helpers
+incomparability verification (\texttt{certify\_incomparable}, \texttt{clopper\_pearson}), the dominance
+control (\texttt{certify\_dominance}), the interference verification, the sample-size helpers
 (\texttt{required\_n}, \texttt{required\_n\_stark}), and the lexical-relevance scalar
 (\texttt{lexical\_relevance}). It includes launchers for the Anthropic CLI (\texttt{claude -p}), the
 Azure Responses API, and OpenAI-compatible chat completions; the launcher auto-detects API style from the
@@ -1975,57 +1935,44 @@ endpoint, and all API keys are read from the environment (never written to a fil
 
 \paragraph{Protocol.} The verifier stubs a fake \texttt{ledger} module that accepts \emph{only} the exact
 private contract (it rejects wrong positional arg order, a missing \texttt{memo=} keyword, and the wrong
-exception type); return code $0$ is PASS. The four certified cells are \texttt{api\_post\_ok},
-\texttt{api\_argorder} (hardened so \texttt{memo} arrives via a parameter, forcing the keyword-only fact
-and dropping its baseline from $40\%$ to $1\%$), \texttt{enc\_amount}, and \texttt{trap\_store\_wire};
-arms are $\{\text{none}, W_1, W_2, W_{1+}\}$ plus $W_{1+}^{\text{rev}}=W_1\!\,{+}{+}\,W_2$ for the order
-control and $W_{\mathrm{pad}}$ (length-matched neutral filler $+\!+\,W_1$) for the padding control.
-PASS is measured over $n$ i.i.d.\ completions per cell and the certificate uses $\eta=0.10$. The
-Anthropic arms run agentically (\texttt{claude -p}, up to six turns); the non-Anthropic arms run
-single-shot (one completion + code extraction). We note for transparency that this design
-choice, agentic for Anthropic, single-shot for the others, is the vendor/harness confound discussed in
-\S\ref{sec:limitations}.
+exception type); return code $0$ is PASS. The four verified cells are \texttt{api\_post\_ok},
+\texttt{api\_argorder} (\texttt{memo} arrives via a parameter, forcing the keyword-only fact),
+\texttt{enc\_amount}, and \texttt{trap\_store\_wire}; the arms are $\{\text{none}, W_1, W_2, W_{1+}\}$,
+with $W_{\mathrm{pad}}$ (length-matched neutral filler $\,{+}{+}\,W_1$) added for the padding control.
+All six models are queried in a single-shot completion (one call, no tools, code extracted from the
+returned text), and PASS is measured over $n=40$ i.i.d.\ completions per cell at $\eta=0.10$.
 
-\paragraph{Decoding, seeding, retries, and turn budget.} All runs use the provider's default
-decoding configuration: the harness sets no explicit temperature, top-$p$, or seed for any arm
-(the Claude CLI and the Azure/OpenAI-compatible launchers are invoked without sampling
-overrides), so the $n$ draws per cell are independent samples from each provider's default
-decoder. Each draw is a fresh process invocation with no state shared across draws; the agentic
-arm allows up to six turns, the single-shot arms exactly one, with a $200$-second timeout per
-call. Transport-level failures (empty or zero-token results) are retried up to three times with
-quadratic backoff; a draw that still fails is scored as a failure, never as a pass. Runs recorded
-before the padding control predate the retry wrapper and used single attempts, under which a
-transport failure scores as a failure; the stark $98$--$100\%$ $W_1$ ceilings in the certified
-anchors indicate such failures were negligible in those runs.
+\paragraph{Decoding, seeding, and retries.} All runs use the provider's default decoding
+configuration: the harness sets no explicit temperature, top-$p$, or seed (the Claude CLI and the
+Azure/OpenAI-compatible launchers are invoked without sampling overrides), so the $n$ draws per cell
+are independent samples from each provider's default decoder, each a fresh single-turn call with a
+$200$-second timeout. Transport-level failures (empty or zero-token results) are retried up to three
+times with quadratic backoff; a draw that still fails is scored as a failure, never as a pass. Where
+a whole arm was hit by a transport-outage window, we re-ran that arm in isolation (the Opus $W_{1+}$
+arm; noted in the artifact list), so no reported cell mixes outage-scored draws with real ones.
 
 \paragraph{Artifacts.} Per-model run logs and result JSONs are in the artifact repository
 (\url{https://github.com/abilous-ti/blackwell-llm-context}) under the pattern
-\texttt{blackwell\_*\_n*.\{log,json\}}, including \texttt{blackwell\_n80\_run.log} /
-\texttt{blackwell\_n80\_results.json} (the $n=80$
-Haiku bundled certification, $1600$ calls), \texttt{blackwell\_argorder\_n80.\{json,log\}} (the hardened
-second anti-monotonicity cell), \texttt{blackwell\_sonnet\_n40}, \texttt{blackwell\_opus\_n20},
-\texttt{blackwell\_gpt55\_n40}, \texttt{blackwell\_deepseek\_n40}, \texttt{blackwell\_kimi\_n40},
-\texttt{blackwell\_pad\_n40b} (the length-matched padding control, single-shot, $400$ calls),
-\texttt{blackwell\_pair2\_n80} (the pair-2 contract cell at $n=80$, $320$ calls),
-\texttt{blackwell\_instr\_n40} (the routing-instruction ablation, $400$ calls), and
-\texttt{blackwell\_xml\_n40} and \texttt{blackwell\_xml\_arm\_only} (the structured-context
-ablation; the first run's XML arm is transport-invalidated and superseded by the arm-only re-run),
-\texttt{reranker\_trap\_n30} (the LLM listwise reranker probe, $90$ calls;
-harness \texttt{tokenbench/measure\_reranker\_trap.py}), and \texttt{dense\_trap.json} (the
-dense/cross-encoder probe, deterministic local scoring of open-weight checkpoints at zero API
-cost; harness \texttt{tokenbench/measure\_dense\_trap.py}). The
-full experimental record with exact per-cell figures is in \texttt{EXPERIMENT-BLACKWELL.md} (\S\S10--13)
-and the theory hardening (formalization and proof sketches) in \texttt{BLACKWELL.md} (\S10).
+\texttt{blackwell\_*.\{log,json\}}: the six single-shot $n=40$ model runs
+(\texttt{blackwell\_haiku\_ss\_n40}, \texttt{blackwell\_sonnet\_ss\_n40}, \texttt{blackwell\_opus\_ss\_n40}
+with its arm-only re-run \texttt{blackwell\_opus\_ss\_W1plus}, \texttt{blackwell\_gpt55\_n40},
+\texttt{blackwell\_deepseek\_n40}, \texttt{blackwell\_kimi\_n40}), and the follow-up controls
+\texttt{blackwell\_pad\_n40b} (length-matched padding, $400$ calls), \texttt{blackwell\_pair2\_n80}
+(second source pair), \texttt{blackwell\_instr\_n40} (routing-instruction ablation),
+\texttt{blackwell\_xml\_n40} / \texttt{blackwell\_xml\_arm\_only} (structured-context ablation),
+\texttt{reranker\_trap\_n30} (LLM listwise reranker probe;
+\texttt{tokenbench/measure\_reranker\_trap.py}), and \texttt{dense\_trap.json} (dense/cross-encoder
+probe, deterministic local scoring of open-weight checkpoints at zero API cost;
+\texttt{tokenbench/measure\_dense\_trap.py}). The full per-cell record is in
+\texttt{EXPERIMENT-BLACKWELL.md} and the theory hardening (formalization and proof sketches) in
+\texttt{BLACKWELL.md}.
 
-\paragraph{Compute and cost.} Total measured spend was approximately \$210 on Anthropic
-(\texttt{claude -p}): roughly \$123 across the Haiku and Sonnet anchors plus the Opus run (\$49.84),
-the order-control and second-cell runs, the padding control (\$7.73), the pair-2 $n=80$ run
-(\$10.05), the routing-instruction ablation (\$7.90), and the structured-context ablation
-(\$8.40 across an arm-invalidated first run and a clean arm-only re-run); the dense/cross-encoder
-probe ran
-locally on open weights at zero API cost. The non-Anthropic runs (GPT-5.5, DeepSeek, Kimi) used Azure
-quota; the Azure Responses API returns no cost field, so those rows report a \$0 cost artifact while token
-counts are captured, the \$210 figure is the Anthropic spend, not the total cost of all six models.
+\paragraph{Compute and cost.} Total measured Anthropic spend was approximately \$130: the
+single-shot Haiku, Sonnet, and Opus runs (Opus the costliest, plus its arm-only re-run) and the
+follow-up controls (padding, second pair, routing, structured-context). The non-Anthropic runs
+(GPT-5.5, DeepSeek, Kimi) used Azure quota; the Azure API returns no cost field, so this figure is
+the Anthropic spend, not the total across all six models. The dense/cross-encoder probe ran locally
+on open weights at zero API cost.
 
 \paragraph{Reference verification.} The bibliography was assembled in part with automated
 literature search and every entry was subsequently verified against arXiv/DBLP/publisher

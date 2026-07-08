@@ -1,0 +1,22 @@
+{
+ "api_post_ok": {
+  "pass": 15,
+  "n": 40,
+  "errs": 0
+ },
+ "api_argorder": {
+  "pass": 6,
+  "n": 40,
+  "errs": 0
+ },
+ "enc_amount": {
+  "pass": 34,
+  "n": 40,
+  "errs": 0
+ },
+ "trap_store_wire": {
+  "pass": 40,
+  "n": 40,
+  "errs": 0
+ }
+}
