@@ -52,7 +52,8 @@ A Blackwell Framework and Verified LLM Evidence}
   Oleksandr Reminnyi \\
   Department of Computerized Automatic Systems \\
   Lviv Polytechnic National University, Lviv, Ukraine \\
-  ORCID: 0009-0005-5119-3695
+  ORCID: 0009-0005-5119-3695 \\
+  \texttt{sasha.reminnyi@gmail.com}
 }
 
 \date{}
@@ -65,7 +66,7 @@ A Blackwell Framework and Verified LLM Evidence}
 % ==========================================================================
 Choosing what to put in a language model's prompt is almost always done by
 scoring each candidate source with a single number and keeping the top few. We
-argue this is the wrong tool. The best context for one task is often useless
+argue this is the wrong approach. The best context for one task is often useless
 for another. Two sources can be \emph{incomparable}, in the exact sense of
 Blackwell's 1953 comparison of experiments~\citep{blackwell1953}, and when they
 are, no single relevance score can rank them correctly for every task. To test
@@ -336,28 +337,18 @@ tasks}.
 \label{sec:related-deficiency}\label{sec:related-llmrep}\label{sec:related-foundations}
 
 The Blackwell--Le~Cam apparatus has entered machine learning, but never for inference-time
-context. Closest is training-\emph{dataset} valuation: \citet{zheng2024pmi} rank datasets by
-Blackwell informativeness and show a pointwise-mutual-information \emph{scalar} is faithful in
-their Bayes-optimal, white-box regime, an instructive contrast with ours, where the order is
-genuinely partial for a fixed rule and no query-independent scalar can be faithful
-(Theorem~\ref{thm:incomparable}); they provide no incomparability statement or finite-sample
-verification. Garbling has been used to harden LLM evaluations~\citep{bradley2024garbling};
-statistical deficiency to order training \emph{tasks}~\citep{fosse2025}; a deficiency-induced
-\emph{directional} dominance appears in transfer learning, without an incomparability statement,
-formal partial order, or distribution-free verification, and outside language
-modeling~\citep{akdemir2025}; and comparison-of-experiments ideas touch loss
-design~\citep{vanrooyen2014}. Blackwell's theorems have been surveyed for
-AI~\citep{blackwellrep2026}, but to our knowledge no prior work states a Blackwell partial order
-over context sources, derives the no-scalar-ranks consequence for language models, or supplies a
-verified decision-restricted estimator. The mathematics we rely on is classical: the
-Blackwell--Sherman--Stein equivalence and deficiency are due to Blackwell and
-Le~Cam~\citep{blackwell1953,lecam1964,lecam1986}, with Torgersen's monograph as the canonical
-reference, and the fact that the order is a non-lattice partial order with genuinely incomparable
-pairs is classical as well~\citep{torgersen1991}. Theorem~\ref{thm:incomparable} is,
-mathematically, a short corollary of Blackwell's theorem applied to a constructed pair of decision
-problems; we state it as an application-level result about language-model context, not as new
-structure in the order. The new pieces are the framing, the surrogate, and the
-verification.
+context. The closest work is training-\emph{dataset} valuation: \citet{zheng2024pmi} rank datasets
+by Blackwell informativeness and show a pointwise-mutual-information \emph{scalar} suffices in their
+Bayes-optimal, white-box regime, the opposite of our finding that no query-independent scalar can
+be faithful once the order is partial (Theorem~\ref{thm:incomparable}). Nearby uses stop short of
+what we do: garbling to harden LLM evaluations~\citep{bradley2024garbling}, statistical deficiency
+to order training \emph{tasks}~\citep{fosse2025}, a deficiency-induced \emph{directional} dominance
+in transfer learning (no incomparability, no distribution-free bound, outside language
+modeling)~\citep{akdemir2025}, comparison-of-experiments ideas in loss
+design~\citep{vanrooyen2014}, and a survey of Blackwell's theorems for AI~\citep{blackwellrep2026}.
+To our knowledge none states a Blackwell partial order over context sources, derives the
+no-scalar-ranks consequence for language models, or supplies a verified decision-restricted
+estimator, the three new pieces here.
 
 % ==========================================================================
 \section{Formalization}
@@ -511,6 +502,12 @@ Randomized decision rules are admitted on both sides; if the dominated experimen
 a randomized garbling, no loss of generality is incurred by allowing randomized rules in
 \textup{(ii)}.
 \end{theorem}
+
+\noindent This is the classical Blackwell--Sherman--Stein theorem~\citep{blackwell1953,torgersen1991},
+which we use as a black box. The only specialization is reading ``decision problem'' as a task with
+bounded verifier utility $v_T\in\{0,1\}$ and ``experiment'' as a context source
+(Definition~\ref{def:source}), which is faithful because the kernels of
+Definition~\ref{def:projection} are standard Borel.
 
 \begin{corollary}[Universal context dominance, C1]
 \label{cor:c1}
@@ -1128,7 +1125,7 @@ $W_{1+}$, $W_1$, $W_2$, and \texttt{none} arms: Opus's superset collapse on \tex
 is real but milder ($100\% \to 38\%$, upper bound $-0.23$, short of $-\tau$), and its
 \texttt{api\_argorder} baseline leaks (\texttt{none} $=40\%$; Remark~\ref{rem:leaky}), so neither
 cell verifies. Both facts are the same model-relative-value effect (\S\ref{sec:results-moat}): Opus
-partially already knows the convention, which shrinks the harm the certificate can attribute to the
+partially already knows the convention, which shrinks the harm the verification can attribute to the
 added signal.
 
 \subsubsection{The relevance score mis-ranks the sources}
@@ -1655,16 +1652,6 @@ domain, are the natural next steps, and the experimental record indicates each i
 \label{app:proofs}
 % ==========================================================================
 
-\subsection*{Proof of Theorem~\ref{thm:blackwell}}
-\begin{proof}
-This is Blackwell's theorem~\citep{blackwell1953}; the loss-function form and the role of
-randomization are standard~\citep{lecam1986,torgersen1991}. We use it as a black box. The only
-substantive specialization is the reading of ``decision problem'' as ``task with a bounded
-verifier utility'' and ``experiment'' as ``context source'' (Definition~\ref{def:source}), which
-is faithful because $v_T \in \{0,1\}$ is a bounded utility and the kernels of
-Definition~\ref{def:projection} are standard Borel.
-\end{proof}
-
 \subsection*{Proof of Lemma~\ref{lem:noref}}
 \begin{proof}
 \emph{(a)} For deterministic experiments a garbling $G$ with $\kappa_{W_B}=G\circ\kappa_{W_A}$
@@ -1793,9 +1780,10 @@ wide, so the same $n$ that verifies incomparability need not verify interference
 
 \begin{table}[t]
 \centering
-\caption{Per-cell PASS rates ($\%$) for the carrying cells, by arm, all single-shot at $n=40$.
-``--'' marks an arm not measured for that cell (the three non-Anthropic runs measured $W_{1+}$ only
-on the interference cell).}
+\caption{Per-cell PASS rates ($\%$) for all four verified cells, by arm, all single-shot at $n=40$.
+Every model was measured on every cell and arm. The encoding rows (\texttt{enc\_amount}) carry the
+$W_2\!>\!W_1$ direction of incomparability: on every model $W_2$ solves encoding while $W_1$ fails
+it, mirroring the API cells where $W_1$ solves and $W_2$ fails.}
 \label{tab:percell}
 \begin{tabular}{@{}llcccc@{}}
 \toprule
@@ -1814,15 +1802,17 @@ Opus-4.8        & \texttt{api\_argorder}           & 40 & 100 & 0   & 15  \\
 Opus-4.8        & \texttt{enc\_amount}             & 0  & 0   & 98  & 85  \\
 Opus-4.8        & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & 100 \\
 GPT-5.5         & \texttt{api\_post\_ok}           & 5  & 100 & 0   & 0   \\
-GPT-5.5         & \texttt{api\_argorder}           & 75 & -- & -- & -- \\
-GPT-5.5         & \texttt{enc\_amount}             & 55 & -- & -- & -- \\
-GPT-5.5         & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & -- \\
+GPT-5.5         & \texttt{api\_argorder}           & 75 & 100 & 0   & 0   \\
+GPT-5.5         & \texttt{enc\_amount}             & 55 & 0   & 100 & 100 \\
+GPT-5.5         & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & 100 \\
 DeepSeek-V4-Pro & \texttt{api\_post\_ok}           & 0  & 75  & 0   & 0   \\
-DeepSeek-V4-Pro & \texttt{api\_argorder}           & 2  & 68  & 0   & -- \\
-DeepSeek-V4-Pro & \texttt{trap\_store\_wire}       & 0  & 98  & 0   & -- \\
+DeepSeek-V4-Pro & \texttt{api\_argorder}           & 2  & 68  & 0   & 5   \\
+DeepSeek-V4-Pro & \texttt{enc\_amount}             & 0  & 0   & 68  & 65  \\
+DeepSeek-V4-Pro & \texttt{trap\_store\_wire}       & 0  & 98  & 0   & 98  \\
 Kimi-K2.6       & \texttt{api\_post\_ok}           & 0  & 100 & 0   & 0   \\
-Kimi-K2.6       & \texttt{api\_argorder}           & 45 & -- & -- & -- \\
-Kimi-K2.6       & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & -- \\
+Kimi-K2.6       & \texttt{api\_argorder}           & 45 & 100 & 0   & 0   \\
+Kimi-K2.6       & \texttt{enc\_amount}             & 0  & 0   & 95  & 92  \\
+Kimi-K2.6       & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & 100 \\
 \bottomrule
 \end{tabular}
 \end{table}
