@@ -345,6 +345,57 @@ To our knowledge none states a Blackwell partial order over context sources, der
 no-scalar-ranks consequence for language models, or supplies a verified decision-restricted
 estimator, the three new pieces here.
 
+\subsection{The design space: no cheap method represents the partial order}
+\label{sec:related-designspace}
+
+Table~\ref{tab:designspace} places the methods above on three axes: whether the method is
+\emph{cheap} (precomputable, or amortizable to a near-retrieval query-time cost), whether it models
+\emph{interaction between sources} rather than scoring each in isolation, and whether it can
+represent \emph{incomparability}. The pattern is uniform, and it is why we frame the problem as we
+do. Every method cheap enough to run at retrieval scale emits a final scalar and therefore lives in
+a total order, including multi-vector late interaction~\citep{khattab2020colbert}, whose per-token
+match is query-dependent but still collapses to one document score, and retrievers trained on the
+language model's own likelihood~\citep{shi2023replug,guu2020realm}, which amortize ``value to the
+model'' into a \emph{number} rather than the non-domination relation and so inherit the limitation
+of Theorem~\ref{thm:incomparable}. Every method that genuinely models interaction is in turn either
+symmetric redundancy over embedding geometry (MMR, DPPs, submodular coverage), carries no dominance
+guarantee (listwise rerankers), or is as costly as direct probing (Shapley valuation, expected
+information gain). No prior row is both cheap and partial-order-faithful; that empty cell is the open
+problem this paper isolates. We occupy the last row, paying probe cost for the guarantee, and leave
+its amortization as the central open question.
+
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Method family (representative) & Cheap? & Interaction? & Incomparability? \\
+\midrule
+Scalar dense / PRP retrieval~\citep{robertson1977}               & \checkmark        & $\times$   & $\times$ \\
+Late interaction, multi-vector~\citep{khattab2020colbert}        & \checkmark        & $\times$   & $\times$ \\
+$\Vcal$-usable information~\citep{ethayarajh2022}                & \checkmark        & $\times$   & $\times$ \\
+LM-supervised retriever~\citep{shi2023replug,guu2020realm}       & \checkmark$^{a}$  & $\times$   & $\times$ \\
+MMR diversity~\citep{carbonell1998}                              & \checkmark        & $\sim^{b}$ & $\times$ \\
+DPP / submodular coverage~\citep{ye2023ceil,huang2025gammacover} & \checkmark        & $\sim^{b}$ & $\times$ \\
+Shapley / influence valuation~\citep{demoshapley2024}            & $\times$          & \checkmark & $\times$ \\
+Expected information gain / BED~\citep{bedllm2026}               & $\times$          & $\sim$     & $\times$ \\
+Listwise LLM reranker~\citep{sun2023rankgpt}                     & $\sim^{c}$        & \checkmark & $\times^{c}$ \\
+\midrule
+\textbf{Probe-Select (this paper)}                               & $\times$          & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\caption{The design space of context selection.
+\checkmark~= yes, $\times$~= no, $\sim$~= partial.
+$^{a}$amortized: trained once on the model's signal, cheap at query time, but still a scalar.
+$^{b}$symmetric redundancy over embedding geometry, not directional anti-monotonicity.
+$^{c}$query-conditioned and interaction-aware, but per-query (not precomputable) and with no
+dominance guarantee. Only the last row represents incomparability, at the cost of direct probing;
+the ``cheap \emph{and} partial-order-faithful'' cell is empty, which is this paper's central open
+problem.}
+\label{tab:designspace}
+\end{table}
+
 % ==========================================================================
 \section{Formalization}
 \label{sec:formalization}
