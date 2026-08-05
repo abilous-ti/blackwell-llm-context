@@ -259,6 +259,33 @@ Appendix~\ref{app:proofs}, the extended experimental record to Appendix~\ref{app
 protocol and artifact details to Appendix~\ref{app:repro}. Every reference has been verified
 against arXiv/DBLP/publisher records.
 
+\paragraph{How to read the formal terms.}
+The argument is necessarily phrased in the language of statistical decision theory.
+Table~\ref{tab:glossary} gives the engineering reading of each recurring term; the empirical
+sections (\S\ref{sec:experiments} onward) can be followed with the right-hand column alone.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}p{0.30\linewidth}p{0.64\linewidth}@{}}
+\toprule
+Formal term & Engineering reading \\
+\midrule
+source $W$ (an experiment) & a candidate context item: a doc, note, or module you could paste into the prompt \\
+Blackwell dominance $W \Bord W'$ & $W$ answers everything $W'$ answers; keeping $W$ and dropping $W'$ is safe \\
+incomparability & each source is decisive on tasks where the other fails; no single number can rank them once and for all \\
+garbling & $W'$ is a lossy transformation of $W$: everything in $W'$ is derivable from $W$ \\
+anti-monotonicity ($\Psi_T<0$) & pasting more true, on-topic text into a working prompt can break it \\
+non-dominated front & the shortlist you must keep whole, because nothing on it verifiably covers anything else on it \\
+verification & a claim measured with exact finite-sample error bars, still significant after multiple-comparison correction, with no distributional assumptions \\
+model rule $\delta_M$ & the model as it actually behaves on the prompt, not an idealized optimal user of the information \\
+surrogate $\dhat_{\Dcal}$ & how many PASS points you lose by using $W'$ in place of $W$ on the task family \\
+\bottomrule
+\end{tabular}
+\caption{Glossary: the recurring formal terms and their engineering reading.}
+\label{tab:glossary}
+\end{table}
+
 % ==========================================================================
 \section{Related Work}
 \label{sec:related}
@@ -1071,6 +1098,16 @@ vendors, a difference between models is a fact about the model, not about how it
 deliberately conservative probe of whether a model uses supplied context: it removes the
 agentic-exploration pathway, so the model must use what it is given in one pass.
 
+\paragraph{What ``verified'' means, in plain terms.}
+Every claim labeled \emph{verified} is statistically significant in the standard sense and then
+corrected for multiplicity: PASS rates are estimated from $n=40$ independent completions per cell,
+uncertainty is carried by exact binomial (Clopper--Pearson) confidence intervals with no
+distributional assumptions, and the family of claims is corrected by a union bound, so all verified
+statements hold jointly with probability at least $90\%$. For the effect sizes at stake, near-$0\%$
+versus near-$100\%$, the $n=40$ intervals stay separated by a wide margin even after correction.
+Results whose intervals did not separate are labeled \emph{reproduced but not verified} and are
+never used as evidence; the protocol reports its own insufficiency rather than hiding it.
+
 \paragraph{Verification parameters.}
 All verifications use confidence budget $\eta = 0.10$. Incomparability uses exact Clopper--Pearson
 intervals at per-cell level $\alpha = \eta/(2|\Dcal|)$ over the $2|\Dcal|$ proportions
@@ -1464,6 +1501,59 @@ superset, still far below $W_1$), so segmentation alone does not cure the interf
 operative variable is routing knowledge. The mitigation hierarchy, raw superset $<$ structure $<$
 routing $<$ dropping the dominated signal, is itself a finding: it locates the failure in
 convention-to-task routing rather than in convention segmentation.
+
+\subsection{The engineering consequence: four selection policies, one measured table}
+\label{sec:results-policies}
+
+The formal results reduce to a comparison an engineer can act on. On the measured pair there are
+four things a selection layer can do, and every one of them was measured (Table~\ref{tab:percell});
+Table~\ref{tab:policies} scores them per model as mean PASS over the four verified cells.
+\emph{Best fixed source} grants the entire query-independent-scalar class its best case: any such
+scalar induces one total order, hence one top-1 reused for every task, and we let it pick the
+oracle-best source ($W_1$ for every model). \emph{Topical top-1} re-scores per task with topical
+relevance, choosing $W_1$ on the API cells and $W_2$ on encoding, but also $W_2$ on the trap,
+where every measured topical ranker puts the wrong source first
+(\S\ref{sec:results-misrank}). \emph{Concatenate both} refuses to choose and submits $W_{1+}$.
+\emph{Front $+$ routing} keeps the verified non-dominated set $\{W_1, W_2\}$ and routes by task
+family, attaining the per-cell maximum of the two sources; this is what the partial order licenses,
+and its price is exactly one probe's worth of knowledge, namely which source is decisive for which
+family.
+
+\begin{table}[t]
+\centering
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Model & Best fixed source & Topical top-1 & Concatenate ($W_{1+}$) & Front $+$ routing \\
+\midrule
+Haiku-4.5       & 60.5 & 63.0 & 53.0 & \textbf{85.5} \\
+Sonnet-4.6      & 75.0 & 74.5 & 36.8 & \textbf{99.5} \\
+Opus-4.8        & 75.0 & 74.5 & 59.5 & \textbf{99.5} \\
+GPT-5.5         & 75.0 & 75.0 & 50.0 & \textbf{100.0} \\
+DeepSeek-V4-Pro & 60.3 & 52.8 & 42.0 & \textbf{77.3} \\
+Kimi-K2.6       & 75.0 & 73.8 & 48.0 & \textbf{98.8} \\
+\midrule
+Mean            & 70.1 & 68.9 & 48.2 & \textbf{93.4} \\
+\bottomrule
+\end{tabular}
+\caption{Mean PASS (\%) over the four verified cells under four selection policies, per model,
+computed from the measured per-cell rates of Table~\ref{tab:percell}. The front-and-routing column
+is the per-cell maximum of $W_1$ and $W_2$ and is therefore the ceiling of \emph{any} selection
+policy on these cells; its remaining gap to $100\%$ is model capability, not selection error.}
+\label{tab:policies}
+\end{table}
+
+Three structural facts, not the magnitudes, are the point. First, the two scalar policies fail on
+\emph{different} cells, the fixed source can never carry encoding, topical top-1 forfeits the trap,
+yet land within about one point of the same aggregate: the cap is the policy \emph{class}, since
+any total order must abandon at least one cell, not the choice of scorer
+(Theorem~\ref{thm:incomparable}, Proposition~\ref{prop:trap-constrained}). Second, the policy that
+refuses to choose is the \emph{worst} of the four: anti-monotonicity is the dominant cost, not a
+tie-breaking subtlety (\S\ref{sec:results-antimono}). Third, the front column shows what selection
+alone can recover: its shortfall from $100\%$ (Haiku's $52\%$ ceiling on \texttt{api\_post\_ok},
+DeepSeek's $68$--$75\%$ band) is the model's own capability limit. One honest caveat: the four
+cells were constructed to exhibit the phenomenon, so the aggregate magnitudes are diagnostic of the
+failure structure, not an estimate of production-traffic gains; what transfers is the structure,
+each cheap policy forfeits an entire cell class, and no total-order policy can keep all four.
 
 % ==========================================================================
 \section{Discussion}
