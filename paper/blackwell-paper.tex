@@ -10,7 +10,7 @@
 \usepackage{amsmath,amssymb,amsthm,booktabs,hyperref,natbib,microtype,enumitem}
 \usepackage{tikz}
 \hypersetup{
-  pdftitle  = {Context selection is a partial order: A Blackwell framework and verified LLM evidence},
+  pdftitle  = {Context selection as a partial order: A Blackwell framework and verified LLM evidence},
   pdfauthor = {Andriy Bilous},
   pdfsubject = {Blackwell comparison of experiments applied to language-model context selection},
   pdfkeywords = {context selection, Blackwell order, partial order, retrieval-augmented generation,
@@ -39,7 +39,7 @@
 \newcommand{\Vcal}{\mathcal{V}}
 \newcommand{\Bord}{\succeq_{B}}
 
-\title{Context selection is a partial order:\\
+\title{Context selection as a partial order:\\
 A Blackwell framework and verified LLM evidence}
 
 \author{%
@@ -126,6 +126,12 @@ is that the order is only \emph{partial}: often neither source is a blurred copy
 the two are \emph{incomparable}. A single score cannot capture a partial order. A score forces
 every source into one line, but two incomparable sources each win on some task, so whichever way
 the score orders them, it is wrong on one.
+
+A note on the scope of the title. A total order is refuted by a single incomparable pair, so the
+claim in the title is licensed by exhibiting verified incomparable pairs, which we do on six
+production models across two source domains (\S\ref{sec:experiments}). Beyond that existential
+core, the partial order is offered as a \emph{framework} for the general phenomenon, and every
+empirical claim in the paper is stated model-relative, not as a law over all context selection.
 
 \paragraph{What is and is not new.}
 The mathematics is classical, the garbling order, the Blackwell--Sherman--Stein equivalence,
@@ -1079,7 +1085,10 @@ claim for query-independent scalars.
 
 \paragraph{Models and vendors.}
 We evaluate six models across four vendors: Anthropic Haiku-4.5, Sonnet-4.6, and Opus-4.8; OpenAI
-GPT-5.5; DeepSeek-V4-Pro; and Moonshot Kimi-K2.6.
+GPT-5.5; DeepSeek-V4-Pro; and Moonshot Kimi-K2.6. Nothing in this paper is trained or fine-tuned:
+all six are fixed production systems accessed through their public APIs, so there are no training
+or validation curves to report; the released measurement record, per-cell PASS tables, exact
+intervals, and raw run logs, is the complete empirical object.
 
 \paragraph{Harness and arms.}
 The harness (\texttt{tokenbench/measure\_blackwell.py}; released with all run logs at
@@ -1119,6 +1128,17 @@ claim joint family-wise control across the incomparability, dominance, and inter
 from a single run (\S\ref{subsec:fwer}, \S\ref{sec:limitations}). The intervals are degenerate at
 $p=0$ and $p=1$, which is why the stark $100\%/0\%$ cells verify incomparability at small $n$ while
 the interference contrast, which mixes intermediate baselines, does not.
+
+\paragraph{Why these constants.}
+Both constants were fixed before the runs and neither is load-bearing. $\eta=0.10$ is a
+conventional $90\%$ family level; the headline separations are near-$0\%$ against near-$100\%$,
+so the verified conclusions are not sensitive to tightening it. $\tau=0.30$ is an a priori
+materiality threshold: to count, interference must destroy at least $30$ PASS points, well above
+the interval widths at $n=40$, so noise cannot clear it. The data show the threshold doing real
+work in both directions: the verified collapses clear it by wide margins (upper confidence bounds
+between $-0.41$ and $-1.00$), while the second-pair contrast, with upper bound $-0.21$, fails it
+and is reported as sign-only rather than verified (\S\ref{sec:results-generality}). A threshold
+that some true effects fail is evidence it was not tuned to pass the data.
 
 \paragraph{Sampling regime.}
 The verification models each cell as $n$ Bernoulli PASS draws (Assumption~\ref{ass:iid}); the four
@@ -1570,6 +1590,27 @@ invariant $W_2$ on the same \texttt{ledger} module) and shows that the resulting
 relevance mis-rank, and an anti-monotonicity collapse all reproduce across six models and four
 vendors. We discuss what the evidence does and does not license, and where the
 formalization is a model rather than a proof of the realized object.
+
+\subsection{What the approach buys, and what it costs}
+\label{sec:disc-tradeoffs}
+
+Consolidating the comparison that runs through the paper: relative to the alternatives of
+Table~\ref{tab:designspace}, the approach buys four things none of them provides. (i) A
+\emph{diagnosis}: incomparability and interference become named, testable properties rather than
+anecdotes about ``context sometimes hurting.'' (ii) \emph{Distribution-free finite-sample
+verification} on live black-box models: exact intervals and multiplicity control, with no training
+and no white-box access. (iii) \emph{Model-relative measurement}: the same protocol re-run on any
+stack answers whether \emph{your} model has this structure on \emph{your} sources, including the
+scalar-suffices answer when sources are nested. (iv) A \emph{selection ceiling}: the non-dominated
+front attains the per-cell maximum of its members (Table~\ref{tab:policies}), bounding what any
+selection policy can recover and separating selection error from model capability. The costs are
+equally concrete. Verification is bought with probe runs, so the method lives at curation scale, a
+reranked shortlist or an offline context library, not corpus scale (\S\ref{sec:limitations}). The
+verified cells are constructed to make the structure visible, so the magnitudes are diagnostic, not
+production estimates. And the guarantees are existential and model-relative: they establish that
+the partial order is real and consequential where verified, not that every source pair in the wild
+is incomparable. In exchange, the practitioner gets what the cheap alternatives cannot give: a
+claim about their own system that is checked rather than assumed.
 
 \subsection{Scope of the claims}
 \label{sec:disc-bridge}\label{sec:disc-deficiency}\label{sec:disc-certificate}
