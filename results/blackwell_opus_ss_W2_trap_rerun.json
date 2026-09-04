@@ -1,0 +1,251 @@
+{
+ "model": "claude-opus-4-8",
+ "cell": "W2|trap_store_wire",
+ "counts": [
+  0,
+  40
+ ],
+ "errs": 0,
+ "rows": [
+  {
+   "solved": false,
+   "cost": 0.25709499999999996,
+   "out_tokens": 465,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.25621499999999997,
+   "out_tokens": 429,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.25304499999999996,
+   "out_tokens": 303,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.058616,
+   "out_tokens": 350,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.056621,
+   "out_tokens": 271,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.06381600000000001,
+   "out_tokens": 558,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.055686,
+   "out_tokens": 290,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.057171,
+   "out_tokens": 293,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.061816,
+   "out_tokens": 478,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.062891,
+   "out_tokens": 521,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.062146,
+   "out_tokens": 492,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.057071,
+   "out_tokens": 289,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.064086,
+   "out_tokens": 568,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.065916,
+   "out_tokens": 642,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.060826000000000005,
+   "out_tokens": 440,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.05856600000000001,
+   "out_tokens": 348,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.06006600000000001,
+   "out_tokens": 408,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.057121,
+   "out_tokens": 291,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.055306,
+   "out_tokens": 220,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.062511,
+   "out_tokens": 505,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.06309100000000001,
+   "out_tokens": 529,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.065886,
+   "out_tokens": 542,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.064636,
+   "out_tokens": 590,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.065696,
+   "out_tokens": 688,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.060461,
+   "out_tokens": 423,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.055741000000000006,
+   "out_tokens": 235,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.056711,
+   "out_tokens": 273,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.062751,
+   "out_tokens": 517,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.061205999999999997,
+   "out_tokens": 467,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.060336,
+   "out_tokens": 418,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.06006600000000001,
+   "out_tokens": 408,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.06529599999999999,
+   "out_tokens": 618,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.056555999999999995,
+   "out_tokens": 270,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.068916,
+   "out_tokens": 762,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.055320999999999995,
+   "out_tokens": 219,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.065636,
+   "out_tokens": 630,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.064516,
+   "out_tokens": 586,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.060021,
+   "out_tokens": 407,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.061071,
+   "out_tokens": 449,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.056966,
+   "out_tokens": 284,
+   "error": null
+  }
+ ]
+}

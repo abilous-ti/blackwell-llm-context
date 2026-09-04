@@ -1157,7 +1157,7 @@ the interval widths at $n=40$, so noise cannot clear it. The data show the thres
 work in both directions. The verified collapses clear it with upper confidence bounds from $-0.36$
 to $-0.69$ (Table~\ref{tab:interference}); the length-matched padding control clears it at $-0.41$.
 Three real effects fail it and are reported as unverified rather than folded in: Opus's milder
-collapse ($100\%\!\to\!38\%$, upper $-0.23$), Haiku's low-ceiling cell (upper $+0.08$), and the
+collapse ($100\%\!\to\!38\%$, upper $-0.23$), Haiku's \texttt{api\_post\_ok} cell (upper $+0.08$; a ceiling the raw-failure audit traces to an omitted import line, not to the contract, \S\ref{sec:results-audit}), and the
 second-pair contrast (upper $-0.21$, sign-only; \S\ref{sec:results-generality}). A threshold that
 genuine effects fail is evidence it was not tuned to pass the data.
 
@@ -1362,8 +1362,10 @@ under the sufficient source $W_1$ (light) versus the strict superset $W_{1+} = W
 (dark), per model (Table~\ref{tab:percell}). The superset \emph{contains} $W_1$'s signal yet
 collapses performance on every model; the effect is large but not monotone in
 capability (Sonnet collapses hardest, Opus least). All runs single-shot, $n{=}40$. Haiku's $W_1$
-does not reach ceiling on this cell single-shot (its verified collapse is on \texttt{api\_argorder},
-$100\%\to5\%$; Table~\ref{tab:interference}); Opus reproduces the collapse but does not verify.}
+reads $52\%$ on this cell only because about half of its replies omit the \texttt{import ledger} line
+while calling the contract correctly (raw-failure audit, \S\ref{sec:results-audit}: with the import
+neutralized, $40/40$); its verified collapse is on \texttt{api\_argorder}, $100\%\to5\%$
+(Table~\ref{tab:interference}). Opus reproduces the collapse but does not verify.}
 \label{fig:collapse}
 \end{figure}
 
@@ -1429,14 +1431,15 @@ the correct output is the two-element Pareto front, which no scalar top-$1$ rule
 Clopper--Pearson upper bound $\overline\Psi_T$ of \eqref{eq:psiupper}; the cell is verified harmful
 when Upper $\le -0.30$. The $W_1 \to W_{1+}$ column reports the PASS collapse. The verification clears
 only on cells whose \texttt{none} baseline floors near zero (the leaky-baseline limitation;
-Remark~\ref{rem:leaky}).}
+Remark~\ref{rem:leaky}). $^{\dagger}$Control row: the same cell with the omitted-\texttt{import} slip neutralized in the verifier (\S\ref{sec:results-audit}); its interference is verified in sign but not at the $\tau=0.30$ margin.}
 \label{tab:interference}
 \begin{tabular}{@{}llcccc@{}}
 \toprule
 Model & Carrying cell & $W_1 \to W_{1+}$ & $\Psi_T$ & Upper & Verified \\
 \midrule
 Haiku-4.5       & \texttt{api\_argorder}            & $100\% \to 5\%$  & $-0.93$ & $-0.56$ & \checkmark \\
-Haiku-4.5       & \texttt{api\_post\_ok}            & $52\% \to 15\%$  & $-0.38$ & $+0.08$ & no (low ceiling) \\
+Haiku-4.5       & \texttt{api\_post\_ok}            & $52\% \to 15\%$  & $-0.38$ & $+0.08$ & no (import omission) \\
+Haiku-4.5       & \texttt{api\_post\_ok}, import-neutralized$^{\dagger}$ & $100\% \to 52\%$ & $-0.47$ & $-0.09$ & sign only$^{\dagger}$ \\
 Sonnet-4.6      & \texttt{api\_post\_ok}            & $100\% \to 2\%$  & $-0.97$ & $-0.64$ & \checkmark \\
 Sonnet-4.6      & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.69$ & \checkmark \\
 GPT-5.5         & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-0.95$ & $-0.60$ & \checkmark \\
@@ -1543,6 +1546,32 @@ operative variable is routing knowledge. The mitigation hierarchy, raw superset 
 routing $<$ dropping the dominated signal, is itself a finding: it locates the failure in
 convention-to-task routing rather than in convention segmentation.
 
+\subsubsection{Raw-failure audit: what Haiku's \texttt{api\_post\_ok} cell measures}
+\label{sec:results-audit}
+
+One cell in Table~\ref{tab:percell} is anomalous: Haiku's $W_1$ arm scores $52\%$ on
+\texttt{api\_post\_ok} while scoring $100\%$ on the harder \texttt{api\_argorder} under the same
+source, and the pattern is stable across five independent Haiku runs ($45$--$57\%$). Because the
+published harness does not retain raw completions, we re-drew the cell keeping every reply, the
+extracted code, and the verifier's stderr (\texttt{results/diag/}, \texttt{harness/diag/}). The
+failures are uniform. In $12/12$ draws the reply calls the private contract exactly as $W_1$
+specifies, \texttt{ledger.post(acct, cents, memo=note)}, and every failure is the single omitted line
+\texttt{import ledger}: PASS coincides with the presence of that line ($5/5$ against $7/7$), and on
+the control cell \texttt{api\_argorder} the same model writes the import in $8/8$. The cause is prompt
+wording, not the contract: this task's prompt names the call as \texttt{ledger.post}, which Haiku
+reads as already in scope. An import-neutralized control then re-measures all four arms at $n{=}40$
+with a verifier that binds \texttt{ledger} into the solution's namespace when the reply omitted the
+import and is otherwise identical: \texttt{none} $0/40$ and $W_2$ $0/40$ under both verifiers
+(neutralization leaks nothing), $W_1$ rises from $23/40$ to $40/40$, and $W_{1+}$ from $8/40$ to
+$21/40$. The superset collapse on this cell is therefore real and has the mechanism the paper
+describes: in the retained $W_{1+}$ replies the model applies $W_2$'s wire encoding to a plain-cents
+amount and posts \texttt{'+500\#5'} in place of \texttt{500}. With the import neutralized the
+interference is $\Psi_T = -0.47$ with upper bound $-0.09$, verified in sign but not at the $\tau=0.30$ margin
+(Table~\ref{tab:interference}). We keep the original-protocol numbers in every table, since the
+verifier is identical across models and the other five models include the import; the audit changes
+the reading of one cell, not its measurement. Haiku's verified claims rest on \texttt{api\_argorder}
+and are unaffected.
+
 \subsection{The engineering consequence: four selection policies, one measured table}
 \label{sec:results-policies}
 
@@ -1590,8 +1619,11 @@ any total order must abandon at least one cell, not the choice of scorer
 (Theorem~\ref{thm:incomparable}, Proposition~\ref{prop:trap-constrained}). Second, the policy that
 refuses to choose is the \emph{worst} of the four: anti-monotonicity is the dominant cost, not a
 tie-breaking subtlety (\S\ref{sec:results-antimono}). Third, the front column shows what selection
-alone can recover: its shortfall from $100\%$ (Haiku's $52\%$ ceiling on \texttt{api\_post\_ok},
-DeepSeek's $68$--$75\%$ band) is the model's own capability limit. One honest caveat: the four
+alone can recover: its shortfall from $100\%$ is not selection error. For DeepSeek ($68$--$75\%$
+band) it is the model's own capability limit; for Haiku the apparent $52\%$ ceiling on
+\texttt{api\_post\_ok} is not even that. A raw-failure audit (\S\ref{sec:results-audit}) shows
+every Haiku reply on that cell calls the private contract correctly and the deficit is an omitted
+\texttt{import} line; with the import neutralized, $W_1$ scores $40/40$. One honest caveat: the four
 cells were constructed to exhibit the phenomenon, so the aggregate magnitudes are diagnostic of the
 failure structure, not an estimate of production-traffic gains; what transfers is the structure,
 each cheap policy forfeits an entire cell class, and no total-order policy can keep all four.
@@ -2145,15 +2177,13 @@ configuration: the harness sets no explicit temperature, top-$p$, or seed (the C
 Azure/OpenAI-compatible launchers are invoked without sampling overrides), so the $n$ draws per cell
 are independent samples from each provider's default decoder, each a fresh single-turn call with a
 $200$-second timeout. Transport-level failures (empty or zero-token results) are retried up to three
-times with quadratic backoff; a draw that still fails is scored as a failure, never as a pass. Where
-a whole arm was hit by a transport-outage window, we re-ran that arm in isolation (the Opus $W_{1+}$
-arm; noted in the artifact list), so no reported cell mixes outage-scored draws with real ones.
+times with quadratic backoff; a draw that still fails is scored as a failure, never as a pass. Where a transport-outage window hit a whole arm or a single cell, we re-measured it cleanly in isolation with the retry harness and report only the clean measurement: the Opus $W_{1+}$ arm; the Opus $W_2$/\texttt{trap\_store\_wire} cell, roughly $18$ of whose $40$ first-run draws were outage-scored (inferred from per-draw cost); and the Haiku $W_1$/\texttt{enc\_amount} cell, whose first run predated the retry wrapper. One cell could not be re-measured at revision time: GPT-5.5 $W_2$/\texttt{trap\_store\_wire} returned HTTP~500 after retries on an unknown number of draws and the Azure quota was unavailable, so its reported $0/40$ still contains outage-scored draws. It is an expected-zero cell (the arm lacks the decisive fact, and it is $0\%$ on all five other models) and lies on no binding bound, but for that one cell the reported $n$ is an upper bound on the number of real draws.
 
 \paragraph{Artifacts.} Per-model run logs and result JSONs are in the artifact repository
 (\url{https://github.com/abilous-ti/blackwell-llm-context}) under the pattern
 \texttt{blackwell\_*.\{log,json\}}: the six single-shot $n=40$ model runs
 (\texttt{blackwell\_haiku\_ss\_n40}, \texttt{blackwell\_sonnet\_ss\_n40}, \texttt{blackwell\_opus\_ss\_n40}
-with its arm-only re-run \texttt{blackwell\_opus\_ss\_W1plus}, \texttt{blackwell\_gpt55\_n40},
+with its arm-only re-run \texttt{blackwell\_opus\_ss\_W1plus} and the clean single-cell re-measurements \texttt{blackwell\_opus\_ss\_W2\_trap\_rerun} and \texttt{blackwell\_haiku\_ss\_W1\_enc\_rerun}, \texttt{blackwell\_gpt55\_n40},
 \texttt{blackwell\_deepseek\_n40}, \texttt{blackwell\_kimi\_n40}), and the follow-up controls
 \texttt{blackwell\_pad\_n40b} (length-matched padding, $400$ calls), \texttt{blackwell\_pair2\_n80}
 (second source pair), \texttt{blackwell\_instr\_n40} (routing-instruction ablation),

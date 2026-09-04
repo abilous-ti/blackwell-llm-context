@@ -1,0 +1,42 @@
+{
+ "none": {
+  "n": 40,
+  "pass_original": 0,
+  "pass_neutral": 0,
+  "with_import": 24,
+  "errs": 0,
+  "spend_usd": 0.73
+ },
+ "W1": {
+  "n": 40,
+  "pass_original": 23,
+  "pass_neutral": 40,
+  "with_import": 23,
+  "errs": 0,
+  "spend_usd": 0.737
+ },
+ "W2": {
+  "n": 40,
+  "pass_original": 0,
+  "pass_neutral": 0,
+  "with_import": 13,
+  "errs": 0,
+  "spend_usd": 0.859
+ },
+ "W1plus": {
+  "n": 40,
+  "pass_original": 8,
+  "pass_neutral": 21,
+  "with_import": 16,
+  "errs": 0,
+  "spend_usd": 0.898
+ },
+ "interference_neutralized": {
+  "psi": -0.475,
+  "upper_bound": -0.088,
+  "alpha_per_interval": 0.025,
+  "tau": 0.3,
+  "verified_at_tau": false,
+  "verified_in_sign": true
+ }
+}
