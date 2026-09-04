@@ -311,6 +311,73 @@ and differs from it only on incomparable pairs, which by Corollary~\ref{cor:scal
 pairs a scalar cannot handle.
 \end{proposition}
 
+\subsection{Worked illustration on measured data}
+\label{sec:illustration}
+
+Algorithm 1 is implemented (\texttt{tokenbench/probe\_select.py}, released with the companion
+paper) and we run it on that paper's measured single-shot record at $n=40$, adding no new model
+calls. Take Sonnet-4.6, whose four cells give the candidate PASS profiles
+\[
+  W_1 = (100,\,100,\,0,\,100), \quad
+  W_2 = (0,\,0,\,97.5,\,0), \quad
+  W_{1+} = (2.5,\,0,\,80,\,65)
+\]
+on \texttt{api\_post\_ok}, \texttt{api\_argorder}, \texttt{enc\_amount},
+\texttt{trap\_store\_wire} respectively. No candidate is verified-dominated: $W_{1+}$ beats $W_1$
+on encoding, $W_1$ beats $W_{1+}$ on the API cells, and $W_2$ beats both on encoding while losing
+everywhere else. The front is therefore the whole pool, $\{W_1, W_2, W_{1+}\}$, an antichain of
+size three. Greedy coverage then takes $W_1$ (largest verified gain from empty) and $W_2$ (adds
+encoding, which $W_1$ cannot cover), returning $\{W_1, W_2\}$ at $k=2$ for a routed PASS of
+$99.4\%$, against $75.0\%$ for the best fixed source and $36.9\%$ for concatenation.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Model & $|$front$|$ & pruned & selected at $k{=}2$ & routed PASS & concat. \\
+\midrule
+Haiku-4.5       & 3 & none & $W_1, W_{1+}$ & 86.2 & 53.1 \\
+Sonnet-4.6      & 3 & none & $W_1, W_2$    & 99.4 & 36.9 \\
+Opus-4.8        & 3 & none & $W_1, W_2$    & 99.4 & 59.4 \\
+GPT-5.5         & 3 & none & $W_1, W_2$    & 100.0 & 50.0 \\
+DeepSeek-V4-Pro & 3 & none & $W_1, W_2$    & 76.9 & 41.9 \\
+Kimi-K2.6       & 3 & none & $W_1, W_2$    & 98.8 & 48.1 \\
+\bottomrule
+\end{tabular}
+\caption{Algorithm 1 on the companion paper's measured record ($n=40$ per cell, $\eta=0.10$,
+$\alpha_{\mathrm{tol}}=0.05$). The front is a full antichain on every model, so the pruning step
+never fires and the coverage step carries the selection. Routed PASS is the per-task maximum over
+the selected set, i.e.\ the value under an oracle router; ``concat.'' is the superset $W_{1+}$
+alone. Percentages.}
+\label{tab:illustration}
+\end{table}
+
+Table~\ref{tab:illustration} runs this across all six models, and the pattern is uniform in a way
+worth stating plainly. On every model the front is the entire pool and \emph{nothing is pruned}.
+This is not a null result but a consequence of the pool: the companion paper constructed $W_1$ and
+$W_2$ to be incomparable, and $W_{1+}$ genuinely wins somewhere, so the candidate set is an
+antichain by design. What the illustration therefore exercises is the coverage step, not the
+filter, and the coverage step does the work the filter cannot: on five of six models it declines to
+select the superset, whose harm the companion paper verified. The two steps are not redundant, and
+this pool separates them.
+
+Haiku is the informative exception, and the reason is arithmetic rather than noise: its $W_{1+}$
+matches $W_2$ on encoding ($100\%$) while beating $W_1$ on the trap cell ($92\%$ vs.\ $90\%$), so
+$\{W_1, W_{1+}\}$ genuinely routes to a higher value than $\{W_1, W_2\}$. Anti-monotonicity is a
+statement about substituting a superset for a component, not about a set that contains both; once
+$W_1$ is retained, routing masks the superset's collapse on the API cells. This is a limitation of
+the routed-PASS endpoint rather than of the selector, and it is why the benchmark of
+\S\ref{sec:experiments} scores assembled context under a realized router rather than an oracle one.
+
+\begin{remark}[What this illustration does and does not establish]
+It establishes that Algorithm 1 runs end to end on real verified measurements and returns the set
+the theory predicts. It does not establish a benchmark win: the candidate pool has three members
+and was built to be incomparable, the evaluation cells coincide with the probe battery, and the
+router is an oracle. Each is addressed in \S\ref{sec:experiments}, and none of the numbers here
+should be read as an end-task comparison against retrieval baselines.
+\end{remark}
+
 \paragraph{Cost.}
 Building $\trianglerighteq$ on $m=|\Ccal|$ candidates costs $m \cdot |\Dcal| \cdot n$
 verifier-gated calls (the pairwise comparisons reuse one per-(source,\,task) PASS table, so cost is
