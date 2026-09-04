@@ -263,7 +263,8 @@ scope, and \S\ref{sec:conclusion} concludes. Proofs of the two central impossibi
 statements; the remaining proofs and technical material are deferred to
 Appendix~\ref{app:proofs}, the extended experimental record to Appendix~\ref{app:record}, and
 protocol and artifact details to Appendix~\ref{app:repro}. Every reference has been verified
-against arXiv/DBLP/publisher records.
+against arXiv/DBLP/publisher records, and the two impossibility results are machine-checked in
+Lean~4 (Remark~\ref{rem:lean}).
 
 \paragraph{How to read the formal terms.}
 The argument is necessarily phrased in the language of statistical decision theory.
@@ -751,6 +752,24 @@ victims of the theorem, not competitors (Proposition~\ref{prop:vinfo-monotone}).
 mathematically a one-line consequence of Blackwell's theorem; the contribution is the
 \emph{application and framing}, reading cross-task non-transfer of relevance as the signature of a
 partial order, not new core mathematics~\citep{blackwell1953,torgersen1991}.
+\end{remark}
+
+\begin{remark}[Machine-checked]
+\label{rem:lean}
+Theorem~\ref{thm:incomparable} and Proposition~\ref{prop:trap-constrained} are formalized and
+machine-checked in Lean~4 (\texttt{lean/ContextSelection.lean} in the artifact repository, as
+\texttt{no\_faithful\_query\_independent\_score} and \texttt{topical\_score\_misranks\_trap}). The
+formalization takes no dependency on Mathlib and checks against a bare \texttt{lean} binary; the
+order on the score codomain is passed explicitly rather than drawn from a typeclass hierarchy,
+which records the fact that the obstruction is \emph{totality of the induced ranking alone}, not any
+property of $\mathbb{R}$. Every scalar in the excluded class therefore falls under the one theorem.
+A \texttt{Demo} namespace instantiates both results on the paper's own configuration, so the
+impossibility statements are not vacuous, and \texttt{\#print axioms} reports that both central
+theorems depend on \emph{no} axioms: the arguments are constructive, using neither choice nor
+excluded middle. What is \emph{not} formalized is stated as plainly: the
+Blackwell--Sherman--Stein theorem remains a cited classical black box
+(Theorem~\ref{thm:blackwell}), and the statistical procedures of \S\ref{sec:estimator} are claims
+about measurements rather than theorems.
 \end{remark}
 
 \begin{proposition}[$\Vcal$-usable information is Blackwell-monotone]
