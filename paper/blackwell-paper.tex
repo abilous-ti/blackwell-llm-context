@@ -1439,7 +1439,7 @@ Model & Carrying cell & $W_1 \to W_{1+}$ & $\Psi_T$ & Upper & Verified \\
 \midrule
 Haiku-4.5       & \texttt{api\_argorder}            & $100\% \to 5\%$  & $-0.93$ & $-0.56$ & \checkmark \\
 Haiku-4.5       & \texttt{api\_post\_ok}            & $52\% \to 15\%$  & $-0.38$ & $+0.08$ & no (import omission) \\
-Haiku-4.5       & \texttt{api\_post\_ok}, import-neutralized$^{\dagger}$ & $100\% \to 52\%$ & $-0.47$ & $-0.09$ & sign only$^{\dagger}$ \\
+Haiku-4.5       & \texttt{api\_post\_ok}, import-neutralized$^{\dagger}$ & $100\% \to 52\%$ & $-0.48$ & $-0.09$ & sign only$^{\dagger}$ \\
 Sonnet-4.6      & \texttt{api\_post\_ok}            & $100\% \to 2\%$  & $-0.97$ & $-0.64$ & \checkmark \\
 Sonnet-4.6      & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.69$ & \checkmark \\
 GPT-5.5         & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-0.95$ & $-0.60$ & \checkmark \\
@@ -1566,7 +1566,7 @@ import and is otherwise identical: \texttt{none} $0/40$ and $W_2$ $0/40$ under b
 $21/40$. The superset collapse on this cell is therefore real and has the mechanism the paper
 describes: in the retained $W_{1+}$ replies the model applies $W_2$'s wire encoding to a plain-cents
 amount and posts \texttt{'+500\#5'} in place of \texttt{500}. With the import neutralized the
-interference is $\Psi_T = -0.47$ with upper bound $-0.09$, verified in sign but not at the $\tau=0.30$ margin
+interference is $\Psi_T = -0.48$ with upper bound $-0.09$, verified in sign but not at the $\tau=0.30$ margin
 (Table~\ref{tab:interference}). We keep the original-protocol numbers in every table, since the
 verifier is identical across models and the other five models include the import; the audit changes
 the reading of one cell, not its measurement. Haiku's verified claims rest on \texttt{api\_argorder}
