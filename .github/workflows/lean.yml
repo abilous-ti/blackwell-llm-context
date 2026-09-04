@@ -1,0 +1,42 @@
+name: verify-proofs
+
+on:
+  push:
+    paths: ['lean/**', '.github/workflows/lean.yml']
+  pull_request:
+    paths: ['lean/**', '.github/workflows/lean.yml']
+  workflow_dispatch:
+
+jobs:
+  lean:
+    name: Machine-check the impossibility results
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reject any incomplete proof
+        run: |
+          if grep -rn --include='*.lean' -E '\bsorry\b|\badmit\b' lean/; then
+            echo "::error::Found an incomplete proof (sorry/admit)."
+            exit 1
+          fi
+          echo "No sorry/admit found."
+
+      - name: Install Lean (version pinned by lean/lean-toolchain)
+        run: |
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain "$(cat lean/lean-toolchain)"
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Check the proofs
+        working-directory: lean
+        run: |
+          lean --version
+          lean ContextSelection.lean | tee axioms.txt
+
+      - name: Assert both central theorems are axiom-free
+        working-directory: lean
+        run: |
+          grep -q "'ContextSelection.no_faithful_query_independent_score' does not depend on any axioms" axioms.txt
+          grep -q "'ContextSelection.topical_score_misranks_trap' does not depend on any axioms" axioms.txt
+          echo "Both impossibility results verified axiom-free."

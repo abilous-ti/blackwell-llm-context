@@ -2124,6 +2124,13 @@ control (\texttt{certify\_dominance}), the interference verification, the sample
 Azure Responses API, and OpenAI-compatible chat completions; the launcher auto-detects API style from the
 endpoint, and all API keys are read from the environment (never written to a file).
 
+\paragraph{Machine-checked proofs.} The bundle also contains \texttt{lean/ContextSelection.lean}, a
+Lean~4 formalization of the two impossibility results (Remark~\ref{rem:lean}). It takes no
+dependency on Mathlib, so it is checked by \texttt{lean ContextSelection.lean} against a bare
+toolchain with no build step or network access; the version is pinned in \texttt{lean/lean-toolchain}
+and a continuous-integration job re-checks it on a clean machine at every change, failing the build
+if any \texttt{sorry} appears or if either theorem stops reporting an empty axiom footprint.
+
 \paragraph{Protocol.} The verifier stubs a fake \texttt{ledger} module that accepts \emph{only} the exact
 private contract (it rejects wrong positional arg order, a missing \texttt{memo=} keyword, and the wrong
 exception type); return code $0$ is PASS. The four verified cells are \texttt{api\_post\_ok},
