@@ -76,9 +76,8 @@ the boundary the theory predicts. We also find that adding a strictly larger
 source can \emph{hurt}: pass rates fall from $100\%$ to as low as $0\%$, and
 controls rule out word order and length as the cause. The lesson is practical:
 treat context selection as a partial-order problem, not a scalar ranking, and
-compare sources by a verified pass-rate test rather than a relevance number. A
-companion paper gives the selection rule this implies; scaling it to large
-corpora is the main open problem.
+compare sources by a verified pass-rate test rather than a relevance number.
+Scaling the selection rule this implies to large corpora is the main open problem.
 \end{abstract}
 
 % ==========================================================================
@@ -260,9 +259,8 @@ claim needs.
 
 \paragraph{Roadmap.}
 \S\ref{sec:related} positions the work against scalar context-selection criteria
-and the recent transport of comparison-of-experiments into machine learning, and
-frames our delta as application-plus-framing-plus-estimator rather than new core
-mathematics. \S\ref{sec:formalization} gives the latent-coordinate experiment
+and the recent transport of comparison-of-experiments into machine learning.
+\S\ref{sec:formalization} gives the latent-coordinate experiment
 model and defines $\theta$. \S\ref{sec:order} develops the partial order, the
 $\delta_M$-restricted order, the non-refinement construction, and the bridging lemma, and \S\ref{sec:incomparability} proves
 the source-level incomparability statement and isolates the query-conditioned
@@ -351,8 +349,10 @@ model-specific~\citep{zhang2025llmutility} and can depend on which other passage
 present~\citep{jain2025contextualutility}. We regard this as the same diagnosis reached from the
 other side, and the present paper as its formal boundary. Utility re-measured per task by running
 the model is not a fixed per-source score; it is the probe our estimator is built from, and its cost
-is the price we make explicit. Utility \emph{predicted} by a learned scorer, LLM-agnostic or
-LLM-specific, is one number per source again and falls back into the excluded class. Three families
+is the price we make explicit. Utility \emph{predicted} by a learned scorer is a number again: fixed across tasks it is
+covered by Theorem~\ref{thm:incomparable}; query-conditioned but topical, by
+Proposition~\ref{prop:trap-constrained}; only a scorer that reads the decisive coordinate escapes,
+which is the listwise boundary. Three families
 sit at the boundary. Listwise LLM rerankers~\citep{sun2023rankgpt} and learned set
 selectors~\citep{optiset2026,rank4gen2026} are query-conditioned \emph{set} functions, outside the
 theorem's scope, though they carry no dominance guarantee of any kind. Skyline
@@ -360,8 +360,7 @@ selection~\citep{bookrag2025} keeps every non-dominated candidate instead of a t
 operator our own selection rule uses, but takes dominance over heuristic per-item scores rather
 than over task value. Diversity-aware selection, from MMR~\citep{carbonell1998} to
 DPPs~\citep{ye2023ceil} and submodular coverage~\citep{huang2025gammacover,pacms2026}, optimizes set
-objectives over embedding geometry, whose partial-order-grounded analogue (verified coverage of
-latent coordinates) we develop in a companion paper.
+objectives over embedding geometry rather than over verified task value.
 
 The limits of scalar relevance are one of the oldest themes in information retrieval, and we
 position inside that lineage rather than apart from it: the Probability Ranking
@@ -436,18 +435,12 @@ here.
 Table~\ref{tab:designspace} places the methods above on three axes: whether the method is
 \emph{cheap} (precomputable, or amortizable to a near-retrieval query-time cost), whether it models
 \emph{interaction between sources} rather than scoring each in isolation, and whether it can
-represent \emph{incomparability}. The pattern is uniform, and it is why we frame the problem as we
-do. Every method cheap enough to run at retrieval scale emits a final scalar and therefore lives in
-a total order, including multi-vector late interaction~\citep{khattab2020colbert}, whose per-token
-match is query-dependent but still collapses to one document score, and retrievers trained on the
-language model's own likelihood~\citep{shi2023replug,guu2020realm}, which amortize ``value to the
-model'' into a \emph{number} rather than the non-domination relation and so inherit the limitation
-of Theorem~\ref{thm:incomparable}. Every method that genuinely models interaction is in turn either
-symmetric redundancy over embedding geometry (MMR, DPPs, submodular coverage), carries no dominance
-guarantee (listwise rerankers), or is as costly as direct probing (Shapley valuation, expected
-information gain). No prior row is both cheap and partial-order-faithful; that empty cell is the open
-problem this paper isolates. We occupy the last row, paying probe cost for the guarantee, and leave
-its amortization as the central open question.
+represent \emph{incomparability}. The pattern is uniform. Every method cheap enough to run at
+retrieval scale emits a final per-item number, however that number is produced, and therefore lives
+in a total order; every method that genuinely models interaction is either symmetric redundancy
+over embedding geometry, carries no dominance guarantee, or is as costly as direct probing. No prior
+row is both cheap and partial-order-faithful; that empty cell is the open problem this paper
+isolates, and we occupy the last row, paying probe cost for the guarantee.
 
 \begin{table}[t]
 \centering
@@ -806,10 +799,7 @@ strict inequalities with margin $\gamma$.
 Theorem~\ref{thm:incomparable} rules out exactly the class of \emph{source-level} scalars: any
 $\varphi$ that is a fixed number per source, regardless of task. $\Vcal$-usable information, mutual
 information, perplexity-gap, and (fixed-prior) EIG all live in this class, so they are corollary
-victims of the theorem, not competitors (Proposition~\ref{prop:vinfo-monotone}). The theorem is
-mathematically a one-line consequence of Blackwell's theorem; the contribution is the
-\emph{application and framing}, reading cross-task non-transfer of relevance as the signature of a
-partial order, not new core mathematics~\citep{blackwell1953,torgersen1991}.
+victims of the theorem, not competitors (Proposition~\ref{prop:vinfo-monotone}).
 \end{remark}
 
 \begin{remark}[Machine-checked]
@@ -1441,7 +1431,7 @@ are the verified incomparable pair), so the correct empirical summary is the two
 Pareto front $\{W_1, W_{1+}\}$, an object no scalar top-$1$ rule can represent
 (Figure~\ref{fig:hasse}). This reads directly off the verified $n{=}40$ Haiku cells; the
 selection rule it implies, keep the verified non-dominated set rather than force the superset,
-is developed in a companion paper.
+follows directly.
 
 \begin{figure}[t]
 \centering
@@ -1710,23 +1700,16 @@ formalization is a model rather than a proof of the realized object.
 \subsection{What the approach buys, and what it costs}
 \label{sec:disc-tradeoffs}
 
-Consolidating the comparison that runs through the paper: relative to the alternatives of
-Table~\ref{tab:designspace}, the approach buys four things none of them provides. (i) A
-\emph{diagnosis}: incomparability and interference become named, testable properties rather than
-anecdotes about ``context sometimes hurting.'' (ii) \emph{Distribution-free finite-sample
-verification} on live black-box models: exact intervals and multiplicity control, with no training
-and no white-box access. (iii) \emph{Model-relative measurement}: the same protocol re-run on any
-stack answers whether \emph{your} model has this structure on \emph{your} sources, including the
-scalar-suffices answer when sources are nested. (iv) A \emph{selection ceiling}: the non-dominated
-front attains the per-cell maximum of its members (Table~\ref{tab:policies}), bounding what any
-selection policy can recover and separating selection error from model capability. The costs are
-equally concrete. Verification is bought with probe runs, so the method lives at curation scale, a
-reranked shortlist or an offline context library, not corpus scale (\S\ref{sec:limitations}). The
-verified cells are constructed to make the structure visible, so the magnitudes are diagnostic, not
-production estimates. And the guarantees are existential and model-relative: they establish that
-the partial order is real and consequential where verified, not that every source pair in the wild
-is incomparable. In exchange, the practitioner gets what the cheap alternatives cannot give: a
-claim about their own system that is checked rather than assumed.
+Consolidating the comparison that runs through the paper (Tables~\ref{tab:designspace}
+and~\ref{tab:policies}): the approach buys a \emph{diagnosis}, incomparability and interference as
+named, testable properties; \emph{distribution-free finite-sample verification} on live black-box
+models, with no training and no white-box access; \emph{model-relative measurement}, the same
+protocol re-run on any stack, including the scalar-suffices answer when sources are nested; and a
+\emph{selection ceiling}, the front's per-cell maximum separating selection error from model
+capability. It costs probe runs, so it lives at curation scale, not corpus scale
+(\S\ref{sec:limitations}); its cells are constructed, so magnitudes are diagnostic rather than
+production estimates; and its guarantees are existential and model-relative. In exchange the
+practitioner gets a claim about their own system that is checked rather than assumed.
 
 \subsection{Scope of the claims}
 \label{sec:disc-bridge}\label{sec:disc-deficiency}\label{sec:disc-certificate}
@@ -1831,28 +1814,22 @@ and the phenomenon is cross-vendor, so any internal story must generalize across
 cannot open. The direct path to mechanism is to reproduce the collapse on an open-weight model
 with the same harness (the launchers speak any OpenAI-compatible endpoint) and then instrument
 attention and activation patterns on the contrasting arms; we regard this as the natural
-mechanistic companion study, downstream of, not prerequisite to, the verified behavioral claim.
+mechanistic follow-up study, downstream of, not prerequisite to, the verified behavioral claim.
 
-\paragraph{Levels of description, and three readings of the phenomenon.}
+\paragraph{Levels of description.}
 The partial order is a decision-theoretic, behavioral-level frame; it does not compete with a
-computational account of how conditioning on added text changes the model's processing. The two
-are levels of description of the same event, and the verified behavioral facts are the
-constraints any computational account must satisfy. Three interpretive readings are compatible
-with the present data, and each is discriminable by a named experiment. \textbf{(i) A transient
-failure of current models}: discriminated by the coherence-versus-scale trajectory of
-\S\ref{sec:disc-antimono}, if $\Psi_T$ shrinks toward zero across model generations, the
-anti-monotonicity half of the phenomenon was a passing artifact (the incomparability half, being
-a property of the sources, remains). \textbf{(ii) A property of fixed-compute inference}: a rule
-that spends the same forward computation regardless of context configuration cannot be optimal
-for every configuration, on this reading some coherence violation persists at every scale and
-only relocates. \textbf{(iii) Prompts as programs}: the added convention does not merely add
-information, it selects a different computation; this reading is supported by the routing
-result, a one-line control statement that adds no task-relevant information recovers most of the
-collapse, and by the structured-context ablation, labeled XML segmentation of the same content
-recovers only a minority of the collapse ($2\%\to42\%$) while the routing statement recovers most
-of it ($\to80\%$), locating the operative variable in convention-to-task \emph{routing} rather
-than formatting or segmentation. We state these as interpretations, not findings; every verified
-claim in the paper is independent of which reading is true.
+computational account of how conditioning on added text changes the model's processing, and the
+verified behavioral facts are the constraints any such account must satisfy. Of the readings
+compatible with the data, two are discriminable by named experiments but not by ours: a transient
+failure of current models (if $\Psi_T$ shrinks toward zero across generations,
+\S\ref{sec:disc-antimono}), and a property of fixed-compute inference (a rule that spends the same
+computation for every context configuration cannot be optimal for all of them). The reading the
+data favour is \emph{prompts as programs}: the added convention does not merely add information,
+it selects a different computation. A one-line routing statement that adds no task-relevant
+information recovers most of the collapse, while labeled XML segmentation of the same content
+recovers only a minority ($2\%\to42\%$ against $\to80\%$), locating the operative variable in
+convention-to-task \emph{routing} rather than formatting. These are interpretations, not findings;
+every verified claim in the paper is independent of which is true.
 
 A mechanism, if one is wanted, now has a plausible route: distractor interference in RAG has been
 localized to a sparse feature subspace and corrected there~\citep{giannetti2026interference}. Our
@@ -1867,8 +1844,8 @@ to the wrong task is an open question the released prompts make testable.
 We collect the scope restrictions here; each is stated once and sized to its weight.
 
 \paragraph{From diagnosis to selection.} The constructive selection rule the partial order
-implies, with its guarantees and evaluation against strong reranker baselines, is factored into a
-companion paper. Building the verified order on $m$ candidates costs
+implies, keep the verified non-dominated set and cover what it leaves uncovered, is left for
+future work; here we note only its cost. Building the verified order on $m$ candidates costs
 $m\!\cdot\!|\Dcal|\!\cdot\!n$ verifier-gated calls, curation scale, not corpus scale; scaling
 verified selection to retrieval over $10^6$ passages, by amortizing the probe into a learned
 deficiency predictor or running the partial-order step as a re-ranking head over a scalar
