@@ -63,7 +63,7 @@ scoring each candidate source with a single number and keeping the top few. We
 argue this is the wrong approach. The best context for one task is often useless
 for another. Two sources can be \emph{incomparable}, in the exact sense of
 Blackwell's 1953 comparison of experiments~\citep{blackwell1953}, and when they
-are, no single relevance score can rank them correctly for every task. To test
+are, no single per-source score, relevance or utility, can rank them correctly for every task. To test
 this on real systems we use a simple check: run each source through a battery of
 pass/fail tasks, compare the pass rates, and attach confidence intervals so the
 comparison is auditable (a distribution-free \emph{verification}). On six
@@ -134,9 +134,21 @@ core, the partial order is offered as a \emph{framework} for the general phenome
 empirical claim in the paper is stated model-relative, not as a law over all context selection.
 
 \paragraph{What is and is not new.}
-The mathematics is classical, the garbling order, the Blackwell--Sherman--Stein equivalence,
-Le~Cam's deficiency; what is new is applying it to context selection, reading cross-task
-non-transfer as a partial order, and giving a test that checks it on a real model
+The mathematics is classical: the garbling order, the Blackwell--Sherman--Stein equivalence,
+Le~Cam's deficiency. Several of the \emph{phenomena} are also known, each in its own literature,
+and we say so up front. That topical relevance is the wrong target and downstream utility the
+right one is the thesis of utility-centric retrieval~\citep{zhang2026utility}; that the same
+passage is worth different amounts to different models is measured there~\citep{zhang2025llmutility};
+that adding sources can lower accuracy while coverage saturates was established for data integration
+over a decade ago~\citep{dong2013lessismore}; that rerankers are steered by lexical similarity is
+documented in the wild~\citep{hagstrom2025lexical}; and keeping a non-dominated set rather than a
+top-$k$ prefix exists as an operator over heuristic scores~\citep{bookrag2025}. What is new is the
+\emph{form} that ties these together: reading cross-task non-transfer as a partial order over
+context sources; proving that no single per-source score, relevance or utility, can be faithful to
+that order across tasks once two sources are incomparable, so that utility re-measured per task by
+running the model is not a shortcut around the theorem but the probe it calls for; and giving a
+finite-sample test that verifies incomparability and superset harm on a live model with both
+sources held correct and the length, position, and routing confounds controlled
 (\S\ref{sec:related}). One gap needs care. Blackwell's theorem is about the \emph{best possible} use
 of a source, but every number we measure comes from one fixed model: $\PASS_M(W,T) =
 \mathbb{E}[v_T(\delta_M(T,w))]$, the pass rate of a single rule $\delta_M$ that is not optimal. So
@@ -318,31 +330,50 @@ at inference time.
 Context and demonstration selection is dominated by \emph{scalar} criteria, each inducing a total
 order and a top-$k$ prefix: topical relevance, lexical or learned~\citep{rankrag2024};
 $\Vcal$-usable information~\citep{ethayarajh2022,cale2025}; expected information gain and Bayesian
-experimental design~\citep{bedllm2026,conformalip2025}; game-theoretic and influence-based
-demonstration valuation~\citep{demoshapley2024,inficl2024}; and binary sufficient-context
-detection~\citep{sufficientcontext2024}. Each collapses the comparison of two sources to one real
-number and is therefore a scalar of the kind the paper rules out
+experimental design~\citep{bedllm2026,conformalip2025}; game-theoretic and influence-based valuation
+of demonstrations~\citep{demoshapley2024,inficl2024} and of retrieved
+documents~\citep{nematov2025shapley}; perplexity-reduction utility~\citep{dai2025seper}; and binary
+sufficient-context detection~\citep{sufficientcontext2024}. Each collapses the comparison of two
+sources to one real number and is therefore a scalar of the kind the paper rules out
 (Theorem~\ref{thm:incomparable} for query-independent scores,
-Proposition~\ref{prop:trap-constrained} for topical query-conditioned ones): not a
-competitor to out-perform but an instance of the excluded class (we prove
-Blackwell-monotonicity for the closest neighbour, $\Vcal$-usable information, in
-Proposition~\ref{prop:vinfo-monotone}, and conjecture it for the rest). Two families sit at the
-boundary of the class. Listwise LLM rerankers~\citep{sun2023rankgpt} are query-conditioned
-\emph{set} functions, outside the theorem's scope, though they carry no dominance guarantee of any
-kind; and diversity-aware selection, from MMR~\citep{carbonell1998} to
-DPPs~\citep{ye2023ceil} and submodular coverage~\citep{huang2025gammacover}, optimizes set
+Proposition~\ref{prop:trap-constrained} for topical query-conditioned ones): not a competitor to
+out-perform but an instance of the excluded class (we prove Blackwell-monotonicity for the closest
+neighbour, $\Vcal$-usable information, in Proposition~\ref{prop:vinfo-monotone}, and conjecture it
+for the rest). Guarantees do not change the class: conformal context
+filtering~\citep{chakraborty2026conformal} calibrates a distribution-free threshold \emph{on} a
+scalar score and so inherits the total order it calibrates, whereas what we verify is an order
+relation between sources; and scorers of equal ranking quality can retain different document
+sets~\citep{frohmann2026orderconsistent}, a symptom of the same under-determination.
+
+The retrieval community has itself moved from relevance to \emph{utility}, the downstream gain a
+passage brings~\citep{zhang2026utility}, and has found that utility is
+model-specific~\citep{zhang2025llmutility} and can depend on which other passages are
+present~\citep{jain2025contextualutility}. We regard this as the same diagnosis reached from the
+other side, and the present paper as its formal boundary. Utility re-measured per task by running
+the model is not a fixed per-source score; it is the probe our estimator is built from, and its cost
+is the price we make explicit. Utility \emph{predicted} by a learned scorer, LLM-agnostic or
+LLM-specific, is one number per source again and falls back into the excluded class. Three families
+sit at the boundary. Listwise LLM rerankers~\citep{sun2023rankgpt} and learned set
+selectors~\citep{optiset2026,rank4gen2026} are query-conditioned \emph{set} functions, outside the
+theorem's scope, though they carry no dominance guarantee of any kind. Skyline
+selection~\citep{bookrag2025} keeps every non-dominated candidate instead of a top-$k$, the
+operator our own selection rule uses, but takes dominance over heuristic per-item scores rather
+than over task value. Diversity-aware selection, from MMR~\citep{carbonell1998} to
+DPPs~\citep{ye2023ceil} and submodular coverage~\citep{huang2025gammacover,pacms2026}, optimizes set
 objectives over embedding geometry, whose partial-order-grounded analogue (verified coverage of
 latent coordinates) we develop in a companion paper.
 
 The limits of scalar relevance are one of the oldest themes in information retrieval, and we
 position inside that lineage rather than apart from it: the Probability Ranking
 Principle~\citep{robertson1977} is optimal only under an independence assumption, its failure once
-documents interact is long documented~\citep{fuhr2008,carbonell1998}, and the LLM-era version,
-relevance-maximizing retrieval degrading answer quality, is measured
-directly~\citep{relevanceutility2025,sureRAG2026}. Our delta is the \emph{form} of the statement:
-the failure becomes a theorem in the comparison-of-experiments frame, with the precise structural
-condition, Blackwell incomparability, under which every query-independent scalar must mis-rank,
-and a verified live instance on six production models.
+documents interact is long documented~\citep{fuhr2008,carbonell1998}, and document interdependence
+was given ranking principles of its own, portfolio theory~\citep{wang2009portfolio} and the quantum
+probability ranking principle, whose ``interference'' term names the dependence of one document's
+relevance on another~\citep{zuccon2010qprp}. The LLM-era version, relevance-maximizing retrieval
+degrading answer quality, is measured directly~\citep{relevanceutility2025,sureRAG2026}. Our delta
+is the \emph{form} of the statement: the failure becomes a theorem in the comparison-of-experiments
+frame, with the precise structural condition, Blackwell incomparability, under which every
+query-independent scalar must mis-rank, and a verified live instance on six production models.
 
 \subsection{Task-dependence and context degradation}
 \label{sec:related-taskdep}
@@ -353,12 +384,27 @@ high-scoring distractors hurt while random noise can help~\citep{cuconasu2024noi
 curves are inverted-U in passage count~\citep{jin2024longrag}; document count hurts at fixed
 length~\citep{levy2025moredocs}; added length alone hurts~\citep{contexthurts2025}; and the effect
 persists across model generations~\citep{hong2025contextrot} and agent-scaffold
-components~\citep{longcontextdegrade2026}. We do not claim to discover this genus. Our
-anti-monotonicity finding contributes its order-theoretic form: a strict \emph{superset} of a
-sufficient source, on sources separately \emph{verified} Blackwell-incomparable, collapses PASS
-under a per-task interference verification with position, length, and routing controls; the
-algebraic object $\Psi_T<0$ is one no monotone-submodular context-value scalar can carry.
-Pareto-incomparability of prompts along competing metrics \emph{within} a single
+components~\citep{longcontextdegrade2026}. The genus is older than language models: in data
+integration, adding sources raises coverage while fusion accuracy first rises and then falls, so
+that ``less is more,'' and no standard fusion model is monotone in the source
+set~\citep{dong2013lessismore}; the lesson has since been carried explicitly to augmented language
+models~\citep{halevy2023learnings}. We do not claim to discover this genus. Two differences locate
+our finding inside it. Where data integration traces the harm to low-quality sources and restores
+monotonicity by redesigning the fusion rule, our two sources are individually correct and
+sufficient, the harm is verified against length, position, and formatting controls to be convention
+routing, and the rule $\delta_M$ is a fixed model that cannot be redesigned, so the response is
+selection rather than fusion. And where ``interference'' in the mechanistic RAG literature means
+distractor passages steering a model, a failure recently localized and corrected in a sparse
+feature space~\citep{giannetti2026interference}, and inter-context \emph{conflict} means contexts
+that contradict each other~\citep{xu2024knowledgeconflicts}, our sources neither distract nor
+conflict: both are true and both are needed, and the superset still collapses. Our
+anti-monotonicity finding contributes the order-theoretic form of this: a strict \emph{superset} of
+a sufficient source, on sources separately \emph{verified} Blackwell-incomparable, collapses PASS
+under a per-task interference verification; the algebraic object $\Psi_T<0$ is one no
+monotone-submodular context-value scalar can carry. A representation-level account of when context
+helps, an additive error decomposition with alignment conditions~\citep{wang2026whencontext}, is
+complementary: it characterizes correction by a single context, not the order structure among
+sources. Pareto-incomparability of prompts along competing metrics \emph{within} a single
 task~\citep{paretoprompts2025} is orthogonal to our object, incomparable \emph{sources across
 tasks}.
 
@@ -375,9 +421,14 @@ to order training \emph{tasks}~\citep{fosse2025}, a deficiency-induced \emph{dir
 in transfer learning (no incomparability, no distribution-free bound, outside language
 modeling)~\citep{akdemir2025}, comparison-of-experiments ideas in loss
 design~\citep{vanrooyen2014}, and a survey of Blackwell's theorems for AI~\citep{blackwellrep2026}.
-To our knowledge none states a Blackwell partial order over context sources, derives the
-no-scalar-ranks consequence for language models, or supplies a verified decision-restricted
-estimator, the three new pieces here.
+The one use of the order for language models at inference time that we know of sits on the
+other side of the model: \citet{zhang2026blackwellagents} rank the information structures induced
+by multi-agent protocols (voting, debate) and prove a pooled-posterior upper bound, a dominance
+result over protocols with no incomparable pair and no verification. To our knowledge none states
+a Blackwell partial order over the context sources of a single model, treats \emph{incomparability}
+rather than dominance as the object of interest, derives the no-scalar-ranks consequence for
+language models, or supplies a verified decision-restricted estimator, the pieces that are new
+here.
 
 \subsection{The design space: no cheap method represents the partial order}
 \label{sec:related-designspace}
@@ -415,6 +466,11 @@ DPP / submodular coverage~\citep{ye2023ceil,huang2025gammacover} & \checkmark   
 Shapley / influence valuation~\citep{demoshapley2024}            & $\times$          & \checkmark & $\times$ \\
 Expected information gain / BED~\citep{bedllm2026}               & $\times$          & $\sim$     & $\times$ \\
 Listwise LLM reranker~\citep{sun2023rankgpt}                     & $\sim^{c}$        & \checkmark & $\times^{c}$ \\
+Utility scores, learned or LLM-specific~\citep{zhang2025llmutility,dai2025seper} & \checkmark$^{a}$ & $\times$ & $\times$ \\
+Conditional passage utility~\citep{jain2025contextualutility}   & \checkmark$^{a}$  & $\sim^{d}$ & $\times$ \\
+Conformal context filtering~\citep{chakraborty2026conformal}    & \checkmark        & $\times$   & $\times$ \\
+Learned set selection~\citep{optiset2026,rank4gen2026}          & $\sim^{c}$        & \checkmark & $\times^{c}$ \\
+Skyline over heuristic scores~\citep{bookrag2025}               & \checkmark        & $\times$   & $\sim^{e}$ \\
 \midrule
 \textbf{Probe-Select (this paper)}                               & $\times$          & \checkmark & \checkmark \\
 \bottomrule
@@ -424,7 +480,9 @@ Listwise LLM reranker~\citep{sun2023rankgpt}                     & $\sim^{c}$   
 $^{a}$amortized: trained once on the model's signal, cheap at query time, but still a scalar.
 $^{b}$symmetric redundancy over embedding geometry, not directional anti-monotonicity.
 $^{c}$query-conditioned and interaction-aware, but per-query (not precomputable) and with no
-dominance guarantee. Only the last row represents incomparability, at the cost of direct probing;
+dominance guarantee. $^{d}$positive complementarity only, a passage made useful by another, not
+directional harm. $^{e}$keeps the non-dominated set, but over heuristic per-item scores rather than
+task value. Only the last row represents incomparability over task value, at the cost of direct probing;
 the ``cheap \emph{and} partial-order-faithful'' cell is empty, which is this paper's central open
 problem.}
 \label{tab:designspace}
@@ -825,7 +883,12 @@ concrete lexical-cosine score practitioners use. In \S\ref{sec:experiments} the
 \varphi(W_2)=0.44$ (ranking $W_2\succ W_1$), yet realized PASS ranks $W_1$ at $96\%$--$100\%$ versus
 $W_2$ at $0$--$10\%$ across all six models. The same mis-rank is realized by representative open-weight learned rankers: two dense bi-encoders (BGE, E5) and a cross-encoder reranker all prefer $W_2$ on the trap
 (\S\ref{sec:results-misrank}, Table~\ref{tab:rankers}), so the topical class is not a lexical strawman: its failure mode is shared by the ranker
-families retrieval systems actually deploy. We also measure the
+families retrieval systems actually deploy. The same failure is documented in the wild:
+language-model re-rankers are steered by lexical similarity across NQ, LitQA2, and
+DRUID~\citep{hagstrom2025lexical}, and passages that are semantically close but logically
+irrelevant defeat retrievers and rerankers at scale, with an evidence-reasoning agent, a listwise
+reader, as the remedy~\citep{chen2026deepera}, which is the boundary
+Proposition~\ref{prop:trap-constrained} draws. We also measure the
 boundary from the other side: an LLM \emph{listwise} reranker, which reads both documents and can
 therefore condition on the private coordinate itself, ranks the trap correctly ($30/30$). This is
 the behaviour Proposition~\ref{prop:trap-constrained} predicts, its hypothesis is topicality
@@ -1742,7 +1805,10 @@ Claude despite being a different vendor, while GPT-5.5's prior is wide ($55\%$--
 \texttt{api\_argorder}/\texttt{enc\_amount}). A ``stronger-model-knows-more'' account predicts the
 spectrum to follow capability; it does not. We read $I(S;W\mid\theta)$ as tracking a vendor's training
 distribution rather than raw capability, which makes the theory's $\theta$-dependence concrete and
-caps which cells verify per model.
+caps which cells verify per model. The retrieval literature has reached the same conclusion from
+the utility side, the same passage carrying different utility for different
+models~\citep{zhang2025llmutility}; the spectrum here adds the verified per-model floor that this
+model-relativity implies for selection.
 
 \subsection{Mechanism: the runtime fingerprint is a correlate, not an explanation}
 \label{sec:disc-mechanism}
@@ -1788,6 +1854,13 @@ of it ($\to80\%$), locating the operative variable in convention-to-task \emph{r
 than formatting or segmentation. We state these as interpretations, not findings; every verified
 claim in the paper is independent of which reading is true.
 
+A mechanism, if one is wanted, now has a plausible route: distractor interference in RAG has been
+localized to a sparse feature subspace and corrected there~\citep{giannetti2026interference}. Our
+interference differs in its cause, the added source is true and needed rather than a distractor,
+and it is not a knowledge conflict in the sense of \citet{xu2024knowledgeconflicts}, since nothing
+in $W_1$ and $W_2$ contradicts; whether the same features mediate a correct convention mis-routed
+to the wrong task is an open question the released prompts make testable.
+
 \subsection{Limitations and threats to validity}
 \label{sec:limitations}
 
@@ -1799,7 +1872,11 @@ companion paper. Building the verified order on $m$ candidates costs
 $m\!\cdot\!|\Dcal|\!\cdot\!n$ verifier-gated calls, curation scale, not corpus scale; scaling
 verified selection to retrieval over $10^6$ passages, by amortizing the probe into a learned
 deficiency predictor or running the partial-order step as a re-ranking head over a scalar
-shortlist, is the central open problem this work opens.
+shortlist, is the central open problem this work opens. Keeping a non-dominated set instead of a
+top-$k$ prefix already exists as an operator, the skyline ranker of \citet{bookrag2025}, and learned
+set selectors optimize evidence sets end to end~\citep{optiset2026,rank4gen2026}; what the partial
+order adds is the object the set is taken over, verified task value rather than heuristic per-item
+scores, which is exactly what makes the selection safe under anti-monotonicity.
 
 \paragraph{Source-pair generality.} Incomparability and dominance hold for two hand-built pairs
 in two domains; the cross-vendor record is single-pair. Pair-2 interference is verified in sign
@@ -1842,8 +1919,10 @@ task-disjoint, so a complementary pair would be needed to test whether a superse
 % ==========================================================================
 
 Context selection is, at bottom, a partial-order problem, not a scalar one. When two sources are
-incomparable, no scalar score can rank them correctly for all tasks (Theorem~\ref{thm:incomparable}),
-which explains the field's ``relevance does not transfer'' folklore. We made the order measurable
+incomparable, no single per-source score, relevance or utility, can rank them correctly for all
+tasks (Theorem~\ref{thm:incomparable}),
+which explains the field's ``relevance does not transfer'' folklore and gives utility-centric
+retrieval its formal boundary. We made the order measurable
 with a value-deficiency surrogate $\dhat_{\Dcal}$ and a distribution-free verification, and we ran
 the theory on six models across four vendors. On every model we verify ($\ge 90\%$) that two
 private sources are incomparable; on every model a real relevance score ranks them the wrong way;
