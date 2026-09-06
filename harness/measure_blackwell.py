@@ -632,7 +632,8 @@ def certify_interference(counts, by_task, eta=0.10, tau=0.30):
 # ============================================================================================
 def measure(arms, mock, runs, tasks=None, workers=1, model="claude-haiku-4-5-20251001",
             singleshot=False):
-    """Returns counts[arm][tid]=(k,n), cost[arm][tid]=mean cost, toks[arm][tid]=mean out_tokens.
+    """Returns counts[arm][tid]=(k,n), cost[arm][tid]=mean cost, toks[arm][tid]=mean out_tokens,
+    draws[arm][tid]=ordered list of 0/1 PASS outcomes (draw i = index i; needed for sequential replay).
     workers>1 runs the n calls of each cell concurrently (calls are subprocess+network bound and
     each uses its own temp dir, so threads are safe and give a near-linear speedup for big n)."""
     from concurrent.futures import ThreadPoolExecutor
@@ -640,6 +641,7 @@ def measure(arms, mock, runs, tasks=None, workers=1, model="claude-haiku-4-5-202
     counts = {a: {} for a in arms}
     cost = {a: {} for a in arms}
     toks = {a: {} for a in arms}
+    draws = {a: {} for a in arms}   # ordered per-draw PASS sequence, for sequential analysis
     for a in arms:
         for t in tasks:
             if workers > 1 and not mock:
@@ -649,12 +651,13 @@ def measure(arms, mock, runs, tasks=None, workers=1, model="claude-haiku-4-5-202
                 rows = [run_one(t, a, mock, i, model, singleshot) for i in range(runs)]
             k = sum(1 for r in rows if r["solved"])
             counts[a][t["id"]] = (k, runs)
+            draws[a][t["id"]] = [1 if r["solved"] else 0 for r in rows]
             cost[a][t["id"]] = statistics.mean(r["cost"] for r in rows)
             toks[a][t["id"]] = statistics.mean(r.get("out_tokens", 0) for r in rows)
             err = next((r.get("error") for r in rows if r.get("error")), "")
             print(f"  arm={a:<6} {t['id']:<16} PASS {k}/{runs}={k/runs:.0%}"
                   f"  ${cost[a][t['id']]:.4f}" + (f"  ERR:{err}" if err else ""))
-    return counts, cost, toks
+    return counts, cost, toks, draws
 
 
 def aggregate_phi(counts_W, counts_none, by_task):
@@ -722,7 +725,7 @@ def main():
           f"arms={arms} tasks={by_task} | {total_n_runs} claude runs | eta={a.eta}\n")
 
     print(f"  model = {a.model}{'  [SINGLE-SHOT]' if a.singleshot else ''}")
-    counts, cost, toks = measure(arms, a.mock, a.runs, tasks=sel_tasks, workers=a.workers,
+    counts, cost, toks, draws = measure(arms, a.mock, a.runs, tasks=sel_tasks, workers=a.workers,
                                  model=a.model, singleshot=a.singleshot)
     total_cost = sum(cost[a_][t] for a_ in arms for t in by_task) * a.runs
     print(f"\ntotal measured spend = ${total_cost:.4f}  (n={a.runs}/cell, "
@@ -893,6 +896,7 @@ def main():
 
     out = {
         "counts": {f"{a_}|{t}": counts[a_][t] for a_ in arms for t in by_task},
+        "draws": {f"{a_}|{t}": draws[a_][t] for a_ in arms for t in by_task},
         "estimator": {"hat_delta_W1_W2": dAB, "hat_delta_W2_W1": dBA,
                       "argsup_W2_beats_W1": argA, "argsup_W1_beats_W2": argB,
                       "incomparable": inc},
