@@ -1,0 +1,16 @@
+corpus: 12 natural chunks | tasks: 6 | candidate pool K=9
+  t_cp       top3=['measure_blackwell.certify_incomparable', 'measure_blackwell.required_n', 'probe_select.greedy_cover']  decisive-chunk miss
+  t_nstark   top3=['measure_blackwell.required_n_stark', 'measure_blackwell.certify_incomparable', 'measure_blackwell.required_n']  decisive-chunk HIT
+  t_suptask  top3=['measure_blackwell.hat_delta_D', 'measure_blackwell.certify_interference', 'measure_blackwell.certify_incomparable']  decisive-chunk HIT
+  t_lab      top3=['measure_blackwell.certify_incomparable', 'measure_blackwell.certify_dominance', 'measure_blackwell.required_n_stark']  decisive-chunk HIT
+  t_ud       top3=['measure_blackwell.certify_dominance', 'measure_blackwell.certify_incomparable', 'measure_blackwell.lexical_relevance']  decisive-chunk HIT
+  t_lex      top3=['measure_blackwell.lexical_relevance', 'measure_blackwell.aggregate_phi', 'measure_blackwell.certify_incomparable']  decisive-chunk HIT
+  arm=measure_blackwell.required_n_stark t_ud             PASS 0/16=0%  $0.0320
+  arm=measure_blackwell.required_n_stark t_lex            PASS 6/16=38%  $0.0273
+  arm=probe_select.greedy_cover t_cp             PASS 11/16=69%  $0.0275
+  arm=probe_select.greedy_cover t_nstark         PASS 0/16=0%  $0.0261
+  arm=probe_select.greedy_cover t_suptask        PASS 0/16=0%  $0.0291
+  arm=probe_select.greedy_cover t_lab            PASS 0/16=0%  $0.0313
+  arm=probe_select.greedy_cover t_ud             PASS 0/16=0%  $0.0265
+  arm=probe_select.greedy_cover t_lex            PASS 0/16=0%  $0.0234
+isolated re-run of ['measure_blackwell.required_n_stark|t_ud', 'measure_blackwell.required_n_stark|t_lex', 'probe_select.greedy_cover|t_cp', 'probe_select.greedy_cover|t_nstark', 'probe_select.greedy_cover|t_suptask', 'probe_select.greedy_cover|t_lab', 'probe_select.greedy_cover|t_ud', 'probe_select.greedy_cover|t_lex'] -> C:\Users\AndriyBilous\Documents\GitHub\blackwell-llm-context\results\prevalence_haiku_n16_v2_iso.json
