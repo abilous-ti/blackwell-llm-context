@@ -1,0 +1,251 @@
+{
+ "model": "claude-haiku-4-5-20251001",
+ "cell": "W2|trap_store_wire",
+ "counts": [
+  0,
+  40
+ ],
+ "errs": 0,
+ "rows": [
+  {
+   "solved": false,
+   "cost": 0.0205292,
+   "out_tokens": 794,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.019399200000000002,
+   "out_tokens": 568,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0206332,
+   "out_tokens": 814,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0198772,
+   "out_tokens": 662,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.019479200000000002,
+   "out_tokens": 584,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0204332,
+   "out_tokens": 774,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.019697199999999998,
+   "out_tokens": 626,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0194732,
+   "out_tokens": 582,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0182202,
+   "out_tokens": 333,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0209672,
+   "out_tokens": 880,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.021008199999999998,
+   "out_tokens": 889,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0232022,
+   "out_tokens": 1327,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0214532,
+   "out_tokens": 978,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.019889200000000003,
+   "out_tokens": 666,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0205982,
+   "out_tokens": 807,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0205912,
+   "out_tokens": 804,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0211882,
+   "out_tokens": 925,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0192482,
+   "out_tokens": 537,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0198332,
+   "out_tokens": 654,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0191432,
+   "out_tokens": 516,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0226792,
+   "out_tokens": 1224,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0208592,
+   "out_tokens": 860,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0200322,
+   "out_tokens": 693,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0205872,
+   "out_tokens": 804,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0235092,
+   "out_tokens": 1390,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0201432,
+   "out_tokens": 716,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0198092,
+   "out_tokens": 650,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0191242,
+   "out_tokens": 513,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0205382,
+   "out_tokens": 795,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0211592,
+   "out_tokens": 920,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0198522,
+   "out_tokens": 657,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.020273199999999998,
+   "out_tokens": 742,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0190232,
+   "out_tokens": 492,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0214202,
+   "out_tokens": 973,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0208532,
+   "out_tokens": 858,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0200192,
+   "out_tokens": 692,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0221602,
+   "out_tokens": 1121,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0215322,
+   "out_tokens": 993,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0192812,
+   "out_tokens": 542,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0215922,
+   "out_tokens": 1005,
+   "error": null
+  }
+ ]
+}

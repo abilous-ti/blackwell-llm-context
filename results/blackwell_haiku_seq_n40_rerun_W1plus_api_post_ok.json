@@ -1,0 +1,251 @@
+{
+ "model": "claude-haiku-4-5-20251001",
+ "cell": "W1plus|api_post_ok",
+ "counts": [
+  14,
+  40
+ ],
+ "errs": 0,
+ "rows": [
+  {
+   "solved": false,
+   "cost": 0.0215822,
+   "out_tokens": 967,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.0191092,
+   "out_tokens": 470,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.021505200000000002,
+   "out_tokens": 950,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.0185552,
+   "out_tokens": 360,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0219332,
+   "out_tokens": 1034,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0205032,
+   "out_tokens": 748,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0215632,
+   "out_tokens": 960,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.0192512,
+   "out_tokens": 500,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.019320200000000003,
+   "out_tokens": 513,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.019939199999999997,
+   "out_tokens": 636,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.0192152,
+   "out_tokens": 492,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0199002,
+   "out_tokens": 629,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0210962,
+   "out_tokens": 869,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0187592,
+   "out_tokens": 400,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.0186302,
+   "out_tokens": 375,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0184042,
+   "out_tokens": 329,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.025316199999999997,
+   "out_tokens": 1713,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0228352,
+   "out_tokens": 1216,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0240012,
+   "out_tokens": 1450,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0186962,
+   "out_tokens": 389,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0183302,
+   "out_tokens": 315,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.018925200000000003,
+   "out_tokens": 434,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0214532,
+   "out_tokens": 938,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.0194152,
+   "out_tokens": 532,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.0194342,
+   "out_tokens": 535,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0214842,
+   "out_tokens": 945,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.0225662,
+   "out_tokens": 1163,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.019169199999999997,
+   "out_tokens": 482,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0208052,
+   "out_tokens": 810,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.031005200000000004,
+   "out_tokens": 2850,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0210202,
+   "out_tokens": 853,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0183562,
+   "out_tokens": 321,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.021969199999999998,
+   "out_tokens": 1042,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0211282,
+   "out_tokens": 873,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.019555200000000002,
+   "out_tokens": 560,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0198092,
+   "out_tokens": 610,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.0191032,
+   "out_tokens": 468,
+   "error": null
+  },
+  {
+   "solved": true,
+   "cost": 0.018642199999999998,
+   "out_tokens": 379,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0184842,
+   "out_tokens": 345,
+   "error": null
+  },
+  {
+   "solved": false,
+   "cost": 0.0187542,
+   "out_tokens": 399,
+   "error": null
+  }
+ ]
+}
