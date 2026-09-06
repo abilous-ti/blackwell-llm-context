@@ -48,7 +48,12 @@ def natural_chunks():
                     continue
                 sig = ast.unparse(node.args) if isinstance(node, ast.FunctionDef) else ""
                 head = ("def %s(%s):" % (node.name, sig)) if sig else ("class %s:" % node.name)
-                text = ("# from module " + fn[:-3] + NL + head + NL + "    " + TQ + doc + TQ)
+                # NOTE: the docstring body is verbatim but NOT wrapped in triple quotes. An embedded
+                # double quote toggles cmd.exe's quote state (it ignores backslash escapes), after
+                # which any < > | in the text act as redirections and the claude.cmd shim receives a
+                # mangled prompt (root cause of the 39 dead cells in prevalence_haiku_n16).
+                body = NL.join("    " + ln if ln.strip() else ln for ln in doc.split(NL))
+                text = ("# from module " + fn[:-3] + NL + head + NL + body)
                 out.append({"id": fn[:-3] + "." + node.name, "name": node.name, "text": text})
     return out
 
