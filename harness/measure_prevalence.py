@@ -222,6 +222,12 @@ def main():
 
     arms = ["none"] + pool
     mb.ARMS = {"none": None, **{d["id"]: d["text"] for d in docs if d["id"] in pool}}
+    if a.mock:
+        keys = {t["id"]: t["key"] for t in TASKS}
+        def fake(task, arm, mock, i, model=None, singleshot=False):
+            p = 0.95 if arm == keys[task["id"]] else 0.03
+            return {"solved": random.random() < p, "cost": 0.0, "out_tokens": 0}
+        mb.run_one = fake
     if a.only_cells:
         tmap = {t["id"]: t for t in TASKS}
         iso = {"counts": {}, "draws": {}, "errs": {}, "isolated": True, "model": a.model,
@@ -237,12 +243,6 @@ def main():
         (REPO / a.out).write_text(json.dumps(iso, indent=1), encoding="utf-8")
         print("isolated re-run of", list(iso["counts"]), "->", REPO / a.out)
         return
-    if a.mock:
-        keys = {t["id"]: t["key"] for t in TASKS}
-        def fake(task, arm, mock, i, model=None, singleshot=False):
-            p = 0.95 if arm == keys[task["id"]] else 0.03
-            return {"solved": random.random() < p, "cost": 0.0, "out_tokens": 0}
-        mb.run_one = fake
     counts, cost, toks, draws, errs = mb.measure(arms, False, a.runs, tasks=TASKS,
                                            workers=1 if a.mock else a.workers,
                                            model=a.model, singleshot=True)
