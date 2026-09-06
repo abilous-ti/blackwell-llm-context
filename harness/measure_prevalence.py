@@ -205,6 +205,9 @@ def main():
     ap.add_argument("--model", default="claude-haiku-4-5-20251001")
     ap.add_argument("--topk", type=int, default=3)
     ap.add_argument("--out", default="results/prevalence_pilot.json")
+    ap.add_argument("--only-cells", default="",
+                    help="comma list of arm|task cells to re-run in ISOLATION (outage protocol); "
+                         "writes counts/draws/errs only, no analysis")
     a = ap.parse_args()
     if a.selftest:
         sys.exit(0 if selftest() else 1)
@@ -219,13 +222,28 @@ def main():
 
     arms = ["none"] + pool
     mb.ARMS = {"none": None, **{d["id"]: d["text"] for d in docs if d["id"] in pool}}
+    if a.only_cells:
+        tmap = {t["id"]: t for t in TASKS}
+        iso = {"counts": {}, "draws": {}, "errs": {}, "isolated": True, "model": a.model,
+               "n_per_cell": a.runs}
+        for cell in [c.strip() for c in a.only_cells.split(",") if c.strip()]:
+            arm, tid = cell.split("|", 1)
+            if arm != "none":
+                mb.ARMS[arm] = next(d["text"] for d in docs if d["id"] == arm)
+            c_, _, _, d_, e_ = mb.measure([arm], False, a.runs, tasks=[tmap[tid]],
+                                          workers=a.workers, model=a.model, singleshot=True)
+            iso["counts"][cell] = c_[arm][tid]; iso["draws"][cell] = d_[arm][tid]
+            iso["errs"][cell] = e_[arm][tid]
+        (REPO / a.out).write_text(json.dumps(iso, indent=1), encoding="utf-8")
+        print("isolated re-run of", list(iso["counts"]), "->", REPO / a.out)
+        return
     if a.mock:
         keys = {t["id"]: t["key"] for t in TASKS}
         def fake(task, arm, mock, i, model=None, singleshot=False):
             p = 0.95 if arm == keys[task["id"]] else 0.03
             return {"solved": random.random() < p, "cost": 0.0, "out_tokens": 0}
         mb.run_one = fake
-    counts, cost, toks, draws = mb.measure(arms, False, a.runs, tasks=TASKS,
+    counts, cost, toks, draws, errs = mb.measure(arms, False, a.runs, tasks=TASKS,
                                            workers=1 if a.mock else a.workers,
                                            model=a.model, singleshot=True)
     by_task = [t["id"] for t in TASKS]
@@ -234,6 +252,7 @@ def main():
            "corpus_size": len(docs), "topk": topk, "pool": pool,
            "counts": {f"{x}|{t}": counts[x][t] for x in arms for t in by_task},
            "draws": {f"{x}|{t}": draws[x][t] for x in arms for t in by_task},
+           "errs": {f"{x}|{t}": errs[x][t] for x in arms for t in by_task},
            "analysis": res,
            "total_cost_usd": sum(cost[x][t] for x in arms for t in by_task) * a.runs}
     (REPO / a.out).write_text(json.dumps(out, indent=1), encoding="utf-8")

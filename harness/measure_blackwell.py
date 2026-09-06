@@ -642,6 +642,7 @@ def measure(arms, mock, runs, tasks=None, workers=1, model="claude-haiku-4-5-202
     cost = {a: {} for a in arms}
     toks = {a: {} for a in arms}
     draws = {a: {} for a in arms}   # ordered per-draw PASS sequence, for sequential analysis
+    errs = {a: {} for a in arms}    # per-draw transport-error flags (1 = outage-scored, not a real fail)
     for a in arms:
         for t in tasks:
             if workers > 1 and not mock:
@@ -652,12 +653,13 @@ def measure(arms, mock, runs, tasks=None, workers=1, model="claude-haiku-4-5-202
             k = sum(1 for r in rows if r["solved"])
             counts[a][t["id"]] = (k, runs)
             draws[a][t["id"]] = [1 if r["solved"] else 0 for r in rows]
+            errs[a][t["id"]] = [1 if r.get("error") else 0 for r in rows]
             cost[a][t["id"]] = statistics.mean(r["cost"] for r in rows)
             toks[a][t["id"]] = statistics.mean(r.get("out_tokens", 0) for r in rows)
             err = next((r.get("error") for r in rows if r.get("error")), "")
             print(f"  arm={a:<6} {t['id']:<16} PASS {k}/{runs}={k/runs:.0%}"
                   f"  ${cost[a][t['id']]:.4f}" + (f"  ERR:{err}" if err else ""))
-    return counts, cost, toks, draws
+    return counts, cost, toks, draws, errs
 
 
 def aggregate_phi(counts_W, counts_none, by_task):
@@ -725,7 +727,7 @@ def main():
           f"arms={arms} tasks={by_task} | {total_n_runs} claude runs | eta={a.eta}\n")
 
     print(f"  model = {a.model}{'  [SINGLE-SHOT]' if a.singleshot else ''}")
-    counts, cost, toks, draws = measure(arms, a.mock, a.runs, tasks=sel_tasks, workers=a.workers,
+    counts, cost, toks, draws, errs = measure(arms, a.mock, a.runs, tasks=sel_tasks, workers=a.workers,
                                  model=a.model, singleshot=a.singleshot)
     total_cost = sum(cost[a_][t] for a_ in arms for t in by_task) * a.runs
     print(f"\ntotal measured spend = ${total_cost:.4f}  (n={a.runs}/cell, "
@@ -897,6 +899,7 @@ def main():
     out = {
         "counts": {f"{a_}|{t}": counts[a_][t] for a_ in arms for t in by_task},
         "draws": {f"{a_}|{t}": draws[a_][t] for a_ in arms for t in by_task},
+        "errs": {f"{a_}|{t}": errs[a_][t] for a_ in arms for t in by_task},
         "estimator": {"hat_delta_W1_W2": dAB, "hat_delta_W2_W1": dBA,
                       "argsup_W2_beats_W1": argA, "argsup_W1_beats_W2": argB,
                       "incomparable": inc},
