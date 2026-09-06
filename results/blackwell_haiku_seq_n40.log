@@ -1,0 +1,67 @@
+BLACKWELL S6 anchor REAL | n=40/cell | arms=['none', 'W1', 'W2', 'W1plus'] tasks=['api_post_ok', 'api_argorder', 'enc_amount', 'trap_store_wire'] | 640 claude runs | eta=0.1
+
+  model = claude-haiku-4-5-20251001  [SINGLE-SHOT]
+  arm=none   api_post_ok      PASS 0/40=0%  $0.0181
+  arm=none   api_argorder     PASS 2/40=5%  $0.0188
+  arm=none   enc_amount       PASS 0/40=0%  $0.0196
+  arm=none   trap_store_wire  PASS 0/40=0%  $0.0189
+  arm=W1     api_post_ok      PASS 17/40=42%  $0.0184
+  arm=W1     api_argorder     PASS 40/40=100%  $0.0185
+  arm=W1     enc_amount       PASS 0/40=0%  $0.0231
+  arm=W1     trap_store_wire  PASS 35/40=88%  $0.0192
+  arm=W2     api_post_ok      PASS 0/40=0%  $0.0212
+  arm=W2     api_argorder     PASS 0/40=0%  $0.0216
+  arm=W2     enc_amount       PASS 40/40=100%  $0.0281
+  arm=W2     trap_store_wire  PASS 0/40=0%  $0.0015  ERR:singleshot failed after 3 attempts: empty/error result: {'type': 'result', 'subt
+  arm=W1plus api_post_ok      PASS 3/40=8%  $0.0146  ERR:singleshot failed after 3 attempts: empty/error result: {'type': 'result', 'subt
+  arm=W1plus api_argorder     PASS 1/40=2%  $0.0221
+  arm=W1plus enc_amount       PASS 40/40=100%  $0.0283
+  arm=W1plus trap_store_wire  PASS 27/40=68%  $0.0197
+
+total measured spend = $12.4693  (n=40/cell, 640 runs)
+==============================================================================
+(A) INCOMPARABILITY (estimator)
+    hat_delta_D(W1,W2) = +1.00  (sup at task 'enc_amount': W2 beats W1)
+    hat_delta_D(W2,W1) = +1.00  (sup at task 'api_argorder': W1 beats W2)
+    both > 0 ? True  -> MUTUAL positive deficiency = EMPIRICAL INCOMPARABILITY
+    CERTIFICATE (uniform, alpha_pair=eta/2|D|=0.0125):
+      L_D(W1,W2) lower bound on sup[PASS(W2)-PASS(W1)] = +0.762
+      L_D(W2,W1) lower bound on sup[PASS(W1)-PASS(W2)] = +0.762
+      certified incomparable at >= 90% ? True
+
+(B) SCALAR MIS-RANK (Theorem 3 instantiated)
+  (B1) outcome-aggregate phi (mean PASS lift, CIRCULAR/contrast only): phi(W1)=+0.56, phi(W2)=+0.24 -> ranks W1 > W2 globally
+  (B2) query-conditioned lexical relevance phi_lex(W,T) vs realized PASS:
+      api_post_ok      relevance(W1,W2)=(0.42,0.25)->W1>W2  PASS(W1,W2)=(42%,0%)->W1>W2 
+      api_argorder     relevance(W1,W2)=(0.30,0.20)->W1>W2  PASS(W1,W2)=(100%,0%)->W1>W2 
+      enc_amount       relevance(W1,W2)=(0.21,0.27)->W2>W1  PASS(W1,W2)=(0%,100%)->W2>W1 
+      trap_store_wire  relevance(W1,W2)=(0.36,0.44)->W2>W1  PASS(W1,W2)=(88%,0%)->W1>W2   <== RELEVANCE MIS-RANKS
+    [OK] STRONG Thm-3: on 'trap_store_wire' relevance prefers W2 but PASS prefers W1 -> no query-conditioned relevance score can rank these sources correctly for all tasks.
+
+(C) DOMINANCE control: W1plus = W2 ++ W1 (literal superset of W2's signal)
+    hat_delta_D(W1plus,W2) = +0.00  (expect 0: no task where W2 beats W1plus)
+    hat_delta_D(W2,W1plus) = +0.68  (expect >0: W1plus wins API tasks)
+    CERTIFICATE (uniform, alpha_pair=(eta/2)/|D|=0.0125, margin alpha_tol=0.15):
+      U_D(W1plus,W2) upper bound on sup[PASS(W2)-PASS(W1plus)] = 0.119
+      delta_D(W1plus,W2) <= 0.15 certified ? True   AND W1plus strictly beats W2 somewhere (certified) ? True
+    one-directional (W1plus dominates W2) ? True  -> for-all-tasks dominance REALIZED
+
+(D) INTERFERENCE I_T = PASS(W1plus)-PASS(W1)-PASS(W2)+PASS(none) (certify harm I_T<=-0.3, alpha=eta/4):
+      api_post_ok      I_T=-0.35  upper=+0.08
+      api_argorder     I_T=-0.93  upper=-0.56  <== CERTIFIED HARM
+      enc_amount       I_T=+0.00  upper=+0.21
+      trap_store_wire  I_T=-0.20  upper=+0.22
+    certified-harm tasks: ['api_argorder']
+
+(F) RUNTIME tell: paired output_tokens W1plus vs W1 (same task)
+      api_post_ok      W1=425tok  W1plus=587tok  (+38%)
+      api_argorder     W1=421tok  W1plus=1082tok  (+157%)
+      enc_amount       W1=1357tok  W1plus=2323tok  (+71%)
+      trap_store_wire  W1=566tok  W1plus=596tok  (+5%)
+
+==============================================================================
+sample-size (alpha_pair=eta/2|D|, |D|=7):
+  worst case (p~0.5, CP half-width<=0.15): n >= 83/cell.
+  STARK crossover (clean ~0% vs ~100%, as designed): n >= 9/cell -> START HERE; raise n only if the real split is noisy.
+==============================================================================
+wrote C:\Users\AndriyBilous\Documents\GitHub\blackwell-llm-context\results\blackwell_haiku_seq_n40.json
