@@ -62,7 +62,7 @@ Choosing what to put in a language model's prompt is almost always done by
 scoring each candidate source with a single number and keeping the top few. We
 argue this is the wrong approach. The best context for one task is often useless
 for another. Two sources can be \emph{incomparable}, in the exact sense of
-Blackwell's 1953 comparison of experiments~\citep{blackwell1953}, and when they
+Blackwell's 1953 comparison of experiments, and when they
 are, no single per-source score, relevance or utility, can rank them correctly for every task. To test
 this on real systems we use a simple check: run each source through a battery of
 pass/fail tasks, compare the pass rates, and attach confidence intervals so the
@@ -79,6 +79,11 @@ treat context selection as a partial-order problem, not a scalar ranking, and
 compare sources by a verified pass-rate test rather than a relevance number.
 Scaling the selection rule this implies to large corpora is the main open problem.
 \end{abstract}
+
+\vspace{0.6em}
+\noindent\textbf{Keywords:} context selection; Blackwell order; comparison of experiments;
+incomparability; partial order; retrieval-augmented generation; large language models;
+distribution-free verification; anti-monotonicity; prompt engineering
 
 % ==========================================================================
 \section{Introduction}
@@ -222,21 +227,25 @@ All six models are run the same way: a single API call per attempt, from which w
 candidate code and grade it with the verifier. This keeps the setup uniform across vendors, so a
 difference between models reflects the model, not how it was run.
 
-\paragraph{Contributions.} The paper makes one claim, context selection is a partial-order
-problem rather than a scalar-ranking problem, and contributes exactly the three pieces that
-claim needs.
+\paragraph{Contributions.} The paper makes one claim, that the order over context sources is
+\emph{partial} rather than total, and contributes the three pieces that claim needs: what follows
+from it, the instrument that makes it testable, and the evidence that it holds.
 \begin{enumerate}
-  \item[\textbf{(C1)}] \textbf{Theory: context sources form a Blackwell partial order}
+  \item[\textbf{(C1)}] \textbf{Theory: the order is partial, and no single per-source score survives it}
   (\S\ref{sec:order}, \S\ref{sec:incomparability}). We formalize context sources as statistical
   experiments on the task's latent requirement, instantiate the Blackwell garbling order with its
   for-all-tasks dominance guarantee via the Blackwell--Sherman--Stein theorem, define the
   $\delta_M$-restricted order the experiments probe, and prove a one-way bridging lemma between
-  them. The central consequence is incomparability: Blackwell-incomparable sources cannot be
-  ranked by \emph{any} query-independent scalar $\varphi(W)$ for all tasks
-  (Theorem~\ref{thm:incomparable}), with the query-conditioned topical case isolated separately
-  (Proposition~\ref{prop:trap-constrained}). Information retrieval has long argued that no single
-  fixed document score is optimal once documents interact (\S\ref{sec:related-ir}); we derive the
-  impossibility as a theorem in the Blackwell frame.
+  them. Bringing this apparatus to inference-time context is not by itself ours: concurrent work
+  reaches the same classical objects from the admission side (\S\ref{sec:related-deficiency}). What
+  is ours is the consequence of taking \emph{incomparability} rather than deficiency-minimization
+  as the object. Blackwell-incomparable sources cannot be ranked by \emph{any} single per-source
+  score $\varphi(W)$, relevance or utility, for all tasks (Theorem~\ref{thm:incomparable}), with
+  the query-conditioned topical case isolated separately (Proposition~\ref{prop:trap-constrained});
+  both impossibility results are machine-checked in Lean~4 and depend on no axioms
+  (Remark~\ref{rem:lean}). Information retrieval has long argued that no single fixed document
+  score is optimal once documents interact (\S\ref{sec:related-ir}); we derive the impossibility as
+  a theorem in the Blackwell frame and name the exact structural condition under which it bites.
   \item[\textbf{(C2)}] \textbf{Verification: a measurable deficiency surrogate with finite-sample
   guarantees} (\S\ref{sec:estimator}). We define
   $\dhat_{\Dcal}(W_1,W_2) = \max\!\big(0,\,
@@ -1732,6 +1741,21 @@ cells were constructed to exhibit the phenomenon, so the aggregate magnitudes ar
 failure structure, not an estimate of production-traffic gains; what transfers is the structure,
 each cheap policy forfeits an entire cell class, and no total-order policy can keep all four.
 
+\paragraph{What follows for practice.} Five statements survive the caveats above and can be acted
+on directly. (i) One number per source is structurally lossy: when two sources each carry a
+decisive fact, any fixed score drops one of them, and no threshold repairs it
+(Theorem~\ref{thm:incomparable}). (ii) Do not cache a source's \emph{value} across task families;
+cache retrieval representations instead, because the value is model- and task-relative
+(\S\ref{sec:disc-moat}). (iii) Adding correct, on-topic text to a working prompt can break it, by
+as much as $100\% \to 0\%$, so a regression after enlarging the context is a candidate
+anti-monotonicity collapse before it is a model failure (\S\ref{sec:results-antimono}).
+(iv) When two candidates win on different tasks, keep both and route by task rather than forcing a
+global top-$1$: the front attains the per-cell maximum of its members
+(Table~\ref{tab:policies}). (v) A cheap topical ranker fails exactly where the surface lexicon
+points at the wrong source, which is where a listwise reader earns its cost
+(Proposition~\ref{prop:trap-constrained}). Each is measurable on any stack with the released
+harness.
+
 % ==========================================================================
 \section{Discussion}
 \label{sec:discussion}
@@ -1925,8 +1949,19 @@ incomparability for a given model on a fixed battery, not the universal Blackwel
 projection construction models sources as clean projections onto independent coordinates; real
 chunks overlap, contradict, and leak (the measured $\theta$-dependence is exactly such leakage),
 so the construction is the cleanest \emph{sufficient} condition for incomparability, realized
-exactly by our hand-built pairs, and measuring verified-incomparability prevalence on natural
-document pairs is the direct next experiment.
+exactly by our hand-built pairs.
+
+\paragraph{Prevalence is not measured, and is the decisive next experiment.} Every claim here is
+existential: it establishes \emph{that} verified incomparability and superset harm occur, on which
+models, and with which confounds excluded. It does not establish \emph{how often} either occurs in
+a deployed retrieval stream, and no number in this paper should be read as an estimate of that.
+The four cells were built to make the structure visible, so their aggregate magnitudes are
+diagnostic of the failure mode rather than of production traffic. The direct experiment is
+specified and inexpensive: draw document pairs from a natural corpus, run the same verification
+battery unchanged, and report the fraction of pairs that verify incomparable and the fraction of
+superset unions that verify harmful, with the sampling frame stated. We name it as the open
+question rather than approximate it here, because a prevalence figure computed from hand-built
+pairs would be circular.
 
 \paragraph{Sampling and verification regime.} The verification assumes $n$ i.i.d.\ Bernoulli PASS
 draws per cell (Assumption~\ref{ass:iid}), which holds because each draw is an independent
@@ -1980,6 +2015,52 @@ the decisive content, escapes it. The hierarchy is computational: scalar scores 
 the order, and probes that read content can measure it, at probe cost. The remaining
 strengthenings, a vendor-general strong mis-rank, larger reranker checkpoints, and a third
 domain, are the natural next steps, and the experimental record indicates each is cheap to run.
+
+% ==========================================================================
+\section*{Author Contributions}
+Conceptualization, A.B. and O.R.; methodology, A.B. and O.R.; software, A.B.; validation, A.B.
+and O.R.; formal analysis, A.B. and O.R.; investigation, A.B.; data curation, A.B.;
+writing---original draft preparation, A.B.; writing---review and editing, A.B. and O.R.;
+visualization, A.B. All authors have read and agreed to the published version of the manuscript.
+
+\section*{Funding}
+This research received no external funding. The measurement costs reported in
+Appendix~\ref{app:repro} were borne by the authors.
+
+\section*{Institutional Review Board Statement}
+Not applicable. The study involved no human participants and no animals; all measurements are
+automated queries to commercial language-model endpoints, graded by executable verifiers.
+
+\section*{Informed Consent Statement}
+Not applicable.
+
+\section*{Data Availability Statement}
+All data, code and machine-checked proofs supporting the reported results are openly available at
+\url{https://github.com/abilous-ti/blackwell-llm-context}. The repository contains the measurement
+harness (Python standard library only), every per-model run log and result file cited in
+Appendix~\ref{app:record}, the raw-completion diagnostic records of \S\ref{sec:results-audit}, and
+the Lean~4 formalization of Remark~\ref{rem:lean} with the continuous-integration job that
+re-checks it. No data were withheld; every reported figure is computed from those files by the
+released scripts.
+
+\section*{Conflicts of Interest}
+The authors declare no conflict of interest.
+
+\section*{Abbreviations}
+The following abbreviations are used in this manuscript:
+
+\noindent\begin{tabular}{@{}ll@{}}
+BSS  & Blackwell--Sherman--Stein (theorem) \\
+CP   & Clopper--Pearson (exact binomial confidence interval) \\
+DPP  & Determinantal point process \\
+EIG  & Expected information gain \\
+IR   & Information retrieval \\
+LLM  & Large language model \\
+MMR  & Maximal marginal relevance \\
+PASS & Pass rate of a fixed model rule on a verifier-graded task \\
+PRP  & Probability ranking principle \\
+RAG  & Retrieval-augmented generation \\
+\end{tabular}
 
 % ==========================================================================
 \bibliographystyle{plainnat}

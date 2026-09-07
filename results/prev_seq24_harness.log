@@ -1,0 +1,8 @@
+corpus=harness: 12 natural chunks | tasks 6 | pool K=9 | nmax=24 round=4 futility=8
+  t_cp         top3=['measure_blackwell.certify_incomparable', 'measure_blackwell.required_n', 'probe_select.greedy_cover']  decisive miss
+  t_nstark     top3=['measure_blackwell.required_n_stark', 'measure_blackwell.certify_incomparable', 'measure_blackwell.required_n']  decisive HIT
+  t_suptask    top3=['measure_blackwell.hat_delta_D', 'measure_blackwell.certify_interference', 'measure_blackwell.certify_incomparable']  decisive HIT
+  t_lab        top3=['measure_blackwell.certify_incomparable', 'measure_blackwell.certify_dominance', 'measure_blackwell.required_n_stark']  decisive HIT
+  t_ud         top3=['measure_blackwell.certify_dominance', 'measure_blackwell.certify_incomparable', 'measure_blackwell.lexical_relevance']  decisive HIT
+  t_lex        top3=['measure_blackwell.lexical_relevance', 'measure_blackwell.aggregate_phi', 'measure_blackwell.certify_incomparable']  decisive HIT
+none-baseline: {'t_cp': '67%', 't_nstark': '0%', 't_suptask': '0%', 't_lab': '0%', 't_ud': '0%', 't_lex': '0%'} | leaky: ['t_cp'] | alpha=0.0100
