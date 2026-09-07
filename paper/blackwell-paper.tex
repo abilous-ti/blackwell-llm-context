@@ -141,7 +141,10 @@ passage is worth different amounts to different models is measured there~\citep{
 that adding sources can lower accuracy while coverage saturates was established for data integration
 over a decade ago~\citep{dong2013lessismore}; that rerankers are steered by lexical similarity is
 documented in the wild~\citep{hagstrom2025lexical}; and keeping a non-dominated set rather than a
-top-$k$ prefix exists as an operator over heuristic scores~\citep{bookrag2025}. What is new is the
+top-$k$ prefix exists as an operator over heuristic scores~\citep{bookrag2025}; and the Blackwell
+and Le~Cam apparatus itself was brought to inference-time context selection against a frozen
+decoder, concurrently with this work and without a priority claim on our
+part~\citep{alpila2026}. What is new is the
 \emph{form} that ties these together: reading cross-task non-transfer as a partial order over
 context sources; proving that no single per-source score, relevance or utility, can be faithful to
 that order across tasks once two sources are incomparable, so that utility re-measured per task by
@@ -197,12 +200,11 @@ and one encoding task; we say so plainly and do not call it a ``distribution.'' 
   \item \textbf{Verified anti-monotonicity.} The superset $W_{1+} = W_2 \,{+}{+}\, W_1$
   (the operator $\,{+}{+}\,$ is text concatenation: $W_2$'s note followed by $W_1$'s),
   which literally \emph{contains} $W_1$'s signal, sharply degrades the API cells:
-  Sonnet and Kimi collapse $100\% \to 0\%$ (interference $\Psi_T = -1.00$,
-  verified upper bound $\leq -0.69$); GPT-5.5 verifies $\Psi_T \leq -0.60$ on
-  \texttt{api\_post\_ok}. The interference verification clears on at least one
-  cell for five of six models (Opus reproduces the collapse, $100\% \to 38\%$,
-  but its milder drop and partly-guessable baseline keep it below the bar;
-  \S\ref{sec:results-antimono}). A
+  Sonnet and Kimi collapse $100\% \to 0\%$ (verified upper bound on the direct
+  contrast $\leq -0.82$), and GPT-5.5 matches them on \texttt{api\_post\_ok}. The
+  verification clears on at least one cell for all six models; the mildest,
+  Opus at $100\% \to 38\%$, clears at $-0.37$
+  (\S\ref{sec:results-antimono}). A
   length-matched padding control shows equal-length irrelevant text is
   harmless, so the harm is the added signal, not token count or position. One
   caveat: the effect is large and robust across the capability ladder but is
@@ -341,7 +343,12 @@ for the rest). Guarantees do not change the class: conformal context
 filtering~\citep{chakraborty2026conformal} calibrates a distribution-free threshold \emph{on} a
 scalar score and so inherits the total order it calibrates, whereas what we verify is an order
 relation between sources; and scorers of equal ranking quality can retain different document
-sets~\citep{frohmann2026orderconsistent}, a symptom of the same under-determination.
+sets~\citep{frohmann2026orderconsistent}, a symptom of the same under-determination. The machinery
+for identifying a non-dominated set from noisy multi-objective samples is in turn classical in the
+bandit literature: \citet{auer2016pareto} define the one-sided maximum gap that our surrogate
+instantiates and give confidence-bound algorithms for Pareto-front identification. What is
+instantiated here is that gap on (model, verifier, task-battery) triples, and its use as a
+verification of incomparability; the measure itself is theirs.
 
 The retrieval community has itself moved from relevance to \emph{utility}, the downstream gain a
 passage brings~\citep{zhang2026utility}, and has found that utility is
@@ -399,8 +406,8 @@ that contradict each other~\citep{xu2024knowledgeconflicts}, our sources neither
 conflict: both are true and both are needed, and the superset still collapses. Our
 anti-monotonicity finding contributes the order-theoretic form of this: a strict \emph{superset} of
 a sufficient source, on sources separately \emph{verified} Blackwell-incomparable, collapses PASS
-under a per-task interference verification; the algebraic object $\Psi_T<0$ is one no
-monotone-submodular context-value scalar can carry. A representation-level account of when context
+under a per-task verification of the direct contrast $\PASS(W_{1+},T)<\PASS(W_1,T)$: a reversal no
+monotone context-value scalar can carry. A representation-level account of when context
 helps, an additive error decomposition with alignment conditions~\citep{wang2026whencontext}, is
 complementary: it characterizes correction by a single context, not the order structure among
 sources. Pareto-incomparability of prompts along competing metrics \emph{within} a single
@@ -410,8 +417,24 @@ tasks}.
 \subsection{The comparison of experiments in machine learning}
 \label{sec:related-deficiency}\label{sec:related-llmrep}\label{sec:related-foundations}
 
-The Blackwell--Le~Cam apparatus has entered machine learning, but never for inference-time
-context. The closest work is training-\emph{dataset} valuation: \citet{zheng2024pmi} rank datasets
+The Blackwell--Le~Cam apparatus has entered machine learning, and, concurrently with this work,
+inference-time context selection itself. \citet{alpila2026} formalizes the admission problem
+against a \emph{frozen decoder} as minimization of Le~Cam deficiency, pairs it with the
+Vereshchagin--Vit\'anyi conditional structure function for the representation problem, proves a
+capacity floor below which the deficiency cannot be driven, and validates a curve-aware allocator
+on seven decoders in four families; a plain-language companion states the
+framing~\citep{alpila2026essay} and the artifact is released~\citep{alpila2026lmrecall}. That work
+and ours reach for the same classical apparatus in the same month, and we make no priority claim
+over it. The objects are nonetheless different, and the difference is what this paper is about.
+There, deficiency is a scalar risk gap \emph{inside one declared decision problem}, with the
+garbling theorem explicitly set aside as inactive there; the partial order that work does invoke
+runs over \emph{compression methods} and is asserted structurally rather than measured. Our object
+is the order \emph{between two admitted sources across tasks}: we show that order is partial by
+\emph{measuring} mutual non-domination, derive the consequence that no single per-source score can
+be faithful to it, and verify a strict superset of a sufficient source collapsing PASS with the
+length, position and routing confounds controlled. Incomparability in this sense cannot arise
+inside a single declared decision problem, so its absence there is not a gap but a different
+question. A second line is training-\emph{dataset} valuation: \citet{zheng2024pmi} rank datasets
 by Blackwell informativeness and show a pointwise-mutual-information \emph{scalar} suffices in their
 Bayes-optimal, white-box regime, the opposite of our finding that no query-independent scalar can
 be faithful once the order is partial (Theorem~\ref{thm:incomparable}). Nearby uses stop short of
@@ -423,11 +446,11 @@ design~\citep{vanrooyen2014}, and a survey of Blackwell's theorems for AI~\citep
 The one use of the order for language models at inference time that we know of sits on the
 other side of the model: \citet{zhang2026blackwellagents} rank the information structures induced
 by multi-agent protocols (voting, debate) and prove a pooled-posterior upper bound, a dominance
-result over protocols with no incomparable pair and no verification. To our knowledge none states
-a Blackwell partial order over the context sources of a single model, treats \emph{incomparability}
-rather than dominance as the object of interest, derives the no-scalar-ranks consequence for
-language models, or supplies a verified decision-restricted estimator, the pieces that are new
-here.
+result over protocols with no incomparable pair and no verification. To our knowledge no prior work \emph{measures} a Blackwell partial order over the context sources
+of a single model, treats verified \emph{incomparability} rather than deficiency-minimization or
+dominance as the object of interest, derives the no-per-source-score consequence from it, or
+supplies a distribution-free finite-sample verification of an order relation between named sources
+on production models. Those are the pieces that are new here.
 
 \subsection{The design space: no cheap method represents the partial order}
 \label{sec:related-designspace}
@@ -465,7 +488,7 @@ Conformal context filtering~\citep{chakraborty2026conformal}    & \checkmark    
 Learned set selection~\citep{optiset2026,rank4gen2026}          & $\sim^{c}$        & \checkmark & $\times^{c}$ \\
 Skyline over heuristic scores~\citep{bookrag2025}               & \checkmark        & $\times$   & $\sim^{e}$ \\
 \midrule
-\textbf{Probe-Select (this paper)}                               & $\times$          & \checkmark & \checkmark \\
+\textbf{Verified front $+$ routing (this paper)}                & $\times$          & \checkmark & \checkmark \\
 \bottomrule
 \end{tabular}
 \caption{The design space of context selection.
@@ -851,17 +874,24 @@ does \emph{not} cover it. We make two precise statements instead.
 \begin{proposition}[Constrained impossibility for feature-measurable scores]
 \label{prop:trap-constrained}
 Suppose $\varphi(W,T)$ is measurable with respect to a fixed feature map of the pair $(W,T)$ that
-is \emph{topical}: it depends on $W,T$ only through surface lexical overlap and is invariant to the
-verifier-decisive coordinate of $S_T$. If there is a task $T_c$ whose decisive
-coordinate is supplied by $W_1$ but whose surface lexicon is saturated with $W_2$'s vocabulary,
-then $\varphi(W_2,T_c) > \varphi(W_1,T_c)$ while the realized utility ranks $W_1 \succ W_2$ on
-$T_c$. Hence no topical query-conditioned score ranks $\{W_1,W_2\}$ correctly on all tasks.
+is \emph{topical}: it depends on $W,T$ only through a feature map that is invariant to the
+verifier-decisive coordinate of $S_T$. Let $T_c$ be a task whose decisive coordinate is supplied by
+$W_1$, so realized utility ranks $W_1\succ W_2$ on $T_c$. \textbf{(a)} If $W_1$ and $W_2$ are
+topically indistinguishable on $T_c$, then $\varphi$ assigns them equal scores and cannot rank
+$W_1$ strictly above $W_2$. \textbf{(b)} If in addition $\varphi(\cdot,T_c)$ is strictly increasing
+in lexical overlap and $T_c$'s surface lexicon is saturated with $W_2$'s vocabulary, then
+$\varphi(W_2,T_c) > \varphi(W_1,T_c)$, a strict mis-rank. Either way no topical query-conditioned
+score ranks $\{W_1,W_2\}$ correctly on all tasks.
 \end{proposition}
 
 \begin{proof}
-By topical invariance, $\varphi(\cdot,T_c)$ ignores the verifier-decisive coordinate and orders by
-lexical overlap, which favours $W_2$ on $T_c$ by construction; utility favours $W_1$ because $T_c$'s
-PASS requires $W_1$'s coordinate. The two orders disagree on $T_c$.
+For (a), topicality makes $\varphi(\cdot,T_c)$ a function of the topical features alone, so equal
+features force equal scores, while faithfulness on $T_c$ would require a strict gap. For (b), the
+added strict monotonicity in overlap turns the saturation hypothesis into $\varphi(W_2,T_c) >
+\varphi(W_1,T_c)$; utility favours $W_1$ because $T_c$'s PASS requires $W_1$'s coordinate, so the
+two orders disagree. Part (a) is the statement machine-checked in Lean
+(Remark~\ref{rem:lean}); (b) adds the monotonicity hypothesis that the informal reading of
+``saturated lexicon'' presumes, and without which no strict inequality follows.
 \end{proof}
 
 Proposition~\ref{prop:trap-constrained} is the strongest \emph{general} statement we can make about
@@ -997,12 +1027,30 @@ $\alpha=\eta/4$ on the four arms $\{W_{1+},W_1,W_2,\texttt{none}\}$ of $T^\star$
 \label{eq:psiupper}
 \overline\Psi_{T^\star} \;:=\; \mathrm{CP}_{\mathrm{hi}}(p_{W_{1+}}) - \mathrm{CP}_{\mathrm{lo}}(p_{W_1}) - \mathrm{CP}_{\mathrm{lo}}(p_{W_2}) + \mathrm{CP}_{\mathrm{hi}}(p_{\texttt{none}})
 \end{equation}
-is a $(1-\eta)$ upper confidence bound on $\Psi_{T^\star}$. Hence $\overline\Psi_{T^\star}\le-\tau$
-verifies harmful non-monotonicity $\Psi_{T^\star}\le-\tau$ at confidence $\ge 1-\eta$. If instead
+is a $(1-\eta)$ upper confidence bound on $\Psi_{T^\star}$. The quantity that verifies \emph{harm},
+however, is the direct contrast $\Delta_{T^\star} := \PASS_M(W_{1+},T^\star)-\PASS_M(W_1,T^\star)$:
+with Clopper--Pearson endpoints at level $\alpha=\eta/2$ on the two arms $\{W_{1+},W_1\}$,
+$\overline\Delta_{T^\star} := \mathrm{CP}_{\mathrm{hi}}(p_{W_{1+}})-\mathrm{CP}_{\mathrm{lo}}(p_{W_1})$
+is a $(1-\eta)$ upper bound on $\Delta_{T^\star}$, and $\overline\Delta_{T^\star}\le-\tau$ verifies
+$\Delta_{T^\star}\le-\tau$ at confidence $\ge 1-\eta$. We verify the contrast, and report $\Psi$
+only as a descriptive interaction term. If instead
 the harmful cell is \emph{selected} from $|\Dcal|$ candidates after unblinding, use $\alpha=\eta/(4|\Dcal|)$;
 this is the same selection correction the verification applies to the deficiency surrogate
 (Remark~\ref{rem:dkw}), and omitting it would repeat the multiplicity error we criticize.
 \end{proposition}
+
+\begin{remark}[$\Psi$ is interaction, not harm]
+\label{rem:psinotharm}
+The second difference must not be read as a harm measure. Writing $f$ for the set function
+$A\mapsto\PASS_M(W_A,T)$, the inequality $\Psi_T\le 0$ is precisely the submodularity condition for
+the pair $\{W_1,W_2\}$, so a negative $\Psi_T$ is what diminishing returns look like and is
+consistent with $f$ being monotone submodular. It does not imply that adding $W_2$ to $W_1$ hurt:
+taking $\PASS(\texttt{none})=0$ and $\PASS(W_1)=\PASS(W_2)=\PASS(W_{1+})=1$ gives $\Psi_T=-1$ with
+no degradation whatever. What the collapse violates is \emph{monotonicity}, $\Delta_T<0$, which is
+the quantity we verify. In our data the two coincide in direction, and the contrast bound is
+tighter than the four-term one because it spends its confidence budget on two intervals rather
+than four.
+\end{remark}
 
 \begin{remark}[The leaky-baseline limitation, stated as a protocol]
 \label{rem:leaky}
@@ -1033,7 +1081,7 @@ $\Bord$, as the Bayes rule $\delta^\star$ is by Theorem~\ref{thm:blackwell}, sat
 $\mathrm{value}(W_{1+},T)\ge\mathrm{value}(W_1,T)$ for every task $T$. If a fixed model rule
 $\delta_M$ has a task $T^\star$ with $\PASS_M(W_{1+},T^\star) <
 \PASS_M(W_1,T^\star)$, then $\delta_M$ is \emph{not} Blackwell-coherent: it violates
-monotonicity under the garbling order on $T^\star$. In particular no monotone-submodular scalar
+monotonicity under the garbling order on $T^\star$. In particular no monotone scalar
 context-value score can predict $\delta_M$'s behaviour on $T^\star$.
 \end{theorem}
 
@@ -1183,8 +1231,11 @@ agentic-exploration pathway, so the model must use what it is given in one pass.
 Every claim labeled \emph{verified} is statistically significant in the standard sense and then
 corrected for multiplicity: PASS rates are estimated from $n=40$ independent completions per cell,
 uncertainty is carried by exact binomial (Clopper--Pearson) confidence intervals with no
-distributional assumptions, and the family of claims is corrected by a union bound, so all verified
-statements hold jointly with probability at least $90\%$. For the effect sizes at stake, near-$0\%$
+distributional assumptions, and each family of claims is corrected by a union bound, so the
+statements \emph{within} a family (all incomparability cells, or the arms of one interference
+contrast) hold jointly with probability at least $90\%$. We do not claim joint control across
+families drawn from the same run; that limitation is stated where it bites
+(\S\ref{subsec:fwer}). For the effect sizes at stake, near-$0\%$
 versus near-$100\%$, the $n=40$ intervals stay separated by a wide margin even after correction.
 Results whose intervals did not separate are labeled \emph{reproduced but not verified} and are
 never used as evidence; the protocol reports its own insufficiency rather than hiding it.
@@ -1488,17 +1539,17 @@ Remark~\ref{rem:leaky}). $^{\dagger}$Control row: the same cell with the omitted
 \label{tab:interference}
 \begin{tabular}{@{}llcccc@{}}
 \toprule
-Model & Carrying cell & $W_1 \to W_{1+}$ & $\Psi_T$ & Upper & Verified \\
+Model & Carrying cell & $W_1 \to W_{1+}$ & $\Delta_T$ & $\overline\Delta_T$ & Verified \\
 \midrule
-Haiku-4.5       & \texttt{api\_argorder}            & $100\% \to 5\%$  & $-0.93$ & $-0.56$ & \checkmark \\
-Haiku-4.5       & \texttt{api\_post\_ok}            & $52\% \to 15\%$  & $-0.38$ & $+0.08$ & no (import omission) \\
-Haiku-4.5       & \texttt{api\_post\_ok}, import-neutralized$^{\dagger}$ & $100\% \to 52\%$ & $-0.48$ & $-0.09$ & sign only$^{\dagger}$ \\
-Sonnet-4.6      & \texttt{api\_post\_ok}            & $100\% \to 2\%$  & $-0.97$ & $-0.64$ & \checkmark \\
-Sonnet-4.6      & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.69$ & \checkmark \\
-GPT-5.5         & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-0.95$ & $-0.60$ & \checkmark \\
-DeepSeek-V4-Pro & \texttt{api\_post\_ok}            & $75\% \to 0\%$   & $-0.75$ & $-0.36$ & \checkmark \\
-Kimi-K2.6       & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-1.00$ & $-0.69$ & \checkmark \\
-Opus-4.8        & \texttt{api\_post\_ok}            & $100\% \to 38\%$ & $-0.62$ & $-0.23$ & no (milder) \\
+Haiku-4.5       & \texttt{api\_argorder}            & $100\% \to 5\%$  & $-0.95$ & $-0.74$ & \checkmark \\
+Haiku-4.5       & \texttt{api\_post\_ok}            & $52\% \to 15\%$  & $-0.38$ & $-0.06$ & sign only (import omission) \\
+Haiku-4.5       & \texttt{api\_post\_ok}, import-neutralized$^{\dagger}$ & $100\% \to 52\%$ & $-0.47$ & $-0.23$ & sign only$^{\dagger}$ \\
+Sonnet-4.6      & \texttt{api\_post\_ok}            & $100\% \to 2\%$  & $-0.97$ & $-0.78$ & \checkmark \\
+Sonnet-4.6      & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.82$ & \checkmark \\
+GPT-5.5         & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-1.00$ & $-0.82$ & \checkmark \\
+DeepSeek-V4-Pro & \texttt{api\_post\_ok}            & $75\% \to 0\%$   & $-0.75$ & $-0.50$ & \checkmark \\
+Kimi-K2.6       & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-1.00$ & $-0.82$ & \checkmark \\
+Opus-4.8        & \texttt{api\_post\_ok}            & $100\% \to 38\%$ & $-0.62$ & $-0.37$ & \checkmark \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1734,14 +1785,14 @@ result), each claim is controlled on its own at level $\eta$ rather than all at 
 \subsection{Anti-monotonicity is real, verified, but not capability-ordered}
 \label{sec:disc-antimono}
 
-The interference object $\Psi_T = \PASS(W_{1+},T) - \PASS(W_1,T) - \PASS(W_2,T) + \PASS(\text{none},T)$
-measures whether appending the (irrelevant-to-this-task) $W_2$ to a sufficient $W_1$ harms
-performance. We verify $\Psi_T \le -0.30$ on at least one cell for five of six models
-(Table~\ref{tab:interference}), with collapses as stark as $100\% \to 0\%$ ($\Psi_T=-1.00$, upper
-bound $-0.69$) on Sonnet and Kimi. This is a verified empirical falsification of
-superset-dominance for these fixed rules (Theorem~\ref{thm:antimono}): a literal superset of a
-sufficient signal can sharply reduce PASS, which no monotone-submodular scalar context-value score can
-represent.
+The harm object is the direct contrast $\Delta_T = \PASS(W_{1+},T) - \PASS(W_1,T)$, which measures
+whether appending the (irrelevant-to-this-task) $W_2$ to a sufficient $W_1$ degrades performance
+(the second difference $\Psi_T$ is an interaction term, not a harm measure;
+Remark~\ref{rem:psinotharm}). We verify $\Delta_T \le -0.30$ on at least one cell for all six
+models (Table~\ref{tab:interference}), with collapses as stark as $100\% \to 0\%$ (upper bound
+$-0.82$) on Sonnet and Kimi. This is a verified empirical falsification of superset-dominance for
+these fixed rules (Theorem~\ref{thm:antimono}): a literal superset of a sufficient signal can
+sharply reduce PASS, which no monotone scalar context-value score can represent.
 
 Two corrections follow from the data. \textbf{(i) The harm is not monotone in
 capability.} An early two-point read (Haiku then Sonnet) suggested the collapse ``intensifies with
@@ -1782,7 +1833,7 @@ itself.
 
 The value of a private convention, $I(S;W\mid\theta)$, is itself a model-relative ($\theta$-dependent)
 object, and the data give a clean continuous map of it. The none-arm baseline on \texttt{api\_argorder}, how often a model reproduces the private convention with no context supplied, forms a spectrum:
-Haiku and Sonnet $\sim\!0\%$, DeepSeek $2\%$, Opus $15\%$, Kimi $45\%$, GPT-5.5 $75\%$. We do not claim this
+Haiku and Sonnet $\sim\!0\%$, DeepSeek $2\%$, Opus $40\%$, Kimi $45\%$, GPT-5.5 $75\%$. We do not claim this
 tracks capability. The decisive piece of evidence is DeepSeek: it has a tight, near-zero prior like
 Claude despite being a different vendor, while GPT-5.5's prior is wide ($55\%$--$75\%$ guessing on
 \texttt{api\_argorder}/\texttt{enc\_amount}). A ``stronger-model-knows-more'' account predicts the
@@ -1903,7 +1954,7 @@ retrieval its formal boundary. We made the order measurable
 with a value-deficiency surrogate $\dhat_{\Dcal}$ and a distribution-free verification, and we ran
 the theory on six models across four vendors. On every model we verify ($\ge 90\%$) that two
 private sources are incomparable; on every model a real relevance score ranks them the wrong way;
-and on five of six we verify that adding a strictly larger source sharply lowers the pass rate (as
+and on all six we verify that adding a strictly larger source sharply lowers the pass rate (as
 deep as $100\%\to 0\%$), which no ``more-is-better'' scalar can predict. How much a private source
 is worth turns out to depend on the model: guessability runs from $0\%$ to $75\%$ across vendors and
 tracks a vendor's training rather than raw capability.
@@ -2018,7 +2069,7 @@ $W_{1+}\Bord W_1$ by deletion of the extra coordinate (a deterministic garbling,
 Lemma~\ref{lem:noref}(a)). By Theorem~\ref{thm:blackwell} any rule whose value respects $\Bord$
 weakly improves under the dominating experiment. The hypothesized strict decrease
 $\PASS_M(W_{1+},T^\star)<\PASS_M(W_1,T^\star)$ contradicts monotonicity, so
-$\delta_M$ is not Blackwell-coherent. A monotone-submodular scalar $\phi$ assigns
+$\delta_M$ is not Blackwell-coherent. A monotone scalar $\phi$ assigns
 $\phi(W_{1+})\ge\phi(W_1)$ (monotonicity), hence orders $W_{1+}$ above $W_1$ and cannot reproduce
 the realized reversal.
 \end{proof}

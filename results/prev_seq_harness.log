@@ -1,0 +1,15 @@
+corpus=harness: 12 natural chunks | tasks 6 | pool K=9 | nmax=16 round=4 futility=8
+  t_cp         top3=['measure_blackwell.certify_incomparable', 'measure_blackwell.required_n', 'probe_select.greedy_cover']  decisive miss
+  t_nstark     top3=['measure_blackwell.required_n_stark', 'measure_blackwell.certify_incomparable', 'measure_blackwell.required_n']  decisive HIT
+  t_suptask    top3=['measure_blackwell.hat_delta_D', 'measure_blackwell.certify_interference', 'measure_blackwell.certify_incomparable']  decisive HIT
+  t_lab        top3=['measure_blackwell.certify_incomparable', 'measure_blackwell.certify_dominance', 'measure_blackwell.required_n_stark']  decisive HIT
+  t_ud         top3=['measure_blackwell.certify_dominance', 'measure_blackwell.certify_incomparable', 'measure_blackwell.lexical_relevance']  decisive HIT
+  t_lex        top3=['measure_blackwell.lexical_relevance', 'measure_blackwell.aggregate_phi', 'measure_blackwell.certify_incomparable']  decisive HIT
+none-baseline: {'t_cp': '38%', 't_nstark': '0%', 't_suptask': '0%', 't_lab': '0%', 't_ud': '0%', 't_lex': '0%'} | leaky: [] | alpha=0.0083
+  round n=4   verified pairs  0/36  active cells  54  calls so far 312
+  round n=8   verified pairs  0/36  active cells  16  calls so far 528
+  round n=12  verified pairs  0/36  active cells  16  calls so far 592
+  round n=16  verified pairs  0/36  active cells  16  calls so far 656
+verdicts: {'unresolved': 35, 'INCOMPARABLE': 1}  | patterns ALL {'no evidence': 21, 'one-way evidence': 14, 'incomparable': 1}  CO-RETRIEVED {'no evidence': 10, 'one-way evidence': 4}
+calls: 656 vs fixed-n 960  -> 1.46x  (32% fewer)   spend $14.18
+wrote C:\Users\AndriyBilous\Documents\GitHub\blackwell-llm-context\results\prev_seq_harness.json
