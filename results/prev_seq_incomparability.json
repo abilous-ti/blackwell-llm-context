@@ -1,0 +1,1241 @@
+{
+ "corpus": "incomparability",
+ "sequential": true,
+ "mock": false,
+ "model": "claude-haiku-4-5-20251001",
+ "eta": 0.1,
+ "nmax": 16,
+ "round": 4,
+ "futility": 8,
+ "topk": {
+  "t_cpx": [
+   "tokenbench.measure_incomparability.clopper_pearson",
+   "tokenbench.measure_incomparability.verify_in",
+   "tokenbench.measure_incomparability.scalar_table"
+  ],
+  "t_hd": [
+   "tokenbench.measure_incomparability.hat_delta",
+   "tokenbench.measure_incomparability.scalar_table",
+   "tokenbench.measure_incomparability.verify_in"
+  ],
+  "t_ninc": [
+   "tokenbench.measure_incomparability.required_n_incomparability",
+   "tokenbench.measure_incomparability.required_n_dominance",
+   "tokenbench.measure_incomparability.scalar_table"
+  ],
+  "t_ndom": [
+   "tokenbench.measure_incomparability.required_n_dominance",
+   "tokenbench.measure_incomparability.required_n_incomparability",
+   "tokenbench.measure_incomparability.scalar_table"
+  ],
+  "t_code": [
+   "tokenbench.measure_incomparability.extract_code",
+   "tokenbench.measure_incomparability.verify_in",
+   "tokenbench.measure_incomparability.scalar_table"
+  ]
+ },
+ "pool": [
+  "tokenbench.measure_incomparability.clopper_pearson",
+  "tokenbench.measure_incomparability.extract_code",
+  "tokenbench.measure_incomparability.hat_delta",
+  "tokenbench.measure_incomparability.required_n_dominance",
+  "tokenbench.measure_incomparability.required_n_incomparability",
+  "tokenbench.measure_incomparability.scalar_table",
+  "tokenbench.measure_incomparability.verify_in"
+ ],
+ "none_pass": {
+  "t_cpx": 1.0,
+  "t_hd": 0.0,
+  "t_ninc": 0.0,
+  "t_ndom": 0.0,
+  "t_code": 0.8125
+ },
+ "leaky_tasks": [
+  "t_cpx",
+  "t_code"
+ ],
+ "clean_tasks": [
+  "t_hd",
+  "t_ninc",
+  "t_ndom"
+ ],
+ "counts": {
+  "none|t_cpx": [
+   16,
+   16
+  ],
+  "none|t_hd": [
+   0,
+   16
+  ],
+  "none|t_ninc": [
+   0,
+   16
+  ],
+  "none|t_ndom": [
+   0,
+   16
+  ],
+  "none|t_code": [
+   13,
+   16
+  ],
+  "tokenbench.measure_incomparability.clopper_pearson|t_cpx": [
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.clopper_pearson|t_hd": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.clopper_pearson|t_ninc": [
+   3,
+   16
+  ],
+  "tokenbench.measure_incomparability.clopper_pearson|t_ndom": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.clopper_pearson|t_code": [
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.extract_code|t_cpx": [
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.extract_code|t_hd": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.extract_code|t_ninc": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.extract_code|t_ndom": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.extract_code|t_code": [
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.hat_delta|t_cpx": [
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.hat_delta|t_hd": [
+   12,
+   16
+  ],
+  "tokenbench.measure_incomparability.hat_delta|t_ninc": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.hat_delta|t_ndom": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.hat_delta|t_code": [
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.required_n_dominance|t_cpx": [
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.required_n_dominance|t_hd": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.required_n_dominance|t_ninc": [
+   10,
+   16
+  ],
+  "tokenbench.measure_incomparability.required_n_dominance|t_ndom": [
+   12,
+   16
+  ],
+  "tokenbench.measure_incomparability.required_n_dominance|t_code": [
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_cpx": [
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_hd": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_ninc": [
+   12,
+   16
+  ],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_ndom": [
+   10,
+   16
+  ],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_code": [
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.scalar_table|t_cpx": [
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.scalar_table|t_hd": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.scalar_table|t_ninc": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.scalar_table|t_ndom": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.scalar_table|t_code": [
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.verify_in|t_cpx": [
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.verify_in|t_hd": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.verify_in|t_ninc": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.verify_in|t_ndom": [
+   0,
+   8
+  ],
+  "tokenbench.measure_incomparability.verify_in|t_code": [
+   0,
+   0
+  ]
+ },
+ "draws": {
+  "none|t_cpx": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "none|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_code": [
+   1,
+   1,
+   1,
+   0,
+   1,
+   1,
+   0,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   1,
+   1,
+   1
+  ],
+  "tokenbench.measure_incomparability.clopper_pearson|t_cpx": [],
+  "tokenbench.measure_incomparability.clopper_pearson|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.clopper_pearson|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0
+  ],
+  "tokenbench.measure_incomparability.clopper_pearson|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.clopper_pearson|t_code": [],
+  "tokenbench.measure_incomparability.extract_code|t_cpx": [],
+  "tokenbench.measure_incomparability.extract_code|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.extract_code|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.extract_code|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.extract_code|t_code": [],
+  "tokenbench.measure_incomparability.hat_delta|t_cpx": [],
+  "tokenbench.measure_incomparability.hat_delta|t_hd": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.hat_delta|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.hat_delta|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.hat_delta|t_code": [],
+  "tokenbench.measure_incomparability.required_n_dominance|t_cpx": [],
+  "tokenbench.measure_incomparability.required_n_dominance|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.required_n_dominance|t_ninc": [
+   1,
+   1,
+   1,
+   0,
+   0,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.required_n_dominance|t_ndom": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.required_n_dominance|t_code": [],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_cpx": [],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_ninc": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_ndom": [
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_code": [],
+  "tokenbench.measure_incomparability.scalar_table|t_cpx": [],
+  "tokenbench.measure_incomparability.scalar_table|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.scalar_table|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.scalar_table|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.scalar_table|t_code": [],
+  "tokenbench.measure_incomparability.verify_in|t_cpx": [],
+  "tokenbench.measure_incomparability.verify_in|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.verify_in|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.verify_in|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.verify_in|t_code": []
+ },
+ "errs": {
+  "none|t_cpx": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_code": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.clopper_pearson|t_cpx": [],
+  "tokenbench.measure_incomparability.clopper_pearson|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.clopper_pearson|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.clopper_pearson|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.clopper_pearson|t_code": [],
+  "tokenbench.measure_incomparability.extract_code|t_cpx": [],
+  "tokenbench.measure_incomparability.extract_code|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.extract_code|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.extract_code|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.extract_code|t_code": [],
+  "tokenbench.measure_incomparability.hat_delta|t_cpx": [],
+  "tokenbench.measure_incomparability.hat_delta|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   1,
+   1,
+   1
+  ],
+  "tokenbench.measure_incomparability.hat_delta|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.hat_delta|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.hat_delta|t_code": [],
+  "tokenbench.measure_incomparability.required_n_dominance|t_cpx": [],
+  "tokenbench.measure_incomparability.required_n_dominance|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.required_n_dominance|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   1,
+   1,
+   1
+  ],
+  "tokenbench.measure_incomparability.required_n_dominance|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   1,
+   1,
+   1
+  ],
+  "tokenbench.measure_incomparability.required_n_dominance|t_code": [],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_cpx": [],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   1,
+   1,
+   1
+  ],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   1,
+   1,
+   1
+  ],
+  "tokenbench.measure_incomparability.required_n_incomparability|t_code": [],
+  "tokenbench.measure_incomparability.scalar_table|t_cpx": [],
+  "tokenbench.measure_incomparability.scalar_table|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.scalar_table|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.scalar_table|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.scalar_table|t_code": [],
+  "tokenbench.measure_incomparability.verify_in|t_cpx": [],
+  "tokenbench.measure_incomparability.verify_in|t_hd": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.verify_in|t_ninc": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.verify_in|t_ndom": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenbench.measure_incomparability.verify_in|t_code": []
+ },
+ "stop_n": {
+  "tokenbench.measure_incomparability.clopper_pearson|t_hd": 8,
+  "tokenbench.measure_incomparability.clopper_pearson|t_ndom": 8,
+  "tokenbench.measure_incomparability.extract_code|t_hd": 8,
+  "tokenbench.measure_incomparability.extract_code|t_ndom": 8,
+  "tokenbench.measure_incomparability.extract_code|t_ninc": 8,
+  "tokenbench.measure_incomparability.hat_delta|t_ndom": 8,
+  "tokenbench.measure_incomparability.hat_delta|t_ninc": 8,
+  "tokenbench.measure_incomparability.required_n_dominance|t_hd": 8,
+  "tokenbench.measure_incomparability.required_n_incomparability|t_hd": 8,
+  "tokenbench.measure_incomparability.scalar_table|t_hd": 8,
+  "tokenbench.measure_incomparability.scalar_table|t_ndom": 8,
+  "tokenbench.measure_incomparability.scalar_table|t_ninc": 8,
+  "tokenbench.measure_incomparability.verify_in|t_hd": 8,
+  "tokenbench.measure_incomparability.verify_in|t_ndom": 8,
+  "tokenbench.measure_incomparability.verify_in|t_ninc": 8,
+  "tokenbench.measure_incomparability.required_n_incomparability|t_ninc": 16,
+  "tokenbench.measure_incomparability.required_n_dominance|t_ninc": 16,
+  "tokenbench.measure_incomparability.clopper_pearson|t_ninc": 16,
+  "tokenbench.measure_incomparability.hat_delta|t_hd": 16,
+  "tokenbench.measure_incomparability.required_n_dominance|t_ndom": 16,
+  "tokenbench.measure_incomparability.required_n_incomparability|t_ndom": 16
+ },
+ "pairs": [
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.clopper_pearson",
+    "tokenbench.measure_incomparability.extract_code"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.496,
+   "L_BA": -0.475,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.clopper_pearson",
+    "tokenbench.measure_incomparability.hat_delta"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.103,
+   "L_BA": -0.475,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.clopper_pearson",
+    "tokenbench.measure_incomparability.required_n_dominance"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.103,
+   "L_BA": -0.496,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.clopper_pearson",
+    "tokenbench.measure_incomparability.required_n_incomparability"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.149,
+   "L_BA": -0.496,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.clopper_pearson",
+    "tokenbench.measure_incomparability.scalar_table"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.496,
+   "L_BA": -0.475,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.clopper_pearson",
+    "tokenbench.measure_incomparability.verify_in"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.496,
+   "L_BA": -0.475,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.extract_code",
+    "tokenbench.measure_incomparability.hat_delta"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.103,
+   "L_BA": -0.496,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.extract_code",
+    "tokenbench.measure_incomparability.required_n_dominance"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.103,
+   "L_BA": -0.496,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.extract_code",
+    "tokenbench.measure_incomparability.required_n_incomparability"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.103,
+   "L_BA": -0.496,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.extract_code",
+    "tokenbench.measure_incomparability.scalar_table"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.496,
+   "L_BA": -0.496,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.extract_code",
+    "tokenbench.measure_incomparability.verify_in"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.496,
+   "L_BA": -0.496,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.hat_delta",
+    "tokenbench.measure_incomparability.required_n_dominance"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.103,
+   "L_BA": -0.103,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.hat_delta",
+    "tokenbench.measure_incomparability.required_n_incomparability"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.103,
+   "L_BA": -0.103,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.hat_delta",
+    "tokenbench.measure_incomparability.scalar_table"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.496,
+   "L_BA": -0.103,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.hat_delta",
+    "tokenbench.measure_incomparability.verify_in"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.496,
+   "L_BA": -0.103,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.required_n_dominance",
+    "tokenbench.measure_incomparability.required_n_incomparability"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.496,
+   "L_BA": -0.496,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.required_n_dominance",
+    "tokenbench.measure_incomparability.scalar_table"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.496,
+   "L_BA": -0.103,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.required_n_dominance",
+    "tokenbench.measure_incomparability.verify_in"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.496,
+   "L_BA": -0.103,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.required_n_incomparability",
+    "tokenbench.measure_incomparability.scalar_table"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.496,
+   "L_BA": -0.103,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.required_n_incomparability",
+    "tokenbench.measure_incomparability.verify_in"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.496,
+   "L_BA": -0.103,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.scalar_table",
+    "tokenbench.measure_incomparability.verify_in"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.496,
+   "L_BA": -0.496,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  }
+ ],
+ "tally": {
+  "unresolved": 21
+ },
+ "pattern_all": {
+  "no evidence": 21
+ },
+ "pattern_co": {
+  "no evidence": 10
+ },
+ "calls": 296,
+ "fixed_calls": 640,
+ "total_cost_usd": 7.492760400000001
+}

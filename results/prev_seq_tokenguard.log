@@ -1,0 +1,15 @@
+corpus=tokenguard: 8 natural chunks | tasks 6 | pool K=8 | nmax=16 round=4 futility=8
+  t_cheap      top3=['tokenguard.router.should_try_cheap_first', 'tokenguard.router.route_and_run', 'tokenguard.idiosyncrasy.extract_features']  decisive HIT
+  t_match      top3=['tokenguard.canonmatch.match', 'tokenguard.plancache.find', 'tokenguard.idiosyncrasy.extract_features']  decisive HIT
+  t_score      top3=['tokenguard.canonmatch.match_score', 'tokenguard.plancache.find', 'tokenguard.idiosyncrasy.extract_features']  decisive HIT
+  t_idio       top3=['tokenguard.idiosyncrasy.is_idiosyncratic', 'tokenguard.idiosyncrasy.extract_features', 'tokenguard.plancache.find']  decisive HIT
+  t_feats      top3=['tokenguard.idiosyncrasy.extract_features', 'tokenguard.plancache.find', 'tokenguard.idiosyncrasy.is_idiosyncratic']  decisive HIT
+  t_compress   top3=['tokenguard.compress.compress_output', 'tokenguard.idiosyncrasy.extract_features', 'tokenguard.plancache.find']  decisive HIT
+none-baseline: {'t_cheap': '0%', 't_match': '19%', 't_score': '0%', 't_idio': '0%', 't_feats': '62%', 't_compress': '0%'} | leaky: ['t_feats'] | alpha=0.0100
+  round n=4   verified pairs  0/28  active cells  40  calls so far 256
+  round n=8   verified pairs  0/28  active cells  10  calls so far 416
+  round n=12  verified pairs  0/28  active cells  10  calls so far 456
+  round n=16  verified pairs  0/28  active cells  10  calls so far 496
+verdicts: {'unresolved': 19, 'INCOMPARABLE': 9}  | patterns ALL {'one-way evidence': 16, 'incomparable': 9, 'no evidence': 3}  CO-RETRIEVED {'one-way evidence': 10, 'no evidence': 2}
+calls: 496 vs fixed-n 864  -> 1.74x  (43% fewer)   spend $10.76
+wrote C:\Users\AndriyBilous\Documents\GitHub\blackwell-llm-context\results\prev_seq_tokenguard.json

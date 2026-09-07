@@ -1,0 +1,1880 @@
+{
+ "corpus": "tokenguard",
+ "sequential": true,
+ "mock": false,
+ "model": "claude-haiku-4-5-20251001",
+ "eta": 0.1,
+ "nmax": 16,
+ "round": 4,
+ "futility": 8,
+ "topk": {
+  "t_cheap": [
+   "tokenguard.router.should_try_cheap_first",
+   "tokenguard.router.route_and_run",
+   "tokenguard.idiosyncrasy.extract_features"
+  ],
+  "t_match": [
+   "tokenguard.canonmatch.match",
+   "tokenguard.plancache.find",
+   "tokenguard.idiosyncrasy.extract_features"
+  ],
+  "t_score": [
+   "tokenguard.canonmatch.match_score",
+   "tokenguard.plancache.find",
+   "tokenguard.idiosyncrasy.extract_features"
+  ],
+  "t_idio": [
+   "tokenguard.idiosyncrasy.is_idiosyncratic",
+   "tokenguard.idiosyncrasy.extract_features",
+   "tokenguard.plancache.find"
+  ],
+  "t_feats": [
+   "tokenguard.idiosyncrasy.extract_features",
+   "tokenguard.plancache.find",
+   "tokenguard.idiosyncrasy.is_idiosyncratic"
+  ],
+  "t_compress": [
+   "tokenguard.compress.compress_output",
+   "tokenguard.idiosyncrasy.extract_features",
+   "tokenguard.plancache.find"
+  ]
+ },
+ "pool": [
+  "tokenguard.canonmatch.match",
+  "tokenguard.canonmatch.match_score",
+  "tokenguard.compress.compress_output",
+  "tokenguard.idiosyncrasy.extract_features",
+  "tokenguard.idiosyncrasy.is_idiosyncratic",
+  "tokenguard.plancache.find",
+  "tokenguard.router.route_and_run",
+  "tokenguard.router.should_try_cheap_first"
+ ],
+ "none_pass": {
+  "t_cheap": 0.0,
+  "t_match": 0.1875,
+  "t_score": 0.0,
+  "t_idio": 0.0,
+  "t_feats": 0.625,
+  "t_compress": 0.0
+ },
+ "leaky_tasks": [
+  "t_feats"
+ ],
+ "clean_tasks": [
+  "t_cheap",
+  "t_match",
+  "t_score",
+  "t_idio",
+  "t_compress"
+ ],
+ "counts": {
+  "none|t_cheap": [
+   0,
+   16
+  ],
+  "none|t_match": [
+   3,
+   16
+  ],
+  "none|t_score": [
+   0,
+   16
+  ],
+  "none|t_idio": [
+   0,
+   16
+  ],
+  "none|t_feats": [
+   10,
+   16
+  ],
+  "none|t_compress": [
+   0,
+   16
+  ],
+  "tokenguard.canonmatch.match|t_cheap": [
+   0,
+   8
+  ],
+  "tokenguard.canonmatch.match|t_match": [
+   16,
+   16
+  ],
+  "tokenguard.canonmatch.match|t_score": [
+   0,
+   8
+  ],
+  "tokenguard.canonmatch.match|t_idio": [
+   0,
+   8
+  ],
+  "tokenguard.canonmatch.match|t_feats": [
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match|t_compress": [
+   0,
+   8
+  ],
+  "tokenguard.canonmatch.match_score|t_cheap": [
+   0,
+   8
+  ],
+  "tokenguard.canonmatch.match_score|t_match": [
+   16,
+   16
+  ],
+  "tokenguard.canonmatch.match_score|t_score": [
+   16,
+   16
+  ],
+  "tokenguard.canonmatch.match_score|t_idio": [
+   0,
+   8
+  ],
+  "tokenguard.canonmatch.match_score|t_feats": [
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match_score|t_compress": [
+   0,
+   8
+  ],
+  "tokenguard.compress.compress_output|t_cheap": [
+   0,
+   8
+  ],
+  "tokenguard.compress.compress_output|t_match": [
+   1,
+   16
+  ],
+  "tokenguard.compress.compress_output|t_score": [
+   0,
+   8
+  ],
+  "tokenguard.compress.compress_output|t_idio": [
+   0,
+   8
+  ],
+  "tokenguard.compress.compress_output|t_feats": [
+   0,
+   0
+  ],
+  "tokenguard.compress.compress_output|t_compress": [
+   15,
+   16
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_cheap": [
+   0,
+   8
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_match": [
+   1,
+   16
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_score": [
+   0,
+   8
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_idio": [
+   0,
+   8
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_feats": [
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_compress": [
+   0,
+   8
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_cheap": [
+   0,
+   8
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_match": [
+   0,
+   8
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_score": [
+   0,
+   8
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_idio": [
+   16,
+   16
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_feats": [
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_compress": [
+   0,
+   8
+  ],
+  "tokenguard.plancache.find|t_cheap": [
+   0,
+   8
+  ],
+  "tokenguard.plancache.find|t_match": [
+   0,
+   8
+  ],
+  "tokenguard.plancache.find|t_score": [
+   0,
+   8
+  ],
+  "tokenguard.plancache.find|t_idio": [
+   0,
+   8
+  ],
+  "tokenguard.plancache.find|t_feats": [
+   0,
+   0
+  ],
+  "tokenguard.plancache.find|t_compress": [
+   0,
+   8
+  ],
+  "tokenguard.router.route_and_run|t_cheap": [
+   0,
+   8
+  ],
+  "tokenguard.router.route_and_run|t_match": [
+   1,
+   16
+  ],
+  "tokenguard.router.route_and_run|t_score": [
+   0,
+   8
+  ],
+  "tokenguard.router.route_and_run|t_idio": [
+   0,
+   8
+  ],
+  "tokenguard.router.route_and_run|t_feats": [
+   0,
+   0
+  ],
+  "tokenguard.router.route_and_run|t_compress": [
+   0,
+   8
+  ],
+  "tokenguard.router.should_try_cheap_first|t_cheap": [
+   16,
+   16
+  ],
+  "tokenguard.router.should_try_cheap_first|t_match": [
+   1,
+   16
+  ],
+  "tokenguard.router.should_try_cheap_first|t_score": [
+   0,
+   8
+  ],
+  "tokenguard.router.should_try_cheap_first|t_idio": [
+   0,
+   8
+  ],
+  "tokenguard.router.should_try_cheap_first|t_feats": [
+   0,
+   0
+  ],
+  "tokenguard.router.should_try_cheap_first|t_compress": [
+   0,
+   8
+  ]
+ },
+ "draws": {
+  "none|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_match": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  "none|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_feats": [
+   1,
+   1,
+   0,
+   0,
+   1,
+   1,
+   0,
+   0,
+   1,
+   0,
+   1,
+   1,
+   0,
+   1,
+   1,
+   1
+  ],
+  "none|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match|t_match": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "tokenguard.canonmatch.match|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match|t_feats": [],
+  "tokenguard.canonmatch.match|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match_score|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match_score|t_match": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "tokenguard.canonmatch.match_score|t_score": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "tokenguard.canonmatch.match_score|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match_score|t_feats": [],
+  "tokenguard.canonmatch.match_score|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.compress.compress_output|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.compress.compress_output|t_match": [
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.compress.compress_output|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.compress.compress_output|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.compress.compress_output|t_feats": [],
+  "tokenguard.compress.compress_output|t_compress": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_match": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_feats": [],
+  "tokenguard.idiosyncrasy.extract_features|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_match": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_idio": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_feats": [],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.plancache.find|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.plancache.find|t_match": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.plancache.find|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.plancache.find|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.plancache.find|t_feats": [],
+  "tokenguard.plancache.find|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.route_and_run|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.route_and_run|t_match": [
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.route_and_run|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.route_and_run|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.route_and_run|t_feats": [],
+  "tokenguard.router.route_and_run|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.should_try_cheap_first|t_cheap": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "tokenguard.router.should_try_cheap_first|t_match": [
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.should_try_cheap_first|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.should_try_cheap_first|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.should_try_cheap_first|t_feats": [],
+  "tokenguard.router.should_try_cheap_first|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "errs": {
+  "none|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_match": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_feats": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "none|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match|t_match": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match|t_feats": [],
+  "tokenguard.canonmatch.match|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match_score|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match_score|t_match": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match_score|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match_score|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.canonmatch.match_score|t_feats": [],
+  "tokenguard.canonmatch.match_score|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.compress.compress_output|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.compress.compress_output|t_match": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.compress.compress_output|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.compress.compress_output|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.compress.compress_output|t_feats": [],
+  "tokenguard.compress.compress_output|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_match": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.extract_features|t_feats": [],
+  "tokenguard.idiosyncrasy.extract_features|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_match": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_feats": [],
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.plancache.find|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.plancache.find|t_match": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.plancache.find|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.plancache.find|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.plancache.find|t_feats": [],
+  "tokenguard.plancache.find|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.route_and_run|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.route_and_run|t_match": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.route_and_run|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.route_and_run|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.route_and_run|t_feats": [],
+  "tokenguard.router.route_and_run|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.should_try_cheap_first|t_cheap": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.should_try_cheap_first|t_match": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.should_try_cheap_first|t_score": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.should_try_cheap_first|t_idio": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "tokenguard.router.should_try_cheap_first|t_feats": [],
+  "tokenguard.router.should_try_cheap_first|t_compress": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ "stop_n": {
+  "tokenguard.canonmatch.match|t_cheap": 8,
+  "tokenguard.canonmatch.match|t_compress": 8,
+  "tokenguard.canonmatch.match|t_idio": 8,
+  "tokenguard.canonmatch.match|t_score": 8,
+  "tokenguard.canonmatch.match_score|t_cheap": 8,
+  "tokenguard.canonmatch.match_score|t_compress": 8,
+  "tokenguard.canonmatch.match_score|t_idio": 8,
+  "tokenguard.compress.compress_output|t_cheap": 8,
+  "tokenguard.compress.compress_output|t_idio": 8,
+  "tokenguard.compress.compress_output|t_score": 8,
+  "tokenguard.idiosyncrasy.extract_features|t_cheap": 8,
+  "tokenguard.idiosyncrasy.extract_features|t_compress": 8,
+  "tokenguard.idiosyncrasy.extract_features|t_idio": 8,
+  "tokenguard.idiosyncrasy.extract_features|t_score": 8,
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_cheap": 8,
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_compress": 8,
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_match": 8,
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_score": 8,
+  "tokenguard.plancache.find|t_cheap": 8,
+  "tokenguard.plancache.find|t_compress": 8,
+  "tokenguard.plancache.find|t_idio": 8,
+  "tokenguard.plancache.find|t_match": 8,
+  "tokenguard.plancache.find|t_score": 8,
+  "tokenguard.router.route_and_run|t_cheap": 8,
+  "tokenguard.router.route_and_run|t_compress": 8,
+  "tokenguard.router.route_and_run|t_idio": 8,
+  "tokenguard.router.route_and_run|t_score": 8,
+  "tokenguard.router.should_try_cheap_first|t_compress": 8,
+  "tokenguard.router.should_try_cheap_first|t_idio": 8,
+  "tokenguard.router.should_try_cheap_first|t_score": 8,
+  "tokenguard.idiosyncrasy.extract_features|t_match": 16,
+  "tokenguard.canonmatch.match_score|t_score": 16,
+  "tokenguard.compress.compress_output|t_match": 16,
+  "tokenguard.idiosyncrasy.is_idiosyncratic|t_idio": 16,
+  "tokenguard.router.should_try_cheap_first|t_cheap": 16,
+  "tokenguard.router.route_and_run|t_match": 16,
+  "tokenguard.canonmatch.match|t_match": 16,
+  "tokenguard.canonmatch.match_score|t_match": 16,
+  "tokenguard.compress.compress_output|t_compress": 16,
+  "tokenguard.router.should_try_cheap_first|t_match": 16
+ },
+ "pairs": [
+  {
+   "pair": [
+    "tokenguard.canonmatch.match",
+    "tokenguard.canonmatch.match_score"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": 0.161,
+   "L_BA": -0.312,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.canonmatch.match",
+    "tokenguard.compress.compress_output"
+   ],
+   "verdict": "INCOMPARABLE",
+   "pattern": "incomparable",
+   "L_AB": 0.061,
+   "L_BA": 0.276,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.canonmatch.match",
+    "tokenguard.idiosyncrasy.extract_features"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.527,
+   "L_BA": 0.276,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.canonmatch.match",
+    "tokenguard.idiosyncrasy.is_idiosyncratic"
+   ],
+   "verdict": "INCOMPARABLE",
+   "pattern": "incomparable",
+   "L_AB": 0.161,
+   "L_BA": 0.161,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.canonmatch.match",
+    "tokenguard.plancache.find"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.527,
+   "L_BA": 0.161,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.canonmatch.match",
+    "tokenguard.router.route_and_run"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.527,
+   "L_BA": 0.276,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.canonmatch.match",
+    "tokenguard.router.should_try_cheap_first"
+   ],
+   "verdict": "INCOMPARABLE",
+   "pattern": "incomparable",
+   "L_AB": 0.161,
+   "L_BA": 0.276,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.canonmatch.match_score",
+    "tokenguard.compress.compress_output"
+   ],
+   "verdict": "INCOMPARABLE",
+   "pattern": "incomparable",
+   "L_AB": 0.061,
+   "L_BA": 0.276,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.canonmatch.match_score",
+    "tokenguard.idiosyncrasy.extract_features"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.527,
+   "L_BA": 0.276,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.canonmatch.match_score",
+    "tokenguard.idiosyncrasy.is_idiosyncratic"
+   ],
+   "verdict": "INCOMPARABLE",
+   "pattern": "incomparable",
+   "L_AB": 0.161,
+   "L_BA": 0.161,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.canonmatch.match_score",
+    "tokenguard.plancache.find"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.527,
+   "L_BA": 0.161,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.canonmatch.match_score",
+    "tokenguard.router.route_and_run"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.527,
+   "L_BA": 0.276,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.canonmatch.match_score",
+    "tokenguard.router.should_try_cheap_first"
+   ],
+   "verdict": "INCOMPARABLE",
+   "pattern": "incomparable",
+   "L_AB": 0.161,
+   "L_BA": 0.276,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.compress.compress_output",
+    "tokenguard.idiosyncrasy.extract_features"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.412,
+   "L_BA": 0.061,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.compress.compress_output",
+    "tokenguard.idiosyncrasy.is_idiosyncratic"
+   ],
+   "verdict": "INCOMPARABLE",
+   "pattern": "incomparable",
+   "L_AB": 0.161,
+   "L_BA": 0.061,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.compress.compress_output",
+    "tokenguard.plancache.find"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.412,
+   "L_BA": 0.061,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.compress.compress_output",
+    "tokenguard.router.route_and_run"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.412,
+   "L_BA": 0.061,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.compress.compress_output",
+    "tokenguard.router.should_try_cheap_first"
+   ],
+   "verdict": "INCOMPARABLE",
+   "pattern": "incomparable",
+   "L_AB": 0.161,
+   "L_BA": 0.061,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.idiosyncrasy.extract_features",
+    "tokenguard.idiosyncrasy.is_idiosyncratic"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": 0.161,
+   "L_BA": -0.527,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.idiosyncrasy.extract_features",
+    "tokenguard.plancache.find"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.412,
+   "L_BA": -0.527,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.idiosyncrasy.extract_features",
+    "tokenguard.router.route_and_run"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.412,
+   "L_BA": -0.412,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.idiosyncrasy.extract_features",
+    "tokenguard.router.should_try_cheap_first"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": 0.161,
+   "L_BA": -0.412,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.idiosyncrasy.is_idiosyncratic",
+    "tokenguard.plancache.find"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.527,
+   "L_BA": 0.161,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.idiosyncrasy.is_idiosyncratic",
+    "tokenguard.router.route_and_run"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.527,
+   "L_BA": 0.161,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.idiosyncrasy.is_idiosyncratic",
+    "tokenguard.router.should_try_cheap_first"
+   ],
+   "verdict": "INCOMPARABLE",
+   "pattern": "incomparable",
+   "L_AB": 0.161,
+   "L_BA": 0.161,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.plancache.find",
+    "tokenguard.router.route_and_run"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.527,
+   "L_BA": -0.412,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.plancache.find",
+    "tokenguard.router.should_try_cheap_first"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": 0.161,
+   "L_BA": -0.412,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenguard.router.route_and_run",
+    "tokenguard.router.should_try_cheap_first"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": 0.161,
+   "L_BA": -0.412,
+   "co_retrieved": true,
+   "n_at_verdict": 16
+  }
+ ],
+ "tally": {
+  "unresolved": 19,
+  "INCOMPARABLE": 9
+ },
+ "pattern_all": {
+  "one-way evidence": 16,
+  "incomparable": 9,
+  "no evidence": 3
+ },
+ "pattern_co": {
+  "one-way evidence": 10,
+  "no evidence": 2
+ },
+ "calls": 496,
+ "fixed_calls": 864,
+ "total_cost_usd": 10.760164600000001
+}
