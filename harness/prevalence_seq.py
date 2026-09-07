@@ -178,7 +178,7 @@ def main():
     leaky = [t for t in by_task if none_p[t] >= 0.5]
     clean = [t for t in by_task if t not in leaky]
     alpha = ETA / (2 * len(clean)); a1 = a2 = alpha / 2
-    print("none-baseline:", {t: f"{v:.0%}" for t, v in none_p.items()}, "| leaky:", leaky, f"| alpha={alpha:.4f}")
+    print(f"[{time.strftime('%H:%M:%S')}] none-baseline:", {t: f"{v:.0%}" for t, v in none_p.items()}, "| leaky:", leaky, f"| alpha={alpha:.4f}")
 
     # 2) candidates in rounds with the two-stage rule
     pairs = [(pool[i], pool[j]) for i in range(len(pool)) for j in range(i + 1, len(pool))]
@@ -206,7 +206,7 @@ def main():
             hopeless = n_drawn >= a.futility and tot[x] == 0 and all(tot[p] == 0 for p in open_partners)
             if all(pr in done for pr in mine) or hopeless:
                 active.discard(cell); stop_n[cell] = n_drawn
-        print(f"  round n={n_drawn:<3} verified pairs {sum(1 for v in done.values() if v[0]=='INCOMPARABLE'):>2}/{len(pairs)}"
+        print(f"  [{time.strftime('%H:%M:%S')}] round n={n_drawn:<3} verified pairs {sum(1 for v in done.values() if v[0]=='INCOMPARABLE'):>2}/{len(pairs)}"
               f"  active cells {len(active):>3}  calls so far {calls}")
     for cell in active:
         stop_n[cell] = n_drawn
