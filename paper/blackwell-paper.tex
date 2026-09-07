@@ -303,7 +303,7 @@ source $W$ (an experiment) & a candidate context item: a doc, note, or module yo
 Blackwell dominance $W \Bord W'$ & $W$ answers everything $W'$ answers; keeping $W$ and dropping $W'$ is safe \\
 incomparability & each source is decisive on tasks where the other fails; no single number can rank them once and for all \\
 garbling & $W'$ is a lossy transformation of $W$: everything in $W'$ is derivable from $W$ \\
-anti-monotonicity ($\Psi_T<0$) & pasting more true, on-topic text into a working prompt can break it \\
+anti-monotonicity ($\Delta_T<0$) & pasting more true, on-topic text into a working prompt can break it \\
 non-dominated front & the shortlist you must keep whole, because nothing on it verifiably covers anything else on it \\
 verification & a claim measured with exact finite-sample error bars, still significant after multiple-comparison correction, with no distributional assumptions \\
 model rule $\delta_M$ & the model as it actually behaves on the prompt, not an idealized optimal user of the information \\
@@ -1024,8 +1024,9 @@ interference
 \end{equation}
 the second-difference (interaction) of adding $W_2$ on top of $W_1$. We write the interaction as
 $\Psi_T$ (rather than a symbol $I$ that would collide with mutual information $I(S;W\mid\theta)$). A
-verified $\Psi_T<0$ on a cell whose $W_1$ arm is at ceiling is the localized statement that ``more
-strictly-more-informative context hurts.''
+verified $\Delta_T<0$ on a cell whose $W_1$ arm is at ceiling is the localized statement that
+``more strictly-more-informative context hurts''; $\Psi_T$ is reported alongside it as the
+interaction term only (Remark~\ref{rem:psinotharm}).
 
 \begin{proposition}[Interference verification]
 \label{prop:interference}
@@ -1066,19 +1067,20 @@ than four.
 The upper bound \eqref{eq:psiupper} includes $+\mathrm{CP}_{\mathrm{hi}}(p_{\texttt{none}})$, so it
 can verify harm only on cells whose \texttt{none}-baseline floors near $0$ (the convention is
 unguessable for the model under test). When the baseline is non-zero, e.g.\ \texttt{api\_argorder}
-at $\texttt{none}=75\%$ for GPT-5.5, $45\%$ for Kimi, $15\%$ for Opus, the bound is mechanically
-slack and harm is not verifiable even when the point estimate is strongly negative. We therefore
-adopt the explicit protocol: \emph{verify $\Psi_T$ only on cells whose \texttt{none}-baseline
-floors near $0$ for the model under test}, and report, per model, which cell carried the verification
-and what its baseline was. This makes the cell selection a stated rule rather than an outcome-driven
-choice. The same model-relative guessability that defines the value of private context
-(\S\ref{subsec:theta}) thus governs which cells can carry the interference verification.
+at $\texttt{none}=75\%$ for GPT-5.5, $45\%$ for Kimi, $40\%$ for Opus, the four-term bound is
+mechanically slack even when the point estimate is strongly negative. This is a property of
+$\Psi_T$ alone: the $+\PASS(\texttt{none})$ term is what a leaky baseline inflates. The harm
+contrast $\Delta_T$ does not involve the \texttt{none} arm at all, so the restriction does not
+apply to it, and cells the interaction bound could not carry are verifiable by the contrast. We
+still report each cell's baseline, because guessability bears on whether the source is genuinely
+private and hence on the incomparability reading (\S\ref{subsec:theta}), and we fix the carrying
+cell per model before unblinding rather than choosing it afterwards.
 \end{remark}
 
 \subsection{Anti-monotonicity as information non-monotonicity of \texorpdfstring{$\delta_M$}{the model rule}}
 \label{subsec:antimono}
 
-A verified $\Psi_{T^\star}<0$ on a ceiling-$W_1$ cell is more than a curiosity: it is a falsification
+A verified $\Delta_{T^\star}<0$ on a ceiling-$W_1$ cell is more than a curiosity: it is a falsification
 of Blackwell superset-dominance \emph{for the fixed model rule}, and it pinpoints exactly where the
 optimal-rule order (Theorem~\ref{thm:blackwell}) and the realized rule diverge.
 
@@ -1115,7 +1117,11 @@ is the one exception that is genuinely joint at $\eta$ on a single event, as pro
 Proposition~\ref{prop:certificate}; all other cross-claim conjunctions on a shared run are reported
 as marginal.
 
-\noindent The two verifications have different effective-$n$ requirements, which is why the consolidated record marks Opus incomparability as verified and Opus interference as reproduced but not verified; the power analysis is in Appendix~\ref{app:proofs}.
+\noindent The two verifications have different effective-$n$ requirements: incomparability is
+carried by stark $0/1$ cells whose intervals are tight, whereas a harm contrast on a milder
+collapse spends more of the budget. This is why the four-term interaction bound left Opus short of
+the margin while the two-arm contrast clears it (\S\ref{sec:results-antimono}); the power analysis
+is in Appendix~\ref{app:proofs}.
 
 % ==========================================================================
 \section{Experiments}
@@ -1253,9 +1259,10 @@ never used as evidence; the protocol reports its own insufficiency rather than h
 All verifications use confidence budget $\eta = 0.10$. Incomparability uses exact Clopper--Pearson
 intervals at per-cell level $\alpha = \eta/(2|\Dcal|)$ over the $2|\Dcal|$ proportions
 $\{p_{W_1,T}, p_{W_2,T}\}_{T\in \Dcal}$, so by the union bound all hold jointly with probability
-$\ge 1-\eta$ and both directions read off the same intervals. The interference verification uses
-$\alpha = \eta/4$ and the threshold $\tau = 0.30$, verifying $\Psi_T \le -\tau$ via the upper bound
-of \eqref{eq:psiupper}. We report each verification as marginally controlled at $\eta$; we do not
+$\ge 1-\eta$ and both directions read off the same intervals. The harm verification uses
+$\alpha = \eta/2$ on the two arms $\{W_{1+},W_1\}$ and the threshold $\tau = 0.30$, verifying
+$\Delta_T \le -\tau$ via $\overline\Delta_T$; the four-term $\Psi_T$ of \eqref{eq:psiupper} is
+reported descriptively only (Remark~\ref{rem:psinotharm}). We report each verification as marginally controlled at $\eta$; we do not
 claim joint family-wise control across the incomparability, dominance, and interference claims drawn
 from a single run (\S\ref{subsec:fwer}, \S\ref{sec:limitations}). The intervals are degenerate at
 $p=0$ and $p=1$, which is why the stark $100\%/0\%$ cells verify incomparability at small $n$ while
@@ -1267,11 +1274,13 @@ conventional $90\%$ family level; the headline separations are near-$0\%$ agains
 so the verified conclusions are not sensitive to tightening it. $\tau=0.30$ is an a priori
 materiality threshold: to count, interference must destroy at least $30$ PASS points, well above
 the interval widths at $n=40$, so noise cannot clear it. The data show the threshold doing real
-work in both directions. The verified collapses clear it with upper confidence bounds from $-0.36$
-to $-0.69$ (Table~\ref{tab:interference}); the length-matched padding control clears it at $-0.41$.
-Three real effects fail it and are reported as unverified rather than folded in: Opus's milder
-collapse ($100\%\!\to\!38\%$, upper $-0.23$), Haiku's \texttt{api\_post\_ok} cell (upper $+0.08$; a ceiling the raw-failure audit traces to an omitted import line, not to the contract, \S\ref{sec:results-audit}), and the
-second-pair contrast (upper $-0.21$, sign-only; \S\ref{sec:results-generality}). A threshold that
+work in both directions. The verified collapses clear it with upper confidence bounds from $-0.37$
+to $-0.82$ (Table~\ref{tab:interference}), and the length-matched padding control clears it at
+$-0.63$. Two real effects fail it and are reported as unverified rather than folded in: Haiku's
+\texttt{api\_post\_ok} cell (upper $-0.06$; a ceiling the raw-failure audit traces to an omitted
+import line, not to the contract, \S\ref{sec:results-audit}), which still falls short at $-0.23$
+once the import is neutralized, and the second-pair contrast (upper $-0.296$, sign-only;
+\S\ref{sec:results-generality}). A threshold that
 genuine effects fail is evidence it was not tuned to pass the data.
 
 \paragraph{Sampling regime.}
@@ -1312,7 +1321,7 @@ Incomp.\ verified ($\ge 90\%$) & \checkmark & \checkmark & \checkmark & \checkma
 $L_{\Dcal}(W_1,W_2)$ & $+0.76$ & $+0.72$ & $+0.72$ & $+0.76$ & $+0.35$ & $+0.68$ \\
 $L_{\Dcal}(W_2,W_1)$ & $+0.76$ & $+0.76$ & $+0.76$ & $+0.76$ & $+0.72$ & $+0.76$ \\
 Relevance mis-rank (trap) & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
-Anti-mono.\ verified (\# cells) & 1 & 2 & $0$ (repro.) & 1 & 1 & 1 \\
+Anti-mono.\ verified (\# cells) & 1 & 2 & 1 & 1 & 1 & 1 \\
 \texttt{api\_argorder} \texttt{none} & $2\%$ & $0\%$ & $40\%$ & $75\%$ & $2\%$ & $45\%$ \\
 \bottomrule
 \end{tabular}
@@ -1357,16 +1366,15 @@ Kimi-K2.6       & Moonshot  & 40 & $+0.675$ & $+0.762$ \\
 \end{tabular}
 \end{table}
 
-\paragraph{Why Opus verifies incomparability but not interference.}
-Opus verifies incomparability ($L_{\Dcal} = +0.715 / +0.762$) but not anti-monotonicity, and the
-reason is instructive. Incomparability is carried by stark cells whose proportions sit at $0$ or
-$1$, where the Clopper--Pearson interval is tight. The interference bound instead mixes the
-$W_{1+}$, $W_1$, $W_2$, and \texttt{none} arms: Opus's superset collapse on \texttt{api\_post\_ok}
-is real but milder ($100\% \to 38\%$, upper bound $-0.23$, short of $-\tau$), and its
-\texttt{api\_argorder} baseline leaks (\texttt{none} $=40\%$; Remark~\ref{rem:leaky}), so neither
-cell verifies. Both facts are the same model-relative-value effect (\S\ref{sec:results-moat}): Opus
-partially already knows the convention, which shrinks the harm the verification can attribute to the
-added signal.
+\paragraph{Why the bound, not the model, was the binding constraint on Opus.}
+Opus's collapse is the mildest in the roster ($100\% \to 38\%$ on \texttt{api\_post\_ok}), and under
+the four-term interaction bound it did not clear the margin: that bound mixes the $W_{1+}$, $W_1$,
+$W_2$ and \texttt{none} arms and spends its confidence budget on four intervals. The harm contrast
+spends it on two, and Opus clears at $-0.37$. The episode is worth stating because it shows what
+the earlier margin was measuring: not whether the model degraded, but how much slack four
+Clopper--Pearson endpoints leave at $n=40$. Opus remains the model whose prior most nearly covers
+the convention (\texttt{api\_argorder} \texttt{none} $=40\%$), and that is a fact about the value of
+private context (\S\ref{sec:results-moat}), not about whether the superset harms it.
 
 \subsubsection{The relevance score mis-ranks the sources}
 \label{sec:results-misrank}
@@ -1427,12 +1435,10 @@ Haiku listwise ($n{=}30$) & LLM listwise & $W_1$ & $W_1$ & $W_2$ \\
 \label{sec:results-antimono}
 
 The superset $W_{1+}$, which literally \emph{contains} $W_1$'s signal, sharply degrades the API cells
-relative to $W_1$ alone. The per-task interference $\Psi_T = \PASS(W_{1+},T) - \PASS(W_1,T) -
-\PASS(W_2,T) + \PASS(\texttt{none},T)$ is verified negative ($\Psi_T \le -\tau$, $\tau=0.30$) on at
-least one cell for five of the six models (Table~\ref{tab:interference}). Opus reproduces the effect
-($100\% \to 38\%$, $\Psi_T = -0.62$) but does not verify: the collapse is milder and its
-\texttt{api\_argorder} baseline leaks, both of which we tie to the model-relative value of context
-in \S\ref{sec:results-moat}. This is a
+relative to $W_1$ alone. The per-task harm contrast $\Delta_T = \PASS(W_{1+},T) - \PASS(W_1,T)$ is
+verified negative ($\Delta_T \le -\tau$, $\tau=0.30$) on at least one cell for all six models
+(Table~\ref{tab:interference}), the mildest being Opus at $100\% \to 38\%$ with upper bound
+$-0.37$. This is a
 verified empirical falsification of Blackwell superset-dominance on live models
 (Theorem~\ref{thm:antimono}): strictly-more-informative context can hurt, and the deficiency
 framework detects it precisely where every monotone scalar must miss it.
@@ -1478,7 +1484,7 @@ capability (Sonnet collapses hardest, Opus least). All runs single-shot, $n{=}40
 reads $52\%$ on this cell only because about half of its replies omit the \texttt{import ledger} line
 while calling the contract correctly (raw-failure audit, \S\ref{sec:results-audit}: with the import
 neutralized, $40/40$); its verified collapse is on \texttt{api\_argorder}, $100\%\to5\%$
-(Table~\ref{tab:interference}). Opus reproduces the collapse but does not verify.}
+(Table~\ref{tab:interference}). Opus's collapse is the mildest and verifies at $-0.37$.}
 \label{fig:collapse}
 \end{figure}
 
@@ -1539,12 +1545,12 @@ the correct output is the two-element Pareto front, which no scalar top-$1$ rule
 
 \begin{table}[t]
 \centering
-\caption{Anti-monotonicity (interference) verification on the carrying cell per model. $\Psi_T =
-\PASS(W_{1+}) - \PASS(W_1) - \PASS(W_2) + \PASS(\texttt{none})$; ``Upper'' is the $\eta/4$
-Clopper--Pearson upper bound $\overline\Psi_T$ of \eqref{eq:psiupper}; the cell is verified harmful
-when Upper $\le -0.30$. The $W_1 \to W_{1+}$ column reports the PASS collapse. The verification clears
-only on cells whose \texttt{none} baseline floors near zero (the leaky-baseline limitation;
-Remark~\ref{rem:leaky}). $^{\dagger}$Control row: the same cell with the omitted-\texttt{import} slip neutralized in the verifier (\S\ref{sec:results-audit}); its interference is verified in sign but not at the $\tau=0.30$ margin.}
+\caption{Anti-monotonicity verification on the carrying cell per model. $\Delta_T =
+\PASS(W_{1+},T) - \PASS(W_1,T)$ is the harm contrast; $\overline\Delta_T$ is its $\eta/2$
+Clopper--Pearson upper bound over the two arms, and the cell is verified harmful when
+$\overline\Delta_T \le -0.30$. The $W_1 \to W_{1+}$ column reports the PASS collapse. Unlike the
+four-term interaction $\Psi_T$, the contrast does not read the \texttt{none} arm, so the
+leaky-baseline restriction of Remark~\ref{rem:leaky} does not bind it. $^{\dagger}$Control row: the same cell with the omitted-\texttt{import} slip neutralized in the verifier (\S\ref{sec:results-audit}); its interference is verified in sign but not at the $\tau=0.30$ margin.}
 \label{tab:interference}
 \begin{tabular}{@{}llcccc@{}}
 \toprule
@@ -1565,15 +1571,14 @@ Opus-4.8        & \texttt{api\_post\_ok}            & $100\% \to 38\%$ & $-0.62$
 
 \paragraph{The leaky-baseline limitation is a stated protocol.}
 The interference upper bound includes the term $+\mathrm{CP}_{\mathrm{hi}}(p_{\texttt{none}})$, so it
-can verify harm only on cells whose no-context baseline floors near zero. This is why
-anti-monotonicity verifies on \texttt{api\_argorder} for Haiku (\texttt{none} $=2\%$, $W_1$ $100\%$)
-and Sonnet (\texttt{none} $=0\%$) but not for GPT-5.5 (\texttt{none} $=75\%$), Kimi ($45\%$), or Opus
-($40\%$), where a non-zero baseline mechanically shrinks $\Psi_T$'s verifiable magnitude. We state
-this as a protocol up front (Remark~\ref{rem:leaky}): we verify anti-monotonicity only on cells whose
-\texttt{none} baseline floors near zero. Table~\ref{tab:interference} reports, per model, which cell
-carried the verification and its collapse, alongside the $W_1$ ceiling: DeepSeek's $W_1$ reaches only
-$75\%$ on \texttt{api\_post\_ok} (an honest capability difference), so its $\Psi_T = -0.75$ starts
-from a lower point and is not directly magnitude-comparable to Sonnet's $100\% \to 2\%$.
+is inflated by a leaky \texttt{none} baseline, which is why the interaction bound could not carry
+cells such as \texttt{api\_argorder} for GPT-5.5 (\texttt{none} $=75\%$), Kimi ($45\%$) or Opus
+($40\%$). The harm contrast does not read the \texttt{none} arm and is unaffected;
+Remark~\ref{rem:leaky} states the distinction. Table~\ref{tab:interference} reports, per model,
+which cell carried the verification and its collapse, alongside the $W_1$ ceiling: DeepSeek's $W_1$
+reaches only $75\%$ on \texttt{api\_post\_ok} (an honest capability difference), so its
+$\Delta_T = -0.75$ starts from a lower point and is not directly magnitude-comparable to Sonnet's
+$100\% \to 2\%$.
 
 \paragraph{Position is not the cause.}
 The collapse is not a lost-in-the-middle or recency artifact. The length-matched padding control
@@ -1643,10 +1648,10 @@ confound, and prompt-curability of the collapse); full protocols and numbers are
 in Appendix~\ref{app:record}. \textbf{(i) A second incomparable pair, different domain}: a private
 \texttt{cache}-module contract versus a key-normalization invariant is again verified incomparable
 on Haiku ($L_{\Dcal} = +0.774/+0.496$), with one-directional dominance fully verified at $n=80$;
-its interference is verified in sign ($\Psi_T<0$, upper bound $-0.21$) but not at the $\tau=0.30$
-margin, because the $80\%$ $V_1$ ceiling keeps the four-term bound wide. \textbf{(ii) Length-matched
+its harm contrast is verified in sign ($\Delta_T<0$, upper bound $-0.296$) but not at the $\tau=0.30$
+margin, because the $80\%$ $V_1$ ceiling keeps the bound wide. \textbf{(ii) Length-matched
 padding}: filler character-matched to $W_{1+}$ leaves $W_1$ at ceiling (\texttt{api\_argorder}
-$100\%$ vs $W_{1+}$ $10\%$; interference verified, upper $-0.41$), attributing the collapse to the
+$100\%$ vs $W_{1+}$ $10\%$; harm verified, upper $-0.63$), attributing the collapse to the
 added signal, not token count.
 \textbf{(iii) Routing instruction}: a one-line convention-routing note recovers most of the collapse
 ($2\%\to80\%$, $22\%\to68\%$; both separated from $W_{1+}$) while remaining directionally below $W_1$ alone on the carrying cell; writing that note requires knowing which source is decisive for which task family,
@@ -1679,7 +1684,7 @@ import and is otherwise identical: \texttt{none} $0/40$ and $W_2$ $0/40$ under b
 $21/40$. The superset collapse on this cell is therefore real and has the mechanism the paper
 describes: in the retained $W_{1+}$ replies the model applies $W_2$'s wire encoding to a plain-cents
 amount and posts \texttt{'+500\#5'} in place of \texttt{500}. With the import neutralized the
-interference is $\Psi_T = -0.48$ with upper bound $-0.09$, verified in sign but not at the $\tau=0.30$ margin
+harm contrast is $\Delta_T = -0.47$ with upper bound $-0.23$, verified in sign but not at the $\tau=0.30$ margin
 (Table~\ref{tab:interference}). We keep the original-protocol numbers in every table, since the
 verifier is identical across models and the other five models include the import; the audit changes
 the reading of one cell, not its measurement. Haiku's verified claims rest on \texttt{api\_argorder}
@@ -1828,10 +1833,10 @@ across the capability ladder, \emph{not} a capability trend.
 $+\mathrm{CP}_{\mathrm{hi}}(p_{\text{none}})$, so it can only verify harm on cells whose none-baseline
 floors near zero. This is precisely the set of cells unguessable for the model under test, which
 couples the verifiable-harm set to the model-relative value of private context (\S\ref{sec:disc-moat}).
-We treat this as a protocol (Remark~\ref{rem:leaky}): we verify anti-monotonicity only on
-floor-baseline cells, because a leaky baseline
-mechanically shrinks the verifiable $\Psi_T$. On \texttt{api\_argorder} the harm is verified for
-Haiku (baseline $2\%$) and Sonnet ($0\%$) but not for GPT-5.5 (baseline $75\%$), Kimi ($45\%$), or Opus ($40\%$).
+That coupling is a property of the four-term interaction (Remark~\ref{rem:leaky}): a leaky baseline
+mechanically shrinks the verifiable $\Psi_T$, which is why the interaction bound could not carry
+\texttt{api\_argorder} for GPT-5.5 (baseline $75\%$), Kimi ($45\%$) or Opus ($40\%$). The harm
+contrast $\Delta_T$ omits the \texttt{none} arm and is free of the coupling.
 
 \paragraph{Will scale restore Blackwell coherence?}
 The capability non-monotonicity raises a question this framework makes precisely testable: is
@@ -2254,8 +2259,8 @@ of zero) with a clean double crossover ($V_1$ solves the contract and trap cells
 key-normalization, all none-baselines floor at $0\%$), and the dominance control again verifies
 one-directionally. Anti-monotonicity reproduces in direction at $n=40$ (the superset collapses the
 contract cell $80\%\!\to\!28\%$, $\Psi_T=-0.53$); re-running the four arms of the contract cell at
-$n=80$ shows the collapse is stable ($80\%\!\to\!29\%$, $\Psi_T=-0.51$) with Clopper--Pearson upper
-bound $-0.21$, which verifies \emph{strictly negative} interference ($\Psi_T<0$ at $\geq 90\%$) but
+$n=80$ shows the collapse is stable ($80\%\!\to\!29\%$, $\Delta_T=-0.51$) with Clopper--Pearson upper
+bound $-0.296$, which verifies \emph{strictly negative} harm ($\Delta_T<0$ at $\geq 90\%$) but
 does not clear the pre-registered magnitude margin $\tau=0.30$: the binding constraint is the $V_1$
 ceiling itself ($80\%$, versus pair-1's ${\sim}100\%$), which keeps the four-term bound wide
 regardless of $n$. We report pair-2 interference as a verified sign, not a verified magnitude. The
@@ -2277,7 +2282,7 @@ content). On single-shot Haiku at $n=40$ on the two collapse cells, padding is f
 equal-length dominated signal is catastrophic: on \texttt{api\_argorder}, $W_1$ $98\%$,
 $W_{\mathrm{pad}}$ $100\%$, $W_{1+}$ $10\%$; on \texttt{api\_post\_ok}, $W_1$ $50\%$,
 $W_{\mathrm{pad}}$ $65\%$, $W_{1+}$ $10\%$; and the same-run interference verification clears on
-\texttt{api\_argorder} ($\Psi_T=-0.82$, upper bound $-0.41$). The anti-monotonicity harm is therefore
+\texttt{api\_argorder} ($\Delta_T=-0.88$, upper bound $-0.63$). The anti-monotonicity harm is therefore
 attributable to $W_2$'s signal content interacting with the fixed rule, not to added tokens. One
 residual axis is not isolated by this control: the padding is off-topic for the \texttt{ledger}
 module while $W_2$ is on-topic, so ``topical but verifier-irrelevant'' text remains a smaller,
