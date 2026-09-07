@@ -90,6 +90,7 @@ def main():
     ap.add_argument("--topk", type=int, default=3)
     ap.add_argument("--model", default="claude-haiku-4-5-20251001")
     ap.add_argument("--out", default="")
+    ap.add_argument("--only-cells", default="", help="arm|task,... re-run in ISOLATION to nmax (outage protocol)")
     a = ap.parse_args()
     corpus = load_corpus(a.corpus)
     TASKS = corpus.TASKS
@@ -143,6 +144,18 @@ def main():
                 draws[key].append(1 if r["solved"] else 0)
                 errs[key].append(1 if r.get("error") else 0)
                 cost += r.get("cost", 0.0); calls += 1
+
+    if a.only_cells:
+        cells = [tuple(c.strip().split("|", 1)) for c in a.only_cells.split(",") if c.strip()]
+        for x, t in cells:
+            draw_cells([(x, t)], a.nmax)
+        out = {"isolated": True, "corpus": a.corpus, "model": a.model, "nmax": a.nmax,
+               "counts": {f"{x}|{t}": [sum(draws[(x, t)]), len(draws[(x, t)])] for x, t in cells},
+               "draws": {f"{x}|{t}": draws[(x, t)] for x, t in cells},
+               "errs": {f"{x}|{t}": errs[(x, t)] for x, t in cells}, "total_cost_usd": cost}
+        (REPO / a.out).write_text(json.dumps(out, indent=1), encoding="utf-8")
+        print("isolated re-run of", list(out["counts"]), "->", REPO / a.out, f"  spend ${cost:.2f}")
+        return
 
     # 1) none arm in full -> leaky tasks -> D_clean and alpha
     draw_cells([("none", t) for t in by_task], a.nmax)
