@@ -130,6 +130,7 @@ def main():
 
     draws = {(x, t): [] for x in ["none"] + pool for t in by_task}
     errs = {k: [] for k in draws}
+    dropped, residual = {}, {}                          # outage draws redrawn / left unscored
     cost = 0.0
     calls = 0
 
@@ -139,11 +140,25 @@ def main():
         def one(job):
             x, t, i = job
             return (x, t), mb.run_one(tmap[t], x, False, len(draws[(x, t)]) + i, a.model, singleshot=True)
-        with ThreadPoolExecutor(max_workers=1 if a.mock else a.workers) as ex:
-            for key, r in ex.map(one, jobs):
-                draws[key].append(1 if r["solved"] else 0)
-                errs[key].append(1 if r.get("error") else 0)
-                cost += r.get("cost", 0.0); calls += 1
+        pending = jobs
+        for attempt in range(4):                       # redraw transport errors, up to 3 extra passes
+            failed = []
+            with ThreadPoolExecutor(max_workers=1 if a.mock else a.workers) as ex:
+                for job, (key, r) in zip(pending, ex.map(one, pending)):
+                    cost += r.get("cost", 0.0); calls += 1
+                    if r.get("error"):
+                        failed.append(job); dropped[key] = dropped.get(key, 0) + 1
+                        continue
+                    draws[key].append(1 if r["solved"] else 0)
+                    errs[key].append(0)
+            if not failed:
+                break
+            if attempt < 3:
+                print(f"    redrawing {len(failed)} outage draw(s), pass {attempt + 1}")
+                time.sleep(20 * (attempt + 1))
+            pending = failed
+        for job in pending if failed else []:          # residual: recorded, NOT scored
+            residual[job[0] + "|" + job[1]] = residual.get(job[0] + "|" + job[1], 0) + 1
 
     if a.only_cells:
         cells = [tuple(c.strip().split("|", 1)) for c in a.only_cells.split(",") if c.strip()]
@@ -183,10 +198,13 @@ def main():
             if st == "INCOMPARABLE":
                 done[pr] = ("INCOMPARABLE", lab, lba, n_drawn)
         # cell stopping: all its pairs done, or futility (still 0 after >= futility draws)
+        tot = {x: sum(sum(draws[(x, t)]) for t in clean) for x in pool}
         for cell in sorted(active):
             x, t = cell
             mine = [pr for pr in pairs if x in pr]
-            if all(pr in done for pr in mine) or (n_drawn >= a.futility and sum(draws[cell]) == 0):
+            open_partners = [pr[0] if pr[1] == x else pr[1] for pr in mine if pr not in done]
+            hopeless = n_drawn >= a.futility and tot[x] == 0 and all(tot[p] == 0 for p in open_partners)
+            if all(pr in done for pr in mine) or hopeless:
                 active.discard(cell); stop_n[cell] = n_drawn
         print(f"  round n={n_drawn:<3} verified pairs {sum(1 for v in done.values() if v[0]=='INCOMPARABLE'):>2}/{len(pairs)}"
               f"  active cells {len(active):>3}  calls so far {calls}")
@@ -212,6 +230,7 @@ def main():
     fixed_calls = (len(pool) + 1) * len(by_task) * a.nmax
     print(f"verdicts: {dict(tally)}  | patterns ALL {dict(pat_all)}  CO-RETRIEVED {dict(pat_co)}")
     print(f"calls: {calls} vs fixed-n {fixed_calls}  -> {fixed_calls/max(calls,1):.2f}x  ({100*(1-calls/fixed_calls):.0f}% fewer)   spend ${cost:.2f}")
+    print(f"outage draws redrawn: {sum(dropped.values())}   left unscored: {sum(residual.values())}")
     out = {"corpus": a.corpus, "sequential": True, "mock": a.mock, "model": a.model, "eta": ETA,
            "nmax": a.nmax, "round": a.round, "futility": a.futility, "topk": topk, "pool": pool,
            "none_pass": none_p, "leaky_tasks": leaky, "clean_tasks": clean,
@@ -220,7 +239,8 @@ def main():
            "errs": {f"{x}|{t}": v for (x, t), v in errs.items()},
            "stop_n": {f"{x}|{t}": n for (x, t), n in stop_n.items()},
            "pairs": rows, "tally": dict(tally), "pattern_all": dict(pat_all), "pattern_co": dict(pat_co),
-           "calls": calls, "fixed_calls": fixed_calls, "total_cost_usd": cost}
+           "calls": calls, "fixed_calls": fixed_calls, "total_cost_usd": cost,
+           "outage_redrawn": dropped, "outage_unscored": residual}
     if a.out:
         (REPO / a.out).write_text(json.dumps(out, indent=1), encoding="utf-8")
         print("wrote", REPO / a.out)
