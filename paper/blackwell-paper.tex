@@ -338,8 +338,14 @@ theorem's scope, though they carry no dominance guarantee of any kind. Skyline
 selection~\citep{skylinerag2026} keeps every non-dominated candidate instead of a top-$k$, the
 operator our own selection rule uses, but takes dominance over heuristic per-item scores rather
 than over task value. Diversity-aware selection, from MMR~\citep{carbonell1998} to
-DPPs~\citep{ye2023ceil} and submodular coverage~\citep{huang2025gammacover,pacms2026}, optimizes set
-objectives over embedding geometry rather than over verified task value.
+DPPs~\citep{ye2023ceil} and submodular context selection~\citep{pacms2026}, optimizes set
+objectives over similarity geometry rather than over verified task value. Directed-information
+$\gamma$-covering~\citep{huang2025gammacover} is the closest of these in form, because its covering
+relation is genuinely \emph{asymmetric} and information-theoretic rather than geometric: chunk $i$
+covers chunk $j$ when it predicts $j$ to within $\gamma$ bits. The relation it orders, however, is
+redundancy \emph{between sources}, computed query-agnostically and offline, so it prunes what
+another chunk already predicts; it never exhibits two sources each decisive on a task the other
+fails, which is the relation we measure.
 
 The limits of scalar relevance are one of the oldest themes in information retrieval, and we
 position inside that lineage rather than apart from it: the Probability Ranking
@@ -348,7 +354,10 @@ documents interact is long documented~\citep{fuhr2008,carbonell1998}, and docume
 was given ranking principles of its own, portfolio theory~\citep{wang2009portfolio} and the quantum
 probability ranking principle, whose ``interference'' term names the dependence of one document's
 relevance on another~\citep{zuccon2010qprp}. The LLM-era version, relevance-maximizing retrieval
-degrading answer quality, is measured directly~\citep{relevanceutility2025,sureRAG2026}. Our delta
+degrading answer quality, is measured directly~\citep{relevanceutility2025}, and the companion
+observation that relevance does not imply \emph{sufficiency}, so that missing hops and unresolved
+conflicts cannot be detected by scoring passages independently, is argued at the set
+level~\citep{sureRAG2026}. Our delta
 is the \emph{form} of the statement: the failure becomes a theorem in the comparison-of-experiments
 frame, with the precise structural condition, Blackwell incomparability, under which every
 query-independent scalar must mis-rank, and a verified live instance on six production models.
@@ -363,9 +372,10 @@ curves are inverted-U in passage count~\citep{jin2024longrag}; document count hu
 length~\citep{levy2025moredocs}; added length alone hurts~\citep{contexthurts2025}; and the effect
 persists across model generations~\citep{hong2025contextrot} and agent-scaffold
 components~\citep{longcontextdegrade2026}. The genus is older than language models: in data
-integration, adding sources raises coverage while fusion accuracy first rises and then falls, so
-that ``less is more,'' and no standard fusion model is monotone in the source
-set~\citep{dong2013lessismore}; the lesson has since been carried explicitly to augmented language
+integration, adding sources raises coverage while integration quality first rises and then
+falls, so that ``less is more'': low-quality sources deteriorate the fused result rather than
+bringing the expected gain, and the right move is to select a subset before
+integrating~\citep{dong2013lessismore}; the lesson has since been carried explicitly to augmented language
 models~\citep{halevy2023learnings}. We do not claim to discover this genus. Two differences locate
 our finding inside it. Where data integration traces the harm to low-quality sources and restores
 monotonicity by redesigning the fusion rule, our two sources are individually correct and
@@ -381,8 +391,8 @@ a sufficient source, on sources separately \emph{verified} Blackwell-incomparabl
 under a per-task verification of the direct contrast $\PASS(W_{1+},T)<\PASS(W_1,T)$: a reversal no
 monotone context-value scalar can carry. A representation-level account of when context
 helps, an additive error decomposition with alignment conditions~\citep{wang2026whencontext}, is
-complementary: it characterizes correction by a single context, not the order structure among
-sources. Pareto-incomparability of prompts along competing metrics \emph{within} a single
+complementary: even in its multi-context extension it characterizes \emph{when} a context
+corrects the error, not an order relation between candidate sources. Pareto-incomparability of prompts along competing metrics \emph{within} a single
 task~\citep{paretoprompts2025} is orthogonal to our object, incomparable \emph{sources across
 tasks}.
 
@@ -452,7 +462,8 @@ Late interaction, multi-vector~\citep{khattab2020colbert}        & \checkmark   
 $\Vcal$-usable information~\citep{ethayarajh2022}                & \checkmark        & $\times$   & $\times$ \\
 LM-supervised retriever~\citep{shi2023replug,guu2020realm}       & \checkmark$^{a}$  & $\times$   & $\times$ \\
 MMR diversity~\citep{carbonell1998}                              & \checkmark        & $\sim^{b}$ & $\times$ \\
-DPP / submodular coverage~\citep{ye2023ceil,huang2025gammacover} & \checkmark        & $\sim^{b}$ & $\times$ \\
+DPP / submodular coverage~\citep{ye2023ceil,pacms2026}           & \checkmark        & $\sim^{b}$ & $\times$ \\
+Directed-information covering~\citep{huang2025gammacover}        & \checkmark        & $\sim^{f}$ & $\times$ \\
 Shapley / influence valuation~\citep{demoshapley2024}            & $\times$          & \checkmark & $\times$ \\
 Expected information gain / BED~\citep{bedllm2026}               & $\times$          & $\sim$     & $\times$ \\
 Listwise LLM reranker~\citep{sun2023rankgpt}                     & $\sim^{c}$        & \checkmark & $\times^{c}$ \\
@@ -472,7 +483,9 @@ $^{b}$symmetric redundancy over embedding geometry, not directional anti-monoton
 $^{c}$query-conditioned and interaction-aware, but per-query (not precomputable) and with no
 dominance guarantee. $^{d}$positive complementarity only, a passage made useful by another, not
 directional harm. $^{e}$keeps the non-dominated set, but over heuristic per-item scores rather than
-task value. Only the last row represents incomparability over task value, at the cost of direct probing;
+task value. $^{f}$genuinely \emph{directional}, but the relation is redundancy between chunks
+(does $i$ predict $j$ to within $\gamma$ bits?), computed offline and query-agnostically, not harm
+to a task's verified value. Only the last row represents incomparability over task value, at the cost of direct probing;
 the ``cheap \emph{and} partial-order-faithful'' cell is empty, which is this paper's central open
 problem.}
 \label{tab:designspace}
