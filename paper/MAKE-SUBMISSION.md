@@ -32,11 +32,19 @@ edit the master and regenerate, or the two will drift.
 
 ## Outstanding — author decisions
 
-1. **Co-author.** The Author Contributions block previously credited a second author
-   (initials `O.R.`) who does not appear on the title page. CRediT has been made consistent
-   with the single-author title page. If a co-author is to be added, update **both** the
-   `\author{}` block (name, affiliation, ORCID) and the CRediT split, and MDPI will ask for
-   the co-author's email at submission.
+1. **Co-authors and the CRediT split.** The paper now carries four authors:
+
+   | Author | Affiliation | ORCID | Email |
+   |---|---|---|---|
+   | Andriy Bilous (corresponding) | Information Systems and Networks | 0009-0006-5467-7932 | andriy.bilous@uitware.com |
+   | Petro Pukach | Applied Mathematics and Fundamental Sciences | 0000-0002-0359-5025 | petro.y.pukach@lpnu.ua |
+   | Vasyl Lytvyn | Information Systems and Networks | 0000-0002-9676-0180 | vasyl.v.lytvyn@lpnu.ua |
+   | Zoriana Rybchak | Information Systems and Networks | 0000-0002-5986-4618 | zoriana.l.rybchak@lpnu.ua |
+
+   Names, affiliations and ORCIDs were verified against the ORCID public API. **The author
+   order and the CRediT split in the manuscript are a drafting placeholder, not a statement
+   any co-author has confirmed** - check both with all four before submission. MDPI emails
+   every listed co-author to confirm authorship.
 
 2. **Preprint declaration.** MDPI asks whether the manuscript has been posted as a preprint.
    If the arXiv version goes up first, declare it in the cover letter and give the arXiv ID.

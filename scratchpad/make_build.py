@@ -51,24 +51,8 @@ sub("header",
     r"%  title block with corresponding-author details." + NL +
     r"%  All references verified against arXiv/DBLP/publisher")
 
-sub("title block",
-NL.join([
-r"\author{%",
-r"  Andriy Bilous \\",
-r"  Department of Information Systems and Networks \\",
-r"  Lviv Polytechnic National University, Lviv, Ukraine \\",
-r"  ORCID: 0009-0006-5467-7932 \\",
-r"  \texttt{andriy.bilous@uitware.com}",
-r"}"]),
-NL.join([
-r"\author{%",
-r"  Andriy Bilous\,$^{1,\ast}$ \\[2pt]",
-r"  \normalsize $^{1}$\,Department of Information Systems and Networks, Lviv Polytechnic National"
-r" University, \\",
-r"  \normalsize S.~Bandery St.~12, 79013 Lviv, Ukraine; \texttt{andriy.bilous@uitware.com} \\[2pt]",
-r"  \normalsize ORCID: 0009-0006-5467-7932 \\[2pt]",
-r"  \normalsize $^{\ast}$\,Correspondence: \texttt{andriy.bilous@uitware.com}",
-r"}",]))
+# title block: the master already carries the MDPI-shaped multi-author block,
+# so the MAKE build needs no substitution here.
 
 open(M, "w", encoding="utf-8", newline="\n").write(m)
 print("written:", M)
