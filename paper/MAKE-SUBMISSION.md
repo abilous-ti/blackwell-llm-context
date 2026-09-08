@@ -48,8 +48,13 @@ edit the master and regenerate, or the two will drift.
 
 ## Outstanding — production format
 
-MDPI's own LaTeX class (`mdpi.cls` + `Definitions/`, `mdpi.bst`) is **not installed here** and
-cannot be fetched from this environment. The current build uses `article` with MDPI's required
+MDPI's own LaTeX class (`mdpi.cls` + `Definitions/`, `mdpi.bst`) is **not installed here**.
+It is not on CTAN and MiKTeX has no `mdpi` package, so it cannot be installed with a package
+manager; and `mdpi.com` returns HTTP 403 to non-browser requests, so the zip cannot be fetched
+from a script either. Getting it takes a browser: open <https://www.mdpi.com/authors/latex>,
+download the zip, unzip it, and the `Definitions/` folder sits next to your `.tex`.
+(A community mirror exists on GitHub, but it is unofficial and of unknown vintage - MDPI
+production uses the current class, so use the official zip.) The current build uses `article` with MDPI's required
 content and a numbered reference style, which is acceptable for **peer review** — MDPI accepts
 a PDF at submission — but the final production version must be moved onto their template.
 
