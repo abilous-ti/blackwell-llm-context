@@ -1,13 +1,18 @@
 % ==========================================================================
 %  Context Selection Is a Partial Order
-%  arXiv article source. All references verified against arXiv/DBLP/publisher
+%  MAKE (MDPI) submission build. GENERATED from blackwell-paper.tex -- do not
+%  hand-edit; regenerate with scratchpad/make_build.py after editing the master.
+%  Differences from the master: numbered (MDPI) citation style and an MDPI-shaped
+%  title block with corresponding-author details.
+%  All references verified against arXiv/DBLP/publisher
 %  records (see the Reference verification note in the Reproducibility section).
 % ==========================================================================
 \documentclass[11pt]{article}
 \usepackage[T1]{fontenc}     % scalable Type1 font encoding
 \usepackage{lmodern}         % scalable Latin Modern fonts (required for microtype expansion)
 \usepackage[margin=1in]{geometry}
-\usepackage{amsmath,amssymb,amsthm,booktabs,hyperref,natbib,microtype,enumitem}
+\usepackage{amsmath,amssymb,amsthm,booktabs,hyperref,microtype,enumitem}
+\usepackage[numbers,sort&compress]{natbib}  % MDPI uses numbered references
 \usepackage{tikz}
 \hypersetup{
   pdftitle  = {Context selection as a partial order: A Blackwell framework and verified LLM evidence},
@@ -43,11 +48,11 @@
 A Blackwell framework and verified LLM evidence}
 
 \author{%
-  Andriy Bilous \\
-  Department of Information Systems and Networks \\
-  Lviv Polytechnic National University, Lviv, Ukraine \\
-  ORCID: 0009-0006-5467-7932 \\
-  \texttt{andriy.bilous@uitware.com}
+  Andriy Bilous\,$^{1,\ast}$ \\[2pt]
+  \normalsize $^{1}$\,Department of Information Systems and Networks, Lviv Polytechnic National University, \\
+  \normalsize S.~Bandery St.~12, 79013 Lviv, Ukraine; \texttt{andriy.bilous@uitware.com} \\[2pt]
+  \normalsize ORCID: 0009-0006-5467-7932 \\[2pt]
+  \normalsize $^{\ast}$\,Correspondence: \texttt{andriy.bilous@uitware.com}
 }
 
 \date{}
@@ -1881,7 +1886,7 @@ RAG  & Retrieval-augmented generation \\
 
 % ==========================================================================
 {\small
-\bibliographystyle{plainnat}
+\bibliographystyle{unsrtnat}
 \bibliography{blackwell-paper}
 }
 
