@@ -1,6 +1,6 @@
 # Context selection as a partial order — artifacts
 
-Measurement harness, executable verifiers, machine-checked proofs, and complete run records for
+Measurement harness, executable verifiers, and complete run records for
 **"Context selection as a partial order: A Blackwell framework and verified LLM evidence"**
 (Andriy Bilous, Petro Pukach, Vasyl Lytvyn, Zoriana Rybchak — Lviv Polytechnic National University).
 
