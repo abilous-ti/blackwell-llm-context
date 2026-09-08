@@ -102,6 +102,7 @@ def main():
     ap.add_argument("--model", default="claude-haiku-4-5-20251001")
     ap.add_argument("--out", default="")
     ap.add_argument("--only-cells", default="", help="arm|task,... re-run in ISOLATION to nmax (outage protocol)")
+    ap.add_argument("--resume", default="", help="continue from a <out>.ckpt.json (or a transcript-reconstructed checkpoint)")
     a = ap.parse_args()
     corpus = load_corpus(a.corpus)
     TASKS = corpus.TASKS
@@ -147,7 +148,7 @@ def main():
 
     def draw_cells(cells, k):
         nonlocal cost, calls
-        jobs = [(x, t, i) for (x, t) in cells for i in range(k)]
+        jobs = [(x, t, i) for (x, t) in cells for i in range(k[(x, t)] if isinstance(k, dict) else k)]
         def one(job):
             x, t, i = job
             return (x, t), mb.run_one(tmap[t], x, False, len(draws[(x, t)]) + i, a.model, singleshot=True)
@@ -186,6 +187,17 @@ def main():
               "written": time.strftime("%Y-%m-%d %H:%M:%S")}
         (REPO / (a.out + ".ckpt.json")).write_text(json.dumps(_strkeys(ck), indent=1), encoding="utf-8")
 
+    resumed = None
+    if a.resume:
+        resumed = json.loads((REPO / a.resume).read_text(encoding="utf-8"))
+        for key, v in resumed["draws"].items():
+            x, t = key.split("|", 1)
+            draws[(x, t)] = list(v); errs[(x, t)] = list(resumed.get("errs", {}).get(key, [0] * len(v)))
+        dropped.update(resumed.get("outage_redrawn", {}) or {}); residual.update(resumed.get("outage_unscored", {}) or {})
+        cost = float(resumed.get("total_cost_usd", 0.0)); calls = int(resumed.get("calls", 0))
+        print(f"[{time.strftime('%H:%M:%S')}] resumed from {a.resume}: n_drawn={resumed['n_drawn']} calls={calls} "
+              f"scored draws={sum(len(v) for v in draws.values())}")
+
     if a.only_cells:
         cells = [tuple(c.strip().split("|", 1)) for c in a.only_cells.split(",") if c.strip()]
         for x, t in cells:
@@ -199,7 +211,7 @@ def main():
         return
 
     # 1) none arm in full -> leaky tasks -> D_clean and alpha
-    draw_cells([("none", t) for t in by_task], a.nmax)
+    draw_cells([("none", t) for t in by_task], {("none", t): max(0, a.nmax - len(draws[("none", t)])) for t in by_task})
     none_p = {t: sum(draws[("none", t)]) / a.nmax for t in by_task}
     leaky = [t for t in by_task if none_p[t] >= 0.5]
     clean = [t for t in by_task if t not in leaky]
@@ -213,9 +225,16 @@ def main():
     active = {(x, t) for x in pool for t in clean}
     stop_n = {}
     n_drawn = 0
+    if resumed:
+        n_drawn = int(resumed["n_drawn"])
+        done = {tuple(k.split("|", 1)): tuple(v) for k, v in (resumed.get("done") or {}).items()}
+        stop_n = {tuple(k.split("|", 1)): v for k, v in (resumed.get("stop_n") or {}).items()}
+        active -= set(stop_n)
     while n_drawn < a.nmax and active:
         k = min(a.round, a.nmax - n_drawn)
-        draw_cells(sorted(active), k)
+        # per-cell top-up to the round boundary: a cell left short by an outage (or by a resume) is
+        # refilled once the API is back, so every active cell reaches n_drawn + k before the check
+        draw_cells(sorted(active), {c: max(0, n_drawn + k - len(draws[c])) for c in active})
         n_drawn += k
         iv = {(x, t): av_interval(sum(draws[(x, t)]), len(draws[(x, t)]), a1) for x in pool for t in clean}
         for pr in pairs:
@@ -268,7 +287,7 @@ def main():
            "stop_n": {f"{x}|{t}": n for (x, t), n in stop_n.items()},
            "pairs": rows, "tally": dict(tally), "pattern_all": dict(pat_all), "pattern_co": dict(pat_co),
            "calls": calls, "fixed_calls": fixed_calls, "total_cost_usd": cost,
-           "outage_redrawn": dropped, "outage_unscored": residual}
+           "outage_redrawn": dropped, "outage_unscored": residual, "resumed_from": a.resume}
     if a.out:
         (REPO / a.out).write_text(json.dumps(_strkeys(out), indent=1), encoding="utf-8")
         print("wrote", REPO / a.out)

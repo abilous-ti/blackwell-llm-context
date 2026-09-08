@@ -1,0 +1,12 @@
+corpus=incomparability: 9 natural chunks | tasks 5 | pool K=7 | nmax=24 round=4 futility=8
+  t_cpx        top3=['tokenbench.measure_incomparability.clopper_pearson', 'tokenbench.measure_incomparability.verify_in', 'tokenbench.measure_incomparability.scalar_table']  decisive HIT
+  t_hd         top3=['tokenbench.measure_incomparability.hat_delta', 'tokenbench.measure_incomparability.scalar_table', 'tokenbench.measure_incomparability.verify_in']  decisive HIT
+  t_ninc       top3=['tokenbench.measure_incomparability.required_n_incomparability', 'tokenbench.measure_incomparability.required_n_dominance', 'tokenbench.measure_incomparability.scalar_table']  decisive HIT
+  t_ndom       top3=['tokenbench.measure_incomparability.required_n_dominance', 'tokenbench.measure_incomparability.required_n_incomparability', 'tokenbench.measure_incomparability.scalar_table']  decisive HIT
+  t_code       top3=['tokenbench.measure_incomparability.extract_code', 'tokenbench.measure_incomparability.verify_in', 'tokenbench.measure_incomparability.scalar_table']  decisive HIT
+[06:23:11] none-baseline: {'t_cpx': '75%', 't_hd': '0%', 't_ninc': '0%', 't_ndom': '0%', 't_code': '79%'} | leaky: ['t_cpx', 't_code'] | alpha=0.0167
+  [06:41:51] round n=4   verified pairs  0/21  active cells  21  calls so far 204
+  [06:59:49] round n=8   verified pairs  0/21  active cells  21  calls so far 288
+  [07:17:13] round n=12  verified pairs  1/21  active cells  21  calls so far 372
+    redrawing 45 outage draw(s), pass 1
+    redrawing 45 outage draw(s), pass 2
