@@ -414,12 +414,6 @@ Jun Wang and Jianhan Zhu.
   on Research and Development in Information Retrieval}, pages 115--122, 2009.
 \newblock \doi{10.1145/1571941.1571963}.
 
-\bibitem[Wang et~al.(2025)Wang, Zhou, and Fang]{bookrag2025}
-Shu Wang, Yingli Zhou, and Yixiang Fang.
-\newblock {BookRAG}: A hierarchical structure-aware index-based approach for
-  retrieval-augmented generation on complex documents.
-\newblock \emph{arXiv preprint arXiv:2512.03413}, 2025.
-
 \bibitem[Xie et~al.(2024)Xie, Luo, Stern, Du, and Cheng]{demoshapley2024}
 Shan Xie, Man Luo, Chadly~Daniel Stern, Mengnan Du, and Lu~Cheng.
 \newblock {DemoShapley}: Valuation of demonstrations for in-context learning.
@@ -491,6 +485,14 @@ Guang Zhao, Byung-Jun Yoon, Gilchan Park, Shantenu Jha, Shinjae Yoo, and
 Shuran Zheng, Xuan Qi, Rui~Ray Chen, Yongchan Kwon, and James Zou.
 \newblock Proper dataset valuation by pointwise mutual information.
 \newblock \emph{arXiv preprint arXiv:2405.18253}, 2024.
+
+\bibitem[Zhu et~al.(2026)Zhu, Li, Zhang, and Chen]{skylinerag2026}
+Xinyi Zhu, Haoyang Li, Yongqi Zhang, and Lei Chen.
+\newblock Skyline retrieval meets set-cover chunk merging: A cost-effective
+  {RAG}-sketch for long-context {LLM} {QA}.
+\newblock \emph{Proceedings of the ACM on Management of Data}, 4\penalty0
+  (3):\penalty0 1--27, 2026.
+\newblock \doi{10.1145/3802111}.
 
 \bibitem[Zuccon and Azzopardi(2010)]{zuccon2010qprp}
 Guido Zuccon and Leif Azzopardi.

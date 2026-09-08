@@ -146,7 +146,7 @@ passage is worth different amounts to different models is measured there~\citep{
 that adding sources can lower accuracy while coverage saturates was established for data integration
 over a decade ago~\citep{dong2013lessismore}; that rerankers are steered by lexical similarity is
 documented in the wild~\citep{hagstrom2025lexical}; and keeping a non-dominated set rather than a
-top-$k$ prefix exists as an operator over heuristic scores~\citep{bookrag2025}; and the Blackwell
+top-$k$ prefix exists as an operator over heuristic scores~\citep{skylinerag2026}; and the Blackwell
 and Le~Cam apparatus itself was brought to inference-time context selection against a frozen
 decoder, concurrently with this work and without a priority claim on our
 part~\citep{alpila2026}. What is new is the
@@ -185,10 +185,10 @@ and one encoding task; we say so plainly and do not call it a ``distribution.'' 
   not a single-lab artifact.
   \item \textbf{Representative topical rankers mis-rank the pair.} On a trap task saturated with
   encoding vocabulary, lexical relevance ranks $W_2 \succ W_1$ while realized PASS ranks
-  $W_1 \gg W_2$ ($96$--$100\%$ vs.\ $0\%$); two dense bi-encoders and a cross-encoder repeat the
-  error, and an LLM listwise reranker escapes it (\S\ref{sec:results-misrank}). On the honest tasks
-  every ranker agrees with PASS, so failure occurs \emph{only} where surface relevance diverges
-  from verifier-decisive content, which is the boundary
+  $W_1 \gg W_2$ ($90$--$100\%$ vs.\ $0\%$); two dense bi-encoders and a cross-encoder repeat the
+  error, and an LLM listwise reranker escapes it (\S\ref{sec:results-misrank}). The lexical and
+  dense rankers agree with PASS on both honest cells, so their failure occurs \emph{only} where
+  surface relevance diverges from verifier-decisive content, which is the boundary
   Proposition~\ref{prop:trap-constrained} draws.
   \item \textbf{Verified anti-monotonicity.} The superset $W_{1+} = W_2 \,{+}{+}\, W_1$ (the
   operator $\,{+}{+}\,$ is text concatenation) literally \emph{contains} $W_1$'s signal yet sharply
@@ -316,10 +316,11 @@ scalar score and so inherits the total order it calibrates, whereas what we veri
 relation between sources; and scorers of equal ranking quality can retain different document
 sets~\citep{frohmann2026orderconsistent}, a symptom of the same under-determination. The machinery
 for identifying a non-dominated set from noisy multi-objective samples is in turn classical in the
-bandit literature: \citet{auer2016pareto} define the one-sided maximum gap that our surrogate
-instantiates and give confidence-bound algorithms for Pareto-front identification. What is
-instantiated here is that gap on (model, verifier, task-battery) triples, and its use as a
-verification of incomparability; the measure itself is theirs.
+bandit literature: \citet{auer2016pareto} give confidence-bound algorithms that identify the
+Pareto front from stochastic samples, with a gap-based sample complexity of the kind our
+verification pays for directly. What is new here is not the statistical machinery but the object
+it is run on, (model, verifier, task-battery) triples, and its use as a verification of
+incomparability between context sources.
 
 The retrieval community has itself moved from relevance to \emph{utility}, the downstream gain a
 passage brings~\citep{zhang2026utility}, and has found that utility is
@@ -334,7 +335,7 @@ which is the listwise boundary. Three families
 sit at the boundary. Listwise LLM rerankers~\citep{sun2023rankgpt} and learned set
 selectors~\citep{optiset2026,rank4gen2026} are query-conditioned \emph{set} functions, outside the
 theorem's scope, though they carry no dominance guarantee of any kind. Skyline
-selection~\citep{bookrag2025} keeps every non-dominated candidate instead of a top-$k$, the
+selection~\citep{skylinerag2026} keeps every non-dominated candidate instead of a top-$k$, the
 operator our own selection rule uses, but takes dominance over heuristic per-item scores rather
 than over task value. Diversity-aware selection, from MMR~\citep{carbonell1998} to
 DPPs~\citep{ye2023ceil} and submodular coverage~\citep{huang2025gammacover,pacms2026}, optimizes set
@@ -405,10 +406,12 @@ is the order \emph{between two admitted sources across tasks}: we show that orde
 be faithful to it, and verify a strict superset of a sufficient source collapsing PASS with the
 length, position and routing confounds controlled. Incomparability in this sense cannot arise
 inside a single declared decision problem, so its absence there is not a gap but a different
-question. A second line is training-\emph{dataset} valuation: \citet{zheng2024pmi} rank datasets
-by Blackwell informativeness and show a pointwise-mutual-information \emph{scalar} suffices in their
-Bayes-optimal, white-box regime, the opposite of our finding that no query-independent scalar can
-be faithful once the order is partial (Theorem~\ref{thm:incomparable}). Nearby uses stop short of
+question. A second line is training-\emph{dataset} valuation: \citet{zheng2024pmi} order datasets
+by Blackwell informativeness and show that in their Bayesian regime a \emph{scalar}, the mutual
+information between the curated and the test data, determines that order, the opposite of our
+finding that no query-independent scalar can be faithful once the order is partial
+(Theorem~\ref{thm:incomparable}); the difference is that their comparison is taken against the
+Bayes-optimal user of the data, ours against a fixed model rule on a task family. Nearby uses stop short of
 what we do: garbling to harden LLM evaluations~\citep{bradley2024garbling}, statistical deficiency
 to order training \emph{tasks}~\citep{fosse2025}, a deficiency-induced \emph{directional} dominance
 in transfer learning (no incomparability, no distribution-free bound, outside language
@@ -457,7 +460,7 @@ Utility scores, learned or LLM-specific~\citep{zhang2025llmutility,dai2025seper}
 Conditional passage utility~\citep{jain2025contextualutility}   & \checkmark$^{a}$  & $\sim^{d}$ & $\times$ \\
 Conformal context filtering~\citep{chakraborty2026conformal}    & \checkmark        & $\times$   & $\times$ \\
 Learned set selection~\citep{optiset2026,rank4gen2026}          & $\sim^{c}$        & \checkmark & $\times^{c}$ \\
-Skyline over heuristic scores~\citep{bookrag2025}               & \checkmark        & $\times$   & $\sim^{e}$ \\
+Skyline over heuristic scores~\citep{skylinerag2026}            & \checkmark        & $\times$   & $\sim^{e}$ \\
 \midrule
 \textbf{Verified front $+$ routing (this paper)}                & $\times$          & \checkmark & \checkmark \\
 \bottomrule
@@ -1172,7 +1175,7 @@ or validation curves to report; the released measurement record, per-cell PASS t
 intervals, and raw run logs, is the complete empirical object.
 
 \paragraph{Harness and arms.}
-The harness (\texttt{tokenbench/measure\_blackwell.py}; released with all run logs at
+The harness (\texttt{harness/measure\_blackwell.py}; released with all run logs at
 \url{https://github.com/abilous-ti/blackwell-llm-context}) is Python-standard-library only (zero
 external dependencies); it computes $\dhat_{\Dcal}$ in both directions, the uniform
 Clopper--Pearson/Bonferroni verification, the interference verification, and the lexical relevance
@@ -1252,8 +1255,9 @@ underlying quantities.
 \begin{table}[t]
 \centering
 \caption{Consolidated 6-model / 4-vendor verdict. All six models are run the same way, a single
-API call per attempt at $n=40$ per cell (\S\ref{sec:methodology}). ``Anti-mono.\ verified'' counts
-cells on which the harm contrast's upper bound clears $-\tau = -0.30$ at $\eta=0.10$. ``Argorder
+API call per attempt at $n=40$ per cell (\S\ref{sec:methodology}). ``Anti-mono.\ verified'' counts, of the two
+API cells tested per model, those on which the harm contrast's upper bound clears $-\tau = -0.30$
+at $\eta=0.10$. ``Argorder
 \texttt{none}'' is the no-context baseline PASS on \texttt{api\_argorder}, the model-relative-value
 spectrum. All figures are real measured runs; no modeled numbers.}
 \label{tab:consolidated}
@@ -1267,7 +1271,7 @@ Incomp.\ verified ($\ge 90\%$) & \checkmark & \checkmark & \checkmark & \checkma
 $L_{\Dcal}(W_1,W_2)$ & $+0.76$ & $+0.72$ & $+0.72$ & $+0.76$ & $+0.35$ & $+0.68$ \\
 $L_{\Dcal}(W_2,W_1)$ & $+0.76$ & $+0.76$ & $+0.76$ & $+0.76$ & $+0.72$ & $+0.76$ \\
 Relevance mis-rank (trap) & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
-Anti-mono.\ verified (\# cells) & 1 & 2 & 1 & 1 & 1 & 1 \\
+Anti-mono.\ verified (\# cells, of 2) & 1 & 2 & 2 & 2 & 2 & 2 \\
 \texttt{api\_argorder} \texttt{none} & $2\%$ & $0\%$ & $40\%$ & $75\%$ & $2\%$ & $45\%$ \\
 \bottomrule
 \end{tabular}
@@ -1351,9 +1355,13 @@ Haiku listwise ($n{=}30$) & LLM listwise & $W_1$ & $W_1$ & $W_2$ \\
 
 The superset $W_{1+}$, which literally \emph{contains} $W_1$'s signal, sharply degrades the API cells
 relative to $W_1$ alone. The per-task harm contrast $\Delta_T = \PASS(W_{1+},T) - \PASS(W_1,T)$ is
-verified negative ($\Delta_T \le -\tau$, $\tau=0.30$) on at least one cell for all six models
-(Table~\ref{tab:interference}), the mildest being Opus at $100\% \to 38\%$ with upper bound
-$-0.37$. This is a
+verified negative ($\Delta_T \le -\tau$, $\tau=0.30$) on eleven of the twelve API cells, two per
+model, and so on at least one cell for all six models (Table~\ref{tab:interference}); the mildest
+verified collapse is Opus at $100\% \to 38\%$ with upper bound $-0.37$, and the one cell that does
+not clear is Haiku's \texttt{api\_post\_ok}, whose $W_1$ arm is depressed by an unrelated import
+slip (\S\ref{sec:results-audit}). Ten of the eleven survive a Bonferroni correction across the two
+cells within each model ($\alpha=\eta/4$); DeepSeek's \texttt{api\_argorder} is the one that falls
+just short, at $-0.298$. This is a
 verified empirical falsification of Blackwell superset-dominance on live models
 (Theorem~\ref{thm:antimono}): strictly-more-informative context can hurt, and the deficiency
 framework detects it precisely where every monotone scalar must miss it.
@@ -1436,9 +1444,13 @@ Haiku-4.5       & \texttt{api\_post\_ok}, import-neutralized$^{\dagger}$ & $100\
 Sonnet-4.6      & \texttt{api\_post\_ok}            & $100\% \to 2\%$  & $-0.97$ & $-0.78$ & \checkmark \\
 Sonnet-4.6      & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.82$ & \checkmark \\
 GPT-5.5         & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-1.00$ & $-0.82$ & \checkmark \\
+GPT-5.5         & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.82$ & \checkmark \\
 DeepSeek-V4-Pro & \texttt{api\_post\_ok}            & $75\% \to 0\%$   & $-0.75$ & $-0.50$ & \checkmark \\
+DeepSeek-V4-Pro & \texttt{api\_argorder}            & $68\% \to 5\%$   & $-0.62$ & $-0.34$ & \checkmark \\
 Kimi-K2.6       & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-1.00$ & $-0.82$ & \checkmark \\
+Kimi-K2.6       & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.82$ & \checkmark \\
 Opus-4.8        & \texttt{api\_post\_ok}            & $100\% \to 38\%$ & $-0.62$ & $-0.37$ & \checkmark \\
+Opus-4.8        & \texttt{api\_argorder}            & $100\% \to 15\%$ & $-0.85$ & $-0.61$ & \checkmark \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1653,7 +1665,7 @@ whether appending the (irrelevant-to-this-task) $W_2$ to a sufficient $W_1$ degr
 (the second difference $\Psi_T$ is an interaction term, not a harm measure;
 Remark~\ref{rem:psinotharm}). We verify $\Delta_T \le -0.30$ on at least one cell for all six
 models (Table~\ref{tab:interference}), with collapses as stark as $100\% \to 0\%$ (upper bound
-$-0.82$) on Sonnet and Kimi. This is a verified empirical falsification of superset-dominance for
+$-0.82$) on Sonnet, GPT-5.5 and Kimi. This is a verified empirical falsification of superset-dominance for
 these fixed rules (Theorem~\ref{thm:antimono}): a literal superset of a sufficient signal can
 sharply reduce PASS, which no monotone scalar context-value score can represent.
 
@@ -1674,11 +1686,15 @@ mutually non-refining signals stay incomparable however capable the reader becom
 \subsection{Mechanism: the runtime fingerprint is a correlate, not an explanation}
 \label{sec:disc-mechanism}
 
-Every collapse is accompanied by output-token inflation on the harmful arm: $W_{1+}$ emits between $+87\%$ and $+281\%$ more output tokens than $W_1$ on the API collapse cells (e.g.\ Haiku $+106\%/+87\%/+252\%$; Sonnet $+120\%/+131\%$; GPT-5.5 $+281\%/+274\%$). One might read this as
-``verbose thrashing'' causing the failure, but the relationship is correlational and uncontrolled: the
-same superset arm also inflates output by $+12\%$ on the \emph{still-passing} encoding cell, which
-undercuts a clean ``verbosity causes collapse'' account. We therefore treat the token fingerprint as a
-reproducible correlate of the harmful arm, not a mechanism.
+Every collapse is accompanied by output-token inflation on the harmful arm. On the two API
+collapse cells $W_{1+}$ emits between $+93\%$ and $+520\%$ more output tokens than $W_1$ (Haiku
+$+115\%/+163\%$; Sonnet $+520\%/+473\%$; GPT-5.5 $+281\%/+274\%$; DeepSeek $+93\%/+166\%$; Kimi
+$+203\%/+249\%$; the re-measured Opus $W_{1+}$ arm carries no token record). One might read this
+as ``verbose thrashing'' causing the failure, but the relationship is correlational and
+uncontrolled: on the \emph{still-passing} encoding cell the same superset arm ranges from $-73\%$
+to $+114\%$ across the same models, with no consistent direction, which undercuts a clean
+``verbosity causes collapse'' account. We therefore treat the token fingerprint as a reproducible
+correlate of the harmful arm, not a mechanism.
 
 The claim structure is deliberately mechanism-agnostic: Theorem~\ref{thm:antimono} verifies that
 the realized rule is not Blackwell-coherent \emph{whatever} the internal cause, and the behavioral
@@ -1709,7 +1725,7 @@ $m\!\cdot\!|\Dcal|\!\cdot\!n$ verifier-gated calls, curation scale, not corpus s
 verified selection to retrieval over $10^6$ passages, by amortizing the probe into a learned
 deficiency predictor or running the partial-order step as a re-ranking head over a scalar
 shortlist, is the central open problem this work opens. Keeping a non-dominated set instead of a
-top-$k$ prefix already exists as an operator, the skyline ranker of \citet{bookrag2025}, and learned
+top-$k$ prefix already exists as an operator, the skyline retrieval step of \citet{skylinerag2026}, and learned
 set selectors optimize evidence sets end to end~\citep{optiset2026,rank4gen2026}; what the partial
 order adds is the object the set is taken over, verified task value rather than heuristic per-item
 scores, which is exactly what makes the selection safe under anti-monotonicity.
@@ -2118,7 +2134,7 @@ dropping the dominated signal, locates the failure in convention-to-task routing
 All reported numbers come from real model calls whose outputs are checked by executable verifiers; there
 are no modeled or aspirational figures. The complete artifact bundle (the measurement harness, the
 executable verifiers, and every per-model run log and result JSON cited below) is available at
-\url{https://github.com/abilous-ti/blackwell-llm-context}. The harness (\texttt{tokenbench/measure\_blackwell.py}) is
+\url{https://github.com/abilous-ti/blackwell-llm-context}. The harness (\texttt{harness/measure\_blackwell.py}) is
 Python-standard-library only (no third-party dependencies; the Clopper--Pearson endpoints use a stdlib
 regularized incomplete beta), is cross-OS, and implements the surrogate $\dhat_{\Dcal}$, the uniform
 incomparability verification (\texttt{certify\_incomparable}, \texttt{clopper\_pearson}), the dominance
@@ -2161,11 +2177,11 @@ with its arm-only re-run \texttt{blackwell\_opus\_ss\_W1plus} and the clean sing
 (second source pair), \texttt{blackwell\_instr\_n40} (routing-instruction ablation),
 \texttt{blackwell\_xml\_n40} / \texttt{blackwell\_xml\_arm\_only} (structured-context ablation),
 \texttt{reranker\_trap\_n30} (LLM listwise reranker probe;
-\texttt{tokenbench/measure\_reranker\_trap.py}), and \texttt{dense\_trap.json} (dense/cross-encoder
+\texttt{harness/measure\_reranker\_trap.py}), and \texttt{dense\_trap.json} (dense/cross-encoder
 probe, deterministic local scoring of open-weight checkpoints at zero API cost;
-\texttt{tokenbench/measure\_dense\_trap.py}). The full per-cell record is in
-\texttt{EXPERIMENT-BLACKWELL.md} and the theory hardening (formalization and proof sketches) in
-\texttt{BLACKWELL.md}.
+\texttt{harness/measure\_dense\_trap.py}). The full per-cell record is in
+\texttt{docs/EXPERIMENT-BLACKWELL.md} and the theory hardening (formalization and proof
+sketches) in \texttt{docs/BLACKWELL.md}.
 
 \paragraph{Compute and cost.} Total measured Anthropic spend was approximately \$130: the
 single-shot Haiku, Sonnet, and Opus runs (Opus the costliest, plus its arm-only re-run) and the
