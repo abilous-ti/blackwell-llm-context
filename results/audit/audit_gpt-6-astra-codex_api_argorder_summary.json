@@ -1,0 +1,34 @@
+{
+ "model": "gpt-6-astra (Codex CLI default; model_reasoning_effort=xhigh)",
+ "label": "gpt-6-astra-codex",
+ "task": "api_argorder",
+ "kind": "codex",
+ "n": 40,
+ "arms": {
+  "W1": {
+   "n": 40,
+   "pass_original": 40,
+   "pass_neutral": 40,
+   "errs": 0,
+   "fail_missing_import_only": 0,
+   "fail_encoded_amount": 0,
+   "fail_code_empty": 0,
+   "fail_prose_first": 0,
+   "fenced_pass": 0,
+   "fenced_fail": 0
+  },
+  "W1plus": {
+   "n": 40,
+   "pass_original": 0,
+   "pass_neutral": 0,
+   "errs": 0,
+   "fail_missing_import_only": 0,
+   "fail_encoded_amount": 40,
+   "fail_code_empty": 0,
+   "fail_prose_first": 0,
+   "fenced_pass": 0,
+   "fenced_fail": 0
+  }
+ },
+ "regime_note": "AGENTIC Codex CLI, not the single-shot Azure completion used for GPT-5.5 in the paper. Different model AND different regime: not comparable to the published GPT-5.5 cell."
+}
