@@ -405,9 +405,11 @@ against a \emph{frozen decoder} as minimization of Le~Cam deficiency, pairs it w
 Vereshchagin--Vit\'anyi conditional structure function for the representation problem, proves a
 capacity floor below which the deficiency cannot be driven, and validates a curve-aware allocator
 on seven decoders in four families; a plain-language companion states the
-framing~\citep{alpila2026essay} and the artifact is released~\citep{alpila2026lmrecall}. That work
-and ours reach for the same classical apparatus in the same month, and we make no priority claim
-over it. The objects are nonetheless different, and the difference is what this paper is about.
+framing~\citep{alpila2026essay} and the artifact is released~\citep{alpila2026lmrecall}. That preprint
+was posted on 25 June 2026, while the measurements reported here were already complete; we claim
+no priority over it, and the reader should treat the transport of this apparatus to inference-time
+context as theirs. The objects are nonetheless different, and that difference is what this paper
+is about.
 There, deficiency is a scalar risk gap \emph{inside one declared decision problem}, with the
 garbling theorem explicitly set aside as inactive there; the partial order that work does invoke
 runs over \emph{compression methods} and is asserted structurally rather than measured. Our object
@@ -430,11 +432,18 @@ design~\citep{vanrooyen2014}, and a survey of Blackwell's theorems for AI~\citep
 The one use of the order for language models at inference time that we know of sits on the
 other side of the model: \citet{zhang2026blackwellagents} rank the information structures induced
 by multi-agent protocols (voting, debate) and prove a pooled-posterior upper bound, a dominance
-result over protocols with no incomparable pair and no verification. To our knowledge no prior work \emph{measures} a Blackwell partial order over the context sources
-of a single model, treats verified \emph{incomparability} rather than deficiency-minimization or
-dominance as the object of interest, derives the no-per-source-score consequence from it, or
-supplies a distribution-free finite-sample verification of an order relation between named sources
-on production models. Those are the pieces that are new here.
+result over protocols with no incomparable pair and no verification. Against all of the above, four things are new here, and each is checkable against the released
+record:
+\begin{enumerate}[topsep=2pt,itemsep=1pt,leftmargin=1.6em]
+  \item the object is the order \emph{between two admitted sources across tasks}, not a scalar risk
+  gap inside one declared decision problem;
+  \item partiality is \emph{measured}, mutual non-domination verified in both directions on six
+  production models, not assumed or asserted structurally;
+  \item the no-per-source-score impossibility is derived from it and machine-checked in Lean~4
+  (Remark~\ref{rem:lean});
+  \item the order relation between \emph{named} sources gets a distribution-free finite-sample
+  verification on black-box models, including a superset that collapses PASS under controls.
+\end{enumerate}
 
 \subsection{The design space: no cheap method represents the partial order}
 \label{sec:related-designspace}
@@ -1792,6 +1801,10 @@ task-disjoint, so a complementary pair would be needed to test whether a superse
 \section{Conclusion}
 \label{sec:conclusion}
 % ==========================================================================
+
+Bringing Blackwell and Le~Cam to inference-time context is not ours to claim: concurrent work
+reached the same apparatus from the admission side (\S\ref{sec:related-deficiency}). What we add
+follows from taking \emph{incomparability}, not deficiency-minimization, as the object.
 
 Context selection is, at bottom, a partial-order problem, not a scalar one. When two sources are
 incomparable, no single per-source score, relevance or utility, can rank them correctly for all
