@@ -1,3 +1,14 @@
+# byte-compiled
+__pycache__/
+*.py[cod]
 
-# raw per-call CLI transcripts (local provenance; committed extracts carry what the reconstruction needs)
+# raw per-call CLI transcripts (local provenance; committed extracts carry
+# what the reconstruction needs)
 results/raw_transcripts/
+
+# LaTeX build products; the compiled PDF and .bbl are committed deliberately
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.blg
+paper/*.toc

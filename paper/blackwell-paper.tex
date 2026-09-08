@@ -211,8 +211,7 @@ from it, the instrument that makes it testable, and the evidence that it holds.
   as the object. Blackwell-incomparable sources cannot be ranked by \emph{any} single per-source
   score $\varphi(W)$, relevance or utility, for all tasks (Theorem~\ref{thm:incomparable}), with
   the query-conditioned topical case isolated separately (Proposition~\ref{prop:trap-constrained});
-  both impossibility results are machine-checked in Lean~4 and depend on no axioms
-  (Remark~\ref{rem:lean}). Information retrieval has long argued that no single fixed document
+  Information retrieval has long argued that no single fixed document
   score is optimal once documents interact (\S\ref{sec:related-ir}); we derive the impossibility as
   a theorem in the Blackwell frame and name the exact structural condition under which it bites.
   \item[\textbf{(C2)}] \textbf{Verification: a measurable deficiency surrogate with finite-sample
@@ -421,8 +420,7 @@ record:
   gap inside one declared decision problem;
   \item partiality is \emph{measured}, mutual non-domination verified in both directions on six
   production models, not assumed or asserted structurally;
-  \item the no-per-source-score impossibility is derived from it and machine-checked in Lean~4
-  (Remark~\ref{rem:lean});
+  \item the no-per-source-score impossibility is derived from it;
   \item the order relation between \emph{named} sources gets a distribution-free finite-sample
   verification on black-box models, including a superset that collapses PASS under controls.
 \end{enumerate}
@@ -843,24 +841,6 @@ information, perplexity-gap, and (fixed-prior) EIG all live in this class, so th
 victims of the theorem, not competitors (Proposition~\ref{prop:vinfo-monotone}).
 \end{remark}
 
-\begin{remark}[Machine-checked]
-\label{rem:lean}
-Theorem~\ref{thm:incomparable} and Proposition~\ref{prop:trap-constrained} are formalized and
-machine-checked in Lean~4 (\texttt{lean/ContextSelection.lean} in the artifact repository, as
-\texttt{no\_faithful\_query\_independent\_score} and \texttt{topical\_score\_misranks\_trap}). The
-formalization takes no dependency on Mathlib and checks against a bare \texttt{lean} binary; the
-order on the score codomain is passed explicitly rather than drawn from a typeclass hierarchy,
-which records the fact that the obstruction is \emph{totality of the induced ranking alone}, not any
-property of $\mathbb{R}$. Every scalar in the excluded class therefore falls under the one theorem.
-A \texttt{Demo} namespace instantiates both results on the paper's own configuration, so the
-impossibility statements are not vacuous, and \texttt{\#print axioms} reports that both central
-theorems depend on \emph{no} axioms: the arguments are constructive, using neither choice nor
-excluded middle. What is \emph{not} formalized is stated as plainly: the
-Blackwell--Sherman--Stein theorem remains a cited classical black box
-(Theorem~\ref{thm:blackwell}), and the statistical procedures of \S\ref{sec:estimator} are claims
-about measurements rather than theorems.
-\end{remark}
-
 \begin{proposition}[$\Vcal$-usable information is Blackwell-monotone]
 \label{prop:vinfo-monotone}
 Let $\Vcal$-usable information $I_{\Vcal}(W\!\to\! S)$ be defined, after
@@ -913,7 +893,7 @@ faithfulness on $T_c$ would require a strict gap. For (b), $\mathrm{ov}(W_2,T_c)
 while utility favours $W_1$ because $T_c$'s PASS requires $W_1$'s coordinate; the two orders
 disagree. The hypotheses are incompatible by construction: under (a)'s feature equality the overlap
 feature is equal too, so a score monotone in overlap returns a tie rather than (b)'s strict
-inversion. Part (a) is the statement machine-checked in Lean (Remark~\ref{rem:lean}); (b) makes
+inversion. Part (b) makes
 explicit the two things the informal reading of ``saturated lexicon'' presumes, strict monotonicity
 and overlap being the only feature read, without which no strict inequality follows.
 \end{proof}
@@ -2023,13 +2003,12 @@ automated queries to commercial language-model endpoints, graded by executable v
 Not applicable.
 
 \section*{Data Availability Statement}
-All data, code and machine-checked proofs supporting the reported results are openly available at
+All data and code supporting the reported results are openly available at
 \url{https://github.com/abilous-ti/blackwell-llm-context}. The repository contains the measurement
 harness (Python standard library only), every per-model run log and result file cited in
-Appendix~\ref{app:record}, the raw-completion diagnostic records of \S\ref{sec:results-audit}, and
-the Lean~4 formalization of Remark~\ref{rem:lean} with the continuous-integration job that
-re-checks it. No data were withheld; every reported figure is computed from those files by the
-released scripts.
+Appendix~\ref{app:record}, and the raw-completion diagnostic records of
+\S\ref{sec:results-audit}. No data were withheld; every reported figure is computed from those
+files by the released scripts.
 
 \section*{Conflicts of Interest}
 The authors declare no conflict of interest.
@@ -2339,13 +2318,6 @@ control (\texttt{certify\_dominance}), the interference verification, the sample
 (\texttt{lexical\_relevance}). It includes launchers for the Anthropic CLI (\texttt{claude -p}), the
 Azure Responses API, and OpenAI-compatible chat completions; the launcher auto-detects API style from the
 endpoint, and all API keys are read from the environment (never written to a file).
-
-\paragraph{Machine-checked proofs.} The bundle also contains \texttt{lean/ContextSelection.lean}, a
-Lean~4 formalization of the two impossibility results (Remark~\ref{rem:lean}). It takes no
-dependency on Mathlib, so it is checked by \texttt{lean ContextSelection.lean} against a bare
-toolchain with no build step or network access; the version is pinned in \texttt{lean/lean-toolchain}
-and a continuous-integration job re-checks it on a clean machine at every change, failing the build
-if any \texttt{sorry} appears or if either theorem stops reporting an empty axiom footprint.
 
 \paragraph{Protocol.} The verifier stubs a fake \texttt{ledger} module that accepts \emph{only} the exact
 private contract (it rejects wrong positional arg order, a missing \texttt{memo=} keyword, and the wrong

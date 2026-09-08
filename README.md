@@ -13,8 +13,7 @@ per-run records from which every verification can be recomputed.
 - **Theory.** Context sources, modelled as statistical experiments on a task's latent requirement,
   form a Blackwell *partial* order. Blackwell-incomparable sources cannot be ranked by any
   query-independent scalar for all tasks, and topical query-conditioned scores fail on a
-  constructed trap. Both impossibility results are machine-checked in Lean 4 and depend on no
-  axioms (`lean/`).
+  constructed trap.
 - **Verification.** A decision-restricted value-deficiency *surrogate* (deliberately not called a
   Le Cam deficiency) with a distribution-free finite-sample verification: exact Clopper–Pearson
   intervals, union bound over the task battery, η = 0.10.
@@ -42,12 +41,11 @@ widened every bound.
 |---|---|
 | `harness/` | measurement code, Python standard library only; API keys are read from the environment and never written to disk |
 | `harness/diag/` | retention re-measurement, packaging audit, certificate recomputation, BigCodeBench pilot |
-| `lean/` | `ContextSelection.lean`, Mathlib-free, checked by a bare `lean` binary; CI rejects `sorry` and asserts both theorems stay axiom-free |
 | `results/` | raw result JSONs and run logs |
 | `results/audit/` | re-measurement with raw completions retained |
 | `results/bcb/` | BigCodeBench pilot |
 | `docs/` | `EXPERIMENT-BLACKWELL.md` (per-cell record), `BLACKWELL.md` (formalization and proof sketches) |
-| `paper/` | manuscript source, compiled PDF, and the MAKE submission build |
+| `paper/` | manuscript source, compiled PDF, the MAKE submission build, and the two scripts that generate it |
 
 ### Harness
 
@@ -102,10 +100,6 @@ python harness/diag/audit_any.py --kind azure --model DeepSeek-V4-Pro \
 pip install sentence-transformers && python harness/measure_dense_trap.py
 ```
 
-```bash
-# machine-checked impossibility proofs (no Mathlib, no build step, no network)
-cd lean && lean ContextSelection.lean
-```
 
 ## Scope of the numbers
 
