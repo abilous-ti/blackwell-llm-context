@@ -78,6 +78,17 @@ def pair_status(iv, a, b, tasks):
 
 
 # ----------------------------------------------------------------------------- driver
+def _strkeys(o):
+    """JSON-safe copy: tuple keys -> "a|b", other non-str keys -> str (values untouched)."""
+    if isinstance(o, dict):
+        return {("|".join(map(str, k)) if isinstance(k, tuple) else
+                 (k if isinstance(k, (str, int, float, bool)) or k is None else str(k))): _strkeys(v)
+                for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [_strkeys(v) for v in o]
+    return o
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--corpus", required=True)
@@ -147,7 +158,8 @@ def main():
                 for job, (key, r) in zip(pending, ex.map(one, pending)):
                     cost += r.get("cost", 0.0); calls += 1
                     if r.get("error"):
-                        failed.append(job); dropped[key] = dropped.get(key, 0) + 1
+                        sk = key[0] + "|" + key[1]                  # string key: JSON-safe
+                        failed.append(job); dropped[sk] = dropped.get(sk, 0) + 1
                         continue
                     draws[key].append(1 if r["solved"] else 0)
                     errs[key].append(0)
@@ -160,6 +172,20 @@ def main():
         for job in pending if failed else []:          # residual: recorded, NOT scored
             residual[job[0] + "|" + job[1]] = residual.get(job[0] + "|" + job[1], 0) + 1
 
+    def checkpoint(n_drawn, done, stop_n):
+        """Raw state after every round -> <out>.ckpt.json, so a crash never loses paid draws."""
+        if not a.out:
+            return
+        ck = {"corpus": a.corpus, "model": a.model, "nmax": a.nmax, "n_drawn": n_drawn,
+              "counts": {f"{x}|{t}": [sum(v), len(v)] for (x, t), v in draws.items()},
+              "draws": {f"{x}|{t}": v for (x, t), v in draws.items()},
+              "errs": {f"{x}|{t}": v for (x, t), v in errs.items()},
+              "done": {f"{pr[0]}|{pr[1]}": list(v) for pr, v in done.items()},
+              "stop_n": {f"{x}|{t}": n for (x, t), n in stop_n.items()},
+              "calls": calls, "total_cost_usd": cost, "outage_redrawn": dropped, "outage_unscored": residual,
+              "written": time.strftime("%Y-%m-%d %H:%M:%S")}
+        (REPO / (a.out + ".ckpt.json")).write_text(json.dumps(_strkeys(ck), indent=1), encoding="utf-8")
+
     if a.only_cells:
         cells = [tuple(c.strip().split("|", 1)) for c in a.only_cells.split(",") if c.strip()]
         for x, t in cells:
@@ -168,7 +194,7 @@ def main():
                "counts": {f"{x}|{t}": [sum(draws[(x, t)]), len(draws[(x, t)])] for x, t in cells},
                "draws": {f"{x}|{t}": draws[(x, t)] for x, t in cells},
                "errs": {f"{x}|{t}": errs[(x, t)] for x, t in cells}, "total_cost_usd": cost}
-        (REPO / a.out).write_text(json.dumps(out, indent=1), encoding="utf-8")
+        (REPO / a.out).write_text(json.dumps(_strkeys(out), indent=1), encoding="utf-8")
         print("isolated re-run of", list(out["counts"]), "->", REPO / a.out, f"  spend ${cost:.2f}")
         return
 
@@ -179,6 +205,7 @@ def main():
     clean = [t for t in by_task if t not in leaky]
     alpha = ETA / (2 * len(clean)); a1 = a2 = alpha / 2
     print(f"[{time.strftime('%H:%M:%S')}] none-baseline:", {t: f"{v:.0%}" for t, v in none_p.items()}, "| leaky:", leaky, f"| alpha={alpha:.4f}")
+    checkpoint(0, {}, {})
 
     # 2) candidates in rounds with the two-stage rule
     pairs = [(pool[i], pool[j]) for i in range(len(pool)) for j in range(i + 1, len(pool))]
@@ -208,6 +235,7 @@ def main():
                 active.discard(cell); stop_n[cell] = n_drawn
         print(f"  [{time.strftime('%H:%M:%S')}] round n={n_drawn:<3} verified pairs {sum(1 for v in done.values() if v[0]=='INCOMPARABLE'):>2}/{len(pairs)}"
               f"  active cells {len(active):>3}  calls so far {calls}")
+        checkpoint(n_drawn, done, stop_n)
     for cell in active:
         stop_n[cell] = n_drawn
 
@@ -242,7 +270,7 @@ def main():
            "calls": calls, "fixed_calls": fixed_calls, "total_cost_usd": cost,
            "outage_redrawn": dropped, "outage_unscored": residual}
     if a.out:
-        (REPO / a.out).write_text(json.dumps(out, indent=1), encoding="utf-8")
+        (REPO / a.out).write_text(json.dumps(_strkeys(out), indent=1), encoding="utf-8")
         print("wrote", REPO / a.out)
 
 
