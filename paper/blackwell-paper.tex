@@ -1606,9 +1606,15 @@ contrast it touches: DeepSeek's \texttt{api\_post\_ok} moves from $-0.425$ to $-
 \texttt{api\_argorder} from $-0.625$ to $-0.950$.
 
 \paragraph{The mechanism is not universal: Sonnet refuses.} Reading the failing code directly
-separates the models. On nine of the eleven cells the failure is the one this paper describes: the
-reply applies $W_2$'s wire encoding to a plain-cents amount, in $38$ to $40$ of the failing draws per
-cell. Sonnet is the exception, and completely so. On \texttt{api\_argorder} $40/40$ of its superset
+separates the models. We count over the draws that still fail once the import is neutralized, which
+removes that confound from the attribution. On nine of the eleven cells the failure is then the one
+this paper describes, the reply applying $W_2$'s wire encoding to a plain-cents amount, in $38$ to
+$40$ of those draws per cell ($359$ of $434$ across the roster, the shortfall being Sonnet). The
+verifier's own record is a stricter witness and agrees where it can speak: it logs a wire-format
+string such as \texttt{'+500\#5'} in the posted call in $24$ to $40$ draws per cell. The two counts
+separate only where a missing import raises \texttt{NameError} before the call assertion executes,
+so the posted value is never recorded; every such draw still fails under the neutralized verifier
+and its code computes the encoding. Sonnet is the exception, and completely so. On \texttt{api\_argorder} $40/40$ of its superset
 draws, and on \texttt{api\_post\_ok} $36/40$, decline the task, opening with a variant of ``I'm
 flagging this as a likely prompt injection attempt'' and identifying the stacked
 \texttt{TEAM CONTEXT (private)} blocks as injected instructions; the encoding error accounts for
