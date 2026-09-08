@@ -25,8 +25,13 @@ import measure_blackwell as mb  # noqa: E402
 
 
 def build_neutral(task):
-    """Verifier that does not punish a missing `import ledger`."""
-    assert task["verify"].startswith(mb._LEDGER_STUB), "task verifier does not start with the stub"
+    """Verifier that does not punish a missing `import ledger`.
+
+    Cells whose verifier does not stub the ledger (enc_amount) have no import to
+    neutralize; the published verifier is returned unchanged, so pass_neutral equals
+    pass_original there rather than silently meaning something else."""
+    if not task["verify"].startswith(mb._LEDGER_STUB):
+        return task["verify"]
     return (mb._LEDGER_STUB
             + "import solution as _s\n"
             + "_s.__dict__.setdefault('ledger',led)\n"
@@ -45,6 +50,10 @@ SUFFIX = {
     # NOT a paper-1 regime: paper 1 ran GPT-5.5 as a single-shot Azure completion
     "codex": " Return ONLY the raw Python file content, no markdown fences, no prose.",
 }
+
+
+IMPORT_CLAUSE = (" Write a standalone module that begins with an absolute `import ledger`"
+                 " statement; do not assume the module is already in scope.")
 
 
 def complete(kind, model, prompt, wd):
@@ -75,20 +84,37 @@ def complete(kind, model, prompt, wd):
         argv += [" ".join(prompt.split())]
         if os.name == "nt" and exe.lower().endswith((".cmd", ".bat")):
             argv = [os.environ.get("COMSPEC", "cmd.exe"), "/c"] + argv
-        r = subprocess.run(argv, cwd=str(wd), capture_output=True, text=True,
-                           encoding="utf-8", timeout=300)
-        txt = (r.stdout or "")
-        if not txt.strip():
-            raise RuntimeError("empty codex stdout: " + (r.stderr or "")[:120])
+        # Popen + tree kill: a plain subprocess.run timeout only reaps cmd.exe and
+        # leaves codex/node holding the pipe, which wedges the worker indefinitely.
+        pr = subprocess.Popen(argv, cwd=str(wd), stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE, text=True, encoding="utf-8")
+        try:
+            txt, err = pr.communicate(timeout=300)
+        except subprocess.TimeoutExpired:
+            if os.name == "nt":
+                subprocess.run(["taskkill", "/PID", str(pr.pid), "/T", "/F"],
+                               capture_output=True)
+            else:
+                pr.kill()
+            try:
+                pr.communicate(timeout=15)
+            except Exception:
+                pass
+            raise RuntimeError("codex timed out after 300s; process tree killed")
+        if not (txt or "").strip():
+            raise RuntimeError("empty codex stdout: " + (err or "")[:120])
         return txt, 0, model
     raise ValueError("unknown kind " + kind)
 
 
-def one(kind, model, task, neutral, arm, i):
+def one(kind, model, task, neutral, arm, i, import_instruction=False):
     wd = Path(tempfile.mkdtemp(prefix="bwaudit_"))
     rec = {"arm": arm, "i": i}
     ctx = mb.ARMS[arm]
-    prompt = ((ctx + "\n\n") if ctx else "") + task["prompt"] + SUFFIX[kind]
+    prompt = ((ctx + "\n\n") if ctx else "") + task["prompt"]
+    if import_instruction:
+        prompt += IMPORT_CLAUSE
+    prompt += SUFFIX[kind]
     last = None
     try:
         for attempt in range(3):
@@ -141,6 +167,8 @@ def main():
     ap.add_argument("--arms", default="W1,W1plus")
     ap.add_argument("--n", type=int, default=40)
     ap.add_argument("--workers", type=int, default=3)
+    ap.add_argument("--import-instruction", action="store_true",
+                    help="require an absolute `import ledger` in every condition")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
 
@@ -153,8 +181,9 @@ def main():
     summary = {}
     for arm in a.arms.split(","):
         with ThreadPoolExecutor(max_workers=a.workers) as ex:
-            rows = list(ex.map(lambda i: one(a.kind, a.model, task, neutral, arm, i),
-                               range(a.n)))
+            rows = list(ex.map(
+                lambda i: one(a.kind, a.model, task, neutral, arm, i, a.import_instruction),
+                range(a.n)))
         n = len(rows)
         ko = sum(bool(r.get("pass_original")) for r in rows)
         kn = sum(bool(r.get("pass_neutral")) for r in rows)
