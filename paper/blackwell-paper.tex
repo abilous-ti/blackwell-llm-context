@@ -240,7 +240,10 @@ from it, the instrument that makes it testable, and the evidence that it holds.
 \paragraph{How to read the formal terms.}
 The argument is necessarily phrased in the language of statistical decision theory.
 Table~\ref{tab:glossary} gives the engineering reading of each recurring term; the empirical
-sections (\S\ref{sec:experiments} onward) can be followed with the right-hand column alone.
+sections (\S\ref{sec:experiments} onward) can be followed with the right-hand column alone. A
+reader who wants the measured result first can go directly to \S\ref{sec:experiments}:
+\S\S\ref{sec:formalization}--\ref{sec:estimator} establish what the measured quantities mean and
+what may be concluded from them, and every proof is deferred to Appendix~\ref{app:proofs}.
 
 \begin{table}[t]
 \centering
@@ -820,19 +823,6 @@ named pair $(T_a', T_b')$ yields $\PASS_M$-disagreement on at least one of $T_a'
 argument; the two conclusions concern their own witness pairs and do not transfer between them.
 \end{theorem}
 
-\begin{proof}
-By incomparability, neither source garbles the other. By the contrapositive of
-Theorem~\ref{thm:blackwell}, ``not $W_1 \Bord W_2$'' yields a task $T_b$ (a prior plus bounded
-utility) with $V^\star(W_2,T_b) > V^\star(W_1,T_b)$, and ``not $W_2 \Bord W_1$'' yields a task
-$T_a$ with $V^\star(W_1,T_a) > V^\star(W_2,T_a)$; both inequalities are \emph{strict}, so ties do
-not arise. A query-independent $\varphi$ assigns the single ordered pair $(\varphi(W_1),
-\varphi(W_2))$, fixing one total order of $\{W_1,W_2\}$ \emph{independent of the task}. That fixed
-order agrees with the optimal-value order on at most one of $T_a, T_b$ (they point opposite ways),
-hence is violated on the other. The $\PASS_M$ conclusion follows by replacing $V^\star$ with
-$\PASS_M$ via Assumption~\ref{ass:attain}, which guarantees the realized rule reproduces both
-strict inequalities with margin $\gamma$.
-\end{proof}
-
 \begin{remark}[Scope]
 \label{rem:c2scope}
 Theorem~\ref{thm:incomparable} rules out exactly the class of \emph{source-level} scalars: any
@@ -885,18 +875,6 @@ $\mathrm{ov}(W_2,T_c) > \mathrm{ov}(W_1,T_c)$. Then $\varphi(W_2,T_c) > \varphi(
 mis-rank. In either case $\varphi$ fails to rank $\{W_1,W_2\}$ by realized utility on $T_c$, so no
 topical query-conditioned score ranks them correctly on all tasks.
 \end{proposition}
-
-\begin{proof}
-For (a), $\varphi=g\circ\psi$ and $\psi(W_1,T_c)=\psi(W_2,T_c)$ force equal scores, while
-faithfulness on $T_c$ would require a strict gap. For (b), $\mathrm{ov}(W_2,T_c) >
-\mathrm{ov}(W_1,T_c)$ with $g$ strictly increasing gives $\varphi(W_2,T_c) > \varphi(W_1,T_c)$,
-while utility favours $W_1$ because $T_c$'s PASS requires $W_1$'s coordinate; the two orders
-disagree. The hypotheses are incompatible by construction: under (a)'s feature equality the overlap
-feature is equal too, so a score monotone in overlap returns a tie rather than (b)'s strict
-inversion. Part (b) makes
-explicit the two things the informal reading of ``saturated lexicon'' presumes, strict monotonicity
-and overlap being the only feature read, without which no strict inequality follows.
-\end{proof}
 
 \begin{remark}[Why \textup{(b)} is stated for a scalar overlap score]
 \label{rem:overlaponly}
@@ -2083,6 +2061,32 @@ the unconditional converse is witnessed by any fixed rule that violates monotoni
 value obeys.
 \end{proof}
 
+\subsection*{Proof of Theorem~\ref{thm:incomparable}}
+\begin{proof}
+By incomparability, neither source garbles the other. By the contrapositive of
+Theorem~\ref{thm:blackwell}, ``not $W_1 \Bord W_2$'' yields a task $T_b$ (a prior plus bounded
+utility) with $V^\star(W_2,T_b) > V^\star(W_1,T_b)$, and ``not $W_2 \Bord W_1$'' yields a task
+$T_a$ with $V^\star(W_1,T_a) > V^\star(W_2,T_a)$; both inequalities are \emph{strict}, so ties do
+not arise. A query-independent $\varphi$ assigns the single ordered pair $(\varphi(W_1),
+\varphi(W_2))$, fixing one total order of $\{W_1,W_2\}$ \emph{independent of the task}. That fixed
+order agrees with the optimal-value order on at most one of $T_a, T_b$ (they point opposite ways),
+hence is violated on the other. The $\PASS_M$ conclusion follows by replacing $V^\star$ with
+$\PASS_M$ via Assumption~\ref{ass:attain}, which guarantees the realized rule reproduces both
+strict inequalities with margin $\gamma$.
+\end{proof}
+
+\subsection*{Proof of Proposition~\ref{prop:trap-constrained}}
+\begin{proof}
+For (a), $\varphi=g\circ\psi$ and $\psi(W_1,T_c)=\psi(W_2,T_c)$ force equal scores, while
+faithfulness on $T_c$ would require a strict gap. For (b), $\mathrm{ov}(W_2,T_c) >
+\mathrm{ov}(W_1,T_c)$ with $g$ strictly increasing gives $\varphi(W_2,T_c) > \varphi(W_1,T_c)$,
+while utility favours $W_1$ because $T_c$'s PASS requires $W_1$'s coordinate; the two orders
+disagree. The hypotheses are incompatible by construction: under (a)'s feature equality the overlap
+feature is equal too, so a score monotone in overlap returns a tie rather than (b)'s strict
+inversion. Part (b) makes
+explicit the two things the informal reading of ``saturated lexicon'' presumes, strict monotonicity
+and overlap being the only feature read, without which no strict inequality follows.
+\end{proof}
 \subsection*{Proof of Proposition~\ref{prop:vinfo-monotone}}
 \begin{proof}
 Let $G$ be the garbling with $\kappa_{W_2}=G\circ\kappa_{W_1}$. Any predictor $g\in\Vcal$ acting
