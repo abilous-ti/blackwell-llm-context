@@ -1,8 +1,64 @@
 {
  "corpus": "incomparability",
+ "sequential": true,
+ "mock": false,
  "model": "claude-haiku-4-5-20251001",
+ "eta": 0.1,
  "nmax": 24,
- "n_drawn": 24,
+ "round": 4,
+ "futility": 8,
+ "topk": {
+  "t_cpx": [
+   "tokenbench.measure_incomparability.clopper_pearson",
+   "tokenbench.measure_incomparability.verify_in",
+   "tokenbench.measure_incomparability.scalar_table"
+  ],
+  "t_hd": [
+   "tokenbench.measure_incomparability.hat_delta",
+   "tokenbench.measure_incomparability.scalar_table",
+   "tokenbench.measure_incomparability.verify_in"
+  ],
+  "t_ninc": [
+   "tokenbench.measure_incomparability.required_n_incomparability",
+   "tokenbench.measure_incomparability.required_n_dominance",
+   "tokenbench.measure_incomparability.scalar_table"
+  ],
+  "t_ndom": [
+   "tokenbench.measure_incomparability.required_n_dominance",
+   "tokenbench.measure_incomparability.required_n_incomparability",
+   "tokenbench.measure_incomparability.scalar_table"
+  ],
+  "t_code": [
+   "tokenbench.measure_incomparability.extract_code",
+   "tokenbench.measure_incomparability.verify_in",
+   "tokenbench.measure_incomparability.scalar_table"
+  ]
+ },
+ "pool": [
+  "tokenbench.measure_incomparability.clopper_pearson",
+  "tokenbench.measure_incomparability.extract_code",
+  "tokenbench.measure_incomparability.hat_delta",
+  "tokenbench.measure_incomparability.required_n_dominance",
+  "tokenbench.measure_incomparability.required_n_incomparability",
+  "tokenbench.measure_incomparability.scalar_table",
+  "tokenbench.measure_incomparability.verify_in"
+ ],
+ "none_pass": {
+  "t_cpx": 0.75,
+  "t_hd": 0.0,
+  "t_ninc": 0.0,
+  "t_ndom": 0.0,
+  "t_code": 0.7916666666666666
+ },
+ "leaky_tasks": [
+  "t_cpx",
+  "t_code"
+ ],
+ "clean_tasks": [
+  "t_hd",
+  "t_ninc",
+  "t_ndom"
+ ],
  "counts": {
   "none|t_cpx": [
    18,
@@ -1549,24 +1605,300 @@
   ],
   "tokenbench.measure_incomparability.verify_in|t_code": []
  },
- "done": {
-  "tokenbench.measure_incomparability.hat_delta|tokenbench.measure_incomparability.required_n_dominance": [
-   "INCOMPARABLE",
-   0.08376884460449219,
-   0.08376884460449219,
-   12
-  ],
-  "tokenbench.measure_incomparability.hat_delta|tokenbench.measure_incomparability.required_n_incomparability": [
-   "INCOMPARABLE",
-   0.14670580625534058,
-   0.24216270446777344,
-   16
-  ]
+ "stop_n": {
+  "tokenbench.measure_incomparability.verify_in|t_ndom": 24,
+  "tokenbench.measure_incomparability.extract_code|t_hd": 24,
+  "tokenbench.measure_incomparability.required_n_incomparability|t_ninc": 24,
+  "tokenbench.measure_incomparability.scalar_table|t_ninc": 24,
+  "tokenbench.measure_incomparability.clopper_pearson|t_hd": 24,
+  "tokenbench.measure_incomparability.hat_delta|t_ndom": 24,
+  "tokenbench.measure_incomparability.required_n_dominance|t_hd": 24,
+  "tokenbench.measure_incomparability.verify_in|t_ninc": 24,
+  "tokenbench.measure_incomparability.required_n_incomparability|t_hd": 24,
+  "tokenbench.measure_incomparability.scalar_table|t_hd": 24,
+  "tokenbench.measure_incomparability.hat_delta|t_ninc": 24,
+  "tokenbench.measure_incomparability.extract_code|t_ndom": 24,
+  "tokenbench.measure_incomparability.verify_in|t_hd": 24,
+  "tokenbench.measure_incomparability.clopper_pearson|t_ndom": 24,
+  "tokenbench.measure_incomparability.required_n_dominance|t_ndom": 24,
+  "tokenbench.measure_incomparability.extract_code|t_ninc": 24,
+  "tokenbench.measure_incomparability.required_n_incomparability|t_ndom": 24,
+  "tokenbench.measure_incomparability.hat_delta|t_hd": 24,
+  "tokenbench.measure_incomparability.scalar_table|t_ndom": 24,
+  "tokenbench.measure_incomparability.clopper_pearson|t_ninc": 24,
+  "tokenbench.measure_incomparability.required_n_dominance|t_ninc": 24
  },
- "stop_n": {},
+ "pairs": [
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.clopper_pearson",
+    "tokenbench.measure_incomparability.extract_code"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.204,
+   "L_BA": -0.2,
+   "co_retrieved": false,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.clopper_pearson",
+    "tokenbench.measure_incomparability.hat_delta"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": 0.592,
+   "L_BA": -0.2,
+   "co_retrieved": false,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.clopper_pearson",
+    "tokenbench.measure_incomparability.required_n_dominance"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": 0.518,
+   "L_BA": -0.204,
+   "co_retrieved": false,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.clopper_pearson",
+    "tokenbench.measure_incomparability.required_n_incomparability"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": 0.383,
+   "L_BA": -0.204,
+   "co_retrieved": false,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.clopper_pearson",
+    "tokenbench.measure_incomparability.scalar_table"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.204,
+   "L_BA": -0.2,
+   "co_retrieved": true,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.clopper_pearson",
+    "tokenbench.measure_incomparability.verify_in"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.204,
+   "L_BA": -0.2,
+   "co_retrieved": true,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.extract_code",
+    "tokenbench.measure_incomparability.hat_delta"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": 0.592,
+   "L_BA": -0.204,
+   "co_retrieved": false,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.extract_code",
+    "tokenbench.measure_incomparability.required_n_dominance"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": 0.592,
+   "L_BA": -0.204,
+   "co_retrieved": false,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.extract_code",
+    "tokenbench.measure_incomparability.required_n_incomparability"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": 0.518,
+   "L_BA": -0.204,
+   "co_retrieved": false,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.extract_code",
+    "tokenbench.measure_incomparability.scalar_table"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.204,
+   "L_BA": -0.204,
+   "co_retrieved": true,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.extract_code",
+    "tokenbench.measure_incomparability.verify_in"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.204,
+   "L_BA": -0.204,
+   "co_retrieved": true,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.hat_delta",
+    "tokenbench.measure_incomparability.required_n_dominance"
+   ],
+   "verdict": "INCOMPARABLE",
+   "pattern": "incomparable",
+   "L_AB": 0.084,
+   "L_BA": 0.084,
+   "co_retrieved": false,
+   "n_at_verdict": 12
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.hat_delta",
+    "tokenbench.measure_incomparability.required_n_incomparability"
+   ],
+   "verdict": "INCOMPARABLE",
+   "pattern": "incomparable",
+   "L_AB": 0.147,
+   "L_BA": 0.242,
+   "co_retrieved": false,
+   "n_at_verdict": 16
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.hat_delta",
+    "tokenbench.measure_incomparability.scalar_table"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.204,
+   "L_BA": 0.592,
+   "co_retrieved": true,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.hat_delta",
+    "tokenbench.measure_incomparability.verify_in"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.204,
+   "L_BA": 0.592,
+   "co_retrieved": true,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.required_n_dominance",
+    "tokenbench.measure_incomparability.required_n_incomparability"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.162,
+   "L_BA": -0.158,
+   "co_retrieved": true,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.required_n_dominance",
+    "tokenbench.measure_incomparability.scalar_table"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.204,
+   "L_BA": 0.592,
+   "co_retrieved": true,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.required_n_dominance",
+    "tokenbench.measure_incomparability.verify_in"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.204,
+   "L_BA": 0.592,
+   "co_retrieved": false,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.required_n_incomparability",
+    "tokenbench.measure_incomparability.scalar_table"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.204,
+   "L_BA": 0.518,
+   "co_retrieved": true,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.required_n_incomparability",
+    "tokenbench.measure_incomparability.verify_in"
+   ],
+   "verdict": "unresolved",
+   "pattern": "one-way evidence",
+   "L_AB": -0.204,
+   "L_BA": 0.518,
+   "co_retrieved": false,
+   "n_at_verdict": 24
+  },
+  {
+   "pair": [
+    "tokenbench.measure_incomparability.scalar_table",
+    "tokenbench.measure_incomparability.verify_in"
+   ],
+   "verdict": "unresolved",
+   "pattern": "no evidence",
+   "L_AB": -0.204,
+   "L_BA": -0.204,
+   "co_retrieved": true,
+   "n_at_verdict": 24
+  }
+ ],
+ "tally": {
+  "unresolved": 19,
+  "INCOMPARABLE": 2
+ },
+ "pattern_all": {
+  "no evidence": 7,
+  "one-way evidence": 12,
+  "incomparable": 2
+ },
+ "pattern_co": {
+  "no evidence": 6,
+  "one-way evidence": 4
+ },
  "calls": 733,
+ "fixed_calls": 960,
  "total_cost_usd": 13.955699399999997,
  "outage_redrawn": {},
  "outage_unscored": {},
- "written": "2026-09-08 11:32:40"
+ "resumed_from": "results/prev_seq24_incomparability.resume2.json"
 }

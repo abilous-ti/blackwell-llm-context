@@ -41,29 +41,50 @@ in flight, Clopper–Pearson at α/2 at n_max; rounds of 4; pair-hopeless futili
   (n* ≈ 12 at these α; zero cells must run to n_max). The C1 savings are real only in the n ≈ 40 verification
   regime with few pairs.
 
-## incomparability corpus — PAUSED at n = 20 (weekly usage limit), resumable
+## incomparability corpus — `prev_seq24_incomparability.json` (complete; a three-part run)
 
-* Part 1 (2026-09-08 05:56 → 10:06, the same pre-fix driver): none block and rounds 1–3 complete (1/21 pairs
-  verified at n = 12); round 4 lost 45 of 84 draws to the next usage-limit window ("resets 8:50am") and the
-  driver hung in its redraw passes (200 s timeouts, orphaned CLI processes), so it was killed at 10:06.
-  Rounds 1–3 plus the scored round-4 draws were reconstructed from the transcripts (checksum `[0, 0, 1]`) into
-  `prev_seq24_incomparability.resume.json`.
+* Part 1 (2026-09-08 05:56 → 10:06, the pre-fix driver): none block and rounds 1–3 complete (1/21 verified at
+  n = 12); round 4 lost 45 of 84 draws to the account's next usage-limit window ("resets 8:50am") and the driver
+  hung in its redraw passes (200 s timeouts, orphaned CLI processes), so it was killed at 10:06. Reconstructed
+  from the transcripts (checksum `[0, 0, 1]`) into `prev_seq24_incomparability.resume.json`.
 * Part 2 (10:13 → 10:40, fixed driver, `--resume`): topped the three short cells up to n = 16 (6 calls); the
-  round-4 check verified 2/21 pairs (hat_delta vs required_n_dominance at n = 12, hat_delta vs
-  required_n_incomparability at n = 16; the driver's own checkpoint is `prev_seq24_incomparability.json.ckpt.json`).
-  Round 5 then ran into the account's WEEKLY limit ("resets Sep 9, 6pm": 33 synthetic replies) and the run was
-  stopped at 10:40 so the quota is not drained. The state was reconstructed into
-  `prev_seq24_incomparability.resume2.json` (n_drawn = 16; 20 cells hold 20 draws, one holds 17; 87 draws remain
-  to n_max) from `prev_seq24_incomparability.transcripts.jsonl.gz` (parts 1+2, checksum `[0, 0, 1, 2]`).
-  Independent validation of the reconstruction method: its per-cell counts at n = 16 agree with the driver's own
-  checkpoint on all 40 cells (0 mismatches) and it re-derives the same two verified pairs.
-* To finish after the limit resets (the confidence sequence is anytime-valid, so the pauses do not affect
-  validity; the JSON records `resumed_from`):
+  round-4 check verified 2/21; round 5 then hit the account's WEEKLY limit ("resets Sep 9, 6pm", 33 synthetic
+  replies) and the run was stopped at 10:40 to protect the quota. Reconstructed (checksum `[0, 0, 1, 2]`) into
+  `prev_seq24_incomparability.resume2.json`; its per-cell counts at n = 16 agree with the driver's own checkpoint
+  on all 40 cells.
+* Part 3 (11:15 → 11:33, after the reset, `--resume` from resume2): 3 top-up calls to n = 20, round 6 (84 calls),
+  stage 2; 0 outage draws; the driver wrote the JSON itself (`resumed_from` recorded). The confidence sequence is
+  anytime-valid, so the two pauses do not affect validity.
+* Cross-validation of the reconstruction method on a run whose ground truth exists: rebuilding the whole run
+  from `prev_seq24_incomparability.transcripts.jsonl.gz` (953 sessions in 733 driver calls) reproduces the
+  driver's JSON — per-round checksums `[0, 0, 1, 2, 2, 2]`, every pair row (verdict, pattern, L values, n at
+  verdict) and the counts of every drawn cell are identical.
+* Results: D_clean = 3 (t_cpx 75 % and t_code 79 % leaky), K = 7, 21 pairs (10 co-retrieved). Verified
+  incomparable 2/21: hat_delta vs required_n_dominance (stage 1, n = 12) and hat_delta vs
+  required_n_incomparability (stage 1, n = 16) — decisive chunks for different tasks. Sign patterns
+  7 no-evidence / 12 one-way / 2 incomparable; co-retrieved 6 / 4 / 0. The sibling pair required_n_dominance vs
+  required_n_incomparability is "no evidence" for the right reason: each docstring also solves the other's task
+  (16/24 and 19/24), so neither beats the other — an overlap, not an incomparability. The four helper chunks
+  (clopper_pearson, extract_code, scalar_table, verify_in) solve nothing (≤ 2/24) and lose one-way to every
+  decisive chunk.
+* Cost, stated honestly: 624 scored draws vs 960 for a fixed-n = 24 grid (1.54×), all of it the leaky-task screen
+  (7 × 2 × 24 candidate draws on the two leaky tasks never drawn); no cell stopped early (21 active in every
+  round). Driver calls 733 = 624 scored + 109 failed attempts; spend ≈ $14 (token-based estimate $13.49; the
+  JSON's $13.96 mixes the checkpoint's estimate with the CLI-reported cost of part 3).
 
-      python -u harness/prevalence_seq.py --corpus incomparability --nmax 24 --round 4 --futility 8 --workers 2 \
-        --resume results/prev_seq24_incomparability.resume2.json --out results/prev_seq24_incomparability.json 2>&1 | tee -a results/prev_seq24_incomparability.log
+## Across the three private corpora
 
-* Driver calls so far 646 (one per temp dir); token-estimated spend $11.67.
+| corpus | rule | pairs verified incomparable | co-retrieved | early cell stops |
+|---|---|---|---|---|
+| harness (seq24, this file) | two-stage, n_max 24 | 5/36 | 2/14 | none |
+| tokenguard (`prev_seq_tokenguard.json`) | two-stage, n_max 16, old zero-cell futility | 9/28 | 0/12 | futility only |
+| incomparability (seq24, this file) | two-stage, n_max 24 | 2/21 | 0/10 | none |
+
+16/85 pairs (19 %) verified incomparable overall, 2/36 (6 %) among co-retrieved pairs. In every corpus the
+verified pairs are pairs of decisive chunks for different tasks, and same-module siblings that cover each
+other's coordinate come out nested or no-evidence — the structure the theory predicts, on natural text with
+retrieval-selected candidates. Sequential stopping never fired on a prevalence grid; its savings belong to the
+n ≈ 40 verification regime.
 
 Raw transcript directories stay local (`results/raw_transcripts/`, git-ignored): they carry the user's tool
 and environment listings. Everything the reconstruction consumes is in the committed extracts.
