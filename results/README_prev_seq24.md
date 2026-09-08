@@ -41,17 +41,29 @@ in flight, Clopper–Pearson at α/2 at n_max; rounds of 4; pair-hopeless futili
   (n* ≈ 12 at these α; zero cells must run to n_max). The C1 savings are real only in the n ≈ 40 verification
   regime with few pairs.
 
-## incomparability corpus — `prev_seq24_incomparability.json`
+## incomparability corpus — PAUSED at n = 20 (weekly usage limit), resumable
 
 * Part 1 (2026-09-08 05:56 → 10:06, the same pre-fix driver): none block and rounds 1–3 complete (1/21 pairs
-  verified at n = 12); round 4 lost 45 of 84 draws to the next usage-limit window and the driver hung in its
-  redraw passes (200 s timeouts, orphaned CLI processes), so it was killed at 10:06. Rounds 1–3 plus the scored
-  round-4 draws were reconstructed from the transcripts (`prev_seq24_incomparability.transcripts.part1.jsonl.gz`,
-  checksum `[0, 0, 1]`) into `prev_seq24_incomparability.resume.json`.
-* Part 2: `prevalence_seq --resume` with the fixed driver tops every active cell up to n = 16 and continues
-  rounds 5–6 under the same rule (the confidence sequence is anytime-valid, so any continuation pattern is
-  admissible); the JSON records `resumed_from` and the driver log is appended to
-  `prev_seq24_incomparability.log`.
+  verified at n = 12); round 4 lost 45 of 84 draws to the next usage-limit window ("resets 8:50am") and the
+  driver hung in its redraw passes (200 s timeouts, orphaned CLI processes), so it was killed at 10:06.
+  Rounds 1–3 plus the scored round-4 draws were reconstructed from the transcripts (checksum `[0, 0, 1]`) into
+  `prev_seq24_incomparability.resume.json`.
+* Part 2 (10:13 → 10:40, fixed driver, `--resume`): topped the three short cells up to n = 16 (6 calls); the
+  round-4 check verified 2/21 pairs (hat_delta vs required_n_dominance at n = 12, hat_delta vs
+  required_n_incomparability at n = 16; the driver's own checkpoint is `prev_seq24_incomparability.json.ckpt.json`).
+  Round 5 then ran into the account's WEEKLY limit ("resets Sep 9, 6pm": 33 synthetic replies) and the run was
+  stopped at 10:40 so the quota is not drained. The state was reconstructed into
+  `prev_seq24_incomparability.resume2.json` (n_drawn = 16; 20 cells hold 20 draws, one holds 17; 87 draws remain
+  to n_max) from `prev_seq24_incomparability.transcripts.jsonl.gz` (parts 1+2, checksum `[0, 0, 1, 2]`).
+  Independent validation of the reconstruction method: its per-cell counts at n = 16 agree with the driver's own
+  checkpoint on all 40 cells (0 mismatches) and it re-derives the same two verified pairs.
+* To finish after the limit resets (the confidence sequence is anytime-valid, so the pauses do not affect
+  validity; the JSON records `resumed_from`):
+
+      python -u harness/prevalence_seq.py --corpus incomparability --nmax 24 --round 4 --futility 8 --workers 2 \
+        --resume results/prev_seq24_incomparability.resume2.json --out results/prev_seq24_incomparability.json 2>&1 | tee -a results/prev_seq24_incomparability.log
+
+* Driver calls so far 646 (one per temp dir); token-estimated spend $11.67.
 
 Raw transcript directories stay local (`results/raw_transcripts/`, git-ignored): they carry the user's tool
 and environment listings. Everything the reconstruction consumes is in the committed extracts.
