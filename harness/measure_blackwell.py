@@ -609,6 +609,41 @@ def required_n_stark(eta=0.10, D=6):
 # uses CPhi for the + terms (W1plus, none) and CPlo for the - terms (W1, W2), all at a Bonferroni
 # level alpha=eta/4 (4 proportions/task) so the per-task claim holds at >= 1-eta.
 # ============================================================================================
+def certify_harm(counts, by_task, eta=0.10, tau=0.30, selected_post_hoc=False):
+    """Verify DIRECT augmentation harm Delta_T = PASS(W1plus,T) - PASS(W1,T) <= -tau.
+
+    This is the quantity the paper verifies. The four-term interaction Psi_T computed
+    by certify_interference is NOT harm: Psi_T <= 0 is exactly the submodularity
+    inequality for {W1,W2}, and is satisfied by monotone functions with no degradation
+    (none=0, W1=W2=W1plus=1 gives Psi=-1 and zero harm). Psi is reported descriptively.
+
+    Confidence budget. Only two endpoints enter the bound: the UPPER endpoint of the
+    superset arm and the LOWER endpoint of the W1 arm. Each must therefore carry
+    noncoverage at most eta/2, so that the union bound over the two delivers eta. A
+    two-sided Clopper-Pearson call at level `eta` puts eta/2 in each tail, which is
+    exactly that; calling it at eta/2 (as an earlier version did) spends eta/4 per tail,
+    delivers 1-eta/2 rather than 1-eta, and widens the bound for nothing.
+    """
+    alpha = eta / (2.0 * len(by_task)) if selected_post_hoc else eta
+    out, certified = {}, []
+    for tid in by_task:
+        k1, n1 = counts["W1"][tid]
+        kp, np_ = counts["W1plus"][tid]
+        delta = pass_rate(counts["W1plus"][tid]) - pass_rate(counts["W1"][tid])
+        hi = clopper_pearson(kp, np_, alpha)[1]     # upper on p_{W1plus}
+        lo = clopper_pearson(k1, n1, alpha)[0]      # lower on p_{W1}
+        d_hi = hi - lo                              # upper confidence bound on Delta_T
+        ok = d_hi <= -tau
+        if ok:
+            certified.append(tid)
+        out[tid] = {"delta": round(delta, 4), "delta_hi": round(d_hi, 4),
+                    "W1": counts["W1"][tid], "W1plus": counts["W1plus"][tid],
+                    "certified_harmful": ok}
+    out["certified"] = certified
+    out["alpha_per_endpoint"] = alpha
+    return out
+
+
 def certify_interference(counts, by_task, eta=0.10, tau=0.30):
     """Per task: point I_T and an upper 1-eta confidence bound; certified harmful iff I_hi<=-tau.
     Requires arms none/W1/W2/W1plus in counts. Returns {tid: {...}} + a 'certified' list."""

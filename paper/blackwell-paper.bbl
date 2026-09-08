@@ -1,4 +1,4 @@
-\begin{thebibliography}{69}
+\begin{thebibliography}{70}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -221,13 +221,25 @@ Kelvin Guu, Kenton Lee, Zora Tung, Panupong Pasupat, and Ming-Wei Chang.
 \newblock In \emph{Proceedings of the 37th International Conference on Machine
   Learning (ICML)}, 2020.
 
-\bibitem[Hagstr{\"o}m et~al.(2025)Hagstr{\"o}m, Nie, Halifa, Schmid, Johansson,
-  and Junge]{hagstrom2025lexical}
+\bibitem[Hagstr{\"o}m et~al.(2025{\natexlab{a}})Hagstr{\"o}m, Marjanovi{\'c},
+  Yu, Arora, Lioma, Maistro, Atanasova, and Augenstein]{hagstrom2025druid}
+Lovisa Hagstr{\"o}m, Sara~Vera Marjanovi{\'c}, Haeun Yu, Arnav Arora, Christina
+  Lioma, Maria Maistro, Pepa Atanasova, and Isabelle Augenstein.
+\newblock A reality check on context utilisation for retrieval-augmented
+  generation.
+\newblock In \emph{Proceedings of the 63rd Annual Meeting of the Association
+  for Computational Linguistics (ACL)}, 2025{\natexlab{a}}.
+\newblock Introduces the DRUID dataset.
+
+\bibitem[Hagstr{\"o}m et~al.(2025{\natexlab{b}})Hagstr{\"o}m, Nie, Halifa,
+  Schmid, Johansson, and Junge]{hagstrom2025lexical}
 Lovisa Hagstr{\"o}m, Ercong Nie, Ruben Halifa, Helmut Schmid, Richard
   Johansson, and Alexander Junge.
 \newblock Language model re-rankers are fooled by lexical similarities.
-\newblock \emph{arXiv preprint arXiv:2502.17036}, 2025.
-\newblock FEVER 2025.
+\newblock In \emph{Proceedings of the Eighth Fact Extraction and VERification
+  Workshop (FEVER)}, pages 18--33, Vienna, Austria, 2025{\natexlab{b}}.
+  Association for Computational Linguistics.
+\newblock URL \url{https://aclanthology.org/2025.fever-1.2/}.
 
 \bibitem[Halevy and Dwivedi-Yu(2023)]{halevy2023learnings}
 Alon Halevy and Jane Dwivedi-Yu.

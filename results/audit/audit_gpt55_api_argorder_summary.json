@@ -1,0 +1,21 @@
+{
+ "model": "gpt-5.5",
+ "label": "gpt55",
+ "task": "api_argorder",
+ "kind": "azure",
+ "n": 40,
+ "arms": {
+  "W1plus": {
+   "n": 40,
+   "pass_original": 0,
+   "pass_neutral": 0,
+   "errs": 0,
+   "fail_missing_import_only": 0,
+   "fail_encoded_amount": 40,
+   "fail_code_empty": 0,
+   "fail_prose_first": 0,
+   "fenced_pass": 0,
+   "fenced_fail": 0
+  }
+ }
+}

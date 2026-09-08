@@ -5,19 +5,7 @@
  "kind": "cli",
  "n": 40,
  "arms": {
-  "W1": {
-   "n": 40,
-   "pass_original": 39,
-   "pass_neutral": 40,
-   "errs": 0,
-   "fail_missing_import_only": 1,
-   "fail_encoded_amount": 0,
-   "fail_code_empty": 0,
-   "fail_prose_first": 1,
-   "fenced_pass": 25,
-   "fenced_fail": 1
-  },
-  "W1plus": {
+  "W2": {
    "n": 40,
    "pass_original": 0,
    "pass_neutral": 0,
@@ -25,9 +13,9 @@
    "fail_missing_import_only": 0,
    "fail_encoded_amount": 40,
    "fail_code_empty": 0,
-   "fail_prose_first": 32,
+   "fail_prose_first": 27,
    "fenced_pass": 0,
-   "fenced_fail": 32
+   "fenced_fail": 27
   }
  }
 }

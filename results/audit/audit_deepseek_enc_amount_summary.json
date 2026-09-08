@@ -1,0 +1,33 @@
+{
+ "model": "DeepSeek-V4-Pro",
+ "label": "deepseek",
+ "task": "enc_amount",
+ "kind": "azure",
+ "n": 40,
+ "arms": {
+  "W1": {
+   "n": 40,
+   "pass_original": 0,
+   "pass_neutral": 0,
+   "errs": 0,
+   "fail_missing_import_only": 22,
+   "fail_encoded_amount": 18,
+   "fail_code_empty": 0,
+   "fail_prose_first": 1,
+   "fenced_pass": 0,
+   "fenced_fail": 1
+  },
+  "W2": {
+   "n": 40,
+   "pass_original": 26,
+   "pass_neutral": 26,
+   "errs": 0,
+   "fail_missing_import_only": 0,
+   "fail_encoded_amount": 14,
+   "fail_code_empty": 0,
+   "fail_prose_first": 0,
+   "fenced_pass": 1,
+   "fenced_fail": 0
+  }
+ }
+}

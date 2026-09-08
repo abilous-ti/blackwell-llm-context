@@ -1,0 +1,33 @@
+{
+ "model": "Kimi-K2.6",
+ "label": "kimi",
+ "task": "enc_amount",
+ "kind": "azure",
+ "n": 40,
+ "arms": {
+  "W1": {
+   "n": 40,
+   "pass_original": 0,
+   "pass_neutral": 0,
+   "errs": 0,
+   "fail_missing_import_only": 39,
+   "fail_encoded_amount": 0,
+   "fail_code_empty": 18,
+   "fail_prose_first": 18,
+   "fenced_pass": 0,
+   "fenced_fail": 0
+  },
+  "W2": {
+   "n": 40,
+   "pass_original": 39,
+   "pass_neutral": 39,
+   "errs": 0,
+   "fail_missing_import_only": 1,
+   "fail_encoded_amount": 0,
+   "fail_code_empty": 1,
+   "fail_prose_first": 1,
+   "fenced_pass": 0,
+   "fenced_fail": 0
+  }
+ }
+}

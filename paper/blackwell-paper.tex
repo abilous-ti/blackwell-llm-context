@@ -162,13 +162,6 @@ we state the order twice, once for the ideal user and once for the fixed model, 
 bridge from what we measure to what the theorem is about (\S\ref{sec:order}); and we call our
 estimator a \emph{value-deficiency surrogate}, not a Le~Cam deficiency (\S\ref{sec:estimator}).
 
-\paragraph{A latent-coordinate model that makes the order non-vacuous.}
-One technical point keeps the framing from being empty. A fixed string of text looks like a
-constant, and a constant carries no information in Blackwell's sense. We avoid this by treating the
-hidden requirement as a list of separate facts and each source as revealing some of them; two
-sources are then incomparable exactly when each reveals a fact the other hides, which is easy to
-check and holds for our pair (Lemma~\ref{lem:noref}).
-
 \paragraph{Empirical findings.}
 We test the theory on the two notes from the opening example: an API call contract $W_1$ and a
 wire-encoding rule $W_2$ for the same module (\S\ref{sec:experiments}), graded by a small battery
@@ -192,8 +185,8 @@ and one encoding task; we say so plainly and do not call it a ``distribution.'' 
   \item \textbf{Verified anti-monotonicity.} The superset $W_{1+} = W_2 \,{+}{+}\, W_1$ (the
   operator $\,{+}{+}\,$ is text concatenation) literally \emph{contains} $W_1$'s signal yet sharply
   degrades the API cells: the harm contrast is verified on at least one cell for all six models,
-  as deep as $100\% \to 0\%$ (upper bound $-0.82$) and as mild as Opus's $100\% \to 38\%$
-  ($-0.37$); a length-matched padding control shows equal-length irrelevant text is harmless, so
+  as deep as $100\% \to 0\%$ (upper bound $-0.86$) and as mild as Opus's $100\% \to 38\%$
+  ($-0.41$); a length-matched padding control shows equal-length irrelevant text is harmless, so
   the harm is the added signal, not token count or position (\S\ref{sec:results-antimono}). The
   effect is robust across the capability ladder but not monotone in capability, so we claim no
   capability trend.
@@ -231,8 +224,9 @@ from it, the instrument that makes it testable, and the evidence that it holds.
   Clopper--Pearson intervals~\citep{clopperpearson1934} at Bonferroni
   level~\citep{bonferroni1936} $\alpha = \eta/(2|\Dcal|)$, valid jointly on
   a single event, so that $L_{\Dcal}>0$ verifies a positive value gap at
-  confidence $\geq 1-\eta$; we argue why a naive DKW bound~\citep{dvoretzky1956} under-covers the
-  supremum, and give the matching interference verification. This is the instrument that makes the
+  confidence $\geq 1-\eta$. The selection multiplicity is paid explicitly rather than absorbed
+  into a single-sample sup inequality~\citep{dvoretzky1956}, which does not cover an argmax over
+  distinct cells; the matching interference verification follows. This is the instrument that makes the
   partial order testable on a real model behind a real verifier.
   \item[\textbf{(C3)}] \textbf{Evidence: verified incomparability and scalar-ranking failure on
   live models} (\S\ref{sec:experiments}). Verified empirical incomparability on six models across
@@ -243,17 +237,6 @@ from it, the instrument that makes it testable, and the evidence that it holds.
   length-padding, and routing-instruction controls, all with the scope limits stated in
   \S\ref{sec:limitations}.
 \end{enumerate}
-
-\paragraph{Roadmap.}
-\S\ref{sec:related} positions the work; \S\ref{sec:formalization} fixes the objects and defines
-$\theta$; \S\ref{sec:order} develops the partial order, the $\delta_M$-restricted order and the
-bridging lemma; \S\ref{sec:incomparability} proves the impossibility and isolates the
-query-conditioned case (C1); \S\ref{sec:estimator} gives the surrogate and its verifications (C2);
-\S\ref{sec:experiments} reports the six-model program (C3); \S\ref{sec:limitations} states scope,
-and \S\ref{sec:conclusion} concludes. The two impossibility proofs accompany their statements; the
-rest is deferred to Appendices~\ref{app:proofs}--\ref{app:repro}. Every reference has been verified
-against arXiv/DBLP/publisher records, and both impossibility results are machine-checked in Lean~4
-(Remark~\ref{rem:lean}).
 
 \paragraph{How to read the formal terms.}
 The argument is necessarily phrased in the language of statistical decision theory.
@@ -552,11 +535,34 @@ producing a candidate solution. Utility is the binary verifier $u(\widehat S, S)
     \PASS_M(W,T) \;:=\; \mathbb E\big[\, v_T\!\big(\delta_M(T,w)\big)\,\big],
     \qquad w \sim \kappa_W(\cdot \mid S_T);
     \end{equation}
-  \item[(ii)] the \emph{Bayes rule} $\delta^\star_{T}$, the (utility-optimal) decision rule for
-    task $T$ given a prior over $S$, achieving the optimal value
-    $V^\star(W,T) := \sup_{\delta} \mathbb E[v_T(\delta(T,w))]$.
+  \item[(ii)] the \emph{Bayes rule} $\delta^\star_{T}$, the utility-optimal rule for task $T$
+    under a prior $\mu_T$ on $\Scal$ (the task family's distribution over private conventions),
+    achieving the optimal value
+    \begin{equation}
+    \label{eq:vstar}
+    V^\star(W,T) \;:=\; \sup_{\delta}\ \mathbb E_{S\sim\mu_T}\,
+      \mathbb E\big[\, v_T\!\big(\delta(T,w)\big)\,\big],
+    \qquad w \sim \kappa_W(\cdot \mid S).
+    \end{equation}
 \end{enumerate}
 \end{definition}
+
+\begin{remark}[The two quantities are taken under different measures]
+\label{rem:measures}
+$\PASS_M$ in \eqref{eq:pass} is \emph{conditional on one latent state}: the expectation runs over
+the source kernel and the decoder with $S$ held at the realized convention $S_T$. $V^\star$ in
+\eqref{eq:vstar} is a \emph{Bayes} value, averaged over $\mu_T$. Consequently
+$V^\star(W,T)\ge \PASS_M(W,T)$ is \emph{not} automatic from optimality, and we never use it in
+that form. The obstruction is elementary: let $S$ be a fair bit, let $W$ be uninformative, and let
+$v_T$ reward naming $S$; the constant rule ``answer $0$'' has $\PASS_M=1$ at the state $S=0$ while
+$V^\star=1/2$. Nor can the gap be closed by taking $\mu_T$ to be a point mass at $S_T$: every
+guessing cap $V^\star(W,T)$ would then equal $1$ and the caps of Lemma~\ref{lem:bridge} would lose
+all content. What optimality does give is the averaged statement $V^\star(W,T) \ge
+\overline{\PASS}_M(W,T) := \mathbb E_{S\sim\mu_T}[\PASS_M(W,T;S)]$. Lemma~\ref{lem:bridge} is
+therefore proved through the sufficiency of the winning source rather than through any such
+comparison, and the measured pass rates enter as its falsifiable signature, not as a bound on a
+Bayes value.
+\end{remark}
 
 The distinction in Definition~\ref{def:decision} is load-bearing. Blackwell's theorem
 (\S\ref{sec:order}) is a statement about $V^\star$ (the optimal user of an experiment); every
@@ -731,21 +737,31 @@ hypothesis.
   \item[\textup{(a)}] Let $W_1, W_2$ be projection sources revealing coordinate sets $A_1, A_2$
     (Definition~\ref{def:projection}), and let $T_a, T_b \in \Dcal$ be tasks whose
     verifier-decisive coordinates lie in $A_1 \setminus A_2$ and $A_2 \setminus A_1$
-    respectively, with \emph{guessing caps} $g_a := V^\star(W_2, T_a)$ and
-    $g_b := V^\star(W_1, T_b)$, the optimal values achievable \emph{without} the decisive
-    coordinate. If $\PASS_M(W_1,T_a) > g_a$ and $\PASS_M(W_2,T_b) > g_b$, then $W_1, W_2$ are
-    Blackwell-incomparable.
+    respectively, each verifier being determined by its decisive coordinate together with facts
+    known $\mu_T$-almost surely (\emph{sufficiency of the informed source}). Let the
+    \emph{guessing caps} $g_a := V^\star(W_2, T_a)$ and $g_b := V^\star(W_1, T_b)$ be the Bayes
+    values \eqref{eq:vstar} attainable \emph{without} the decisive coordinate. If $g_a < 1$ and
+    $g_b < 1$, so that neither deprived source determines the coordinate its task turns on, then
+    $W_1, W_2$ are Blackwell-incomparable. The measured crossover $\PASS_M(W_1,T_a) > g_a$ and
+    $\PASS_M(W_2,T_b) > g_b$ is the falsifiable signature of that separation and is what
+    \S\ref{sec:experiments} verifies per cell; since $\PASS_M$ is state-conditional and
+    $V^\star$ a Bayes value, it is evidence for the hypothesis rather than a bound on $V^\star$
+    (Remark~\ref{rem:measures}).
   \item[\textup{(b)}] The converse fails in general: Blackwell incomparability concerns $V^\star$,
     and a fixed sub-optimal $\delta_M$ may fail to realize the optimal-value crossover on $\Dcal$.
     It holds under the value-attainment hypothesis (Assumption~\ref{ass:attain}).
 \end{enumerate}
-The separation hypothesis in \textup{(a)} is necessary, and our own measurements witness the
-necessity: $(W_1, W_{1+})$ is $(M,\Dcal)$-incomparable on the measured cells ($W_1$ wins the API
-cells, $W_{1+}$ the encoding cell) yet Blackwell-\emph{comparable} by construction
-($W_{1+} \Bord W_1$), precisely because the deprived-side premise fails there, $W_{1+}$ contains
-$W_1$'s coordinate, so the API-side cap is not small. A bare $\PASS_M$ crossover, without the
-separation hypothesis, witnesses only the sub-optimality of $\delta_M$
-(Theorem~\ref{thm:antimono}).
+The hypotheses of \textup{(a)}, separation \emph{and} the caps, cannot be dropped, and our own
+measurements witness it: $(W_1, W_{1+})$ is $(M,\Dcal)$-incomparable on the measured cells ($W_1$
+wins the API cells, $W_{1+}$ the encoding cell) yet Blackwell-\emph{comparable} by construction
+($W_{1+} \Bord W_1$), precisely because the deprived-side premise fails there: $W_{1+}$ contains
+$W_1$'s coordinate, so the API-side cap is not small. A bare $\PASS_M$ crossover, with neither
+premise verified, certifies nothing structural in \emph{either} direction. It is equally
+consistent with genuine incomparability under optimal play (two sources revealing independent
+coordinates cross even when each side plays optimally) and with a merely incoherent rule
+(Theorem~\ref{thm:antimono}). Nor is the projection construction \emph{necessary} for
+incomparability: it is the cleanest sufficient condition we know, and the one our sources
+realize.
 \end{lemma}
 
 Intuitively: a fixed-rule crossover proves structural incomparability only when each winning
@@ -755,11 +771,14 @@ witness nothing more than the rule's own incoherence.
 
 \begin{assumption}[Value attainment on the witnessing tasks]
 \label{ass:attain}
-There exist tasks $T_a, T_b$ and a margin $\gamma>0$ such that $\delta_M$ attains
+Let $(T_a,T_b)$ be an \emph{ordered pair of named tasks}. Say $\delta_M$ \emph{attains value on}
+$(T_a,T_b)$ with margin $\gamma>0$ if
 $\PASS_M(W_1,T_a) - \PASS_M(W_2,T_a) \ge \gamma$ and
-$\PASS_M(W_2,T_b) - \PASS_M(W_1,T_b) \ge \gamma$; i.e.\ the fixed model actually
-exploits each source's private coordinate on the task that requires it. Under
-Assumption~\ref{ass:attain} with $\{T_a,T_b\}\subseteq \Dcal$, $W_1$ and $W_2$ are
+$\PASS_M(W_2,T_b) - \PASS_M(W_1,T_b) \ge \gamma$; i.e.\ the fixed model actually exploits each
+source's private coordinate on the task that requires it. The hypothesis is always asserted of an
+explicitly named pair: it does \emph{not} assert that some such pair exists somewhere in $\Dcal$,
+and attainment on one pair implies nothing about attainment on another. If $\delta_M$ attains
+value on a pair with $\{T_a,T_b\}\subseteq \Dcal$, then $W_1$ and $W_2$ are
 $(M,\Dcal)$-incomparable.
 \end{assumption}
 
@@ -795,8 +814,12 @@ Let $W_1, W_2$ be Blackwell-incomparable. Let $\varphi : \{\text{sources}\} \to 
 \emph{query-independent} scalar score (a single number per source: relevance to a fixed corpus,
 mutual information $I(S;W)$, $\Vcal$-usable information, perplexity-gap, expected information gain
 under a fixed prior). Then there exist tasks $T_a, T_b$ such that the ranking of $\{W_1,W_2\}$
-induced by $\varphi$ disagrees with the optimal-value ranking on at least one of $T_a, T_b$; and,
-under Assumption~\ref{ass:attain}, with the realized-$\PASS_M$ ranking on at least one of them.
+induced by $\varphi$ disagrees with the optimal-value ranking on at least one of $T_a, T_b$. If
+moreover $\delta_M$ attains value on \emph{that same} pair $(T_a,T_b)$
+(Assumption~\ref{ass:attain}), the $\varphi$-induced ranking also disagrees with the
+realized-$\PASS_M$ ranking on at least one of $T_a, T_b$. More generally, attainment on \emph{any}
+named pair $(T_a', T_b')$ yields $\PASS_M$-disagreement on at least one of $T_a', T_b'$ by the same
+argument; the two conclusions concern their own witness pairs and do not transfer between them.
 \end{theorem}
 
 \begin{proof}
@@ -868,26 +891,44 @@ does \emph{not} cover it. We make two precise statements instead.
 
 \begin{proposition}[Constrained impossibility for feature-measurable scores]
 \label{prop:trap-constrained}
-Suppose $\varphi(W,T)$ is measurable with respect to a fixed feature map of the pair $(W,T)$ that
-is \emph{topical}: it depends on $W,T$ only through a feature map that is invariant to the
-verifier-decisive coordinate of $S_T$. Let $T_c$ be a task whose decisive coordinate is supplied by
-$W_1$, so realized utility ranks $W_1\succ W_2$ on $T_c$. \textbf{(a)} If $W_1$ and $W_2$ are
-topically indistinguishable on $T_c$, then $\varphi$ assigns them equal scores and cannot rank
-$W_1$ strictly above $W_2$. \textbf{(b)} If in addition $\varphi(\cdot,T_c)$ is strictly increasing
-in lexical overlap and $T_c$'s surface lexicon is saturated with $W_2$'s vocabulary, then
-$\varphi(W_2,T_c) > \varphi(W_1,T_c)$, a strict mis-rank. Either way no topical query-conditioned
-score ranks $\{W_1,W_2\}$ correctly on all tasks.
+Suppose $\varphi(W,T)=g(\psi(W,T))$ for a fixed feature map $\psi$ that is \emph{topical}: $\psi$
+is invariant to the verifier-decisive coordinate of $S_T$. Let $T_c$ be a task whose decisive
+coordinate is supplied by $W_1$, so realized utility ranks $W_1\succ W_2$ on $T_c$. Parts
+\textup{(a)} and \textup{(b)} are \emph{alternatives}, not a chain: their hypotheses are mutually
+exclusive, and between them they exhaust the two ways a topical score fails on $T_c$.
+\textbf{(a) (Tie.)} If $\psi(W_1,T_c)=\psi(W_2,T_c)$ then $\varphi(W_1,T_c)=\varphi(W_2,T_c)$, so
+$\varphi$ cannot rank $W_1$ strictly above $W_2$.
+\textbf{(b) (Strict inversion.)} Suppose instead that $\varphi(\cdot,T_c)=g(\mathrm{ov}(\cdot,T_c))$
+reads the pair through the scalar lexical-overlap feature $\mathrm{ov}$ alone, with $g$ strictly
+increasing, and that $T_c$'s lexicon is saturated with $W_2$'s vocabulary in the precise sense
+$\mathrm{ov}(W_2,T_c) > \mathrm{ov}(W_1,T_c)$. Then $\varphi(W_2,T_c) > \varphi(W_1,T_c)$, a strict
+mis-rank. In either case $\varphi$ fails to rank $\{W_1,W_2\}$ by realized utility on $T_c$, so no
+topical query-conditioned score ranks them correctly on all tasks.
 \end{proposition}
 
 \begin{proof}
-For (a), topicality makes $\varphi(\cdot,T_c)$ a function of the topical features alone, so equal
-features force equal scores, while faithfulness on $T_c$ would require a strict gap. For (b), the
-added strict monotonicity in overlap turns the saturation hypothesis into $\varphi(W_2,T_c) >
-\varphi(W_1,T_c)$; utility favours $W_1$ because $T_c$'s PASS requires $W_1$'s coordinate, so the
-two orders disagree. Part (a) is the statement machine-checked in Lean
-(Remark~\ref{rem:lean}); (b) adds the monotonicity hypothesis that the informal reading of
-``saturated lexicon'' presumes, and without which no strict inequality follows.
+For (a), $\varphi=g\circ\psi$ and $\psi(W_1,T_c)=\psi(W_2,T_c)$ force equal scores, while
+faithfulness on $T_c$ would require a strict gap. For (b), $\mathrm{ov}(W_2,T_c) >
+\mathrm{ov}(W_1,T_c)$ with $g$ strictly increasing gives $\varphi(W_2,T_c) > \varphi(W_1,T_c)$,
+while utility favours $W_1$ because $T_c$'s PASS requires $W_1$'s coordinate; the two orders
+disagree. The hypotheses are incompatible by construction: under (a)'s feature equality the overlap
+feature is equal too, so a score monotone in overlap returns a tie rather than (b)'s strict
+inversion. Part (a) is the statement machine-checked in Lean (Remark~\ref{rem:lean}); (b) makes
+explicit the two things the informal reading of ``saturated lexicon'' presumes, strict monotonicity
+and overlap being the only feature read, without which no strict inequality follows.
 \end{proof}
+
+\begin{remark}[Why \textup{(b)} is stated for a scalar overlap score]
+\label{rem:overlaponly}
+Strict monotonicity in one \emph{coordinate} of a multi-feature $\psi$ does not give (b). Take
+$\psi=(\mathrm{ov},\mathrm{style})$ and $\varphi=\mathrm{ov}+10\,\mathrm{style}$, which is strictly
+increasing in overlap. With $\psi(W_1,T_c)=(0.2,1)$ and $\psi(W_2,T_c)=(0.9,0)$ the scores are
+$10.2$ and $0.9$: overlap favours $W_2$ while the score favours $W_1$. Comparing two inputs that
+differ in other features therefore needs the whole map, which is why (b) assumes $\varphi$ reads
+overlap alone. The lexical cosine of \S\ref{sec:experiments} satisfies that assumption by
+construction; a learned reranker need not, which is why its behaviour is settled empirically
+rather than by this proposition.
+\end{remark}
 
 Proposition~\ref{prop:trap-constrained} is the strongest \emph{general} statement we can make about
 query-conditioned scores: it holds for any score in the topical (lexical-feature) class, but not for
@@ -900,7 +941,9 @@ $W_2$ at $0$--$10\%$ across all six models. The same mis-rank is realized by rep
 (\S\ref{sec:results-misrank}, Table~\ref{tab:rankers}), so the topical class is not a lexical strawman: its failure mode is shared by the ranker
 families retrieval systems actually deploy. The same failure is documented in the wild:
 language-model re-rankers are steered by lexical similarity across NQ, LitQA2, and
-DRUID~\citep{hagstrom2025lexical}, and passages that are semantically close but logically
+DRUID~\citep{hagstrom2025lexical}, the last of these a corpus of real retrieved contexts
+built precisely to check whether synthetic benchmarks overstate context
+utilisation~\citep{hagstrom2025druid}; and passages that are semantically close but logically
 irrelevant defeat retrievers and rerankers at scale, with an evidence-reasoning agent, a listwise
 reader, as the remedy~\citep{chen2026deepera}, which is the boundary
 Proposition~\ref{prop:trap-constrained} draws. We also measure the
@@ -973,9 +1016,15 @@ L_{\Dcal}(W_1,W_2) \;:=\; \max_{T\in \Dcal}\big[\,L_{W_2,T} - U_{W_1,T}\,\big]
 \end{equation}
 is a $(1-\eta)$ lower confidence bound on $\sup_{T\in \Dcal}[p_{W_2,T}-p_{W_1,T}]$. Hence
 $L_{\Dcal}(W_1,W_2) > 0$ \textbf{verifies} $\dhat_{\Dcal}(W_1,W_2)>0$ at confidence $\ge 1-\eta$.
-Both directions $L_{\Dcal}(W_1,W_2)$ and $L_{\Dcal}(W_2,W_1)$ read off the \emph{same} $2|\Dcal|$ intervals, so the
-joint incomparability claim $\{\dhat_{\Dcal}(W_1,W_2)>0 \wedge \dhat_{\Dcal}(W_2,W_1)>0\}$
-holds at $\ge 1-\eta$ with no additional correction. The matching quantity
+Both directions $L_{\Dcal}(W_1,W_2)$ and $L_{\Dcal}(W_2,W_1)$ read off the \emph{same} $2|\Dcal|$
+intervals and so are valid on the same coverage event. Consequently, \emph{if both observed bounds
+are positive}, the joint incomparability claim
+$\{\dhat_{\Dcal}(W_1,W_2)>0 \wedge \dhat_{\Dcal}(W_2,W_1)>0\}$ holds at $\ge 1-\eta$ with no
+additional correction. The condition is not decoration: coverage alone implies nothing about the
+population gaps, which are identically $0$ when $W_1$ and $W_2$ are the same source. The
+verification is one-sided, asserting nothing when the two bounds are not both positive, and the
+guarantee is frequentist: the probability of declaring incomparability when it does not hold is at
+most $\eta$, which is not a posterior probability that the fixed sources satisfy the inequality. The matching quantity
 $U_{\Dcal}(W_1,W_2) := \max_{T\in \Dcal}\big[\,U_{W_2,T} - L_{W_1,T}\,\big]$ is, on the same
 event, a $(1-\eta)$ \emph{upper} confidence bound on the same supremum; the dominance control
 uses it to verify $\dhat_{\Dcal}(W_1,W_2)=0$ up to the equivalence margin.
@@ -1018,8 +1067,10 @@ interaction term only (Remark~\ref{rem:psinotharm}).
 \label{prop:interference}
 Fix a target task $T^\star\in \Dcal$ chosen \emph{before} unblinding, and let
 $\Delta_{T^\star} := \PASS_M(W_{1+},T^\star)-\PASS_M(W_1,T^\star)$ be the harm contrast. With exact
-Clopper--Pearson endpoints $\mathrm{CP}_{\mathrm{lo}},\mathrm{CP}_{\mathrm{hi}}$ at level
-$\alpha=\eta/2$ on the two arms $\{W_{1+},W_1\}$,
+Clopper--Pearson endpoints $\mathrm{CP}_{\mathrm{lo}},\mathrm{CP}_{\mathrm{hi}}$ carrying
+noncoverage at most $\alpha=\eta/2$ \emph{per endpoint} on the two arms $\{W_{1+},W_1\}$ (two
+endpoints, union-bounding to $\eta$; the two unused endpoints of a two-sided interval are not
+paid for),
 \begin{equation}
 \label{eq:deltaupper}
 \overline\Delta_{T^\star} \;:=\; \mathrm{CP}_{\mathrm{hi}}(p_{W_{1+}}) - \mathrm{CP}_{\mathrm{lo}}(p_{W_1})
@@ -1028,7 +1079,9 @@ is a $(1-\eta)$ upper confidence bound on $\Delta_{T^\star}$, and $\overline\Del
 verifies $\Delta_{T^\star}\le-\tau$ at confidence $\ge 1-\eta$. If instead the harmful cell is
 \emph{selected} from $|\Dcal|$ candidates after unblinding, use $\alpha=\eta/(2|\Dcal|)$;
 this is the same selection correction the verification applies to the deficiency surrogate
-(Remark~\ref{rem:dkw}), and omitting it would repeat the multiplicity error we criticize. Because
+(the multiplicity is real: the selected cell is an argmax over $|\Dcal|$ noisy gaps, so a
+single-sample sup inequality does not cover it), and omitting it would repeat the error we
+criticize. Because
 $\Delta$ reads only the two arms it contrasts, the bound is insensitive to the \texttt{none}
 baseline; we still report that baseline per cell, because guessability bears on whether the source
 is genuinely private and hence on the incomparability reading (\S\ref{subsec:theta}).
@@ -1077,15 +1130,19 @@ miss it by construction.
 
 Each verification above controls error \emph{marginally} at $\eta$ for its own claim
 (incomparability via Proposition~\ref{prop:certificate}; interference via
-Proposition~\ref{prop:interference}). When several claims are read off the \emph{same} $n$-sample
-run at the same $\eta$, incomparability (both directions, on one shared event $E$), one-directional
-dominance, and the interference cells, the conjunction over distinct claims is \emph{not} jointly
-controlled at $\eta$ unless the budget is split across claims. We state results as marginally
-verified per claim and, where a joint statement is wanted, allocate $\eta$ across the $C$ verified
-claims (e.g.\ $\eta/C$ each) so the global family-wise error is $\le\eta$. The incomparability pair
-is the one exception that is genuinely joint at $\eta$ on a single event, as proved in
-Proposition~\ref{prop:certificate}; all other cross-claim conjunctions on a shared run are reported
-as marginal.
+Proposition~\ref{prop:interference}). The unit of accounting is the \emph{coverage event}, not the
+claim. Every statement that is a deterministic consequence of the same $2|\Dcal|$
+Clopper--Pearson intervals holds simultaneously on the event $E$ of
+Proposition~\ref{prop:certificate}, and therefore \emph{jointly} at $\ge 1-\eta$ with no further
+correction: this covers both incomparability directions, the dominance control
+$U_{\Dcal}(\cdot,\cdot)$, whose endpoints are endpoints of those very intervals, and any per-task
+strict win read off them. Adding a conclusion drawn from intervals already covered does not by
+itself cost another Bonferroni factor. What does require fresh allocation is a conjunction
+spanning \emph{different} events, that is, claims reading cells outside $E$ or intervals built at a
+different level. The interference verification is of that kind, since it reads the $W_{1+}$ and
+\texttt{none} arms at $\alpha=\eta/2$; conjunctions joining it to the incomparability family are
+therefore reported as marginal per claim, and where a joint statement is wanted we allocate $\eta$
+across the $C$ events involved.
 
 \noindent The two verifications have different effective-$n$ requirements: incomparability is
 carried by stark $0/1$ cells whose intervals are tight, whereas a harm contrast on a milder
@@ -1244,25 +1301,37 @@ conventional $90\%$ family level; the headline separations are near-$0\%$ agains
 so the verified conclusions are not sensitive to tightening it. $\tau=0.30$ is an a priori
 materiality threshold: to count, interference must destroy at least $30$ PASS points, well above
 the interval widths at $n=40$, so noise cannot clear it. The data show the threshold doing real
-work in both directions. The verified collapses clear it with upper confidence bounds from $-0.37$
-to $-0.82$ (Table~\ref{tab:interference}), and the length-matched padding control clears it at
-$-0.63$. Two real effects fail it and are reported as unverified rather than folded in: Haiku's
-\texttt{api\_post\_ok} cell (upper $-0.06$; a ceiling the raw-failure audit traces to an omitted
-import line, not to the contract, \S\ref{sec:results-audit}), which still falls short at $-0.23$
-once the import is neutralized, and the second-pair contrast (upper $-0.296$, sign-only;
-\S\ref{sec:results-generality}). A threshold that
-genuine effects fail is evidence it was not tuned to pass the data.
+work. The verified collapses clear it with upper confidence bounds from $-0.39$ to $-0.86$
+(Table~\ref{tab:interference}), and the length-matched padding control clears it at $-0.67$. One
+real effect fails it and is reported as unverified rather than folded in: Haiku's
+\texttt{api\_post\_ok} cell (upper $-0.11$; a ceiling the raw-failure audit traces to an omitted
+import line, not to the contract, \S\ref{sec:results-audit}), which still falls short at $-0.27$
+once the import is neutralized. A threshold that a genuine effect fails is evidence it was not
+tuned to pass the data. We note that the second-pair contrast, reported in an earlier version as
+sign-only, clears the margin at $-0.33$ once the confidence budget is allocated correctly
+(\S\ref{sec:results-generality}); the earlier shortfall was an artifact of spending two-sided
+intervals on a one-sided bound, not a property of that effect.
+
+\paragraph{What the intervals do not cover.}
+The Clopper--Pearson intervals carry sampling error under Assumption~\ref{ass:iid}, a fixed
+success probability per cell. They carry nothing else, and two components outside them are larger
+than they are. \emph{Model drift}: the re-measurement of \S\ref{sec:remeasure} moved Opus's
+\texttt{api\_post\_ok} superset arm from $38\%$ to $3\%$ and DeepSeek's $W_1$ arm from $75\%$ to
+$43\%$, both far outside the nominal intervals for those cells, and Sonnet's failure mode changed
+category entirely. \emph{Prompt wording}: the raw-failure audit traces a $100\%\to52\%$ swing on
+one cell to the prompt naming the call as \texttt{ledger.post}, an effect an order of magnitude
+wider than any interval here, and each cell has exactly one prompt, so this component is not
+modelled at all. Every verified quantity is therefore an inference about a
+(model snapshot, prompt, default decoder) triple, indexed by $\theta$ (\S\ref{subsec:theta}), and
+not a property of a vendor's model line. We regard this as the honest reading rather than a
+weakness: the re-measurement bounds the drift component empirically, and the direction of every
+verdict survived it.
 
 \paragraph{Sampling regime.}
 The verification models each cell as $n$ Bernoulli PASS draws (Assumption~\ref{ass:iid}); the four
 arms within a cell are separate completions, and each of the $n$ draws is an independent call with no
 shared state, so the draws are manifestly independent. We report the decoding parameters, seeding
 policy, and retry policy in Appendix~\ref{app:repro}.
-
-\paragraph{Spend.}
-The record reflects roughly \$120 of Anthropic spend on the single-shot Haiku, Sonnet, and Opus runs
-(itemized in Appendix~\ref{app:repro}) plus Azure quota for the non-Anthropic models; the Azure API
-returns no cost field, so this figure is not the total cost across all six models.
 
 \subsection{Results}
 \label{sec:results}
@@ -1309,9 +1378,22 @@ and trap cells. For Haiku at $n=40$ the carrying cells are \texttt{api\_argorder
 / $W_1$ $100\%$ / $W_2$ $0\%$) and \texttt{enc\_amount} (\texttt{none} $0\%$ / $W_1$ $0\%$ / $W_2$
 $100\%$), giving $L_{\Dcal} = +0.762 / +0.762$, far clear of zero.
 
+\paragraph{The six-model claim, made jointly.} Proposition~\ref{prop:certificate} controls the
+$2|\Dcal|$ intervals of \emph{one} model's run, so the per-model verifications above are each at
+$\ge 1-\eta$ and their conjunction across the roster is not. Rather than leave the six-model
+statement marginal we pay for it: allocating $\eta$ across the six runs, i.e.\ per-endpoint level
+$\eta/(2|\Dcal|\cdot 6)=\eta/48$, every one of the twelve directions remains strictly positive,
+binding at DeepSeek-V4-Pro's $L_{\Dcal}(W_1,W_2)=+0.263$ and reaching $+0.685$ on the stark cells.
+The claim ``all six models are empirically incomparable'' therefore holds \emph{simultaneously} at
+$\ge 90\%$, not merely model by model. Table~\ref{tab:consolidated} reports the per-model bounds;
+the simultaneous ones are uniformly smaller by $0.08$ to $0.09$ and change no verdict.
+
 Because incomparability is a two-directional claim, both $L_{\Dcal}$ bounds must be positive; the
-smaller of the two is the binding one. The two carrying cells are one API cell
-and one encoding cell, so the effective support of the surrogate is two cells. We therefore describe
+smaller of the two is the binding one. Two cells carry each model's verification, and which two
+is model-specific: on five models they are one API cell and the encoding cell, while on
+DeepSeek-V4-Pro the $W_1$-over-$W_2$ direction is carried by the \emph{trap} cell rather than an
+API cell (its API margins being smaller). The effective support of the surrogate is therefore two
+cells per model, drawn from a battery of four. We therefore describe
 $\Dcal$ as a fixed adversarial four-cell battery rather than a sampled task distribution: the
 verification is valid for what it covers, and what it covers is a single hand-built API-versus-encoding
 opposition replicated across six models.
@@ -1378,11 +1460,10 @@ The superset $W_{1+}$, which literally \emph{contains} $W_1$'s signal, sharply d
 relative to $W_1$ alone. The per-task harm contrast $\Delta_T = \PASS(W_{1+},T) - \PASS(W_1,T)$ is
 verified negative ($\Delta_T \le -\tau$, $\tau=0.30$) on eleven of the twelve API cells, two per
 model, and so on at least one cell for all six models (Table~\ref{tab:interference}); the mildest
-verified collapse is Opus at $100\% \to 38\%$ with upper bound $-0.37$, and the one cell that does
+verified collapse is Opus at $100\% \to 38\%$ with upper bound $-0.41$, and the one cell that does
 not clear is Haiku's \texttt{api\_post\_ok}, whose $W_1$ arm is depressed by an unrelated import
-slip (\S\ref{sec:results-audit}). Ten of the eleven survive a Bonferroni correction across the two
-cells within each model ($\alpha=\eta/4$); DeepSeek's \texttt{api\_argorder} is the one that falls
-just short, at $-0.298$. This is a
+slip (\S\ref{sec:results-audit}). All eleven survive a Bonferroni correction across the two cells
+within each model, the tightest being DeepSeek's \texttt{api\_argorder} at $-0.34$. This is a
 verified empirical falsification of Blackwell superset-dominance on live models
 (Theorem~\ref{thm:antimono}): strictly-more-informative context can hurt, and the deficiency
 framework detects it precisely where every monotone scalar must miss it.
@@ -1459,19 +1540,19 @@ baseline cannot slacken it. $^{\dagger}$Control row: the same cell with the omit
 \toprule
 Model & Carrying cell & $W_1 \to W_{1+}$ & $\Delta_T$ & $\overline\Delta_T$ & Verified \\
 \midrule
-Haiku-4.5       & \texttt{api\_argorder}            & $100\% \to 5\%$  & $-0.95$ & $-0.74$ & \checkmark \\
-Haiku-4.5       & \texttt{api\_post\_ok}            & $52\% \to 15\%$  & $-0.38$ & $-0.06$ & sign only (import omission) \\
-Haiku-4.5       & \texttt{api\_post\_ok}, import-neutralized$^{\dagger}$ & $100\% \to 52\%$ & $-0.47$ & $-0.23$ & sign only$^{\dagger}$ \\
-Sonnet-4.6      & \texttt{api\_post\_ok}            & $100\% \to 2\%$  & $-0.97$ & $-0.78$ & \checkmark \\
-Sonnet-4.6      & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.82$ & \checkmark \\
-GPT-5.5         & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-1.00$ & $-0.82$ & \checkmark \\
-GPT-5.5         & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.82$ & \checkmark \\
-DeepSeek-V4-Pro & \texttt{api\_post\_ok}            & $75\% \to 0\%$   & $-0.75$ & $-0.50$ & \checkmark \\
-DeepSeek-V4-Pro & \texttt{api\_argorder}            & $68\% \to 5\%$   & $-0.62$ & $-0.34$ & \checkmark \\
-Kimi-K2.6       & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-1.00$ & $-0.82$ & \checkmark \\
-Kimi-K2.6       & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.82$ & \checkmark \\
-Opus-4.8        & \texttt{api\_post\_ok}            & $100\% \to 38\%$ & $-0.62$ & $-0.37$ & \checkmark \\
-Opus-4.8        & \texttt{api\_argorder}            & $100\% \to 15\%$ & $-0.85$ & $-0.61$ & \checkmark \\
+Haiku-4.5       & \texttt{api\_argorder}            & $100\% \to 5\%$  & $-0.95$ & $-0.78$ & \checkmark \\
+Haiku-4.5       & \texttt{api\_post\_ok}            & $52\% \to 15\%$  & $-0.38$ & $-0.11$ & sign only (import omission) \\
+Haiku-4.5       & \texttt{api\_post\_ok}, import-neutralized$^{\dagger}$ & $100\% \to 52\%$ & $-0.47$ & $-0.27$ & sign only$^{\dagger}$ \\
+Sonnet-4.6      & \texttt{api\_post\_ok}            & $100\% \to 2\%$  & $-0.97$ & $-0.82$ & \checkmark \\
+Sonnet-4.6      & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.86$ & \checkmark \\
+GPT-5.5         & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-1.00$ & $-0.86$ & \checkmark \\
+GPT-5.5         & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.86$ & \checkmark \\
+DeepSeek-V4-Pro & \texttt{api\_post\_ok}            & $75\% \to 0\%$   & $-0.75$ & $-0.54$ & \checkmark \\
+DeepSeek-V4-Pro & \texttt{api\_argorder}            & $68\% \to 5\%$   & $-0.62$ & $-0.39$ & \checkmark \\
+Kimi-K2.6       & \texttt{api\_post\_ok}            & $100\% \to 0\%$  & $-1.00$ & $-0.86$ & \checkmark \\
+Kimi-K2.6       & \texttt{api\_argorder}            & $100\% \to 0\%$  & $-1.00$ & $-0.86$ & \checkmark \\
+Opus-4.8        & \texttt{api\_post\_ok}            & $100\% \to 38\%$ & $-0.62$ & $-0.41$ & \checkmark \\
+Opus-4.8        & \texttt{api\_argorder}            & $100\% \to 15\%$ & $-0.85$ & $-0.65$ & \checkmark \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1532,10 +1613,10 @@ confound, and prompt-curability of the collapse); full protocols and numbers are
 in Appendix~\ref{app:record}. \textbf{(i) A second incomparable pair, different domain}: a private
 \texttt{cache}-module contract versus a key-normalization invariant is again verified incomparable
 on Haiku ($L_{\Dcal} = +0.774/+0.496$), with one-directional dominance fully verified at $n=80$;
-its harm contrast is verified in sign ($\Delta_T<0$, upper bound $-0.296$) but not at the $\tau=0.30$
-margin, because the $80\%$ $V_1$ ceiling keeps the bound wide. \textbf{(ii) Length-matched
+its harm contrast is verified at the $\tau=0.30$ margin ($\Delta_T=-0.51$, upper bound $-0.33$),
+so the second pair carries both incomparability and harm. \textbf{(ii) Length-matched
 padding}: filler character-matched to $W_{1+}$ leaves $W_1$ at ceiling (\texttt{api\_argorder}
-$100\%$ vs $W_{1+}$ $10\%$; harm verified, upper $-0.63$), attributing the collapse to the
+$100\%$ vs $W_{1+}$ $10\%$; harm verified, upper $-0.67$), attributing the collapse to the
 added signal, not token count.
 \textbf{(iii) Routing instruction}: a one-line convention-routing note recovers most of the collapse
 ($2\%\to80\%$, $22\%\to68\%$; both separated from $W_{1+}$) while remaining directionally below $W_1$ alone on the carrying cell; writing that note requires knowing which source is decisive for which task family,
@@ -1568,7 +1649,7 @@ import and is otherwise identical: \texttt{none} $0/40$ and $W_2$ $0/40$ under b
 $21/40$. The superset collapse on this cell is therefore real and has the mechanism the paper
 describes: in the retained $W_{1+}$ replies the model applies $W_2$'s wire encoding to a plain-cents
 amount and posts \texttt{'+500\#5'} in place of \texttt{500}. With the import neutralized the
-harm contrast is $\Delta_T = -0.47$ with upper bound $-0.23$, verified in sign but not at the $\tau=0.30$ margin
+harm contrast is $\Delta_T = -0.47$ with upper bound $-0.27$, verified in sign but not at the $\tau=0.30$ margin
 (Table~\ref{tab:interference}). We keep the original-protocol numbers in every table, since the
 verifier is identical across models and the other five models include the import; the audit changes
 the reading of one cell, not its measurement. Haiku's verified claims rest on \texttt{api\_argorder}
@@ -1771,7 +1852,7 @@ whether appending the (irrelevant-to-this-task) $W_2$ to a sufficient $W_1$ degr
 (the second difference $\Psi_T$ is an interaction term, not a harm measure;
 Remark~\ref{rem:psinotharm}). We verify $\Delta_T \le -0.30$ on at least one cell for all six
 models (Table~\ref{tab:interference}), with collapses as stark as $100\% \to 0\%$ (upper bound
-$-0.82$) on Sonnet, GPT-5.5 and Kimi. This is a verified empirical falsification of superset-dominance for
+$-0.86$) on Sonnet, GPT-5.5 and Kimi. This is a verified empirical falsification of superset-dominance for
 these fixed rules (Theorem~\ref{thm:antimono}): a literal superset of a sufficient signal can
 sharply reduce PASS, which no monotone scalar context-value score can represent.
 
@@ -1780,14 +1861,6 @@ Two cautions attach to it. The harm is robust across the capability ladder but n
 verification is still a choice: we fix it per model before unblinding rather than picking the
 starkest afterwards, and cells differ in their $W_1$ ceiling, so magnitudes are not comparable
 across models even though each binary verdict stands on its own.
-
-\paragraph{Will scale restore Blackwell coherence?}
-Three points on one vendor's ladder cannot answer this, and we do not extrapolate; what the
-framework contributes is the instrument, since coherence is now a verifiable property of any fixed
-rule and ``$\Delta_T$ versus scale'' is a measurable trajectory. Whatever that curve shows, the
-central claim is unaffected: anti-monotonicity is a coherence failure of the \emph{rule} and could
-in principle vanish with scale, but incomparability is a property of the \emph{sources}, and
-mutually non-refining signals stay incomparable however capable the reader becomes.
 
 \subsection{Mechanism: the runtime fingerprint is a correlate, not an explanation}
 \label{sec:disc-mechanism}
@@ -1843,9 +1916,8 @@ order adds is the object the set is taken over, verified task value rather than 
 scores, which is exactly what makes the selection safe under anti-monotonicity.
 
 \paragraph{Source-pair generality.} Incomparability and dominance hold for two hand-built pairs
-in two domains; the cross-vendor record is single-pair. Pair-2 harm is verified in sign
-($\overline\Delta_T=-0.296$) but not at the $\tau=0.30$ margin, because its $80\%$ $V_1$ ceiling
-keeps the bound wide; pair-2's relevance trap was an honest null (its prompt was not lexically
+in two domains; the cross-vendor record is single-pair. Pair-2 harm is verified at the margin
+($\overline\Delta_T=-0.33$ at $n=80$); pair-2's relevance trap was an honest null (its prompt was not lexically
 $V_2$-leaning). A third domain and a vendor-general strong mis-rank remain inexpensive next
 steps.
 
@@ -2007,15 +2079,24 @@ applied in both directions.
 \subsection*{Proof of Lemma~\ref{lem:bridge}}
 \begin{proof}
 \textup{(a)} Suppose, for contradiction, $W_2 \Bord W_1$. By Theorem~\ref{thm:blackwell},
-$V^\star(W_2, T) \ge V^\star(W_1, T)$ for every task $T$, in particular at $T_a$. But
-$V^\star(W_1, T_a) \ge \PASS_M(W_1, T_a) > g_a = V^\star(W_2, T_a)$, the first inequality because
-the optimal rule weakly improves on any fixed rule, the second by hypothesis, a contradiction.
-Hence $W_2 \not\Bord W_1$. Symmetrically, $\PASS_M(W_2,T_b) > g_b = V^\star(W_1,T_b)$ forbids
-$W_1 \Bord W_2$. Neither dominance direction holds, so $W_1, W_2$ are Blackwell-incomparable.
-The caps are essential: without them a $\PASS_M$ crossover is compatible even with Blackwell
-\emph{equivalence}, since a fixed rule keyed to one signal's surface form can under-perform on
-the other, exactly the non-coherence phenomenon Theorem~\ref{thm:antimono} verifies for
-$(W_1, W_{1+})$.
+$V^\star(W_2, T) \ge V^\star(W_1, T)$ for every task $T$, in particular at $T_a$. By the
+sufficiency hypothesis, $T_a$'s verifier is determined by its decisive coordinate, which lies in
+$A_1\setminus A_2$ and is revealed exactly by $W_1$ (Definition~\ref{def:projection}); the rule
+that reads that coordinate off and answers accordingly attains $v_{T_a}=1$ at $\mu_{T_a}$-almost
+every state, so $V^\star(W_1,T_a)=1$. By hypothesis $g_a = V^\star(W_2,T_a) < 1$, hence
+$V^\star(W_1,T_a) > V^\star(W_2,T_a)$, a contradiction. Therefore $W_2 \not\Bord W_1$;
+symmetrically $g_b < 1$ forbids $W_1 \Bord W_2$, so $W_1, W_2$ are Blackwell-incomparable.
+
+Two things this argument does \emph{not} use are worth stating, because the natural shorter proof
+uses both and is wrong. It never asserts $V^\star(W_1,T_a) \ge \PASS_M(W_1,T_a)$: the left side is
+a Bayes value under $\mu_{T_a}$, the right a pass rate at the single realized convention, and
+optimality relates $V^\star$ only to the $\mu_{T_a}$-averaged $\overline{\PASS}_M$
+(Remark~\ref{rem:measures}). And it never treats the measured crossover as the hypothesis: the
+crossover is the observable signature of $g_a, g_b < 1$, not a substitute for it. The caps remain
+essential in the converse direction: without them a $\PASS_M$ crossover is compatible even with
+Blackwell \emph{equivalence}, since a fixed rule keyed to one signal's surface form can
+under-perform on the other, exactly the non-coherence phenomenon Theorem~\ref{thm:antimono}
+verifies for $(W_1, W_{1+})$.
 
 \textup{(b)} Assumption~\ref{ass:attain} directly yields $\PASS_M(W_1,T_a) > \PASS_M(W_2,T_a)$
 and the reverse at $T_b$, which is Definition~\ref{def:dmorder}'s incomparability; the failure of
@@ -2052,13 +2133,22 @@ conjunction holds at $\ge 1-\eta$ without a further Bonferroni factor.
 
 \subsection*{Proof of Proposition~\ref{prop:interference}}
 \begin{proof}
-The four arms are independent Bernoulli samples (separate completions), so on the intersection of
-the four Clopper--Pearson events, probability $\ge 1-4\alpha = 1-\eta$ by the union
-bound, each true proportion lies in its interval. Substituting the coverage-respecting endpoint for
-each term of \eqref{eq:interference} (upper endpoints for the positively-signed $p_{W_{1+}},
-p_{\texttt{none}}$, lower endpoints for the negatively-signed $p_{W_1}, p_{W_2}$) gives
-$\Psi_{T^\star}\le\overline\Psi_{T^\star}$ on that event. For a post-hoc selected cell, replacing
-$\alpha$ by $\eta/(4|\Dcal|)$ and union-bounding over the $4|\Dcal|$ endpoints preserves $\ge 1-\eta$
+Only two quantities enter $\overline\Delta_{T^\star}$: an upper endpoint on $p_{W_{1+},T^\star}$
+and a lower endpoint on $p_{W_1,T^\star}$. The two arms are independent Bernoulli samples
+(separate completions). Let $E_+$ be the event $p_{W_{1+},T^\star}\le U_{W_{1+},T^\star}$ and
+$E_-$ the event $p_{W_1,T^\star}\ge L_{W_1,T^\star}$. By the exact one-sided coverage of
+Clopper--Pearson at noncoverage $\alpha=\eta/2$ per endpoint, $\Pr[E_+^c]\le\eta/2$ and
+$\Pr[E_-^c]\le\eta/2$, so by the union bound $\Pr[E_+\cap E_-]\ge 1-\eta$. On that event
+\[
+  \Delta_{T^\star} \;=\; p_{W_{1+},T^\star}-p_{W_1,T^\star}
+  \;\le\; U_{W_{1+},T^\star}-L_{W_1,T^\star} \;=\; \overline\Delta_{T^\star},
+\]
+which is the claim; if $\overline\Delta_{T^\star}\le-\tau$ then $\Delta_{T^\star}\le-\tau$ at
+confidence $\ge 1-\eta$. Note that the budget is spent on exactly the two endpoints used: a
+two-sided interval at level $\eta/2$ would place $\eta/4$ in each tail, leave two endpoints
+unused, and deliver $1-\eta/2$ while widening the bound, which is why the allocation is stated
+per endpoint rather than per interval. For a post-hoc selected cell, replacing $\alpha$ by
+$\eta/(2|\Dcal|)$ and union-bounding over the $2|\Dcal|$ endpoints preserves $\ge 1-\eta$
 simultaneous coverage.
 \end{proof}
 
@@ -2072,19 +2162,6 @@ $\delta_M$ is not Blackwell-coherent. A monotone scalar $\phi$ assigns
 $\phi(W_{1+})\ge\phi(W_1)$ (monotonicity), hence orders $W_{1+}$ above $W_1$ and cannot reproduce
 the realized reversal.
 \end{proof}
-
-\subsection*{Why a naive DKW bound fails}
-\begin{remark}[Why a naive DKW bound fails]
-\label{rem:dkw}
-The Dvoretzky--Kiefer--Wolfowitz inequality~\citep{dvoretzky1956} bounds the sup-deviation of
-\emph{one} empirical CDF from \emph{its own} population CDF over a single i.i.d.\ sample. Our object
-is different in two ways that DKW does not handle: it is a $\max$ over $|\Dcal|$ \emph{differences of
-two binomial means across distinct cells}, and the $\max$ \emph{selects} the argmax-gap cell. A
-single-sample sup inequality neither spans distinct cells nor pays for the selection, so its nominal
-level under-covers a supremum over $|\Dcal|$ comparisons; the Type-I error grows with $|\Dcal|$. The
-multiplicity must be paid explicitly via the union bound (Proposition~\ref{prop:certificate}), not
-absorbed into a single-sample DKW envelope.
-\end{remark}
 
 \subsection*{Relation to LLM-evaluation statistics}
 \begin{remark}[Relation to LLM-evaluation statistics]
@@ -2171,11 +2248,10 @@ of zero) with a clean double crossover ($V_1$ solves the contract and trap cells
 key-normalization, all none-baselines floor at $0\%$), and the dominance control again verifies
 one-directionally. Anti-monotonicity reproduces in direction at $n=40$ (the superset collapses the
 contract cell $80\%\!\to\!28\%$, $\Delta_T=-0.52$); re-running the arms at $n=80$ shows the collapse
-is stable ($80\%\!\to\!29\%$, $\Delta_T=-0.51$) with Clopper--Pearson upper bound $-0.296$, which
-verifies \emph{strictly negative} harm ($\Delta_T<0$ at $\ge 90\%$) but does not clear the
-pre-registered margin $\tau=0.30$: the binding constraint is the $V_1$ ceiling itself ($80\%$,
-versus pair-1's ${\sim}100\%$), which keeps the bound wide. We report pair-2 harm as a verified
-sign, not a verified magnitude. The
+is stable ($80\%\!\to\!29\%$, $\Delta_T=-0.51$) with Clopper--Pearson upper bound $-0.33$, which
+clears the pre-registered margin $\tau=0.30$. The binding constraint is the $V_1$ ceiling itself
+($80\%$, versus pair-1's ${\sim}100\%$), so the margin is met with little to spare; at $n=40$ the
+same collapse gives $-0.21$ and does not clear, which is why the cell was re-run at $n=80$. The
 $n=80$ run also strengthens the dominance control to a fully verified one-directional dominance
 ($U_{\Dcal}=0.000$ with a verified strict win). The relevance trap for this pair was a
 null, its prompt vocabulary leaned toward $V_1$ ($\varphi(V_1)=0.39 > \varphi(V_2)=0.25$), so
@@ -2194,7 +2270,7 @@ content). On single-shot Haiku at $n=40$ on the two collapse cells, padding is f
 equal-length dominated signal is catastrophic: on \texttt{api\_argorder}, $W_1$ $98\%$,
 $W_{\mathrm{pad}}$ $100\%$, $W_{1+}$ $10\%$; on \texttt{api\_post\_ok}, $W_1$ $50\%$,
 $W_{\mathrm{pad}}$ $65\%$, $W_{1+}$ $10\%$; and the same-run interference verification clears on
-\texttt{api\_argorder} ($\Delta_T=-0.88$, upper bound $-0.63$). The anti-monotonicity harm is therefore
+\texttt{api\_argorder} ($\Delta_T=-0.88$, upper bound $-0.67$). The anti-monotonicity harm is therefore
 attributable to $W_2$'s signal content interacting with the fixed rule, not to added tokens. One
 residual axis is not isolated by this control: the padding is off-topic for the \texttt{ledger}
 module while $W_2$ is on-topic, so ``topical but verifier-irrelevant'' text remains a smaller,
@@ -2225,7 +2301,7 @@ instructed rule, keeping the dominated signal is at best equal and directionally
 dropping it, so the selection-level conclusion, keep the non-dominated set rather than forcing
 the superset, survives the ablation intact.
 
-\paragraph{A structured-context ablation: segmentation is not the bottleneck.}
+\paragraph{A structured-context ablation: labeled XML segmentation mitigates only weakly.}
 To separate ``the model cannot segment the two conventions'' from ``the model cannot route them
 to task families,'' the arm $W_{1+}^{\mathrm{xml}}$ wraps the same two conventions, in the same
 order as $W_{1+}$, in labeled XML sections (\texttt{<wire\_encoding\_invariant>},
@@ -2238,8 +2314,11 @@ alone; on \texttt{api\_post\_ok} it is not separated from the raw superset. Prot
 $W_{1+}^{\mathrm{xml}}$ arm was measured in a clean arm-only re-run (its arm in the first run was
 invalidated by a transport-failure window and scored no completions; the re-run had zero
 transport errors), so its comparison against same-day baseline arms is across runs rather than
-within one run. The resulting mitigation hierarchy, raw superset $<$ structure $<$ routing $<$
-dropping the dominated signal, locates the failure in convention-to-task routing.
+within one run. The resulting mitigation hierarchy, raw superset $<$ structure $<$ routing $<$ dropping the
+dominated signal, is consistent with the operative variable being convention-to-task routing
+rather than segmentation alone; as in \S\ref{sec:disc-mechanism} this localization is an
+interpretation of the behavioural contrasts, not a verified claim, and it rests on one model at
+$n=40$ with the structure arm scored in a separate run.
 
 
 % ==========================================================================
@@ -2282,7 +2361,13 @@ configuration: the harness sets no explicit temperature, top-$p$, or seed (the C
 Azure/OpenAI-compatible launchers are invoked without sampling overrides), so the $n$ draws per cell
 are independent samples from each provider's default decoder, each a fresh single-turn call with a
 $200$-second timeout. Transport-level failures (empty or zero-token results) are retried up to three
-times with quadratic backoff; a draw that still fails is scored as a failure, never as a pass. Where a transport-outage window hit a whole arm or a single cell, we re-measured it cleanly in isolation with the retry harness and report only the clean measurement: the Opus $W_{1+}$ arm; the Opus $W_2$/\texttt{trap\_store\_wire} cell, roughly $18$ of whose $40$ first-run draws were outage-scored (inferred from per-draw cost); and the Haiku $W_1$/\texttt{enc\_amount} cell, whose first run predated the retry wrapper. One cell could not be re-measured at revision time: GPT-5.5 $W_2$/\texttt{trap\_store\_wire} returned HTTP~500 after retries on an unknown number of draws and the Azure quota was unavailable, so its reported $0/40$ still contains outage-scored draws. It is an expected-zero cell (the arm lacks the decisive fact, and it is $0\%$ on all five other models) and lies on no binding bound, but for that one cell the reported $n$ is an upper bound on the number of real draws.
+times with quadratic backoff; a draw that still fails is scored as a failure, never as a pass. Where a transport-outage window hit a whole arm or a single cell, we re-measured it cleanly in isolation with the retry harness and report only the clean measurement: the Opus $W_{1+}$ arm; the Opus $W_2$/\texttt{trap\_store\_wire} cell, roughly $18$ of whose $40$ first-run draws were outage-scored (inferred from per-draw cost); and the Haiku $W_1$/\texttt{enc\_amount} cell, whose first run predated the retry wrapper. One cell could not be re-measured at revision time: GPT-5.5 $W_2$/\texttt{trap\_store\_wire} returned HTTP~500 after retries on an unknown number of draws and the Azure quota was unavailable, so its reported $0/40$ still contains outage-scored draws. It is an expected-zero cell (the arm lacks the decisive fact, and it is $0\%$ on all five other
+models) and lies on no binding bound, but for that one cell the reported $n$ is an upper bound on
+the number of real draws. Because a coverage family should contain only cells that are valid
+binomial samples, we also report GPT-5.5's certificate over the admissible three-cell set that
+omits the trap: both directions then read $+0.774$, slightly \emph{stronger} than the four-cell
+$+0.762$, since dropping a cell widens the per-interval level from $\eta/8$ to $\eta/6$. Excluding
+the cell therefore repairs the coverage construction without weakening the reported crossing.
 
 \paragraph{Artifacts.} Per-model run logs and result JSONs are in the artifact repository
 (\url{https://github.com/abilous-ti/blackwell-llm-context}) under the pattern
@@ -2306,11 +2391,6 @@ follow-up controls (padding, second pair, routing, structured-context). The non-
 (GPT-5.5, DeepSeek, Kimi) used Azure quota; the Azure API returns no cost field, so this figure is
 the Anthropic spend, not the total across all six models. The dense/cross-encoder probe ran locally
 on open weights at zero API cost.
-
-\paragraph{Reference verification.} The bibliography was assembled in part with automated
-literature search and every entry was subsequently verified against arXiv/DBLP/publisher
-records; all entries resolve to real papers, and the classics (Blackwell 1953; Le~Cam
-1964/1986; Torgersen 1991; Ethayarajh et al.\ 2022) were checked against the primary sources.
 
 
 % ==========================================================================
