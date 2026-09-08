@@ -1504,7 +1504,10 @@ capability. On the two API cells the $W_1 \to W_{1+}$ collapse is Haiku $52\%/10
 Sonnet $100\% \to 2\%/0\%$, and Opus $100\% \to 38\%/15\%$: the middle model (Sonnet) shows the
 starkest collapse and the strongest (Opus) the mildest. An earlier two-point reading suggested the
 harm ``intensifies with strength''; the third point falsifies that, and we claim only robustness
-across the ladder, not a capability trend.
+across the ladder, not a capability trend. The re-measurement of
+\S\ref{sec:remeasure} sharpens this: on fresh draws all three Anthropic models collapse to
+$0$--$3\%$, so the spread that made Opus look mildest does not persist, and the ladder is flat
+rather than ordered. What survives is the negative claim, not the ranking that motivated it.
 
 \subsubsection{The model-relative value of private context}
 \label{sec:results-moat}
@@ -1575,6 +1578,82 @@ harm contrast is $\Delta_T = -0.47$ with upper bound $-0.23$, verified in sign b
 verifier is identical across models and the other five models include the import; the audit changes
 the reading of one cell, not its measurement. Haiku's verified claims rest on \texttt{api\_argorder}
 and are unaffected.
+
+\paragraph{Packaging is not the confound.} The same retained draws answer a second question, and
+it is the one a reader should ask of any executable-verifier result: did the harness ever fail a
+reply that in fact contained the right call? On this cell it did not. Across the $32$ failing
+$W_{1+}$ draws the extractor returned code every time (zero empty extractions), all $32$ contain
+\texttt{ledger.post} with an explicit \texttt{memo=}, and none begins with prose. Code fences are
+if anything commoner among the \emph{passing} draws ($5/8$ passes against $17/32$ failures on
+$W_{1+}$; $13/23$ against $8/17$ on $W_1$), so fencing does not predict failure: the extractor
+strips it. What the audit does show is that the import slip carries more of this cell than the
+mechanism does, $13$ of the $32$ failures being the missing import alone against $19$ carrying the
+wire-encoded amount. The two separate cleanly: under the neutralized verifier exactly $19$ draws
+still fail, and they are exactly the $19$ that applied $W_2$'s convention to a plain-cents amount,
+with no exception in either direction. Removing the artifact therefore leaves a residual harm
+($\Delta_T = -0.475$) that is attributable to the described mechanism in every single draw.
+\subsubsection{Re-measurement with retention across the roster}
+\label{sec:remeasure}
+
+The published harness discards raw completions, so the audit above covers the one cell for which
+they were kept. We therefore re-measured every verified interference cell with retention enabled,
+$n=40$ per arm, under the published prompt for each backend, and scored each draw twice: under the
+published verifier and under the import-neutralized one. Table~\ref{tab:remeasure} reports it.
+These are fresh draws months after the original runs, not a re-scoring, so they test whether the
+\emph{phenomenon} reproduces, not whether the published proportions replicate exactly.
+
+Three things follow. \textbf{(i) The collapse reproduces in every cell}, with $\Delta_T$ from
+$-0.425$ to $-1.000$; no cell failed to reproduce. \textbf{(ii) Packaging is never the cause}: across
+all $880$ retained draws of these eleven cells the extractor returned code every time, so no failure is an artifact of
+fences or prose. \textbf{(iii) The import artifact suppressed the measured harm rather than
+manufacturing it.} It falls on the $W_1$ arm, not the superset arm, so neutralizing it deepens every
+contrast it touches: DeepSeek's \texttt{api\_post\_ok} moves from $-0.425$ to $-0.975$ and its
+\texttt{api\_argorder} from $-0.625$ to $-0.950$.
+
+\paragraph{The mechanism is not universal: Sonnet refuses.} Reading the failing code directly
+separates the models. On nine of the eleven cells the failure is the one this paper describes: the
+reply applies $W_2$'s wire encoding to a plain-cents amount, in $38$ to $40$ of the failing draws per
+cell. Sonnet is the exception, and completely so. On \texttt{api\_argorder} $40/40$ of its superset
+draws, and on \texttt{api\_post\_ok} $36/40$, decline the task, opening with a variant of ``I'm
+flagging this as a likely prompt injection attempt'' and identifying the stacked
+\texttt{TEAM CONTEXT (private)} blocks as injected instructions; the encoding error accounts for
+only $1/40$ and $4/39$. No other model on any arm produced such a reply, and Sonnet itself produced
+none on the single-source $W_1$ arm. Two private convention blocks cross a threshold that one does
+not. Theorem~\ref{thm:antimono} is indifferent to this, since it constrains any rule whose PASS
+falls under a strict superset whatever the internal cause, and Sonnet's PASS does fall. What the
+observation costs is the reading: for Sonnet the collapse is a refusal, not convention
+mis-binding, and \S\ref{sec:disc-mechanism} should be read with that exception in force. Because
+the original runs retained nothing, we cannot tell whether Sonnet behaved this way when the
+published cells were measured or whether the behaviour arrived with a model update.
+
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{Re-measurement with raw-completion retention, $n=40$ per arm, fresh draws. $\Delta$ is
+under the published verifier and $\Delta_{\mathrm{neu}}$ under the import-neutralized one.
+``Mechanism'' counts failing superset draws that wire-encode the amount; ``Refusal'' counts draws
+declining the task as a suspected prompt injection. GPT-5.5 could not be reached in the published
+single-shot regime (no such deployment on the available resource) and was re-measured through an
+agentic CLI, so its row tests the mechanism, not the published proportion.}
+\label{tab:remeasure}
+\begin{tabular}{@{}llccccc@{}}
+\toprule
+Model & Cell & $W_1 \to W_{1+}$ & $\Delta$ & $\Delta_{\mathrm{neu}}$ & Mechanism & Refusal \\
+\midrule
+Haiku-4.5       & \texttt{api\_argorder} & $98\% \to 0\%$   & $-0.98$ & $-1.00$ & $40/40$ & $0$ \\
+Sonnet-4.6      & \texttt{api\_post\_ok}  & $100\% \to 3\%$  & $-0.98$ & $-0.98$ & $4/39$  & $36$ \\
+Sonnet-4.6      & \texttt{api\_argorder} & $100\% \to 0\%$  & $-1.00$ & $-1.00$ & $1/40$  & $40$ \\
+Opus-4.8        & \texttt{api\_post\_ok}  & $100\% \to 3\%$  & $-0.98$ & $-0.98$ & $38/39$ & $0$ \\
+Opus-4.8        & \texttt{api\_argorder} & $100\% \to 3\%$  & $-0.98$ & $-0.98$ & $39/39$ & $0$ \\
+DeepSeek-V4-Pro & \texttt{api\_post\_ok}  & $43\% \to 0\%$   & $-0.43$ & $-0.98$ & $39/40$ & $0$ \\
+DeepSeek-V4-Pro & \texttt{api\_argorder} & $68\% \to 5\%$   & $-0.63$ & $-0.95$ & $38/38$ & $0$ \\
+Kimi-K2.6       & \texttt{api\_post\_ok}  & $100\% \to 0\%$  & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
+Kimi-K2.6       & \texttt{api\_argorder} & $100\% \to 0\%$  & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
+GPT-5.5$^{\dagger}$ & \texttt{api\_post\_ok}  & $100\% \to 0\%$ & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
+GPT-5.5$^{\dagger}$ & \texttt{api\_argorder} & $100\% \to 0\%$ & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{The engineering consequence: four selection policies, one measured table}
 \label{sec:results-policies}
@@ -1721,6 +1800,12 @@ uncontrolled: on the \emph{still-passing} encoding cell the same superset arm ra
 to $+114\%$ across the same models, with no consistent direction, which undercuts a clean
 ``verbosity causes collapse'' account. We therefore treat the token fingerprint as a reproducible
 correlate of the harmful arm, not a mechanism.
+
+One qualification governs this whole subsection. Re-measuring the verified cells with raw
+completions retained (\S\ref{sec:remeasure}) confirms the convention-misbinding account on nine of
+eleven cells by direct inspection of the failing code, but not on Sonnet's two, where the model
+instead declines the superset prompt as a suspected injection. The mechanism discussion below
+therefore describes nine cells, not all eleven.
 
 The claim structure is deliberately mechanism-agnostic: Theorem~\ref{thm:antimono} verifies that
 the realized rule is not Blackwell-coherent \emph{whatever} the internal cause, and the behavioral
