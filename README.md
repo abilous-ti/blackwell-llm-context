@@ -106,8 +106,10 @@ pip install sentence-transformers && python harness/measure_dense_trap.py
 Verification parameters match the paper: η = 0.10, exact Clopper–Pearson intervals at union-bound
 level over the battery, τ = 0.30 for harm. Transport-level failures are retried and never scored as
 passes; where an outage hit a whole arm it was re-measured in isolation and only the clean
-measurement is reported (see the manuscript's reproducibility appendix for the one cell where that
-was not possible).
+measurement is reported. The one cell that resisted re-measurement for a while, GPT-5.5's
+`W2`/`trap_store_wire`, was re-run after a GPT-5.5 deployment became available: all four GPT-5.5
+cells now have clean single-shot runs at n=40 that reproduce the published grid exactly
+(`results/audit/audit_gpt55_*`).
 
 The intervals carry sampling error only. The re-measurement in `results/audit/` shows between-run
 shifts wider than the nominal intervals, and the raw-failure audit shows prompt wording moving one

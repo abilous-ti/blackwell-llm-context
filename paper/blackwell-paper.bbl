@@ -16,19 +16,18 @@ Pia Alpila.
 \newblock Context selection as approximate sufficiency: {Le Cam} deficiency and
   {Kolmogorov}'s structure function against a fixed decoder,
   2026{\natexlab{a}}.
-\newblock Preprint, 25 June 2026; companion essays 10.5281/zenodo.20799732 and
-  10.5281/zenodo.20800098.
+\newblock Preprint, 25 June 2026.
 
 \bibitem[Alpila(2026{\natexlab{b}})]{alpila2026essay}
 Pia Alpila.
 \newblock Context selection has been a solved problem since 1951,
   2026{\natexlab{b}}.
-\newblock Expository companion to \citet{alpila2026}.
+\newblock Expository companion to the preprint above.
 
 \bibitem[Alpila(2026{\natexlab{c}})]{alpila2026lmrecall}
 Pia Alpila.
-\newblock {LM Recall}: corpus, experiment code and per-decoder results,
-  2026{\natexlab{c}}.
+\newblock {LM Recall}: Code and data for ``context selection as approximate
+  sufficiency'', 2026{\natexlab{c}}.
 \newblock Software and data artifact.
 
 \bibitem[Auer et~al.(2016)Auer, Chiang, Ortner, and Drugan]{auer2016pareto}
