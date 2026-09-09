@@ -2,88 +2,108 @@
 
 Target: *Machine Learning and Knowledge Extraction* (MAKE), MDPI.
 
-Build the submission files with:
+Build the submission PDF with:
 
 ```bash
-python scratchpad/make_build.py     # regenerates blackwell-paper-make.tex from the master
-pdflatex blackwell-paper-make && bibtex blackwell-paper-make && pdflatex blackwell-paper-make && pdflatex blackwell-paper-make
+python paper/build_make_variant.py && pdflatex blackwell-paper-make && bibtex blackwell-paper-make && pdflatex blackwell-paper-make && pdflatex blackwell-paper-make
 ```
 
 `blackwell-paper-make.tex` is **generated** from `blackwell-paper.tex`. Never hand-edit it —
 edit the master and regenerate, or the two will drift.
 
-## Done
+## Authors, as submitted
+
+Order confirmed by the corresponding author.
+
+| # | Author | Affiliation | ORCID | Email |
+|---|---|---|---|---|
+| 1 | **Andriy Bilous** (corresponding) | 1 | 0009-0006-5467-7932 | andriy.bilous@uitware.com |
+| 2 | Vasyl Lytvyn | 1 | 0000-0002-9676-0180 | vasyl.v.lytvyn@lpnu.ua |
+| 3 | Petro Pukach | 2 | 0000-0002-0359-5025 | petro.y.pukach@lpnu.ua |
+| 4 | Zoriana Rybchak | 1 | 0000-0002-5986-4618 | zoriana.l.rybchak@lpnu.ua |
+
+1. Department of Information Systems and Networks, Institute of Computer Science and Information
+   Technologies, Lviv Polytechnic National University, S. Bandery St. 12, 79013 Lviv, Ukraine
+2. Institute of Applied Mathematics and Fundamental Sciences, Lviv Polytechnic National
+   University, S. Bandery St. 12, 79013 Lviv, Ukraine
+
+Names, affiliations and ORCIDs were verified against the ORCID public API.
+
+## Manuscript requirements — done
 
 | Requirement | State |
 |---|---|
-| Abstract ≤ 200 words | 198 |
+| Title | present; running title not needed until production |
+| Author list in MDPI form (`Name 1,*, Name 1, Name 2, …`) | present, with ORCID iDs |
+| Numbered affiliations with full postal address | present |
+| Corresponding-author line | present |
+| Abstract ≤ 200 words | 199 |
 | No citations in the abstract | none |
 | Keywords (3–10) | 10 |
-| Author Contributions (CRediT) | present, single author |
-| Funding statement | present |
-| Institutional Review Board Statement | present (not applicable, stated why) |
+| Author Contributions (CRediT), all four authors | present |
+| Funding statement | present (no external funding) |
+| Institutional Review Board Statement | present (not applicable, reason stated) |
 | Informed Consent Statement | present (not applicable) |
 | Data Availability Statement | present, points at the artifact repository |
+| Acknowledgments | present |
+| Use of Generative AI disclosure | present (MDPI / COPE research-integrity policy) |
 | Conflicts of Interest | present |
 | Abbreviations table | present |
 | Numbered reference style | `natbib[numbers]` + `unsrtnat` |
-| Corresponding-author block | present |
-| References real and used | 69 entries, 69 cited, all verified against arXiv/DBLP/Crossref |
+| References real, used, and verified | 72 entries, 72 cited, 0 uncited; all 47 arXiv ids resolve with matching titles; DOIs and Zenodo records checked |
+| Every reported number recomputed from the raw records | yes, by the scripts in `harness/` |
 
-## Outstanding — author decisions
+## Outstanding — author decisions before you press submit
 
-1. **Co-authors and the CRediT split.** The paper now carries four authors:
+1. **Co-author confirmation.** MDPI emails every listed co-author to confirm authorship and the
+   CRediT split. Send all three co-authors the current PDF and the Author Contributions
+   paragraph before submitting. The CRediT split is the corresponding author's draft; it has
+   not been confirmed by the others.
 
-   | Author | Affiliation | ORCID | Email |
-   |---|---|---|---|
-   | Andriy Bilous (corresponding) | Information Systems and Networks | 0009-0006-5467-7932 | andriy.bilous@uitware.com |
-   | Petro Pukach | Applied Mathematics and Fundamental Sciences | 0000-0002-0359-5025 | petro.y.pukach@lpnu.ua |
-   | Vasyl Lytvyn | Information Systems and Networks | 0000-0002-9676-0180 | vasyl.v.lytvyn@lpnu.ua |
-   | Zoriana Rybchak | Information Systems and Networks | 0000-0002-5986-4618 | zoriana.l.rybchak@lpnu.ua |
-
-   Names, affiliations and ORCIDs were verified against the ORCID public API. **The author
-   order and the CRediT split in the manuscript are a drafting placeholder, not a statement
-   any co-author has confirmed** - check both with all four before submission. MDPI emails
-   every listed co-author to confirm authorship.
-
-2. **Preprint declaration.** MDPI asks whether the manuscript has been posted as a preprint.
-   If the arXiv version goes up first, declare it in the cover letter and give the arXiv ID.
-   Posting a preprint does not disqualify MDPI submission.
+2. **The generative-AI disclosure must be checked for accuracy.** The manuscript now states that
+   an AI coding assistant was used for the harness, the analysis scripts and parts of the text,
+   and that no result was produced by a model acting as author or analyst. Confirm this matches
+   what you are willing to declare — MDPI treats a false or missing disclosure as a research
+   integrity matter.
 
 3. **Repository visibility.** The Data Availability Statement points at
-   `https://github.com/abilous-ti/blackwell-llm-context`. That repository must be **public**
-   before submission or the statement is false and reviewers cannot check any number.
+   `https://github.com/abilous-ti/blackwell-llm-context`. That repository is public as of the
+   last push; keep it public, or the statement is false and reviewers cannot check any number.
+
+4. **Preprint declaration.** MDPI asks whether the manuscript has been posted as a preprint. If
+   the arXiv version goes up first, declare it in the submission form and the cover letter with
+   the arXiv id. Posting a preprint does not disqualify MDPI submission.
+
+5. **Rotate the Azure API key** used for the GPT-5.5, DeepSeek and Kimi runs. It was pasted in
+   plain text during development. It is in no tracked file and in no commit, but rotate it.
+
+6. **Optional, the biggest remaining reviewer lever:** prevalence is measured in a companion
+   study (16/85 pairs incomparable, 2/36 co-retrieved) but not imported here. The manuscript
+   currently declares prevalence unmeasured in `\S`Limitations. Importing it would answer the
+   most likely reviewer objection; leaving it out keeps this paper's scope clean. Undecided.
 
 ## Outstanding — production format
 
-MDPI's own LaTeX class (`mdpi.cls` + `Definitions/`, `mdpi.bst`) is **not installed here**.
-It is not on CTAN and MiKTeX has no `mdpi` package, so it cannot be installed with a package
-manager; and `mdpi.com` returns HTTP 403 to non-browser requests, so the zip cannot be fetched
-from a script either. Getting it takes a browser: open <https://www.mdpi.com/authors/latex>,
-download the zip, unzip it, and the `Definitions/` folder sits next to your `.tex`.
-(A community mirror exists on GitHub, but it is unofficial and of unknown vintage - MDPI
-production uses the current class, so use the official zip.) The current build uses `article` with MDPI's required
-content and a numbered reference style, which is acceptable for **peer review** — MDPI accepts
-a PDF at submission — but the final production version must be moved onto their template.
+MDPI's own LaTeX class (`mdpi.cls` + `Definitions/`, `mdpi.bst`) is **not installed here**. It is
+not on CTAN and MiKTeX has no `mdpi` package, so it cannot be installed with a package manager;
+`mdpi.com` returns 403 to scripted download.
 
-When you do convert:
+This does not block submission: MAKE accepts a PDF for review, and MDPI's production office
+converts the accepted manuscript into their template. `blackwell-paper-make.tex` is built to be
+close to that template in the ways that matter for review — MDPI-shaped author block, numbered
+references, complete back matter — so the conversion is mechanical.
 
-- download the LaTeX template from <https://www.mdpi.com/authors/latex>;
-- move the body into `mdpi.cls` with `\documentclass[make,article,submit,pdftex,moreauthors]{Definitions/mdpi}`;
-- MDPI's class defines its own `\Author`, `\address`, `\corres`, `\abstract`, `\keyword` macros —
-  the front matter here maps onto them one-to-one;
-- switch `\bibliographystyle{unsrtnat}` to `mdpi.bst`;
-- theorem environments: `mdpi.cls` predefines `Theorem`, `Lemma`, `Proposition`, `Remark`,
-  `Definition` (capitalised); the `\newtheorem` block in the preamble is then redundant.
+If you want the true MDPI class before submitting, download the LaTeX template zip manually from
+the MAKE "Instructions for Authors" page while logged in, unpack it beside the `.tex`, and swap
+`\documentclass{article}` for `\documentclass[make,article,submit,pdftex,moreauthors]{mdpi}`.
+The back matter section names in this manuscript already match the macros that template expects.
 
-Alternatively submit the Word file (`blackwell-paper-MAKE.docx`) on MDPI's Word template — MAKE
-accepts either.
-
-## Files
+## Submission package
 
 | File | Purpose |
 |---|---|
-| `blackwell-paper.tex` | master; arXiv build (author–year references) |
-| `blackwell-paper-make.tex` | generated MAKE build (numbered references, MDPI front matter) |
-| `blackwell-paper-make.pdf` | submission PDF, 40 pp |
-| `blackwell-paper-MAKE.docx` | Word version for MDPI's Word template route |
+| `blackwell-paper-make.pdf` | the review PDF |
+| `blackwell-paper-make.tex` + `blackwell-paper.bib` | source, if the editor asks for it |
+| `blackwell-paper-MAKE.docx` | Word version, if the editor prefers it |
+| `COVER-LETTER.md` | cover letter, edit the bracketed fields before sending |
+| the artifact repository | referenced by the Data Availability Statement |

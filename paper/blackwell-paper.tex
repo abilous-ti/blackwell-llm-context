@@ -9,9 +9,13 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb,amsthm,booktabs,hyperref,natbib,microtype,enumitem}
 \usepackage{tikz}
+% ORCID iD glyphs if the package is present; plain text if not, so the file
+% compiles on any TeX installation a reviewer or production office may use.
+\IfFileExists{orcidlink.sty}{\usepackage{orcidlink}}{%
+  \newcommand{\orcidlink}[1]{\,\textsuperscript{\scriptsize\textsc{iD}}}}
 \hypersetup{
   pdftitle  = {Context selection as a partial order: A Blackwell framework and verified LLM evidence},
-  pdfauthor = {Andriy Bilous, Petro Pukach, Vasyl Lytvyn, Zoriana Rybchak},
+  pdfauthor = {Andriy Bilous, Vasyl Lytvyn, Petro Pukach, Zoriana Rybchak},
   pdfsubject = {Blackwell comparison of experiments applied to language-model context selection},
   pdfkeywords = {context selection, Blackwell order, partial order, retrieval-augmented generation,
                  language models, statistical deficiency, verified evaluation},
@@ -43,17 +47,17 @@
 A Blackwell framework and verified LLM evidence}
 
 \author{%
-  Andriy Bilous\,$^{1,\ast}$ \quad Petro Pukach\,$^{2}$ \quad Vasyl Lytvyn\,$^{1}$ \quad Zoriana Rybchak\,$^{1}$ \\[5pt]
-  \normalsize $^{1}$\,Department of Information Systems and Networks, Lviv Polytechnic National University, \\
-  \normalsize S.~Bandery St.~12, 79013 Lviv, Ukraine \\[3pt]
-  \normalsize $^{2}$\,Institute of Applied Mathematics and Fundamental Sciences, Lviv Polytechnic National University, \\
-  \normalsize S.~Bandery St.~12, 79013 Lviv, Ukraine \\[5pt]
-  \normalsize P.P.: Dr.Sc., Professor, Director of the Institute; V.L.: Dr.Sc., Full Professor, Head of Department; \\
-  \normalsize Z.R.: PhD, Associate Professor \\[3pt]
-  \normalsize \texttt{andriy.bilous@uitware.com} (A.B.); \texttt{petro.y.pukach@lpnu.ua} (P.P.); \\
+  Andriy Bilous\,$^{1,\ast}$\orcidlink{0009-0006-5467-7932},\quad
+  Vasyl Lytvyn\,$^{1}$\orcidlink{0000-0002-9676-0180},\quad
+  Petro Pukach\,$^{2}$\orcidlink{0000-0002-0359-5025},\quad
+  Zoriana Rybchak\,$^{1}$\orcidlink{0000-0002-5986-4618} \\[6pt]
+  \normalsize $^{1}$\,Department of Information Systems and Networks, Institute of Computer Science
+  and Information Technologies, \\
+  \normalsize Lviv Polytechnic National University, S.~Bandery St.~12, 79013 Lviv, Ukraine; \\
   \normalsize \texttt{vasyl.v.lytvyn@lpnu.ua} (V.L.); \texttt{zoriana.l.rybchak@lpnu.ua} (Z.R.) \\[3pt]
-  \normalsize ORCID: A.B. 0009-0006-5467-7932; P.P. 0000-0002-0359-5025; \\
-  \normalsize V.L. 0000-0002-9676-0180; Z.R. 0000-0002-5986-4618 \\[5pt]
+  \normalsize $^{2}$\,Institute of Applied Mathematics and Fundamental Sciences, \\
+  \normalsize Lviv Polytechnic National University, S.~Bandery St.~12, 79013 Lviv, Ukraine; \\
+  \normalsize \texttt{petro.y.pukach@lpnu.ua} \\[5pt]
   \normalsize $^{\ast}$\,Correspondence: \texttt{andriy.bilous@uitware.com}
 }
 
@@ -2099,11 +2103,11 @@ domain, are the natural next steps, and the experimental record indicates each i
 
 % ==========================================================================
 \section*{Author Contributions}
-Conceptualization, A.B. and V.L.; methodology, A.B. and P.P.; software, A.B.; validation, A.B.,
-V.L. and Z.R.; formal analysis, A.B. and P.P.; investigation, A.B.; data curation, A.B.;
-writing---original draft preparation, A.B.; writing---review and editing, A.B., P.P., V.L. and
-Z.R.; visualization, A.B. and Z.R.; supervision, V.L. and P.P.; project administration, V.L. All
-authors have read and agreed to the published version of the manuscript.
+Conceptualization, A.B. and V.L.; methodology, A.B., V.L. and P.P.; software, A.B.; validation,
+A.B., V.L. and Z.R.; formal analysis, A.B. and P.P.; investigation, A.B.; resources, V.L.; data
+curation, A.B.; writing---original draft preparation, A.B.; writing---review and editing, A.B.,
+V.L., P.P. and Z.R.; visualization, A.B. and Z.R.; supervision, V.L. and P.P.; project
+administration, V.L. All authors have read and agreed to the published version of the manuscript.
 
 \section*{Funding}
 This research received no external funding. The measurement costs reported in
@@ -2123,6 +2127,22 @@ harness (Python standard library only), every per-model run log and result file 
 Appendix~\ref{app:record}, and the raw-completion diagnostic records of
 \S\ref{sec:results-audit}. No data were withheld; every reported figure is computed from those
 files by the released scripts.
+
+\section*{Acknowledgments}
+The authors thank the Department of Information Systems and Networks, Lviv Polytechnic National
+University, for institutional support. No third party contributed to the design, execution or
+analysis of the reported measurements beyond the listed authors.
+
+\section*{Use of Generative Artificial Intelligence}
+Generative AI was used in two distinct roles, which we separate because only one of them bears on
+the results. \emph{As the object of study:} every number reported here is a pass rate obtained by
+querying commercial language models through their public APIs, as described in
+\S\ref{sec:methodology}; the models are the measured subject, not a tool. \emph{As a tool:} an
+AI coding assistant was used while writing the measurement harness, the analysis scripts and
+parts of the manuscript text. No result, table or figure was produced by a language model acting
+as an author or an analyst: every reported quantity is computed from the released raw run
+records by the released scripts, and the authors verified each against those records. The authors
+take full responsibility for the content of the manuscript.
 
 \section*{Conflicts of Interest}
 The authors declare no conflict of interest.
