@@ -60,17 +60,20 @@ MAPPING = [
     ("Figure: policy bars (fig:policies)", ["<same as tab:percell>"]),
     ("Figure: Hasse diagram (fig:hasse)", [TABLE["Haiku-4.5"][0] + ".json"]
      + sorted({f + ".json" for f in TABLE["Haiku-4.5"][1].values()})),
-    ("Table: ranker spectrum (tab:rankers)", ["reranker_trap_n30.json", "dense_trap.json"]),
-    ("Table: re-measurement with retention (tab:remeasure)",
-     ["audit/audit_<model>_<task>_<arm>.json  (11 cells x 2 arms, 880 retained draws)"]),
+    ("Table: ranker spectrum (tab:rankers)", ["reranker_trap_api_n100.json", "dense_trap.json"]),
     ("Explicit-import condition", ["audit/audit_impctl-*.json"]),
     ("Raw-failure audit (sec:results-audit)", ["diag/"]),
-    ("Padding control (character-matched)", ["blackwell_pad_n40b.json"]),
-    ("Order control (reversed concatenation, single-shot, n=40)", ["blackwell_order_ss_n40.json"]),
-    ("Routing-instruction ablation", ["blackwell_instr_n40.json"]),
-    ("Structured-context (XML) ablation", ["blackwell_xml_n40.json", "blackwell_xml_arm_v2.json"]),
-    ("Second source pair (agentic)", ["blackwell_pair2_n40.json", "blackwell_pair2_n80.json"]),
-    ("Second source pair (single-shot re-measurement)", ["blackwell_pair2_ss_n40.json"]),
+    ("Behavioural controls: padding, order reversal, routing note, XML segmentation",
+     ["blackwell_controls_api_n40.json"]),
+    ("Second source pair", ["blackwell_pair2_api_n40.json"]),
+    ("LLM listwise reranker probe", ["reranker_trap_api_n100.json"]),
+    ("Retained completions behind the audit table",
+     ["retain_api/haiku/", "retain_api/sonnet/", "retain_api/opus/"]),
+    # The base GPT-5.5 run logged an HTTP 500 on this one cell, so the published trap result is
+    # bound to the clean retained re-measurement instead. The percentages are unchanged.
+    ("GPT-5.5 trap cell (transport-clean source)",
+     ["audit/audit_gpt55_trap_store_wire_W1.json", "audit/audit_gpt55_trap_store_wire_W2.json",
+      "audit/audit_gpt55_trap_store_wire_summary.json"]),
     ("BigCodeBench pilot", ["bcb/"]),
 ]
 

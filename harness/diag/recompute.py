@@ -31,7 +31,11 @@ CLI = {
     "Opus-4.8":        ("blackwell_opus_ss_n40",   dict([(("W1plus", t), "blackwell_opus_ss_W1plus_v2")
                                                          for t in TASKS] +
                                                         [(("W2", "trap_store_wire"), "blackwell_opus_ss_W2_trap_v2")])),
-    "GPT-5.5":         ("blackwell_gpt55_n40",     {}),
+    # The base GPT run logged an HTTP 500 on W2/trap_store_wire, so both arms of that cell
+    # are read from the retained re-measurement, which has zero transport errors. Same counts.
+    "GPT-5.5":         ("blackwell_gpt55_n40",
+                        {("W1", "trap_store_wire"): "audit/audit_gpt55_trap_store_wire_summary",
+                         ("W2", "trap_store_wire"): "audit/audit_gpt55_trap_store_wire_summary"}),
     "DeepSeek-V4-Pro": ("blackwell_deepseek_n40",  {}),
     "Kimi-K2.6":       ("blackwell_kimi_n40",      {}),
 }
@@ -66,6 +70,11 @@ def counts_for(model, spec):
         if od is None:
             continue
         kn = od["counts"].get("%s|%s" % (a, t)) if "counts" in od else None
+        if kn is None and "arms" in od:
+            # retained-audit summary: {arms: {W1: {n, pass_original, ...}, ...}}
+            arm = (od["arms"] or {}).get(a)
+            if arm and "pass_original" in arm and "n" in arm:
+                kn = [arm["pass_original"], arm["n"]]
         if kn is None:  # arm-only files store a single cell
             for k2, v2 in (od.get("counts") or {}).items():
                 if k2.endswith("|" + t):

@@ -28,23 +28,21 @@ Transport of the six-model record in this manifest: **HTTP API for all six model
 
 | Object in the manuscript | Computed from (paths relative to `results/`) |
 |---|---|
-| Table: per-cell PASS (tab:percell) | `blackwell_haiku_api_n40.json`<br>`blackwell_sonnet_api_n40.json`<br>`blackwell_opus_api_n40.json`<br>`blackwell_gpt55_n40.json`<br>`blackwell_deepseek_n40.json`<br>`blackwell_kimi_n40.json` |
+| Table: per-cell PASS (tab:percell) | `blackwell_haiku_api_n40.json`<br>`blackwell_sonnet_api_n40.json`<br>`blackwell_opus_api_n40.json`<br>`blackwell_gpt55_n40.json`<br>`audit/audit_gpt55_trap_store_wire_summary.json`<br>`blackwell_deepseek_n40.json`<br>`blackwell_kimi_n40.json` |
 | Table: consolidated 6-model verdict (tab:consolidated) | <same as tab:percell> |
 | Table: anti-monotonicity (tab:interference) | <same as tab:percell> |
 | Figure: harm forest plot (fig:forest) | <same as tab:percell> |
 | Table: selection policies (tab:policies) | <same as tab:percell> |
 | Figure: policy bars (fig:policies) | <same as tab:percell> |
 | Figure: Hasse diagram (fig:hasse) | `blackwell_haiku_api_n40.json` |
-| Table: ranker spectrum (tab:rankers) | `reranker_trap_n30.json`<br>`dense_trap.json` |
-| Table: re-measurement with retention (tab:remeasure) | `audit/audit_<model>_<task>_<arm>.json  (11 cells x 2 arms, 880 retained draws)` |
+| Table: ranker spectrum (tab:rankers) | `reranker_trap_api_n100.json`<br>`dense_trap.json` |
 | Explicit-import condition | `audit/audit_impctl-*.json` |
 | Raw-failure audit (sec:results-audit) | `diag/` |
-| Padding control (character-matched) | `blackwell_pad_n40b.json` |
-| Order control (reversed concatenation, single-shot, n=40) | `blackwell_order_ss_n40.json` |
-| Routing-instruction ablation | `blackwell_instr_n40.json` |
-| Structured-context (XML) ablation | `blackwell_xml_n40.json`<br>`blackwell_xml_arm_v2.json` |
-| Second source pair (agentic) | `blackwell_pair2_n40.json`<br>`blackwell_pair2_n80.json` |
-| Second source pair (single-shot re-measurement) | `blackwell_pair2_ss_n40.json` |
+| Behavioural controls: padding, order reversal, routing note, XML segmentation | `blackwell_controls_api_n40.json` |
+| Second source pair | `blackwell_pair2_api_n40.json` |
+| LLM listwise reranker probe | `reranker_trap_api_n100.json` |
+| Retained completions behind the audit table | `retain_api/haiku/`<br>`retain_api/sonnet/`<br>`retain_api/opus/` |
+| GPT-5.5 trap cell (transport-clean source) | `audit/audit_gpt55_trap_store_wire_W1.json`<br>`audit/audit_gpt55_trap_store_wire_W2.json`<br>`audit/audit_gpt55_trap_store_wire_summary.json` |
 | BigCodeBench pilot | `bcb/` |
 
 Arm-only re-runs supersede the corresponding cells of the base file. The verification
