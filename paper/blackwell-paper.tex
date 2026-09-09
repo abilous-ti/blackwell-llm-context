@@ -403,11 +403,15 @@ be faithful to it, and verify a strict superset of a sufficient source collapsin
 length, position and routing confounds controlled. Incomparability in this sense cannot arise
 inside a single declared decision problem, so its absence there is not a gap but a different
 question. A second line is training-\emph{dataset} valuation: \citet{zheng2024pmi} order datasets
-by Blackwell informativeness and show that in their Bayesian regime a \emph{scalar}, the mutual
-information between the curated and the test data, determines that order, the opposite of our
-finding that no query-independent scalar can be faithful once the order is partial
-(Theorem~\ref{thm:incomparable}); the difference is that their comparison is taken against the
-Bayes-optimal user of the data, ours against a fixed model rule on a task family. Nearby uses stop short of
+by Blackwell informativeness and show that the mutual information between the curated and the
+test data is a \emph{strategy-proof} score: a curation step that garbles the data, so that
+$\theta \to D \to f(D)$ is a Markov chain, cannot raise it. That is the data-processing
+direction, and it is one-directional; a scalar can be monotone along the order without
+representing it, so their result is compatible with ours rather than opposed to it. Their
+comparison is also taken against the Bayes-optimal user of the data, ours against a fixed model
+rule on a task family. What Theorem~\ref{thm:incomparable} adds is the converse question, whether
+any query-independent scalar can be \emph{faithful} to the order, which a monotone score need not
+be once the order is partial. Nearby uses stop short of
 what we do: garbling to harden LLM evaluations~\citep{bradley2024garbling}, statistical deficiency
 to order training \emph{tasks}~\citep{fosse2025}, a deficiency-induced \emph{directional} dominance
 in transfer learning (no incomparability, no distribution-free bound, outside language
