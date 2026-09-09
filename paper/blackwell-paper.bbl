@@ -1,4 +1,4 @@
-\begin{thebibliography}{70}
+\begin{thebibliography}{72}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -36,6 +36,13 @@ Peter Auer, Chao-Kai Chiang, Ronald Ortner, and Madalina Drugan.
 \newblock In \emph{Proceedings of the 19th International Conference on
   Artificial Intelligence and Statistics (AISTATS)}, volume~51 of \emph{PMLR},
   pages 939--947, 2016.
+
+\bibitem[Bertschinger and Rauh(2014)]{bertschinger2014nolattice}
+Nils Bertschinger and Johannes Rauh.
+\newblock The {Blackwell} relation defines no lattice.
+\newblock In \emph{2014 IEEE International Symposium on Information Theory
+  (ISIT)}, pages 2479--2483, 2014.
+\newblock \doi{10.1109/ISIT.2014.6875280}.
 
 \bibitem[Blackwell(1953)]{blackwell1953}
 David Blackwell.
@@ -283,6 +290,13 @@ Hailey Joren, Jianyi Zhang, Chun-Sung Ferng, Da-Cheng Juan, Ankur Taly, and
   systems.
 \newblock \emph{arXiv preprint arXiv:2411.06037}, 2024.
 \newblock ICLR 2025.
+
+\bibitem[Khan et~al.(2024)Khan, Yu, and Zhang]{khan2025blackwell}
+M.~Ali Khan, Haomiao Yu, and Zhixiang Zhang.
+\newblock A simple proof of {Blackwell}'s theorem on the comparison of
+  experiments for a general state space.
+\newblock \emph{Economics Letters}, 245:\penalty0 112146, 2024.
+\newblock \doi{10.1016/j.econlet.2024.112146}.
 
 \bibitem[Khattab and Zaharia(2020)]{khattab2020colbert}
 Omar Khattab and Matei Zaharia.
