@@ -44,12 +44,11 @@ sub("natbib numeric",
 sub("bibstyle", r"\bibliographystyle{plainnat}", r"\bibliographystyle{unsrtnat}")
 
 sub("header",
-    r"%  arXiv article source. All references verified against arXiv/DBLP/publisher",
+    r"%  All references verified against arXiv/DBLP/publisher records.",
     r"%  MAKE (MDPI) submission build. GENERATED from blackwell-paper.tex -- do not" + NL +
-    r"%  hand-edit; regenerate with scratchpad/make_build.py after editing the master." + NL +
-    r"%  Differences from the master: numbered (MDPI) citation style and an MDPI-shaped" + NL +
-    r"%  title block with corresponding-author details." + NL +
-    r"%  All references verified against arXiv/DBLP/publisher")
+    r"%  hand-edit; regenerate with paper/build_make_variant.py after editing the master." + NL +
+    r"%  Differences from the master: numbered (MDPI) citation style." + NL +
+    r"%  All references verified against arXiv/DBLP/publisher records.")
 
 # title block: the master already carries the MDPI-shaped multi-author block,
 # so the MAKE build needs no substitution here.
