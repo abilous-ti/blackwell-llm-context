@@ -40,7 +40,8 @@ Names, affiliations and ORCIDs were verified against the ORCID public API.
 | Abstract ≤ 200 words | 199 |
 | No citations in the abstract | none |
 | Keywords (3–10) | 10 |
-| Author Contributions (CRediT), all four authors | present |
+| Author Contributions (CRediT) | present, reconciled with the commit history; co-author roles to confirm (see below) |
+| Commit provenance stated in the manuscript | Data Availability Statement |
 | Funding statement | present (no external funding) |
 | Institutional Review Board Statement | present (not applicable, reason stated) |
 | Informed Consent Statement | present (not applicable) |
@@ -56,10 +57,23 @@ Names, affiliations and ORCIDs were verified against the ORCID public API.
 
 ## Outstanding — author decisions before you press submit
 
-1. **Co-author confirmation.** MDPI emails every listed co-author to confirm authorship and the
-   CRediT split. Send all three co-authors the current PDF and the Author Contributions
-   paragraph before submitting. The CRediT split is the corresponding author's draft; it has
-   not been confirmed by the others.
+1. **Co-author confirmation, and the authorship-criteria question under it.** The commit
+   history is 77 commits, every one authored by A.B.; no co-author committed anything. The
+   CRediT paragraph was rewritten to match: every artifact-producing role (software,
+   investigation, validation, formal analysis, data curation, visualization, original draft)
+   is A.B. alone. The co-authors are left with writing---review and editing (all three),
+   supervision (V.L., P.P.) and project administration (V.L.), because a commit log can
+   neither evidence nor refute off-repository work.
+
+   **Two things to settle before submitting.** First, if any co-author did contribute to
+   conception, design or interpretation through discussion rather than code, say so and
+   restore those roles - they were removed for lack of evidence, not because they are known
+   to be absent. Second, MDPI applies ICMJE-style criteria: supervision plus review and
+   editing alone may not meet "substantial contribution to conception or design, or to
+   acquisition, analysis or interpretation". If a co-author's real contribution is only
+   supervisory, the correct place for it may be the Acknowledgments rather than the author
+   list. This is the corresponding author's call; MDPI emails every listed co-author to
+   confirm, so a mismatch surfaces at submission.
 
 2. **The generative-AI disclosure must be checked for accuracy.** The manuscript now states that
    an AI coding assistant was used for the harness, the analysis scripts and parts of the text,

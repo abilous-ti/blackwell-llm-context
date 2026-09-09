@@ -2108,11 +2108,16 @@ domain, are the natural next steps, and the experimental record indicates each i
 
 % ==========================================================================
 \section*{Author Contributions}
-Conceptualization, A.B. and V.L.; methodology, A.B., V.L. and P.P.; software, A.B.; validation,
-A.B., V.L. and Z.R.; formal analysis, A.B. and P.P.; investigation, A.B.; resources, V.L.; data
-curation, A.B.; writing---original draft preparation, A.B.; writing---review and editing, A.B.,
-V.L., P.P. and Z.R.; visualization, A.B. and Z.R.; supervision, V.L. and P.P.; project
-administration, V.L. All authors have read and agreed to the published version of the manuscript.
+Conceptualization, A.B.; methodology, A.B.; software, A.B.; validation, A.B.; formal analysis,
+A.B.; investigation, A.B.; data curation, A.B.; writing---original draft preparation, A.B.;
+visualization, A.B.; writing---review and editing, A.B., V.L., P.P. and Z.R.; supervision, V.L.
+and P.P.; project administration, V.L. All authors have read and agreed to the published version
+of the manuscript.
+
+The division above is evidenced by the artifact repository, whose commit history is authored
+solely by A.B.: the measurement harness, every run, the raw records and the analysis scripts were
+produced by the corresponding author. The generative-AI assistance described in the
+Acknowledgments is a tool and holds no authorship and no CRediT role.
 
 \section*{Funding}
 This research received no external funding. The measurement costs reported in
@@ -2131,7 +2136,10 @@ All data and code supporting the reported results are openly available at
 harness (Python standard library only), every per-model run log and result file cited in
 Appendix~\ref{app:record}, and the raw-completion diagnostic records of
 \S\ref{sec:results-audit}. \texttt{results/MANIFEST.md} pins every record by SHA-256 and maps each
-table and figure to the files it is computed from. No data were withheld; every reported figure is
+table and figure to the files it is computed from. The repository's full commit history is
+published with it and is authored solely by the corresponding author, with the generative-AI
+assistance of the Acknowledgments recorded per commit in \texttt{Co-Authored-By} trailers, so the
+provenance of every artifact is inspectable. No data were withheld; every reported figure is
 computed from those files by the released scripts.
 
 \section*{Acknowledgments}
