@@ -1,0 +1,47 @@
+
+```python
+import anthropic
+import time
+
+client = anthropic.Anthropic()
+
+cache = {}
+cache_times = {}
+
+def put(k, v):
+    """Mock cache.put function that stores value and returns if key was new"""
+    is_new = k not in cache
+    cache[k] = v
+    cache_times[k] = time.time()
+    return is_new
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    current_time = time.time()
+    
+    if k in cache:
+        expiry_time = cache_times[k] + cache[k][1]
+        if current_time < expiry_time:
+            return False
+    
+    cache[k] = (v, secs)
+    cache_times[k] = current_time
+    
+    return True
+
+if __name__ == "__main__":
+    print("Testing store function:")
+    
+    print(f"store('key1', 'value1', 10): {store('key1', 'value1', 10)}")
+    print(f"store('key1', 'value2', 10): {store('key1', 'value2', 10)}")
+    
+    print(f"store('key2', 'value3', 1): {store('key2', 'value3', 1)}")
+    
+    time.sleep(1.5)
+    print(f"After 1.5 seconds, store('key2', 'value4', 10): {store('key2', 'value4', 10)}")
+    
+    print(f"store('key3', 'value5', 100): {store('key3', 'value5', 100)}")
+```

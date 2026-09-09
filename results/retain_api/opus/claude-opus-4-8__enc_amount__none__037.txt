@@ -1,0 +1,73 @@
+I'll analyze this problem. Since there's no specified "private wire format" given, I need to make reasonable assumptions about a sensible money serialization format. A common approach is to serialize to integer cents (avoiding floating-point issues) with a clear structure.
+
+I'll create a format that encodes the sign and the amount in cents as a compact, unambiguous string.
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format:
+        A single ASCII string of the form:  "<sign>C<cents>"
+        where:
+          <sign>  is 'P' for positive/zero or 'N' for negative
+          'C'     is a literal separator
+          <cents> is the absolute value of the amount expressed as an
+                  integer number of cents, with no leading zeros
+                  (except a lone '0' for a zero amount).
+
+    Examples:
+        '12.30'  -> 'PC1230'
+        '-0.07'  -> 'NC7'
+        '0'      -> 'PC0'
+        '0.00'   -> 'PC0'
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    negative = False
+    if s[0] in '+-':
+        negative = s[0] == '-'
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount")
+
+    if '.' in s:
+        int_part, _, frac_part = s.partition('.')
+        if '.' in frac_part:
+            raise ValueError("multiple decimal points in amount")
+    else:
+        int_part, frac_part = s, ''
+
+    # Allow forms like '.5' or '12.'
+    if int_part == '':
+        int_part = '0'
+    if frac_part == '':
+        frac_part = '0'
+
+    if not int_part.isdigit() or not frac_part.isdigit():
+        raise ValueError("invalid characters in amount")
+
+    # Normalize fractional part to exactly two digits (cents).
+    if len(frac_part) > 2:
+        # Round half-up based on the third fractional digit.
+        keep = frac_part[:2]
+        next_digit = frac_part[2]
+        cents = int(int_part) * 100 + int(keep)
+        if next_digit >= '5':
+            cents += 1
+    else:
+        frac_part = (frac_part + '00')[:2]
+        cents = int(int_part) * 100 + int(frac_part)
+
+    # Zero is always encoded as positive to keep a canonical form.
+    if cents == 0:
+        negative = False
+
+    sign = 'N' if negative else 'P'
+    return f"{sign}C{cents}"

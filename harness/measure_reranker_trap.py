@@ -14,8 +14,8 @@ Usage: python tokenbench/measure_reranker_trap.py --n 10 --model claude-haiku-4-
 import argparse, json, re, subprocess, sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from tokenbench.measure_blackwell import W1, W2, TASKS, claude_cmd  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from measure_blackwell import W1, W2, TASKS, _azure_complete  # noqa: E402
 
 RERANK_TASKS = ["trap_store_wire", "api_post_ok", "enc_amount"]
 GROUND_TRUTH = {"trap_store_wire": "W1", "api_post_ok": "W1", "enc_amount": "W2"}
@@ -30,30 +30,24 @@ PROMPT = (
 
 
 def rank_once(task_prompt, doc_a, doc_b, model):
-    """One reranker call; returns 'A' or 'B' (top-ranked id) or None on parse failure."""
+    """One reranker call over HTTP; returns 'A' or 'B' (top-ranked id), or None if the
+    reply could not be parsed after three attempts."""
+    import time
     p = PROMPT.format(task=task_prompt, doc_a=doc_a, doc_b=doc_b)
-    cmd = claude_cmd(["-p", " ".join(p.split()), "--model", model,
-                      "--output-format", "json", "--max-turns", "1",
-                      "--dangerously-skip-permissions"])
     last = None
     for attempt in range(3):
         try:
-            r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
-                               timeout=200)
-            out = json.loads((r.stdout or "").strip().splitlines()[-1])
-            text = out.get("result", "") or ""
-            m = re.search(r"\{[^{}]*\"ranking\"[^{}]*\}", text, re.S)
+            text, _ = _azure_complete(p, model)
+            m = re.search(r"\{[^{}]*\"ranking\"[^{}]*\}", text or "", re.S)
             top = json.loads(m.group(0))["ranking"][0].strip().upper()
             if top in ("A", "B"):
                 return top
-            raise ValueError(f"bad top id {top!r}")
-        except Exception as e:  # transient transport or parse issue -> retry
+            raise ValueError("bad top id %r" % top)
+        except Exception as e:   # transient transport or parse issue -> retry
             last = e
-            import time
             time.sleep(5 * (attempt + 1))
-    print(f"    [WARN] rank_once failed 3x: {last}", flush=True)
+    print("    [WARN] rank_once failed 3x: %s" % last, flush=True)
     return None
-
 
 def main():
     ap = argparse.ArgumentParser()
@@ -71,9 +65,12 @@ def main():
         tally = {"W1_first": 0, "W2_first": 0, "null": 0, "by_order": {}}
         for order in ("W1A", "W1B"):
             doc_a, doc_b = (W1, W2) if order == "W1A" else (W2, W1)
-            o = {"W1": 0, "W2": 0, "null": 0}
+            o = {"W1": 0, "W2": 0, "null": 0, "seq": []}
             for i in range(a.n):
                 top = rank_once(tp, doc_a, doc_b, a.model)
+                o["seq"].append("null" if top is None else
+                                (("W1" if top == "A" else "W2") if order == "W1A"
+                                 else ("W2" if top == "A" else "W1")))
                 if top is None:
                     o["null"] += 1
                 else:

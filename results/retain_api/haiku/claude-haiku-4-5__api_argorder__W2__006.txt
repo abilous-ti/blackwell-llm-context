@@ -1,0 +1,32 @@
+```python
+def transfer(acct, cents, reason):
+    """
+    Transfer funds by posting to account.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (integer)
+        reason: Memo/reason for transfer
+    
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    # Determine sign
+    sign = '+' if cents >= 0 else '-'
+    
+    # Get absolute value and convert to string
+    abs_cents = abs(cents)
+    digits = str(abs_cents)
+    
+    # Calculate check digit as sum of decimal digits mod 10
+    check_digit = sum(int(d) for d in digits) % 10
+    
+    # Format the amount string
+    amount_str = f"{sign}{digits}#{check_digit}"
+    
+    # Post to ledger and return entry id
+    from ledger import post
+    entry_id = post(acct, amount_str, reason)
+    
+    return entry_id
+```

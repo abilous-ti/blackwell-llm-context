@@ -1,0 +1,18 @@
+def save(k, v):
+    """
+    Save value v under already-normalized key k with 60 second TTL.
+    Returns True only if newly inserted (key didn't exist before).
+    """
+    try:
+        # Check if key exists first
+        existing = cache.read(k)
+        if existing is not None:
+            return False
+        
+        # Key doesn't exist, insert it
+        cache.write(k, v, ttl=60)
+        return True
+    except:
+        # If key doesn't exist, cache.read raises an exception
+        cache.write(k, v, ttl=60)
+        return True

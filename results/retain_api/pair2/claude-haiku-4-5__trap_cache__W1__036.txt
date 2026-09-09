@@ -1,0 +1,12 @@
+```python
+import cache
+
+
+def save(k, v):
+    """
+    Cache value v under key k for 60 seconds.
+    Returns True if key was newly inserted, False if it replaced an existing value.
+    Raises cache.CacheError if k is empty.
+    """
+    return cache.put(k, v, ttl=60)
+```

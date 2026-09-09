@@ -1,0 +1,16 @@
+
+```python
+import anthropic
+from cache import put, CacheError
+
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    try:
+        return put(k, v, ttl=secs)
+    except CacheError:
+        return False
+```

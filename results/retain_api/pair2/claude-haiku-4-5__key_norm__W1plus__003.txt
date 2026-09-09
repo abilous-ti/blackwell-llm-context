@@ -1,0 +1,25 @@
+
+```python
+def make_key(label: str) -> str:
+    """Convert a raw label into a cache key following team conventions."""
+    # Step 1: lowercase
+    key = label.lower()
+    
+    # Step 2: replace every run of non-alphanumeric characters with a single underscore
+    result = []
+    in_non_alnum = False
+    for char in key:
+        if char.isalnum():
+            result.append(char)
+            in_non_alnum = False
+        else:
+            if not in_non_alnum:
+                result.append('_')
+                in_non_alnum = True
+    
+    # Step 3: strip leading/trailing underscores
+    key = ''.join(result).strip('_')
+    
+    # Step 4: prepend the fixed private namespace prefix
+    return 'kx7-' + key
+```

@@ -1,0 +1,16 @@
+```python
+import cache
+
+def save(k, v):
+    """
+    Save a value to cache under an already-normalized key.
+    
+    Args:
+        k: An already-normalized cache key (e.g., 'kx7-hello_world')
+        v: The value to cache
+    
+    Returns:
+        True if the key was newly inserted, False if it replaced an existing value
+    """
+    return cache.put(k, v, ttl=60)
+```

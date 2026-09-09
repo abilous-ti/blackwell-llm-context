@@ -1,0 +1,17 @@
+I'll write the `store` function. However, I need to make reasonable assumptions about the ledger module's interface since it wasn't fully specified. Based on the description, I'll assume a `ledger` module with a `write` function.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')
+```
+
+Wait, the instruction says "Return ONLY the raw Python file content, no markdown fences, no prose." Let me provide just that.
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

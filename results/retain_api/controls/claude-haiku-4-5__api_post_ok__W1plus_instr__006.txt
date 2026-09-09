@@ -1,0 +1,24 @@
+
+```python
+import anthropic
+import ledger
+
+def record(acct: str, cents: int, note: str) -> int:
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    # Call the ledger.post API with the required arguments
+    # account (acct) is first positional argument
+    # amount (cents) is second positional argument  
+    # memo (note) is required keyword-only argument
+    entry_id = ledger.post(acct, cents, memo=note)
+    return entry_id
+
+
+# For testing/demonstration purposes
+if __name__ == "__main__":
+    # This would be called by the ledger module in actual usage
+    # The function record() wraps the ledger.post API call
+    pass
+```

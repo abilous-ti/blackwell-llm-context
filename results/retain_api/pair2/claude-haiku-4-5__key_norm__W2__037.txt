@@ -1,0 +1,34 @@
+
+```python
+import re
+
+
+def make_key(label: str) -> str:
+    """Convert a raw label into a team's private cache key.
+    
+    Process:
+    1. Lowercase the label
+    2. Replace every run of non-alphanumeric characters with a single underscore
+    3. Strip leading/trailing underscores
+    4. Prepend the fixed private namespace prefix 'kx7-'
+    """
+    # Step 1: Lowercase
+    lowercased = label.lower()
+    
+    # Step 2: Replace runs of non-alphanumeric characters with single underscore
+    normalized = re.sub(r'[^a-z0-9]+', '_', lowercased)
+    
+    # Step 3: Strip leading/trailing underscores
+    stripped = normalized.strip('_')
+    
+    # Step 4: Prepend the fixed prefix
+    cache_key = 'kx7-' + stripped
+    
+    return cache_key
+
+
+if __name__ == "__main__":
+    # Test cases based on examples
+    print(make_key('Hello, World!'))  # Should output: kx7-hello_world
+    print(make_key(' A__B '))  # Should output: kx7-a_b
+```

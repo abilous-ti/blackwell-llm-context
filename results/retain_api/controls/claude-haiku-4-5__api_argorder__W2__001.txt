@@ -1,0 +1,29 @@
+import ledger
+
+def transfer(acct, cents, reason):
+    """
+    Posts a transfer of `cents` to account `acct` with `reason` as the memo.
+    Returns the entry id.
+    
+    The amount must be encoded as a wire string: <sign><digits>#<check>
+    where <check> is (sum of decimal digits) mod 10
+    """
+    # Determine sign
+    sign = '+' if cents >= 0 else '-'
+    
+    # Work with absolute value
+    abs_cents = abs(cents)
+    
+    # Convert to string of digits
+    digits = str(abs_cents)
+    
+    # Calculate check digit: sum of all decimal digits mod 10
+    check = sum(int(d) for d in digits) % 10
+    
+    # Build wire-encoded string
+    wire_amount = f"{sign}{digits}#{check}"
+    
+    # Post to ledger
+    entry_id = ledger.post(acct, wire_amount, reason)
+    
+    return entry_id

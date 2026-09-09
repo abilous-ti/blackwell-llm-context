@@ -1,0 +1,48 @@
+
+```python
+import anthropic
+import json
+import time
+
+cache = {}
+cache_ttl = {}
+
+def save(k, v):
+    """
+    Cache value v under key k for 60 seconds.
+    Returns True only if this is a newly inserted key (not an update).
+    """
+    is_new = k not in cache
+    cache[k] = v
+    cache_ttl[k] = time.time() + 60
+    return is_new
+
+
+def get(k):
+    """
+    Retrieve value from cache if key exists and hasn't expired.
+    Returns None if key doesn't exist or has expired.
+    """
+    if k not in cache:
+        return None
+    
+    if time.time() > cache_ttl.get(k, 0):
+        del cache[k]
+        if k in cache_ttl:
+            del cache_ttl[k]
+        return None
+    
+    return cache[k]
+
+
+def cleanup_expired():
+    """
+    Remove all expired entries from cache.
+    """
+    current_time = time.time()
+    expired_keys = [k for k, ttl in cache_ttl.items() if current_time > ttl]
+    for k in expired_keys:
+        if k in cache:
+            del cache[k]
+        del cache_ttl[k]
+```

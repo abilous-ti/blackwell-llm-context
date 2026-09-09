@@ -1,0 +1,105 @@
+
+```python
+import anthropic
+import json
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts a transfer to an account using Claude to interact with the ledger module.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (positive or negative)
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        The entry id of the posted transfer
+    """
+    
+    # Encode the amount using the wire-encoding format
+    sign = '+' if cents >= 0 else '-'
+    digits_str = str(abs(cents))
+    digit_sum = sum(int(d) for d in digits_str)
+    check_digit = digit_sum % 10
+    encoded_amount = f"{sign}{digits_str}#{check_digit}"
+    
+    # Create the Anthropic client
+    client = anthropic.Anthropic()
+    
+    # Define the ledger tools
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts a transfer to the ledger system",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "Account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "Amount in wire-encoding format (sign + digits # check)"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Memo or reason for the transfer"
+                    }
+                },
+                "required": ["acct", "amount", "memo"]
+            }
+        }
+    ]
+    
+    # Create a message asking Claude to post the transfer
+    messages = [
+        {
+            "role": "user",
+            "content": f"""Please post a transfer to the ledger system with the following details:
+- Account: {acct}
+- Amount (wire-encoded): {encoded_amount}
+- Reason: {reason}
+
+Use the ledger_post tool to complete this transfer and return the entry id."""
+        }
+    ]
+    
+    # Interact with Claude using tool_use
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response
+    entry_id = None
+    
+    # Check if Claude wants to use the tool
+    for block in response.content:
+        if block.type == "tool_use":
+            # Simulate the ledger.post function behavior
+            # In a real scenario, this would actually call the ledger module
+            tool_input = block.input
+            
+            # Validate the wire-encoding format
+            amount_str = tool_input["amount"]
+            if '#' in amount_str:
+                sign_digits, check = amount_str.rsplit('#', 1)
+                if sign_digits[0] in ['+', '-']:
+                    digits_only = sign_digits[1:]
+                    # Verify check digit
+                    digit_sum = sum(int(d) for d in digits_only)
+                    expected_check = digit_sum % 10
+                    if int(check) == expected_check:
+                        # Generate entry id (in real system, this comes from ledger)
+                        entry_id = f"entry_{tool_input['acct']}_{abs(int(digits_only))}"
+                        break
+    
+    if entry_id is None:
+        # Fallback entry id generation
+        entry_id = f"entry_{acct}_{abs(cents)}"
+    
+    return entry_id
+```

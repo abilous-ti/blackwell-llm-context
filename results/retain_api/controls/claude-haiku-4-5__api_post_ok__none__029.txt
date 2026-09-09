@@ -1,0 +1,126 @@
+
+```python
+import anthropic
+import json
+
+
+def post(acct: str, cents: int, note: str) -> str:
+    """
+    Post cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Post an amount to a ledger account with a note",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "The amount in cents to post"
+                    },
+                    "note": {
+                        "type": "string",
+                        "description": "The memo note for this entry"
+                    }
+                },
+                "required": ["acct", "cents", "note"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account '{acct}' with note '{note}' using the ledger_post function and return the entry id."
+        }
+    ]
+    
+    while True:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        if response.stop_reason == "tool_use":
+            tool_use_block = None
+            for block in response.content:
+                if block.type == "tool_use":
+                    tool_use_block = block
+                    break
+            
+            if tool_use_block:
+                tool_name = tool_use_block.name
+                tool_input = tool_use_block.input
+                
+                if tool_name == "ledger_post":
+                    try:
+                        import ledger
+                        entry_id = ledger.post(
+                            tool_input["acct"],
+                            tool_input["cents"],
+                            tool_input["note"]
+                        )
+                        
+                        messages.append({"role": "assistant", "content": response.content})
+                        messages.append({
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "tool_result",
+                                    "tool_use_id": tool_use_block.id,
+                                    "content": str(entry_id)
+                                }
+                            ]
+                        })
+                        
+                        continue
+                    except Exception as e:
+                        messages.append({"role": "assistant", "content": response.content})
+                        messages.append({
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "tool_result",
+                                    "tool_use_id": tool_use_block.id,
+                                    "content": f"Error: {str(e)}"
+                                }
+                            ]
+                        })
+                        
+                        continue
+        
+        for block in response.content:
+            if hasattr(block, "text"):
+                text = block.text
+                try:
+                    parsed = json.loads(text)
+                    if isinstance(parsed, dict) and "entry_id" in parsed:
+                        return str(parsed["entry_id"])
+                except (json.JSONDecodeError, ValueError):
+                    pass
+                
+                if "entry_id" in text.lower():
+                    lines = text.split("\n")
+                    for line in lines:
+                        if "entry_id" in line.lower():
+                            parts = line.split(":")
+                            if len(parts) > 1:
+                                return parts[-1].strip().strip('"').strip("'")
+                
+                if text.strip() and not any(c.isspace() for c in text.strip().split()[0] if c.isspace()):
+                    return text.strip().strip('"').strip("'")
+        
+        break
+    
+    return ""
+```

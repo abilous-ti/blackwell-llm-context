@@ -1,0 +1,52 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# In-memory ledger to simulate the ledger module
+ledger_entries = []
+next_entry_id = 1
+
+
+def post(acct, cents, reason):
+    """Post a transaction to the ledger and return the entry id."""
+    global next_entry_id
+    entry_id = next_entry_id
+    ledger_entries.append({
+        "id": entry_id,
+        "account": acct,
+        "amount": cents,
+        "memo": reason
+    })
+    next_entry_id += 1
+    return entry_id
+
+
+def transfer(acct, cents, reason):
+    """Transfer cents to account acct using reason as the memo, and return the entry id."""
+    # Use Claude to help process the transfer through the ledger
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"I need to post a transfer to the ledger. Account: {acct}, Amount: {cents} cents, Reason: {reason}. Please confirm this should be posted."
+            }
+        ]
+    )
+    
+    # Process the transfer by posting to the ledger
+    entry_id = post(acct, cents, reason)
+    return entry_id
+
+
+if __name__ == "__main__":
+    # Example usage
+    entry_id = transfer("checking", 10000, "Monthly salary")
+    print(f"Posted transfer with entry id: {entry_id}")
+    print(f"Ledger entries: {ledger_entries}")
+```

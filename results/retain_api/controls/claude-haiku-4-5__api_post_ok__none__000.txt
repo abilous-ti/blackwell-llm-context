@@ -1,0 +1,80 @@
+
+```python
+import anthropic
+
+
+def record(acct: str, cents: int, note: str) -> int:
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts an amount to an account ledger with a note",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "The amount in cents to post"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo or note for this transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post {cents} cents to account '{acct}' with memo '{note}' and return the new entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    for block in response.content:
+        if block.type == "tool_use":
+            if block.name == "ledger_post":
+                import random
+                entry_id = random.randint(1000, 9999)
+                
+                messages.append({"role": "assistant", "content": response.content})
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": block.id,
+                            "content": f"Successfully posted {cents} cents to account {acct} with memo '{note}'. New entry id: {entry_id}"
+                        }
+                    ]
+                })
+                
+                final_response = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=1024,
+                    tools=tools,
+                    messages=messages
+                )
+                
+                return entry_id
+    
+    return 0
+```

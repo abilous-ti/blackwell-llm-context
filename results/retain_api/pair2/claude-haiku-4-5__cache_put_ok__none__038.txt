@@ -1,0 +1,58 @@
+
+```python
+import anthropic
+import time
+from datetime import datetime, timedelta
+
+# Mock cache module for demonstration
+class MockCache:
+    def __init__(self):
+        self.data = {}
+    
+    def put(self, k, v, secs):
+        """Store value v under key k for secs seconds"""
+        self.data[k] = {
+            'value': v,
+            'expires_at': datetime.now() + timedelta(seconds=secs)
+        }
+
+# Initialize mock cache
+cache = MockCache()
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    # Check if key already exists and hasn't expired
+    key_existed = False
+    if k in cache.data:
+        if datetime.now() < cache.data[k]['expires_at']:
+            key_existed = True
+    
+    # Store the value using cache.put
+    cache.put(k, v, secs)
+    
+    # Return True only if this was a new key insertion
+    return not key_existed
+
+# Test the function
+if __name__ == "__main__":
+    # Test 1: New key insertion should return True
+    result1 = store("key1", "value1", 10)
+    print(f"First insertion of 'key1': {result1}")  # Should be True
+    
+    # Test 2: Existing key insertion should return False
+    result2 = store("key1", "value1_updated", 10)
+    print(f"Second insertion of 'key1': {result2}")  # Should be False
+    
+    # Test 3: New key should return True
+    result3 = store("key2", "value2", 10)
+    print(f"First insertion of 'key2': {result3}")  # Should be True
+    
+    # Test 4: Expired key should return True (as if new)
+    store("key3", "value3", 1)
+    time.sleep(1.1)  # Wait for expiration
+    result4 = store("key3", "value3_new", 10)
+    print(f"Insertion of expired 'key3': {result4}")  # Should be True
+```

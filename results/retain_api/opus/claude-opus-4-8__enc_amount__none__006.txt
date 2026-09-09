@@ -1,0 +1,73 @@
+I'll analyze this problem. Since there's no specification of the actual "private wire format," I need to make reasonable design decisions and implement a clear, self-consistent serialization format.
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    The wire format is a compact, unambiguous encoding based on the total
+    signed value expressed in cents (the smallest currency unit), prefixed
+    with a marker so it can be recognized and round-tripped.
+
+    Format: "M:<sign><cents>"
+      - 'M:' is the fixed wire marker for a money amount.
+      - <sign> is '+' for non-negative amounts, '-' for negative amounts.
+      - <cents> is the absolute value expressed as an integer number of cents,
+        with no leading zeros (except a single '0' for zero).
+
+    Examples:
+      '12.30'  -> 'M:+1230'
+      '-0.07'  -> 'M:-7'
+      '0'      -> 'M:+0'
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Determine sign.
+    negative = False
+    if s[0] in '+-':
+        negative = s[0] == '-'
+        s = s[1:]
+
+    if s == '':
+        raise ValueError("missing digits in amount")
+
+    # Split into integer and fractional parts.
+    if '.' in s:
+        int_part, _, frac_part = s.partition('.')
+        if '.' in frac_part:
+            raise ValueError("too many decimal points")
+    else:
+        int_part, frac_part = s, ''
+
+    # Allow empty integer part (e.g. '.07') and empty fractional part (e.g. '12.').
+    if int_part == '':
+        int_part = '0'
+    if frac_part == '':
+        frac_part = '0'
+
+    if not int_part.isdigit() or not frac_part.isdigit():
+        raise ValueError("invalid characters in amount: %r" % dollars)
+
+    # Normalize fractional part to exactly 2 digits (cents).
+    if len(frac_part) > 2:
+        # Reject sub-cent precision to keep the wire format exact.
+        # Trailing zeros beyond 2 places are tolerated and trimmed.
+        significant = frac_part[2:].rstrip('0')
+        if significant:
+            raise ValueError("sub-cent precision not supported: %r" % dollars)
+        frac_part = frac_part[:2]
+    frac_part = frac_part.ljust(2, '0')
+
+    total_cents = int(int_part) * 100 + int(frac_part)
+
+    # Zero is always encoded as non-negative.
+    if total_cents == 0:
+        negative = False
+
+    sign = '-' if negative else '+'
+    return "M:%s%d" % (sign, total_cents)

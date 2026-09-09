@@ -1,0 +1,30 @@
+
+```python
+import anthropic
+
+client = anthropic.Anthropic()
+
+# Initialize cache with a simple in-memory store
+_cache_store = {}
+
+def save(k: str, v: str) -> bool:
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (key didn't exist before).
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+    
+    Returns:
+        True if this is a new insertion, False if key already existed
+    """
+    is_new = k not in _cache_store
+    
+    _cache_store[k] = {
+        'value': v,
+        'ttl': 60
+    }
+    
+    return is_new
+```

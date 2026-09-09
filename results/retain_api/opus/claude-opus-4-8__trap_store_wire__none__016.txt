@@ -1,0 +1,17 @@
+I'll analyze this task. The key constraint is that the wire-encoded amount is ALREADY serialized, so I should pass it through as-is to the ledger's write function without decoding or re-encoding.
+
+Since I don't have the exact signature of the ledger module's `write` function, I'll make a reasonable assumption based on the parameters mentioned: account, amount, and memo.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    """Post an already wire-encoded amount string to an account.
+
+    The `wire` value (e.g. '+1230#6') is ALREADY serialized; it is passed
+    through to the ledger write function untouched -- no decoding or
+    re-encoding is performed.
+    """
+    return ledger.write(acct, wire, 'wire')
+```

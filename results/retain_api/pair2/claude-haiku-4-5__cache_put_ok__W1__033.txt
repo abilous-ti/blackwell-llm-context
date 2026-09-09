@@ -1,0 +1,94 @@
+
+```python
+from anthropic import Anthropic
+
+client = Anthropic()
+
+# System prompt that teaches Claude about the cache API contract
+system_prompt = """You are a Python coding assistant with expertise in the cache module API.
+
+The canonical write call is: cache.put(key: str, value, *, ttl: int)
+- key is FIRST positional argument (string)
+- value is SECOND positional argument
+- ttl is a REQUIRED keyword-only integer argument (in seconds)
+- Returns True if the key was NEWLY inserted, False if it REPLACED an existing value
+- Raises cache.CacheError (not ValueError or KeyError) on empty key
+
+You must write a function called store(k, v, secs) that:
+1. Uses cache.put with the correct argument order and keyword argument
+2. Returns True only if the key was newly inserted
+3. Returns False if an existing key was replaced
+
+Do not import cache directly - it will be available at runtime."""
+
+conversation_history = []
+
+def chat_with_claude(user_message: str) -> str:
+    """Send a message to Claude and get a response."""
+    conversation_history.append({
+        "role": "user",
+        "content": user_message
+    })
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=8096,
+        system=system_prompt,
+        messages=conversation_history
+    )
+    
+    assistant_message = response.content[0].text
+    conversation_history.append({
+        "role": "assistant",
+        "content": assistant_message
+    })
+    
+    return assistant_message
+
+def main():
+    print("Cache API Interactive Assistant")
+    print("=" * 50)
+    print("I'll help you understand the cache API and write the store() function.")
+    print("Type 'quit' to exit, 'code' to see the generated code.\n")
+    
+    # Initial request to Claude
+    initial_response = chat_with_claude(
+        "I need to write a function store(k, v, secs) that uses cache.put to cache value v under key k "
+        "for secs seconds. The function should return True only if the key was newly inserted. "
+        "Can you explain the cache.put API contract and show me how to implement this?"
+    )
+    print(f"Assistant: {initial_response}\n")
+    
+    while True:
+        user_input = input("You: ").strip()
+        
+        if user_input.lower() == 'quit':
+            print("Exiting...")
+            break
+        elif user_input.lower() == 'code':
+            # Ask Claude to generate just the code
+            code_response = chat_with_claude(
+                "Please provide ONLY the Python code for the store(k, v, secs) function that I can put in solution.py. "
+                "No explanations, just the code."
+            )
+            print(f"\nGenerated code:\n{code_response}\n")
+        elif user_input:
+            response = chat_with_claude(user_input)
+            print(f"Assistant: {response}\n")
+
+if __name__ == "__main__":
+    main()
+```
+
+Wait, I need to provide the actual solution.py file content, not an interactive assistant. Let me correct this:
+
+```python
+import cache
+
+def store(k, v, secs):
+    """Cache value v under key k for secs seconds.
+    
+    Returns True if the key was newly inserted, False if it replaced an existing value.
+    """
+    return cache.put(k, v, ttl=secs)
+```

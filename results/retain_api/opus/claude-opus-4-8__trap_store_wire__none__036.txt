@@ -1,0 +1,24 @@
+I need to see what the ledger module's write function looks like, but since I only have the task description, I'll write a reasonable implementation based on the instructions.
+
+The key constraints:
+- The `wire` string is ALREADY encoded — pass it through untouched.
+- Post to account `acct` with memo `'wire'` using the ledger module's `write` function.
+- Return the new entry id.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')
+```
+
+Let me consider that `write` might have a different signature. Without more info, the most defensible interpretation is to pass the wire string as-is (no re-encoding/decoding), the account, and the memo.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')
+```

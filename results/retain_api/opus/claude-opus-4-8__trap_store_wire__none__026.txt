@@ -1,0 +1,9 @@
+I need to make some reasonable assumptions about the `ledger` module's interface since it's not specified. The task says to use the ledger module's `write` function, post the wire string as-is (no re-encoding/decoding), with memo 'wire', and return the new entry id.
+
+Here's my solution:
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

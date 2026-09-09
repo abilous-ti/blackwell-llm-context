@@ -1,0 +1,74 @@
+
+```python
+import anthropic
+
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts a transfer to an account using the ledger module's write function.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in minor units (cents)
+        reason: Memo/reason for the transfer
+        
+    Returns:
+        The entry id from the ledger post
+    """
+    client = anthropic.Anthropic()
+    
+    # Create the encoding helper function first
+    def encode_amount(cents: int) -> str:
+        """Encode amount in cents to wire format: <sign><digits>#<check>"""
+        sign = '+' if cents >= 0 else '-'
+        abs_cents = abs(cents)
+        digits_str = str(abs_cents)
+        
+        # Calculate check digit: sum of digits mod 10
+        digit_sum = sum(int(d) for d in digits_str)
+        check = digit_sum % 10
+        
+        return f"{sign}{digits_str}#{check}"
+    
+    # Encode the amount
+    encoded_amount = encode_amount(cents)
+    
+    # Use Claude to help construct and execute the ledger post
+    prompt = f"""You are helping me execute a ledger transfer operation. I need to call the ledger module's write function 'post' with the following parameters:
+    
+- Account: {acct}
+- Encoded amount: {encoded_amount}
+- Reason/memo: {reason}
+
+The encoded amount follows the format <sign><digits>#<check> where:
+- sign is '+' or '-'
+- digits is the amount in cents (minor units)
+- check is a Luhn-style digit equal to (sum of decimal digits) mod 10
+
+Please help me construct the call to ledger.post() and simulate executing it. Return just the entry id that would be created, in the format that the ledger system would return."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    # Extract the entry id from Claude's response
+    response_text = message.content[0].text
+    
+    # Parse the response to get the entry id
+    # The entry id is typically a UUID or similar identifier
+    entry_id = response_text.strip()
+    
+    # If the response contains multiple lines, try to extract just the id
+    lines = entry_id.split('\n')
+    for line in lines:
+        line = line.strip()
+        if line and not line.startswith('Please') and not line.startswith('The'):
+            entry_id = line
+            break
+    
+    return entry_id
+```

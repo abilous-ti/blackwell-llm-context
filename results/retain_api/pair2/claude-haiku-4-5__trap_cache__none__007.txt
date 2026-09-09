@@ -1,0 +1,114 @@
+
+```python
+import anthropic
+import json
+import time
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# In-memory cache storage with expiration times
+_cache = {}
+
+
+def save(k, v):
+    """
+    Caches value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+        
+    Returns:
+        True if newly inserted, False if key already existed
+    """
+    current_time = time.time()
+    is_new = k not in _cache
+    
+    # Store the value with its expiration time
+    _cache[k] = {
+        'value': v,
+        'expires_at': current_time + 60
+    }
+    
+    return is_new
+
+
+def get(k):
+    """
+    Retrieves value from cache if it exists and hasn't expired.
+    
+    Args:
+        k: Cache key
+        
+    Returns:
+        The cached value or None if not found or expired
+    """
+    if k not in _cache:
+        return None
+    
+    current_time = time.time()
+    cache_entry = _cache[k]
+    
+    # Check if entry has expired
+    if current_time >= cache_entry['expires_at']:
+        del _cache[k]
+        return None
+    
+    return cache_entry['value']
+
+
+def cleanup_expired():
+    """
+    Removes expired entries from the cache.
+    """
+    current_time = time.time()
+    expired_keys = [k for k, v in _cache.items() if current_time >= v['expires_at']]
+    for k in expired_keys:
+        del _cache[k]
+
+
+def main():
+    """Test the cache save functionality."""
+    # Test 1: Save new key
+    result1 = save('kx7-hello_world', 'value1')
+    print(f"Save new key 'kx7-hello_world': {result1}")  # Should be True
+    assert result1 is True
+    
+    # Test 2: Try to save same key again
+    result2 = save('kx7-hello_world', 'value2')
+    print(f"Save existing key 'kx7-hello_world': {result2}")  # Should be False
+    assert result2 is False
+    
+    # Test 3: Verify value was updated
+    cached_value = get('kx7-hello_world')
+    print(f"Retrieved value: {cached_value}")  # Should be 'value2'
+    assert cached_value == 'value2'
+    
+    # Test 4: Save another new key
+    result3 = save('kx7-another_key', 'another_value')
+    print(f"Save new key 'kx7-another_key': {result3}")  # Should be True
+    assert result3 is True
+    
+    # Test 5: Test expiration
+    print("\nTesting expiration (waiting 61 seconds)...")
+    import time
+    original_expires = _cache['kx7-hello_world']['expires_at']
+    # Simulate expiration by setting the expiration time to the past
+    _cache['kx7-hello_world']['expires_at'] = time.time() - 1
+    expired_value = get('kx7-hello_world')
+    print(f"Retrieved expired value: {expired_value}")  # Should be None
+    assert expired_value is None
+    
+    # Test 6: After expiration, key should be available again for insertion
+    result4 = save('kx7-hello_world', 'value3')
+    print(f"Save previously expired key 'kx7-hello_world': {result4}")  # Should be True
+    assert result4 is True
+    
+    print("\nAll tests passed!")
+
+
+if __name__ == '__main__':
+    main()
+```

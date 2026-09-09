@@ -1,0 +1,29 @@
+import ledger
+
+
+def compute_check_digit(digits_str):
+    """Compute Luhn-style check digit: sum of digits mod 10."""
+    return sum(int(d) for d in digits_str) % 10
+
+
+def encode_amount(cents):
+    """Encode amount in cents to wire format: <sign><digits>#<check>."""
+    if cents >= 0:
+        sign = '+'
+        digits_str = str(cents)
+    else:
+        sign = '-'
+        digits_str = str(-cents)
+    
+    check = compute_check_digit(digits_str)
+    return f"{sign}{digits_str}#{check}"
+
+
+def record(acct, cents, note):
+    """
+    Post cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    encoded_amount = encode_amount(cents)
+    entry_id = ledger.post(acct, encoded_amount, memo=note)
+    return entry_id

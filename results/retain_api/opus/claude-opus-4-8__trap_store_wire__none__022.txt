@@ -1,0 +1,7 @@
+I'll write the `store` function based on the requirements. Since I don't have the ledger module's exact API, I'll make reasonable assumptions about its interface.
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

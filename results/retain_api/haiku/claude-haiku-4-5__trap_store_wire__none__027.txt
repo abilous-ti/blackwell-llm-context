@@ -1,0 +1,107 @@
+
+```python
+import anthropic
+import json
+import re
+import subprocess
+
+
+def store(acct: str, wire: str) -> str:
+    """
+    Posts a wire-encoded amount string to an account using the ledger module's write function.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "write",
+            "description": "Write a transaction entry to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The wire-encoded amount string"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Transaction memo/description"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post the wire-encoded amount '{wire}' to account '{acct}' with memo 'wire' using the write function and return the new entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    tool_use_block = None
+    for block in response.content:
+        if block.type == "tool_use":
+            tool_use_block = block
+            break
+    
+    if not tool_use_block:
+        raise ValueError("No tool use block found in response")
+    
+    tool_input = tool_use_block.input
+    
+    result = subprocess.run(
+        ["python", "-c", f"""
+import sys
+sys.path.insert(0, '.')
+from ledger import write
+result = write(account='{tool_input['account']}', amount='{tool_input['amount']}', memo='{tool_input['memo']}')
+print(result)
+"""],
+        capture_output=True,
+        text=True
+    )
+    
+    if result.returncode != 0:
+        raise RuntimeError(f"Ledger write failed: {result.stderr}")
+    
+    entry_id = result.stdout.strip()
+    
+    messages.append({
+        "role": "assistant",
+        "content": response.content
+    })
+    
+    messages.append({
+        "role": "user",
+        "content": f"The write function returned: {entry_id}"
+    })
+    
+    final_response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    return entry_id
+```

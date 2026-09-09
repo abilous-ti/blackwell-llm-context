@@ -1,0 +1,66 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a monetary amount to the team's private wire format.
+    
+    Format: <sign><digits>#<check>
+    - sign: '+' or '-'
+    - digits: amount in MINOR UNITS (cents, as integer)
+    - check: Luhn-style digit = (sum of decimal digits in <digits>) mod 10
+    
+    Examples:
+    - '12.30' -> '+1230#6'
+    - '-0.07' -> '-7#7'
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are a financial encoding system. Your job is to encode monetary amounts to a specific wire format.
+
+ENCODING RULES:
+- Format: <sign><digits>#<check>
+- <sign>: '+' for positive amounts, '-' for negative amounts
+- <digits>: the absolute amount in MINOR UNITS (cents as integer, no decimal point)
+  - $12.30 = 1230 cents
+  - $0.07 = 7 cents
+- <check>: single Luhn-style check digit = (sum of all decimal digits in <digits>) mod 10
+
+EXAMPLES:
+- Input: '12.30' -> Output: '+1230#6' (digits=1230, sum=1+2+3+0=6, check=6%10=6)
+- Input: '-0.07' -> Output: '-7#7' (digits=7, sum=7, check=7%10=7)
+- Input: '0.00' -> Output: '+0#0' (digits=0, sum=0, check=0%10=0)
+
+Now encode this amount: '{dollars}'
+
+Return ONLY the encoded string in the format <sign><digits>#<check>, with no explanation or additional text."""
+            }
+        ]
+    )
+    
+    result = message.content[0].text.strip()
+    return result
+
+
+if __name__ == "__main__":
+    test_cases = [
+        "12.30",
+        "-0.07",
+        "0.00",
+        "100.00",
+        "-50.25",
+        "999.99"
+    ]
+    
+    for test in test_cases:
+        encoded = encode_amount(test)
+        print(f"{test:>10} -> {encoded}")
+```

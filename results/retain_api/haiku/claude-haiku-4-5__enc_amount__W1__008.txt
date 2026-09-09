@@ -1,0 +1,80 @@
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encode a dollar amount string to the team's private wire format.
+    
+    Takes a string like '12.30' or '-0.07' and converts it to the wire format.
+    The wire format is cents as an integer string (e.g., '1230' or '-7').
+    
+    Args:
+        dollars: A string representation of dollars with optional decimal places
+        
+    Returns:
+        The encoded amount as a string in the wire format
+    """
+    dollars = dollars.strip()
+    
+    parts = dollars.split('.')
+    
+    if len(parts) == 1:
+        whole = parts[0]
+        fractional = '00'
+    elif len(parts) == 2:
+        whole = parts[0]
+        fractional = parts[1].ljust(2, '0')[:2]
+    else:
+        raise ValueError(f"Invalid amount format: {dollars}")
+    
+    if whole == '' or whole == '-':
+        whole = whole + '0'
+    
+    cents = int(whole) * 100 + int(fractional)
+    
+    if whole.startswith('-'):
+        cents = -abs(int(whole)) * 100 - int(fractional)
+    
+    return str(cents)
+```
+
+Wait, let me reconsider the logic for negative numbers:
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encode a dollar amount string to the team's private wire format.
+    
+    Takes a string like '12.30' or '-0.07' and converts it to the wire format.
+    The wire format is cents as an integer string (e.g., '1230' or '-7').
+    
+    Args:
+        dollars: A string representation of dollars with optional decimal places
+        
+    Returns:
+        The encoded amount as a string in the wire format
+    """
+    dollars = dollars.strip()
+    
+    is_negative = dollars.startswith('-')
+    dollars_abs = dollars.lstrip('-')
+    
+    parts = dollars_abs.split('.')
+    
+    if len(parts) == 1:
+        whole = parts[0]
+        fractional = '00'
+    elif len(parts) == 2:
+        whole = parts[0]
+        fractional = parts[1].ljust(2, '0')[:2]
+    else:
+        raise ValueError(f"Invalid amount format: {dollars}")
+    
+    if whole == '':
+        whole = '0'
+    
+    cents = int(whole) * 100 + int(fractional)
+    
+    if is_negative:
+        cents = -cents
+    
+    return str(cents)
+```

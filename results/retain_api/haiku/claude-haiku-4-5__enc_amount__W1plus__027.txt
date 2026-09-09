@@ -1,0 +1,45 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    # Parse the input string to extract sign and amount
+    is_negative = dollars.startswith('-')
+    amount_str = dollars.lstrip('+-')
+    
+    # Remove the decimal point and convert to cents (integer)
+    parts = amount_str.split('.')
+    if len(parts) == 1:
+        # No decimal point, assume .00
+        cents = int(parts[0]) * 100
+    elif len(parts) == 2:
+        # Has decimal point
+        dollars_part = int(parts[0])
+        cents_part = parts[1]
+        # Pad or truncate to 2 decimal places
+        if len(cents_part) == 1:
+            cents_part = cents_part + '0'
+        elif len(cents_part) > 2:
+            cents_part = cents_part[:2]
+        cents = dollars_part * 100 + int(cents_part)
+    else:
+        raise ValueError(f"Invalid amount format: {dollars}")
+    
+    # Convert cents to string for digit sum calculation
+    cents_str = str(cents)
+    
+    # Calculate check digit as sum of digits mod 10
+    digit_sum = sum(int(d) for d in cents_str)
+    check = digit_sum % 10
+    
+    # Format the result
+    sign = '-' if is_negative else '+'
+    return f"{sign}{cents_str}#{check}"
+
+
+if __name__ == "__main__":
+    # Test cases from the problem statement
+    print(encode_amount('-0.07'))   # Should be "-7#7"
+    print(encode_amount('12.30'))   # Should be "+1230#6"
+    print(encode_amount('0.00'))    # Should be "+0#0"
+    print(encode_amount('100.00'))  # Should be "+10000#1"
+    print(encode_amount('-100.00')) # Should be "-10000#1"
+```

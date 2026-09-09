@@ -1,0 +1,5 @@
+import ledger
+
+
+def record(acct, cents, note):
+    return ledger.post(acct, cents, note)

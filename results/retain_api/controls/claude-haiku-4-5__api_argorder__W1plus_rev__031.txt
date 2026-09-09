@@ -1,0 +1,24 @@
+```python
+import ledger
+
+
+def transfer(acct, cents, reason):
+    """
+    Transfer cents to account acct with reason as memo.
+    Returns the entry id from ledger.post().
+    """
+    # Calculate the check digit (Luhn-style: sum of digits mod 10)
+    digits_str = str(abs(cents))
+    check_digit = sum(int(d) for d in digits_str) % 10
+    
+    # Determine sign
+    sign = '+' if cents >= 0 else '-'
+    
+    # Format amount as wire-encoded string
+    amount = f"{sign}{digits_str}#{check_digit}"
+    
+    # Post to ledger with required memo keyword argument
+    entry_id = ledger.post(acct, amount, memo=reason)
+    
+    return entry_id
+```

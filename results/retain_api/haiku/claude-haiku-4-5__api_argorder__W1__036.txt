@@ -1,0 +1,17 @@
+def transfer(acct, cents, reason):
+    """
+    Posts a transfer to the ledger.
+    
+    Args:
+        acct: The account to post to
+        cents: The amount in cents
+        reason: The memo/reason for the transfer
+        
+    Returns:
+        The entry id from the ledger post
+        
+    Raises:
+        ledger.PostError: If the post fails
+    """
+    import ledger
+    return ledger.post(acct, cents, memo=reason)

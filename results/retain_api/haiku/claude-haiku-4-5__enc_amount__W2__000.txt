@@ -1,0 +1,68 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a monetary amount to the team's private wire format.
+    
+    Args:
+        dollars: A string representing a dollar amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        A wire-encoded string in the format '<sign><digits>#<check>'
+    """
+    client = anthropic.Anthropic()
+    
+    prompt = f"""You are a financial encoding expert. Given a dollar amount string, encode it to this specific wire format:
+
+Format: <sign><digits>#<check>
+- <sign>: '+' for positive amounts, '-' for negative amounts
+- <digits>: The amount in MINOR UNITS (integer cents, no decimal point). For example, $12.30 becomes 1230
+- <check>: A single Luhn-style check digit equal to (sum of the decimal digits in <digits>) mod 10
+
+Examples:
+- Input: '-0.07' -> Output: '-7#7' (7 cents negative, sum of digits in '7' is 7, 7 mod 10 = 7)
+- Input: '+12.30' -> Output: '+1230#6' (1230 cents positive, sum of digits in '1230' is 1+2+3+0=6, 6 mod 10 = 6)
+
+Encode the following dollar amount to this wire format:
+Dollar amount: {dollars}
+
+Return ONLY the encoded string in the format <sign><digits>#<check>, with no additional text or explanation."""
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=50,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    # Extract the encoded amount from Claude's response
+    encoded = message.content[0].text.strip()
+    
+    # Verify the format is correct
+    if not encoded or not (encoded[0] in ['+', '-']):
+        raise ValueError(f"Invalid encoded format: {encoded}")
+    
+    # Validate the check digit
+    parts = encoded.split('#')
+    if len(parts) != 2:
+        raise ValueError(f"Invalid encoded format: {encoded}")
+    
+    sign_and_digits = parts[0]
+    check_digit = parts[1]
+    
+    # Extract digits (everything after the sign)
+    digits = sign_and_digits[1:]
+    
+    # Calculate the expected check digit
+    digit_sum = sum(int(d) for d in digits)
+    expected_check = str(digit_sum % 10)
+    
+    if check_digit != expected_check:
+        raise ValueError(f"Invalid check digit in encoded format: {encoded}")
+    
+    return encoded
+```

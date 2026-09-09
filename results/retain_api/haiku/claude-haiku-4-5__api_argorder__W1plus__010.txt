@@ -1,0 +1,21 @@
+def transfer(acct, cents, reason):
+    from ledger import post
+    
+    # Convert cents to wire-encoded amount string
+    # Format: <sign><digits>#<check>
+    # where check = (sum of decimal digits) mod 10
+    
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits = str(abs_cents)
+    
+    # Calculate check digit as sum of digits mod 10
+    check = sum(int(d) for d in digits) % 10
+    
+    # Construct wire-encoded amount
+    amount = f"{sign}{digits}#{check}"
+    
+    # Call ledger.post with required keyword argument
+    entry_id = post(acct, amount, memo=reason)
+    
+    return entry_id

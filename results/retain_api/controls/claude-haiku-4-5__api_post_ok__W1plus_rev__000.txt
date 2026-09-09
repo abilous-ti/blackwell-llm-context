@@ -1,0 +1,33 @@
+import ledger
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    
+    Args:
+        acct: Account identifier (string)
+        cents: Amount in cents (integer)
+        note: Memo/note (string)
+    
+    Returns:
+        New entry id (integer >= 1)
+    
+    Raises:
+        ledger.PostError: On any failure (unknown account, malformed amount)
+    """
+    # Encode cents to wire format: <sign><digits>#<check>
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits = str(abs_cents)
+    
+    # Calculate Luhn-style check digit
+    digit_sum = sum(int(d) for d in digits)
+    check = digit_sum % 10
+    
+    # Build wire-encoded amount string
+    amount = f"{sign}{digits}#{check}"
+    
+    # Post to ledger and return entry id
+    entry_id = ledger.post(acct, amount, memo=note)
+    return entry_id

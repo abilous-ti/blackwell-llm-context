@@ -1,0 +1,22 @@
+
+```python
+import anthropic
+import json
+from datetime import datetime, timedelta
+
+client = anthropic.Anthropic()
+cache = {}
+cache_ttl = {}
+
+def save(k: str, v) -> bool:
+    """
+    Caches value `v` under the already-normalized key `k` for ttl 60 seconds.
+    Returns True only if newly inserted (key didn't exist before).
+    """
+    is_new = k not in cache
+    
+    cache[k] = v
+    cache_ttl[k] = datetime.now() + timedelta(seconds=60)
+    
+    return is_new
+```

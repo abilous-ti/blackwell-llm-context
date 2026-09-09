@@ -1,0 +1,44 @@
+
+```python
+import anthropic
+import ledger
+
+
+def transfer(acct, cents, reason):
+    """Transfer cents to account acct with reason as memo.
+    
+    Returns the entry id from the ledger post operation.
+    Raises ledger.PostError on failure.
+    """
+    try:
+        entry_id = ledger.post(acct, cents, memo=reason)
+        return entry_id
+    except ledger.PostError:
+        raise
+
+
+client = anthropic.Anthropic()
+
+
+def process_transfer_with_claude(acct, cents, reason):
+    """Use Claude to validate and process a transfer request."""
+    prompt = f"""A user wants to transfer {cents} cents to account {acct} with reason: {reason}.
+    
+    Please validate this transfer request and confirm it's appropriate before I execute it.
+    Respond with 'APPROVED' if valid, or explain why it should be rejected."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    response_text = message.content[0].text
+    
+    if "APPROVED" in response_text:
+        return transfer(acct, cents, reason)
+    else:
+        raise ValueError(f"Transfer rejected: {response_text}")
+```

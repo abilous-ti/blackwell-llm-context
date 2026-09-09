@@ -1,0 +1,54 @@
+
+```python
+import anthropic
+import time
+
+client = anthropic.Anthropic()
+
+cache = {}
+
+def put(k, v):
+    """Store value v under key k in the cache."""
+    cache[k] = v
+
+def store(k, v, secs):
+    """
+    Cache value v under key k for secs seconds.
+    Returns True only if the key was newly inserted.
+    """
+    # Check if key already exists
+    key_exists = k in cache
+    
+    # Put the value in cache
+    put(k, v)
+    
+    # If key didn't exist before, it was newly inserted
+    if not key_exists:
+        # Set up expiration
+        if secs > 0:
+            def expire_key():
+                time.sleep(secs)
+                if k in cache:
+                    del cache[k]
+            
+            import threading
+            expiry_thread = threading.Thread(target=expire_key, daemon=True)
+            expiry_thread.start()
+        
+        return True
+    else:
+        return False
+
+if __name__ == "__main__":
+    # Test the store function
+    result1 = store("key1", "value1", 10)
+    print(f"First insert of key1: {result1}")  # Should be True
+    
+    result2 = store("key1", "value2", 10)
+    print(f"Second insert of key1: {result2}")  # Should be False
+    
+    result3 = store("key2", "value3", 10)
+    print(f"First insert of key2: {result3}")  # Should be True
+    
+    print(f"Cache contents: {cache}")
+```

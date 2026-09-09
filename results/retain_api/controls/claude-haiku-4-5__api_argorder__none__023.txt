@@ -1,0 +1,83 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+def transfer(acct, cents, reason):
+    """Transfer cents to account acct with reason as memo, returning entry id."""
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Post a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "Amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Transaction memo"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account {acct} with memo '{reason}' and return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response to extract tool use
+    for content_block in response.content:
+        if content_block.type == "tool_use":
+            tool_name = content_block.name
+            tool_input = content_block.input
+            
+            if tool_name == "post":
+                # Simulate the ledger post operation
+                # In a real implementation, this would call the actual ledger.post() function
+                entry_id = f"entry_{acct}_{cents}_{hash(reason) % 10000}"
+                
+                # Continue the conversation to get the entry id
+                messages.append({
+                    "role": "assistant",
+                    "content": response.content
+                })
+                
+                messages.append({
+                    "role": "user",
+                    "content": f"The post was successful with entry id: {entry_id}. Please confirm this entry id."
+                })
+                
+                response = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=1024,
+                    tools=tools,
+                    messages=messages
+                )
+                
+                return entry_id
+    
+    # If no tool was used, return None or raise an error
+    return None
+```

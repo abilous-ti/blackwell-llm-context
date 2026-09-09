@@ -1,0 +1,21 @@
+
+```python
+import anthropic
+
+cache = None
+
+def set_cache(cache_instance):
+    """Set the cache instance for use in save()."""
+    global cache
+    cache = cache_instance
+
+def save(k, v):
+    """
+    Save value v under the already-normalized key k with ttl of 60 seconds.
+    Returns True if newly inserted, False if replaced an existing value.
+    Raises cache.CacheError if key is empty.
+    """
+    if cache is None:
+        raise RuntimeError("Cache not initialized. Call set_cache() first.")
+    return cache.put(k, v, ttl=60)
+```

@@ -1,0 +1,57 @@
+
+```python
+import anthropic
+
+def post(acct, cents, note):
+    """Posts cents to account acct with memo note and returns the new entry id."""
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "The amount in cents to post"
+                    },
+                    "note": {
+                        "type": "string",
+                        "description": "The memo or note for this transaction"
+                    }
+                },
+                "required": ["acct", "cents", "note"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post {cents} cents to account {acct} with note '{note}' and return the new entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    if response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                if content_block.name == "ledger_post":
+                    entry_id = content_block.id
+    
+    return entry_id
+```

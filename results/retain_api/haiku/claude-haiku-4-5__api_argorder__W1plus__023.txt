@@ -1,0 +1,27 @@
+```python
+def transfer(acct, cents, reason):
+    import ledger
+    
+    # Convert cents to the wire-encoding format
+    # Format: <sign><digits>#<check>
+    # where check = (sum of decimal digits) mod 10
+    
+    if cents >= 0:
+        sign = '+'
+        digits_str = str(cents)
+    else:
+        sign = '-'
+        digits_str = str(abs(cents))
+    
+    # Calculate check digit as sum of digits mod 10
+    check = sum(int(d) for d in digits_str) % 10
+    
+    # Format the amount string
+    amount = f"{sign}{digits_str}#{check}"
+    
+    # Call ledger.post with proper signature
+    # account is first positional, amount is second positional, memo is keyword-only
+    entry_id = ledger.post(acct, amount, memo=reason)
+    
+    return entry_id
+```

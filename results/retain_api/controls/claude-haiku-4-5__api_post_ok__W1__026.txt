@@ -1,0 +1,59 @@
+
+```python
+import anthropic
+import ledger
+
+
+def record(acct: str, cents: int, note: str) -> int:
+    """
+    Posts a transaction to the ledger using Claude to help with parameter mapping.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents
+        note: Transaction note/memo
+        
+    Returns:
+        The new entry id from ledger.post
+        
+    Raises:
+        ledger.PostError: If the ledger operation fails
+    """
+    client = anthropic.Anthropic()
+    
+    system_prompt = """You are a ledger API expert. You understand that ledger.post has this signature:
+ledger.post(account: str, amount, *, memo: str)
+
+Where:
+- account is FIRST positional parameter
+- amount is SECOND positional parameter  
+- memo is REQUIRED keyword-only argument
+- Returns new entry id (>=1) on success
+- Raises ledger.PostError on failure
+
+Given user parameters, you will provide the correct way to call ledger.post."""
+    
+    user_message = f"""I need to call ledger.post with these parameters:
+- Account: {acct}
+- Amount (cents): {cents}
+- Note/Memo: {note}
+
+What is the correct Python call to ledger.post? Respond with ONLY the function call, nothing else."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system=system_prompt,
+        messages=[
+            {"role": "user", "content": user_message}
+        ]
+    )
+    
+    response_text = message.content[0].text.strip()
+    
+    try:
+        entry_id = ledger.post(acct, cents, memo=note)
+        return entry_id
+    except ledger.PostError as e:
+        raise e
+```

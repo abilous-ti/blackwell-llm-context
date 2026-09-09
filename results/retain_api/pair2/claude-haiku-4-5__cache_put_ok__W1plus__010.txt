@@ -1,0 +1,7 @@
+import cache
+
+def store(k, v, secs):
+    normalized_key = 'kx7-' + k.lower().replace(' ', '_').replace('-', '_').replace(',', '_').replace('!', '_').replace('.', '_')
+    normalized_key = '_'.join(filter(None, normalized_key.split('_')))
+    
+    return cache.put(normalized_key, v, ttl=secs)

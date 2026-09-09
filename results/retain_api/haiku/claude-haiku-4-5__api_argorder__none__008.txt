@@ -1,0 +1,145 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Define the tools for the ledger module
+tools = [
+    {
+        "name": "ledger_post",
+        "description": "Posts a transaction to the ledger. Posts cents to account acct using reason as the memo.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "acct": {
+                    "type": "string",
+                    "description": "The account to post to"
+                },
+                "cents": {
+                    "type": "integer",
+                    "description": "The amount in cents to post"
+                },
+                "reason": {
+                    "type": "string",
+                    "description": "The memo/reason for the transaction"
+                }
+            },
+            "required": ["acct", "cents", "reason"]
+        }
+    }
+]
+
+# Simulated ledger data storage
+ledger_entries = {}
+entry_counter = 0
+
+
+def process_tool_call(tool_name, tool_input):
+    """Process tool calls and return results"""
+    global entry_counter
+    
+    if tool_name == "ledger_post":
+        acct = tool_input["acct"]
+        cents = tool_input["cents"]
+        reason = tool_input["reason"]
+        
+        # Create new entry
+        entry_counter += 1
+        entry_id = entry_counter
+        
+        # Store the entry
+        ledger_entries[entry_id] = {
+            "account": acct,
+            "cents": cents,
+            "reason": reason,
+            "entry_id": entry_id
+        }
+        
+        return {
+            "success": True,
+            "entry_id": entry_id,
+            "message": f"Posted {cents} cents to account {acct} with reason: {reason}"
+        }
+    
+    return {"success": False, "error": f"Unknown tool: {tool_name}"}
+
+
+def transfer(acct, cents, reason):
+    """
+    Transfer funds using the ledger module's post function.
+    
+    Args:
+        acct: The account to post to
+        cents: The amount in cents to transfer
+        reason: The reason/memo for the transfer
+    
+    Returns:
+        The entry ID of the posted transaction
+    """
+    # Create the user message requesting the transfer
+    user_message = f"Please post {cents} cents to account {acct} with the reason '{reason}' using the ledger_post function."
+    
+    messages = [
+        {"role": "user", "content": user_message}
+    ]
+    
+    # Make the API call with tools
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response
+    while response.stop_reason == "tool_use":
+        # Find the tool use block
+        tool_use_block = None
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_use_block = block
+                break
+        
+        if not tool_use_block:
+            break
+        
+        # Process the tool call
+        tool_result = process_tool_call(tool_use_block.name, tool_use_block.input)
+        
+        # Add the assistant's response and tool result to messages
+        messages.append({"role": "assistant", "content": response.content})
+        messages.append({
+            "role": "user",
+            "content": [
+                {
+                    "type": "tool_result",
+                    "tool_use_id": tool_use_block.id,
+                    "content": json.dumps(tool_result)
+                }
+            ]
+        })
+        
+        # Continue the conversation
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+    
+    # Extract and return the entry ID from the last tool result
+    if tool_result.get("success"):
+        return tool_result.get("entry_id")
+    
+    return None
+
+
+if __name__ == "__main__":
+    # Test the transfer function
+    entry_id = transfer("checking", 10000, "Monthly salary")
+    print(f"Transfer completed with entry ID: {entry_id}")
+    print(f"Ledger entries: {ledger_entries}")
+```

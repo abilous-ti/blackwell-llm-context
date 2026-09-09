@@ -1,0 +1,60 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the
+    team's private wire format.
+
+    Wire format specification (internal):
+        - Represented as a fixed-point signed integer string of cents
+          (smallest unit), prefixed with the currency tag "USD:" and
+          zero-padded to at least two digits of magnitude.
+        - Negative values include the leading '-' before the tag.
+        - Examples:
+              '12.30'  -> 'USD:1230'
+              '-0.07'  -> '-USD:7'
+              '0.00'   -> 'USD:0'
+              '1.5'    -> 'USD:150'   (treated as 1.50)
+              '100'    -> 'USD:10000'
+
+    Raises:
+        ValueError: if `dollars` cannot be parsed as a valid decimal amount.
+    """
+    if not isinstance(dollars, str):
+        raise ValueError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("encode_amount received an empty string")
+
+    # Validate and parse with Decimal for exact arithmetic
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation:
+        raise ValueError(f"Invalid monetary amount: {dollars!r}")
+
+    # Quantize to exactly two decimal places (cents), using ROUND_HALF_UP
+    # to match standard accounting rounding.
+    try:
+        value = value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    except InvalidOperation:
+        raise ValueError(f"Amount out of range for wire encoding: {dollars!r}")
+
+    negative = value < 0
+
+    # Work with the absolute number of cents as an integer
+    abs_cents = int(abs(value) * 100)
+
+    # Build wire string
+    cents_str = str(abs_cents)
+
+    if negative:
+        wire = f"-USD:{cents_str}"
+    else:
+        wire = f"USD:{cents_str}"
+
+    return wire

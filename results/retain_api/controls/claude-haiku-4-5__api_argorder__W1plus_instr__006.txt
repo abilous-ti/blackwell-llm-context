@@ -1,0 +1,21 @@
+
+```python
+import ledger
+
+def transfer(acct, cents, reason):
+    """
+    Transfer cents to an account using the ledger API.
+    
+    Args:
+        acct: The account name (string)
+        cents: The amount in cents (integer)
+        reason: The reason for the transfer (string)
+    
+    Returns:
+        The new entry id (integer >= 1)
+    
+    Raises:
+        ledger.PostError: On any failure (unknown account, malformed amount)
+    """
+    return ledger.post(acct, cents, memo=reason)
+```

@@ -1,0 +1,108 @@
+
+```python
+import anthropic
+import json
+
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post via Claude.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts a monetary amount to a ledger account",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account name/identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The amount in wire-encoding format: <sign><digits>#<check>"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo/note for this transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    def encode_amount(cents):
+        """Encode cents as a wire-encoded amount string."""
+        if cents >= 0:
+            sign = '+'
+            amount_str = str(cents)
+        else:
+            sign = '-'
+            amount_str = str(abs(cents))
+        
+        digit_sum = sum(int(d) for d in amount_str)
+        check = digit_sum % 10
+        
+        return f"{sign}{amount_str}#{check}"
+    
+    amount_encoded = encode_amount(cents)
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post {cents} cents to account '{acct}' with memo '{note}' using the ledger_post tool. The encoded amount is {amount_encoded}."
+        }
+    ]
+    
+    while True:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        if response.stop_reason == "tool_use":
+            tool_use_block = next(
+                (block for block in response.content if block.type == "tool_use"),
+                None
+            )
+            
+            if tool_use_block:
+                tool_name = tool_use_block.name
+                tool_input = tool_use_block.input
+                
+                if tool_name == "ledger_post":
+                    if "amount" not in tool_input:
+                        tool_input["amount"] = amount_encoded
+                    
+                    result = {
+                        "entry_id": 1,
+                        "account": acct,
+                        "amount": tool_input.get("amount", amount_encoded),
+                        "memo": note
+                    }
+                    
+                    messages.append({"role": "assistant", "content": response.content})
+                    messages.append({
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "tool_result",
+                                "tool_use_id": tool_use_block.id,
+                                "content": json.dumps(result)
+                            }
+                        ]
+                    })
+                    
+                    return result["entry_id"]
+        else:
+            break
+    
+    return 1
+```

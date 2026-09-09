@@ -1,0 +1,17 @@
+```python
+import time
+
+_cache = {}
+
+def save(k, v):
+    """
+    Cache value v under already-normalized key k for ttl 60 seconds.
+    Return True only if newly inserted (key did not exist before).
+    """
+    is_new = k not in _cache
+    _cache[k] = {
+        'value': v,
+        'expiry': time.time() + 60
+    }
+    return is_new
+```

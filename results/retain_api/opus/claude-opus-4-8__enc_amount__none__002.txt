@@ -1,0 +1,73 @@
+I'll create a money serialization function. Since the specific "private wire format" isn't defined, I'll design a sensible, well-documented format that handles the examples given.
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string to this team's private wire format.
+
+    Wire format specification:
+        <SIGN><CENTS>
+      - SIGN is 'P' for positive/zero amounts, 'N' for negative amounts.
+      - CENTS is the absolute value of the amount expressed as an
+        integer number of cents (dollars * 100), with no leading zeros
+        (except the value 0 itself which is rendered as '0').
+
+    Examples:
+        '12.30'  -> 'P1230'
+        '-0.07'  -> 'N7'
+        '0'      -> 'P0'
+        '-0.00'  -> 'P0'   (negative zero normalizes to positive)
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    negative = False
+    if s[0] in "+-":
+        negative = s[0] == "-"
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount")
+
+    if "." in s:
+        int_part, _, frac_part = s.partition(".")
+    else:
+        int_part, frac_part = s, ""
+
+    # Validate digit content
+    if int_part and not int_part.isdigit():
+        raise ValueError("invalid integer part: %r" % int_part)
+    if frac_part and not frac_part.isdigit():
+        raise ValueError("invalid fractional part: %r" % frac_part)
+    if not int_part and not frac_part:
+        raise ValueError("invalid amount: %r" % dollars)
+
+    int_part = int_part or "0"
+
+    # Normalize fractional part to exactly two digits (cents).
+    if len(frac_part) == 0:
+        cents_frac = 0
+    elif len(frac_part) == 1:
+        cents_frac = int(frac_part) * 10
+    elif len(frac_part) == 2:
+        cents_frac = int(frac_part)
+    else:
+        # More than two decimals: round half-up to the nearest cent.
+        first_two = frac_part[:2]
+        remainder = frac_part[2:]
+        cents_frac = int(first_two)
+        if remainder and int(remainder[0]) >= 5:
+            cents_frac += 1
+
+    total_cents = int(int_part) * 100 + cents_frac
+
+    if total_cents == 0:
+        negative = False  # normalize negative zero
+
+    sign = "N" if negative else "P"
+    return "%s%d" % (sign, total_cents)
+```

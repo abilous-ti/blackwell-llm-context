@@ -1,0 +1,15 @@
+I'll analyze the requirements, but I need to make reasonable assumptions about the `ledger` module's interface since it's not fully specified.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')
+```
+
+Note: I've made assumptions about the `ledger.write` signature. If you can share the actual `ledger` module interface (parameter names/order for `write`), I'll align `store` exactly to it. Based on your description:
+
+- `wire` is passed through **as-is** (already wire-encoded, no re-encoding/decoding).
+- The memo is `'wire'`.
+- The function returns whatever `ledger.write` returns (the new entry id).

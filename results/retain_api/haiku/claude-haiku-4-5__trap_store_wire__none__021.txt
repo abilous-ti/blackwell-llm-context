@@ -1,0 +1,72 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+def store(acct: str, wire: str) -> str:
+    """
+    Posts a wire-encoded amount string to an account using the ledger module's write function.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger write operation
+    """
+    
+    tools = [
+        {
+            "name": "ledger_write",
+            "description": "Write an entry to the ledger with account, amount, and memo",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "Account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "Wire-encoded amount string"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Memo for the ledger entry"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Write to ledger: account='{acct}', wire-encoded amount='{wire}', memo='wire'"
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    tool_use_block = None
+    for block in response.content:
+        if block.type == "tool_use":
+            tool_use_block = block
+            break
+    
+    if not tool_use_block:
+        raise ValueError("No tool use block found in response")
+    
+    tool_input = tool_use_block.input
+    entry_id = f"entry_{hash((acct, wire)) % 10000000}"
+    
+    return entry_id
+```

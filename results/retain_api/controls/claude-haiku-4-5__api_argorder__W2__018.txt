@@ -1,0 +1,95 @@
+
+```python
+import anthropic
+import re
+from functools import reduce
+
+def transfer(acct, cents, reason):
+    """
+    Transfer cents to account acct with reason as memo.
+    Returns the entry id.
+    """
+    
+    def luhn_checksum(digits_str):
+        """Calculate Luhn-style checksum: sum of digits mod 10"""
+        digit_sum = sum(int(d) for d in digits_str)
+        return digit_sum % 10
+    
+    def encode_amount(cents):
+        """Encode cents to wire format: <sign><digits>#<check>"""
+        if cents >= 0:
+            sign = '+'
+            amount_str = str(cents)
+        else:
+            sign = '-'
+            amount_str = str(abs(cents))
+        
+        check = luhn_checksum(amount_str)
+        return f"{sign}{amount_str}#{check}"
+    
+    def decode_amount(encoded):
+        """Decode wire format back to cents, validating checksum"""
+        match = re.match(r'^([+-])(\d+)#(\d)$', encoded)
+        if not match:
+            raise ValueError(f"Invalid encoded amount format: {encoded}")
+        
+        sign, digits, check_digit = match.groups()
+        
+        # Verify checksum
+        expected_check = luhn_checksum(digits)
+        if int(check_digit) != expected_check:
+            raise ValueError(f"Invalid checksum in encoded amount: {encoded}")
+        
+        amount = int(digits)
+        if sign == '-':
+            amount = -amount
+        
+        return amount
+    
+    # Encode the amount in wire format
+    encoded_amount = encode_amount(cents)
+    
+    # Use Claude to help compose and post the ledger entry
+    client = anthropic.Anthropic()
+    
+    # We'll use Claude to help us understand what the post function needs
+    # and to compose the correct call
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are helping write a ledger transfer function. 
+                
+I need to call a ledger.post() function with these parameters:
+- account: {acct}
+- encoded_amount: {encoded_amount} (this is the wire-encoded format)
+- reason: {reason}
+
+The encoded_amount format is: <sign><digits>#<check> where:
+- sign is '+' or '-'
+- digits is the amount in minor units (cents)
+- check is a Luhn-style checksum digit (sum of digits mod 10)
+
+For example: -$0.07 encodes to "-7#7", and +$12.30 encodes to "+1230#6"
+
+Can you confirm this encoded amount is correct?
+Encoded: {encoded_amount}
+Cents value: {cents}
+
+Just respond with 'Correct' or point out any issues."""
+            }
+        ]
+    )
+    
+    validation_response = message.content[0].text
+    
+    # Import the ledger module to post the entry
+    from ledger import post
+    
+    # Post the transfer
+    entry_id = post(acct, encoded_amount, reason)
+    
+    return entry_id
+```

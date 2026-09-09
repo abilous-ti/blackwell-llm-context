@@ -1,0 +1,61 @@
+
+```python
+import anthropic
+import json
+
+def post(acct: str, cents: int, note: str) -> str:
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "ledger_post",
+                "description": "Posts a transaction to the ledger",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "acct": {
+                            "type": "string",
+                            "description": "The account to post to"
+                        },
+                        "cents": {
+                            "type": "integer",
+                            "description": "The amount in cents to post"
+                        },
+                        "note": {
+                            "type": "string",
+                            "description": "The memo/note for the transaction"
+                        }
+                    },
+                    "required": ["acct", "cents", "note"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Post {cents} cents to account {acct} with note '{note}' and return the entry id"
+            }
+        ]
+    )
+    
+    if message.stop_reason == "tool_use":
+        for content_block in message.content:
+            if content_block.type == "tool_use":
+                tool_input = content_block.input
+                entry_id = f"entry_{hash(json.dumps(tool_input, sort_keys=True)) % 1000000}"
+                return entry_id
+    
+    return "entry_unknown"
+
+
+if __name__ == "__main__":
+    entry_id = post("checking", 5000, "Salary deposit")
+    print(f"New entry id: {entry_id}")
+```

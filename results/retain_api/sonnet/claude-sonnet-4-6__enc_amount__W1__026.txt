@@ -1,0 +1,43 @@
+# solution.py
+
+import re
+
+_AMOUNT_PATTERN = re.compile(
+    r'^(?P<sign>-?)(?P<dollars>\d+)\.(?P<cents>\d{2})$'
+)
+
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string to the team's private wire format.
+
+    The wire format is: SIGN + dollars zero-padded to 10 digits + cents (2 digits)
+    represented as a single integer string, prefixed with 'AMT:'.
+
+    Examples:
+        '12.30'  -> 'AMT:+0000001230'
+        '-0.07'  -> 'AMT:-0000000007'
+        '0.00'   -> 'AMT:+0000000000'
+    """
+    if not isinstance(dollars, str):
+        raise TypeError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    match = _AMOUNT_PATTERN.match(dollars.strip())
+    if match is None:
+        raise ValueError(
+            f"encode_amount: {dollars!r} is not a valid money string "
+            f"(expected optional '-', digits, '.', exactly 2 decimal digits)"
+        )
+
+    sign_char = match.group('sign')
+    dollar_part = match.group('dollars')
+    cent_part = match.group('cents')
+
+    # Combine into total cents as an integer to normalise and validate
+    total_cents = int(dollar_part) * 100 + int(cent_part)
+
+    # Represent sign
+    wire_sign = '-' if sign_char == '-' else '+'
+
+    # Zero-pad total cents to 10 digits (supports up to $99,999,999.99)
+    encoded = f'AMT:{wire_sign}{total_cents:010d}'
+    return encoded

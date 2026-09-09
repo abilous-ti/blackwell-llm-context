@@ -1,0 +1,41 @@
+
+```python
+import anthropic
+import hashlib
+
+
+def make_key(label: str) -> str:
+    """Convert a raw label into a team's private cache key using Claude."""
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"Convert this label into a private cache key for our team: '{label}'. Return only the cache key, nothing else. The key should be a valid identifier (alphanumeric and underscores only, starting with a letter), derived from the label."
+            }
+        ]
+    )
+    
+    cache_key = message.content[0].text.strip()
+    
+    cache_key = ''.join(c if c.isalnum() or c == '_' else '_' for c in cache_key)
+    if cache_key and cache_key[0].isdigit():
+        cache_key = 'key_' + cache_key
+    
+    return cache_key if cache_key else "default_cache_key"
+
+
+if __name__ == "__main__":
+    test_label = "user_profile_data"
+    result = make_key(test_label)
+    print(f"Label: {test_label}")
+    print(f"Cache Key: {result}")
+    
+    test_label2 = "API Response #123"
+    result2 = make_key(test_label2)
+    print(f"\nLabel: {test_label2}")
+    print(f"Cache Key: {result2}")
+```

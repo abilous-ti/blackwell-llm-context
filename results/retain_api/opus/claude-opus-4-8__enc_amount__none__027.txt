@@ -1,0 +1,65 @@
+I'll analyze this problem. The issue is that "this team's private wire format" isn't specified anywhere in the prompt. Without knowing the actual format specification, I cannot know what output the function should produce.
+
+Let me implement a reasonable, well-documented serialization for a money amount that avoids floating-point issues and handles the given examples, while being explicit about the format I'm defining.
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to a wire format.
+
+    NOTE: The exact "private wire format" was not specified in the task.
+    This implementation defines a clear, lossless, self-describing format:
+
+        <sign><cents>
+
+    where:
+      - <sign> is '+' or '-'
+      - <cents> is the absolute value expressed as an integer number of cents
+        (i.e. dollars * 100), with no leading zeros (except a single '0').
+
+    Examples:
+      '12.30'  -> '+1230'
+      '-0.07'  -> '-7'
+      '0.00'   -> '+0'
+      '100'    -> '+10000'
+    """
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Determine sign.
+    negative = False
+    if s[0] in "+-":
+        negative = s[0] == "-"
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits")
+
+    # Split integer and fractional parts.
+    if "." in s:
+        int_part, frac_part = s.split(".", 1)
+        if "." in frac_part:
+            raise ValueError("invalid amount: multiple decimal points")
+    else:
+        int_part, frac_part = s, ""
+
+    if int_part == "":
+        int_part = "0"
+
+    if not int_part.isdigit():
+        raise ValueError(f"invalid integer part: {int_part!r}")
+    if frac_part != "" and not frac_part.isdigit():
+        raise ValueError(f"invalid fractional part: {frac_part!r}")
+
+    # Normalize fractional part to exactly 2 digits (cents).
+    if len(frac_part) > 2:
+        # Reject sub-cent precision to avoid silent rounding.
+        if any(c != "0" for c in frac_part[2:]):
+            raise ValueError("sub-cent precision not supported")
+        frac_part = frac_part[:2]
+    frac_part = (frac_part + "00")[:2]
+
+    total_cents = int(int_part) * 100 + int(frac_part)
+
+    sign = "-" if (negative and total_cents != 0) else "+"
+    return f"{sign}{total_cents}"

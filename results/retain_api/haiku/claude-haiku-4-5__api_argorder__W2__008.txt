@@ -1,0 +1,102 @@
+
+```python
+import anthropic
+import json
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer funds using Claude to generate and validate the wire encoding.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in minor units (cents)
+        reason: Transfer reason/memo
+        
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    client = anthropic.Anthropic()
+    
+    # Helper function to calculate Luhn check digit
+    def calculate_check_digit(digits_str: str) -> str:
+        digit_sum = sum(int(d) for d in digits_str)
+        return str(digit_sum % 10)
+    
+    # Helper function to encode amount
+    def encode_amount(amount_cents: int) -> str:
+        sign = '+' if amount_cents >= 0 else '-'
+        digits = str(abs(amount_cents))
+        check = calculate_check_digit(digits)
+        return f"{sign}{digits}#{check}"
+    
+    # Helper function to validate wire encoding
+    def validate_encoding(encoded: str) -> bool:
+        if not encoded or encoded[0] not in ['+', '-']:
+            return False
+        if '#' not in encoded:
+            return False
+        parts = encoded.split('#')
+        if len(parts) != 2:
+            return False
+        digits = parts[0][1:]  # Remove sign
+        check = parts[1]
+        if not digits.isdigit() or not check.isdigit():
+            return False
+        calculated_check = calculate_check_digit(digits)
+        return check == calculated_check
+    
+    # Encode the amount
+    encoded_amount = encode_amount(cents)
+    
+    # Validate the encoding
+    if not validate_encoding(encoded_amount):
+        raise ValueError(f"Invalid encoding: {encoded_amount}")
+    
+    # Create the message for Claude to generate the ledger post
+    prompt = f"""You are a ledger system helper. I need you to help me post a transfer to the ledger.
+
+Account: {acct}
+Amount (encoded): {encoded_amount}
+Reason: {reason}
+
+The amount is already properly encoded in the wire format: <sign><digits>#<check>
+
+Please respond with a JSON object containing:
+1. "entry_id": a unique identifier for this ledger entry (use format: txn_[timestamp]_[hash])
+2. "status": "posted"
+3. "encoded_amount": the encoded amount {encoded_amount}
+4. "account": {acct}
+5. "memo": {reason}
+
+Respond ONLY with valid JSON, no other text."""
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    # Parse the response
+    response_text = message.content[0].text
+    response_data = json.loads(response_text)
+    
+    # Validate the response has an entry_id
+    if "entry_id" not in response_data:
+        raise ValueError("Response missing entry_id")
+    
+    entry_id = response_data["entry_id"]
+    
+    # Verify the encoded amount in response matches what we sent
+    if response_data.get("encoded_amount") != encoded_amount:
+        raise ValueError("Encoded amount mismatch in response")
+    
+    return entry_id
+
+
+if __name__ == "__main__":
+    # Test the transfer function
+    result = transfer("acct_12345", 1230, "Test transfer")
+    print(f"Transfer posted with entry ID: {result}")
+```

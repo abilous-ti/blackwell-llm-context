@@ -1,0 +1,32 @@
+
+def encode_amount(dollars: str) -> str:
+    negative = dollars.startswith('-')
+    if negative:
+        dollars = dollars[1:]
+    
+    if '.' in dollars:
+        integer_part, fractional_part = dollars.split('.')
+    else:
+        integer_part = dollars
+        fractional_part = '00'
+    
+    # Normalize fractional part to 2 digits
+    fractional_part = (fractional_part + '00')[:2]
+    
+    integer_part = integer_part.lstrip('0') or '0'
+    
+    total_cents = int(integer_part) * 100 + int(fractional_part)
+    
+    if negative:
+        total_cents = -total_cents
+    
+    # Encode as fixed wire format: sign byte + 8-byte big-endian integer
+    sign = b'\x01' if negative else b'\x00'
+    amount_bytes = abs(total_cents).to_bytes(8, byteorder='big')
+    
+    wire_bytes = sign + amount_bytes
+    
+    # Convert to hex string representation
+    result = wire_bytes.hex()
+    
+    return result

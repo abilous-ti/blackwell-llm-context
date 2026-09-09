@@ -1,0 +1,141 @@
+
+```python
+import anthropic
+import json
+import re
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Define the tools for the ledger module
+tools = [
+    {
+        "name": "ledger_post",
+        "description": "Posts a transaction to an account in the ledger. Returns the entry ID of the posted transaction.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "acct": {
+                    "type": "string",
+                    "description": "The account to post the transaction to"
+                },
+                "cents": {
+                    "type": "integer",
+                    "description": "The amount in cents to post"
+                },
+                "reason": {
+                    "type": "string",
+                    "description": "The memo/reason for the transaction"
+                }
+            },
+            "required": ["acct", "cents", "reason"]
+        }
+    }
+]
+
+# Mock ledger storage
+ledger_entries = {}
+next_entry_id = 1
+
+def ledger_post(acct: str, cents: int, reason: str) -> str:
+    """Posts a transaction to the ledger and returns the entry ID."""
+    global next_entry_id
+    entry_id = str(next_entry_id)
+    next_entry_id += 1
+    
+    ledger_entries[entry_id] = {
+        "account": acct,
+        "amount_cents": cents,
+        "memo": reason,
+        "entry_id": entry_id
+    }
+    
+    return entry_id
+
+def process_tool_call(tool_name: str, tool_input: dict) -> str:
+    """Process a tool call and return the result."""
+    if tool_name == "ledger_post":
+        entry_id = ledger_post(
+            tool_input["acct"],
+            tool_input["cents"],
+            tool_input["reason"]
+        )
+        return json.dumps({"entry_id": entry_id, "status": "success"})
+    return json.dumps({"error": "Unknown tool"})
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer funds to an account using the ledger module's post function.
+    
+    Args:
+        acct: The account to post to
+        cents: The amount in cents
+        reason: The memo/reason for the transaction
+        
+    Returns:
+        The entry ID of the posted transaction
+    """
+    # Use Claude with tools to execute the transfer
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post a transfer of {cents} cents to account '{acct}' with the reason '{reason}' using the ledger_post tool and return the entry ID."
+        }
+    ]
+    
+    # Agentic loop
+    while True:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        # Check if we're done
+        if response.stop_reason == "end_turn":
+            # Extract the entry ID from the response
+            for block in response.content:
+                if hasattr(block, 'text'):
+                    # Try to find entry ID in the text
+                    text = block.text
+                    # Look for entry ID pattern
+                    import re
+                    match = re.search(r'entry[_-]?id["\']?\s*[=:]\s*["\']?(\d+)["\']?', text, re.IGNORECASE)
+                    if match:
+                        return match.group(1)
+                    # If no pattern found, try to extract any number that looks like an ID
+                    numbers = re.findall(r'\d+', text)
+                    if numbers:
+                        return numbers[-1]
+            break
+        
+        # Process tool calls
+        if response.stop_reason == "tool_use":
+            tool_results = []
+            for block in response.content:
+                if block.type == "tool_use":
+                    tool_result = process_tool_call(block.name, block.input)
+                    tool_results.append({
+                        "type": "tool_result",
+                        "tool_use_id": block.id,
+                        "content": tool_result
+                    })
+            
+            # Add assistant response and tool results to messages
+            messages.append({"role": "assistant", "content": response.content})
+            messages.append({"role": "user", "content": tool_results})
+        else:
+            break
+    
+    # Fallback: directly call the ledger_post function
+    return ledger_post(acct, cents, reason)
+
+
+# Test the transfer function
+if __name__ == "__main__":
+    # Test transfer
+    entry_id = transfer("checking", 10000, "Initial deposit")
+    print(f"Transfer completed. Entry ID: {entry_id}")
+    print(f"Ledger entries: {ledger_entries}")
+```

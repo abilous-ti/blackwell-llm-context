@@ -1,0 +1,77 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Define the cache module API contract for the model
+CACHE_API_CONTRACT = """
+TEAM CONTEXT (private), cache module API contract: the canonical write call is `cache.put(key: str, value, *, ttl: int)` -- note `key` is FIRST, `value` is SECOND and positional, and `ttl` (seconds) is a REQUIRED keyword-only integer argument (calling without ttl= is an error). put(...) returns True if the key was NEWLY inserted and False if it REPLACED an existing value. On an empty key it raises `cache.CacheError` (NOT ValueError, NOT KeyError). This signature is house-private and not discoverable from the function name. In a module `cache` there is a write function `put`.
+"""
+
+def store(k, v, secs):
+    """
+    Caches value `v` under key `k` for `secs` seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    
+    This function uses Claude to generate and execute the caching logic.
+    """
+    
+    # Use Claude to generate the cache.put call
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system=f"""You are a Python code generation assistant. 
+{CACHE_API_CONTRACT}
+
+Your task is to generate Python code that uses the cache.put function correctly.
+When given parameters k, v, and secs, you must generate code that:
+1. Calls cache.put with the correct signature: cache.put(k, v, ttl=secs)
+2. Returns True if the key was newly inserted, False if it replaced an existing value
+3. Handles the cache.CacheError exception for empty keys
+
+Return ONLY valid Python code that can be executed. No explanations, no markdown, just code.""",
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Generate Python code for storing a value in cache with these parameters:
+- key: {repr(k)}
+- value: {repr(v)}
+- ttl_seconds: {secs}
+
+The code should:
+1. Call cache.put with correct signature
+2. Return True if newly inserted, False if replaced
+3. Handle empty key errors appropriately
+
+Return only the Python expression or statement that performs this operation."""
+            }
+        ]
+    )
+    
+    # Extract the generated code from Claude's response
+    generated_code = message.content[0].text.strip()
+    
+    # Import cache module
+    import cache
+    
+    # Execute the generated code with access to cache module and local variables
+    result = eval(generated_code, {"cache": cache, "k": k, "v": v, "secs": secs})
+    
+    return result
+```
+
+Wait, I need to reconsider this. The task asks for a `solution.py` file that implements the `store(k, v, secs)` function using `cache.put`. Let me provide the correct implementation:
+
+```python
+import cache
+
+def store(k, v, secs):
+    """
+    Caches value `v` under key `k` for `secs` seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    return cache.put(k, v, ttl=secs)
+```

@@ -1,0 +1,48 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount to the team's private wire format.
+    
+    Takes a string representation of dollars (e.g., '12.30', '-0.07')
+    and converts it to the wire format used by the ledger module.
+    
+    The wire format represents money as an integer number of cents.
+    
+    Args:
+        dollars: String representation of a dollar amount
+        
+    Returns:
+        String representation of the amount in wire format (cents as integer)
+    """
+    # Parse the dollar amount
+    # Handle the string input which may have 1-2 decimal places
+    parts = dollars.split('.')
+    
+    if len(parts) == 1:
+        # No decimal point - whole dollars
+        cents = int(parts[0]) * 100
+    elif len(parts) == 2:
+        # Has decimal point
+        dollars_part = int(parts[0]) if parts[0] else 0
+        cents_part_str = parts[1]
+        
+        # Pad or truncate to exactly 2 decimal places
+        if len(cents_part_str) == 1:
+            cents_part = int(cents_part_str) * 10
+        elif len(cents_part_str) == 2:
+            cents_part = int(cents_part_str)
+        else:
+            # More than 2 decimal places - truncate
+            cents_part = int(cents_part_str[:2])
+        
+        # Handle negative zero case
+        if dollars_part == 0 and dollars.startswith('-'):
+            cents = -cents_part
+        else:
+            cents = dollars_part * 100 + (cents_part if dollars_part >= 0 else -cents_part)
+    else:
+        raise ValueError(f"Invalid dollar amount format: {dollars}")
+    
+    return str(cents)
+```

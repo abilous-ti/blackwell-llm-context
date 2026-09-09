@@ -1,0 +1,48 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the
+    team-private wire format.
+
+    Wire format: a fixed-point integer string representing the value
+    in cents (i.e. the dollar amount multiplied by 100, rounded to the
+    nearest whole cent), prefixed with 'AMT:' and suffixed with 'c'.
+
+    Examples:
+        '12.30'  -> 'AMT:1230c'
+        '-0.07'  -> 'AMT:-7c'
+        '0.00'   -> 'AMT:0c'
+        '1'      -> 'AMT:100c'
+    """
+    if not isinstance(dollars, str):
+        raise TypeError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("encode_amount received an empty string")
+
+    # Validate that the input looks like a money amount before we parse it.
+    # Allow optional leading sign, digits, and an optional decimal portion.
+    if not re.fullmatch(r"-?\d+(\.\d+)?", stripped):
+        raise ValueError(f"encode_amount: malformed amount string {dollars!r}")
+
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation as exc:
+        raise ValueError(f"encode_amount: cannot parse {dollars!r} as a decimal") from exc
+
+    # Convert to cents: multiply by 100 and round to nearest integer cent.
+    cents = int(value * 100)
+
+    # Sanity-check: confirm the round-trip is exact to two decimal places.
+    if Decimal(cents) != (value * 100).to_integral_value():
+        raise ValueError(
+            f"encode_amount: {dollars!r} does not round to an exact number of cents"
+        )
+
+    return f"AMT:{cents}c"

@@ -1,0 +1,100 @@
+
+```python
+import anthropic
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts a transfer to account acct using the ledger module's post function.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents
+        reason: Memo/reason for the transfer
+        
+    Returns:
+        The entry id from the post function
+    """
+    
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Posts an entry to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo for the transaction"
+                    }
+                },
+                "required": ["acct", "cents", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post a transfer of {cents} cents to account {acct} with the reason '{reason}' using the post function. Return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    if response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                tool_name = content_block.name
+                if tool_name == "post":
+                    tool_input = content_block.input
+                    tool_use_id = content_block.id
+                    
+                    import ledger
+                    entry_id = ledger.post(
+                        acct=tool_input["acct"],
+                        cents=tool_input["cents"],
+                        memo=tool_input["memo"]
+                    )
+                    
+                    messages.append({"role": "assistant", "content": response.content})
+                    messages.append({
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "tool_result",
+                                "tool_use_id": tool_use_id,
+                                "content": str(entry_id)
+                            }
+                        ]
+                    })
+                    
+                    final_response = client.messages.create(
+                        model="claude-3-5-sonnet-20241022",
+                        max_tokens=1024,
+                        tools=tools,
+                        messages=messages
+                    )
+                    
+                    for final_block in final_response.content:
+                        if hasattr(final_block, 'text'):
+                            return entry_id
+                    
+                    return entry_id
+    
+    return None
+```

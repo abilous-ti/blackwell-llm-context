@@ -1,0 +1,10 @@
+import ledger
+
+
+def record(acct, cents, note):
+    """Post a transaction to the ledger and return the new entry id."""
+    sign = '+' if cents >= 0 else '-'
+    digits = str(abs(cents))
+    check = sum(int(d) for d in digits) % 10
+    amount = f"{sign}{digits}#{check}"
+    return ledger.post(acct, amount, memo=note)

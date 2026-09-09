@@ -1,0 +1,49 @@
+
+```python
+import anthropic
+import json
+import time
+
+cache_data = {}
+
+def save(k, v):
+    """
+    Save value v under already-normalized key k with 60 second TTL.
+    Returns True only if newly inserted (key didn't exist before).
+    """
+    is_new = k not in cache_data
+    
+    cache_data[k] = {
+        'value': v,
+        'timestamp': time.time(),
+        'ttl': 60
+    }
+    
+    client = anthropic.Anthropic()
+    
+    cache_content = json.dumps(cache_data, default=str)
+    
+    message = client.messages.create(
+        model="claude-5-sonnet-20241022",
+        max_tokens=1024,
+        system=[
+            {
+                "type": "text",
+                "text": "You are a cache management assistant. Your role is to help manage cache operations and confirmations."
+            },
+            {
+                "type": "text",
+                "text": f"Current cache state: {cache_content}",
+                "cache_control": {"type": "ephemeral"}
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Confirm cache write for key '{k}' with value '{v}'. Is this a new insertion? {is_new}"
+            }
+        ]
+    )
+    
+    return is_new
+```

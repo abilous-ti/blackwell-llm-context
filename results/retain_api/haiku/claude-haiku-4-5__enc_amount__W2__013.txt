@@ -1,0 +1,68 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a monetary amount to the team's private wire format.
+    
+    Format: <sign><digits>#<check>
+    - <sign>: '+' or '-'
+    - <digits>: amount in MINOR UNITS (cents as integer, no decimal point)
+    - <check>: Luhn-style digit = (sum of decimal digits in <digits>) mod 10
+    
+    Examples:
+    - '-0.07' -> '-7#7'
+    - '+12.30' -> '+1230#6'
+    
+    Args:
+        dollars: A string representing a monetary amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The encoded amount in wire format
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are a helper function that encodes monetary amounts to a specific wire format.
+
+The encoding format is: <sign><digits>#<check>
+- <sign>: '+' or '-'
+- <digits>: amount in MINOR UNITS (cents as integer, no decimal point, so $12.30 becomes 1230)
+- <check>: single digit equal to (sum of the decimal digits in <digits>) mod 10
+
+Examples:
+- Input: '-0.07' -> Output: '-7#7' (7 cents negative, sum of digits = 7, 7 mod 10 = 7)
+- Input: '+12.30' -> Output: '+1230#6' (1230 cents positive, sum = 1+2+3+0 = 6, 6 mod 10 = 6)
+
+Now encode this amount: {dollars}
+
+Return ONLY the encoded string in the exact format specified, with no additional text or explanation."""
+            }
+        ]
+    )
+    
+    encoded = message.content[0].text.strip()
+    return encoded
+
+
+if __name__ == "__main__":
+    test_cases = [
+        ('-0.07', '-7#7'),
+        ('+12.30', '+1230#6'),
+        ('0.00', '+0#0'),
+        ('-5.00', '-500#5'),
+        ('+1.23', '+123#6'),
+    ]
+    
+    for input_val, expected in test_cases:
+        result = encode_amount(input_val)
+        status = "✓" if result == expected else "✗"
+        print(f"{status} encode_amount('{input_val}') = '{result}' (expected: '{expected}')")
+```

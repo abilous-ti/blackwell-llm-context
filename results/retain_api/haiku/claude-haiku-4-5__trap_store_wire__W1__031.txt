@@ -1,0 +1,27 @@
+
+```python
+import anthropic
+import json
+import ledger
+
+def store(acct: str, wire: str) -> int:
+    """
+    Posts a wire-encoded amount string to an account using the ledger module's write function.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id (>=1) from the ledger post operation
+    
+    Raises:
+        ledger.PostError: If the account is unknown or amount is malformed
+    """
+    # Call the ledger.post function with the correct signature:
+    # - account is first positional argument
+    # - amount is second positional argument  
+    # - memo is a required keyword-only argument
+    entry_id = ledger.post(acct, wire, memo='wire')
+    return entry_id
+```

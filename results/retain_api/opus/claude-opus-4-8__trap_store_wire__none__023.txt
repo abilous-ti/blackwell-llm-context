@@ -1,0 +1,7 @@
+I need to make some reasonable assumptions about the ledger module's interface since it's not fully specified. Based on the description, I'll write a `store` function that passes the wire string through unchanged (no re-encoding/decoding) and uses the ledger's `write` function.
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

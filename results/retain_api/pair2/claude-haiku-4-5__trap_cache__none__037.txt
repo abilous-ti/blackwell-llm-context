@@ -1,0 +1,21 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+cache = {}
+cache_ttl = {}
+
+def write(key: str, value: any, ttl: int) -> bool:
+    """Write to cache with TTL. Returns True if newly inserted, False if updated."""
+    is_new = key not in cache
+    cache[key] = value
+    cache_ttl[key] = ttl
+    return is_new
+
+def save(k: str, v: any) -> bool:
+    """Save value v under key k with 60 second TTL. Returns True if newly inserted."""
+    return write(k, v, 60)
+```

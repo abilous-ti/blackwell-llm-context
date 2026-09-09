@@ -1,0 +1,9 @@
+import cache
+
+
+def store(k, v, secs):
+    normalized_key = 'kx7-' + ''.join(
+        c.lower() if c.isalnum() else '_' for c in k
+    ).replace('_' * 2, '_').strip('_')
+    
+    return cache.put(normalized_key, v, ttl=secs)

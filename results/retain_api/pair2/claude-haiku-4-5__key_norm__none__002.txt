@@ -1,0 +1,36 @@
+
+```python
+import anthropic
+import hashlib
+
+
+def make_key(label: str) -> str:
+    """Convert a raw label into a team's private cache key."""
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system="You are a key generation system. Convert the given label into a consistent, deterministic cache key using SHA256 hashing. The key should be lowercase hexadecimal. Always use the same format: 'cache_' followed by the first 16 characters of the SHA256 hash of the label.",
+        messages=[
+            {"role": "user", "content": f"Generate a cache key for the label: {label}"}
+        ]
+    )
+    
+    response_text = message.content[0].text.strip()
+    
+    if response_text.startswith("cache_"):
+        return response_text
+    
+    sha256_hash = hashlib.sha256(label.encode()).hexdigest()
+    cache_key = f"cache_{sha256_hash[:16]}"
+    
+    return cache_key
+
+
+if __name__ == "__main__":
+    test_labels = ["user_123", "config_prod", "session_abc"]
+    for label in test_labels:
+        key = make_key(label)
+        print(f"Label: {label} -> Cache Key: {key}")
+```

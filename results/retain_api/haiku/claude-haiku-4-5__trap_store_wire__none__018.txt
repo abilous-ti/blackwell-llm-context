@@ -1,0 +1,89 @@
+
+```python
+import anthropic
+from ledger import write
+
+def store(acct: str, wire: str) -> str:
+    """
+    Posts a wire-encoded amount string to an account using the ledger module.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "write_ledger",
+            "description": "Write an entry to the ledger with account, amount, and memo",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The wire-encoded amount string (already serialized)"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post wire-encoded amount '{wire}' to account '{acct}' with memo 'wire' using the write_ledger tool"
+        }
+    ]
+    
+    while True:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        if response.stop_reason == "tool_use":
+            tool_use_block = next(
+                (block for block in response.content if block.type == "tool_use"),
+                None
+            )
+            
+            if tool_use_block and tool_use_block.name == "write_ledger":
+                entry_id = write(
+                    tool_use_block.input["account"],
+                    tool_use_block.input["amount"],
+                    tool_use_block.input["memo"]
+                )
+                
+                messages.append({"role": "assistant", "content": response.content})
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": tool_use_block.id,
+                            "content": str(entry_id)
+                        }
+                    ]
+                })
+                
+                return entry_id
+        else:
+            break
+    
+    raise ValueError("Failed to write to ledger using Claude")
+```

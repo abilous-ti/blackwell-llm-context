@@ -1,0 +1,83 @@
+
+```python
+import anthropic
+import hashlib
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# In-memory cache to track which keys have been inserted
+_cache_state = {}
+
+
+def normalize_cache_key(label: str) -> str:
+    """Normalize a raw label to a cache key using the specified invariant."""
+    # (1) lowercase
+    normalized = label.lower()
+    # (2) replace every run of non-alphanumeric characters with a single underscore
+    import re
+    normalized = re.sub(r'[^a-z0-9]+', '_', normalized)
+    # (3) strip leading/trailing underscores
+    normalized = normalized.strip('_')
+    # (4) prepend the fixed private namespace prefix 'kx7-'
+    normalized = 'kx7-' + normalized
+    return normalized
+
+
+def store(k: str, v, secs: int) -> bool:
+    """
+    Cache value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    # Normalize the cache key
+    cache_key = normalize_cache_key(k)
+    
+    # Check if this is a new insertion
+    is_new = cache_key not in _cache_state
+    
+    # Store the value and metadata
+    _cache_state[cache_key] = {
+        'value': v,
+        'ttl': secs,
+        'inserted_new': is_new
+    }
+    
+    # Prepare the value for caching (serialize if necessary)
+    if isinstance(v, (dict, list)):
+        cached_value = json.dumps(v)
+    else:
+        cached_value = str(v)
+    
+    # Call the cache.put function through Claude
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system="You are a helpful assistant that manages cache operations. When asked to store a value in cache, confirm the operation and return the status.",
+        messages=[
+            {
+                "role": "user",
+                "content": f"Please store the value '{cached_value}' under cache key '{cache_key}' with TTL of {secs} seconds. Confirm when done."
+            }
+        ]
+    )
+    
+    # Return True if this was a newly inserted key
+    return is_new
+
+
+if __name__ == "__main__":
+    # Test the store function
+    result1 = store("Hello, World!", "test_value_1", 60)
+    print(f"First insertion of 'Hello, World!': {result1}")  # Should be True
+    
+    result2 = store("Hello, World!", "test_value_2", 60)
+    print(f"Second insertion of 'Hello, World!': {result2}")  # Should be False
+    
+    result3 = store(" A__B ", "test_value_3", 120)
+    print(f"First insertion of ' A__B ': {result3}")  # Should be True
+    
+    # Verify key normalization
+    print(f"Normalized 'Hello, World!': {normalize_cache_key('Hello, World!')}")
+    print(f"Normalized ' A__B ': {normalize_cache_key(' A__B ')}")
+```

@@ -1,0 +1,122 @@
+
+```python
+import anthropic
+import json
+
+ledger = None
+
+def init_ledger(mock_ledger):
+    global ledger
+    ledger = mock_ledger
+
+def transfer(acct, cents, reason):
+    """
+    Transfer money to an account using the ledger module's wire-encoding format.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (can be positive or negative)
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    
+    # Format the amount according to wire-encoding rules
+    # sign: '+' for positive, '-' for negative
+    sign = '+' if cents >= 0 else '-'
+    
+    # digits: absolute value in cents (no decimal point)
+    digits_str = str(abs(cents))
+    
+    # check: sum of decimal digits mod 10
+    digit_sum = sum(int(d) for d in digits_str)
+    check = digit_sum % 10
+    
+    # Create the wire-encoded amount string
+    encoded_amount = f"{sign}{digits_str}#{check}"
+    
+    # Use the ledger module's post function to record the transfer
+    entry_id = ledger.post(acct, encoded_amount, reason)
+    
+    return entry_id
+
+
+class MockLedger:
+    def __init__(self):
+        self.entries = []
+        self.entry_counter = 0
+    
+    def post(self, acct, encoded_amount, reason):
+        self.entry_counter += 1
+        entry = {
+            'id': self.entry_counter,
+            'account': acct,
+            'amount': encoded_amount,
+            'reason': reason
+        }
+        self.entries.append(entry)
+        return self.entry_counter
+    
+    def verify_encoding(self, encoded_amount):
+        """Verify that an encoded amount has a valid check digit"""
+        if '#' not in encoded_amount:
+            return False
+        
+        parts = encoded_amount.rsplit('#', 1)
+        if len(parts) != 2:
+            return False
+        
+        amount_part = parts[0]
+        check_digit = parts[1]
+        
+        if not amount_part or len(check_digit) != 1:
+            return False
+        
+        # Extract sign and digits
+        if amount_part[0] not in ['+', '-']:
+            return False
+        
+        digits = amount_part[1:]
+        if not digits.isdigit():
+            return False
+        
+        # Calculate expected check digit
+        digit_sum = sum(int(d) for d in digits)
+        expected_check = digit_sum % 10
+        
+        return int(check_digit) == expected_check
+
+
+if __name__ == "__main__":
+    # Initialize mock ledger for testing
+    mock_ledger = MockLedger()
+    init_ledger(mock_ledger)
+    
+    # Test cases
+    print("Testing transfer function with wire-encoding...")
+    
+    # Test 1: Positive amount $12.30 (1230 cents)
+    entry_id = transfer("account1", 1230, "Payment for services")
+    print(f"Transfer 1 - Entry ID: {entry_id}")
+    print(f"  Encoded amount: {mock_ledger.entries[-1]['amount']}")
+    print(f"  Valid encoding: {mock_ledger.verify_encoding(mock_ledger.entries[-1]['amount'])}")
+    
+    # Test 2: Negative amount -$0.07 (7 cents)
+    entry_id = transfer("account2", -7, "Refund")
+    print(f"\nTransfer 2 - Entry ID: {entry_id}")
+    print(f"  Encoded amount: {mock_ledger.entries[-1]['amount']}")
+    print(f"  Valid encoding: {mock_ledger.verify_encoding(mock_ledger.entries[-1]['amount'])}")
+    
+    # Test 3: Zero amount
+    entry_id = transfer("account3", 0, "Adjustment")
+    print(f"\nTransfer 3 - Entry ID: {entry_id}")
+    print(f"  Encoded amount: {mock_ledger.entries[-1]['amount']}")
+    print(f"  Valid encoding: {mock_ledger.verify_encoding(mock_ledger.entries[-1]['amount'])}")
+    
+    # Test 4: Larger positive amount $999.99 (99999 cents)
+    entry_id = transfer("account4", 99999, "Large transfer")
+    print(f"\nTransfer 4 - Entry ID: {entry_id}")
+    print(f"  Encoded amount: {mock_ledger.entries[-1]['amount']}")
+    print(f"  Valid encoding: {mock_ledger.verify_encoding(mock_ledger.entries[-1]['amount'])}")
+```

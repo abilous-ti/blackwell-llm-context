@@ -1,0 +1,35 @@
+```python
+def record(acct, cents, note):
+    """Post a transaction to the ledger and return the entry id.
+    
+    Args:
+        acct: Account name
+        cents: Amount in cents (integer)
+        note: Memo/description
+        
+    Returns:
+        New entry id (integer >= 1)
+        
+    Raises:
+        ledger.PostError: If account is unknown or amount is malformed
+    """
+    import ledger
+    
+    # Determine sign
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    
+    # Format digits (no decimal point, cents as integer)
+    digits = str(abs_cents)
+    
+    # Calculate Luhn check digit: sum of decimal digits mod 10
+    check = sum(int(d) for d in digits) % 10
+    
+    # Encode amount as string
+    amount = f"{sign}{digits}#{check}"
+    
+    # Call ledger.post with required keyword argument for memo
+    entry_id = ledger.post(acct, amount, memo=note)
+    
+    return entry_id
+```

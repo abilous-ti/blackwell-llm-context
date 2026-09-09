@@ -1,0 +1,59 @@
+
+```python
+import anthropic
+import json
+
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a money amount to the team's private wire format using Claude.
+    
+    Args:
+        dollars: A string representing dollars (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The encoded amount in the team's private wire format
+    """
+    client = anthropic.Anthropic()
+    
+    context = """You are helping encode money amounts to a private wire format.
+    
+The team's ledger module has this API contract:
+- ledger.post(account: str, amount, *, memo: str)
+- account is FIRST positional
+- amount is SECOND positional  
+- memo is REQUIRED keyword-only argument
+- Returns new integer entry id (>=1) on success
+- Raises ledger.PostError on failure (not ValueError, not KeyError)
+
+Given a dollars string amount like '12.30' or '-0.07', determine the team's private wire format for amounts.
+
+Think about what format would make sense for a ledger system's wire protocol. Consider:
+- Pennies vs dollars representation
+- Negative amounts
+- Consistency with financial systems
+- What the amount parameter in post() would need
+
+Respond with ONLY the encoded format string, nothing else."""
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=[
+            {
+                "role": "user",
+                "content": f"Encode this dollar amount to the team's private wire format: '{dollars}'"
+            }
+        ],
+        system=context
+    )
+    
+    return message.content[0].text.strip()
+
+
+if __name__ == "__main__":
+    test_amounts = ["12.30", "-0.07", "100.00", "-50.25", "0.01"]
+    
+    for amount in test_amounts:
+        encoded = encode_amount(amount)
+        print(f"encode_amount('{amount}') -> '{encoded}'")
+```

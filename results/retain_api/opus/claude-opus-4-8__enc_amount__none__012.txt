@@ -1,0 +1,64 @@
+I'll analyze this problem. Since there's no existing "private wire format" specification provided, I need to design a reasonable, self-consistent serialization format for money amounts.
+
+Let me create a sensible wire format that handles the requirements (dollars/cents, negatives) reliably.
+
+```python
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string to this team's private wire format.
+
+    The wire format encodes a monetary value as a signed integer number of
+    cents, prefixed with a marker, so that '12.30' and '12.3' encode
+    identically and no floating point ambiguity occurs.
+
+    Format:  "$" + sign + <integer cents as decimal digits>
+      sign is '+' for zero/positive, '-' for negative.
+
+    Examples:
+      encode_amount('12.30')  -> '$+1230'
+      encode_amount('-0.07')  -> '$-7'
+      encode_amount('0')      -> '$+0'
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Determine sign.
+    negative = False
+    if s[0] in '+-':
+        negative = s[0] == '-'
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount: %r" % dollars)
+
+    # Split into whole and fractional parts.
+    if '.' in s:
+        whole, _, frac = s.partition('.')
+        if '.' in frac:
+            raise ValueError("too many decimal points: %r" % dollars)
+    else:
+        whole, frac = s, ''
+
+    # Allow a bare fractional like '.07' or a bare whole like '12'.
+    if whole == '':
+        whole = '0'
+
+    if not whole.isdigit():
+        raise ValueError("invalid whole part: %r" % dollars)
+    if frac != '' and not frac.isdigit():
+        raise ValueError("invalid fractional part: %r" % dollars)
+
+    # Normalize fractional part to exactly two digits (cents).
+    if len(frac) > 2:
+        # Reject extra precision rather than silently truncating.
+        raise ValueError("more than two decimal places: %r" % dollars)
+    frac = (frac + '00')[:2]
+
+    cents = int(whole) * 100 + int(frac)
+
+    sign = '-' if (negative and cents != 0) else '+'
+    return '$' + sign + str(cents)
+```

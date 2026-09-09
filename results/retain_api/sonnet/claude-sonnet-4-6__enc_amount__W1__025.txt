@@ -1,0 +1,53 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the
+    team-private wire format.
+
+    Wire format specification:
+      - Canonical decimal representation with exactly 2 decimal places
+      - Negative amounts are prefixed with '-'
+      - No thousands separators
+      - Prefixed with the wire envelope marker 'AMT:' followed by the
+        normalized value
+      - Example: '12.30'  -> 'AMT:1230'  (integer cents, sign-aware)
+      - Example: '-0.07'  -> 'AMT:-7'
+      - Example: '0.00'   -> 'AMT:0'
+
+    The wire format encodes the amount as integer cents to avoid
+    floating-point ambiguity, wrapped in the 'AMT:' envelope the
+    ledger module expects on the wire.
+    """
+    if not isinstance(dollars, str):
+        raise TypeError(f"dollars must be a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("dollars string must not be empty")
+
+    # Validate general shape before parsing
+    if not re.fullmatch(r"-?\d+(\.\d+)?", stripped):
+        raise ValueError(
+            f"Invalid amount format {dollars!r}; expected decimal string like '12.30' or '-0.07'"
+        )
+
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation as exc:
+        raise ValueError(f"Cannot parse {dollars!r} as a decimal amount") from exc
+
+    # Quantize to exactly 2 decimal places and convert to integer cents
+    try:
+        cents_decimal = (value * 100).to_integral_value()
+    except InvalidOperation as exc:
+        raise ValueError(f"Amount {dollars!r} cannot be converted to cents") from exc
+
+    cents = int(cents_decimal)
+
+    wire = f"AMT:{cents}"
+    return wire

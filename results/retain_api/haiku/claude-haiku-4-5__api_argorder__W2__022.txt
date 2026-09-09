@@ -1,0 +1,9 @@
+import ledger
+
+def transfer(acct, cents, reason):
+    sign = '+' if cents >= 0 else '-'
+    digits = str(abs(cents))
+    check = sum(int(d) for d in digits) % 10
+    encoded = f"{sign}{digits}#{check}"
+    entry_id = ledger.post(acct, encoded, reason)
+    return entry_id

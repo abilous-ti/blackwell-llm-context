@@ -1,0 +1,11 @@
+I need to see what the ledger module's write function looks like, but since I don't have it, I'll make reasonable assumptions based on the description.
+
+The task says the amount is ALREADY encoded and I should NOT re-encode/decode it — just pass the string through to the ledger's write function.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, 'wire')
+```

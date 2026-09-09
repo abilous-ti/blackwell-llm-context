@@ -1,0 +1,42 @@
+
+```python
+import anthropic
+import json
+import hashlib
+
+client = anthropic.Anthropic()
+cache = {}
+cache_timestamps = {}
+
+def save(k, v):
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+        
+    Returns:
+        bool: True if newly inserted, False if key already existed
+    """
+    import time
+    
+    current_time = time.time()
+    
+    # Check if key already exists and is not expired
+    is_new = k not in cache
+    
+    # Store the value and its timestamp
+    cache[k] = v
+    cache_timestamps[k] = current_time
+    
+    # Clean up expired entries
+    expired_keys = [key for key, timestamp in cache_timestamps.items() 
+                    if current_time - timestamp > 60]
+    for expired_key in expired_keys:
+        del cache[expired_key]
+        del cache_timestamps[expired_key]
+    
+    return is_new
+```

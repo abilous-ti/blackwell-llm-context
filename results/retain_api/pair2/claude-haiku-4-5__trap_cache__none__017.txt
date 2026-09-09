@@ -1,0 +1,31 @@
+
+```python
+import anthropic
+import json
+import time
+
+cache = {}
+expiry_times = {}
+
+def write(key, value, ttl):
+    """Write to cache with TTL"""
+    cache[key] = value
+    expiry_times[key] = time.time() + ttl
+    return True
+
+def get(key):
+    """Get from cache if not expired"""
+    if key in cache:
+        if time.time() < expiry_times[key]:
+            return cache[key]
+        else:
+            del cache[key]
+            del expiry_times[key]
+    return None
+
+def save(k, v):
+    """Save value v under key k with 60 second TTL, returning True only if newly inserted"""
+    is_new = k not in cache or time.time() >= expiry_times.get(k, 0)
+    write(k, v, 60)
+    return is_new
+```

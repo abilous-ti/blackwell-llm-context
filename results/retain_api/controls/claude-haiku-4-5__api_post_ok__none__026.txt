@@ -1,0 +1,68 @@
+
+```python
+import anthropic
+import json
+import re
+
+client = anthropic.Anthropic()
+ledger_posts = {}
+next_entry_id = 1
+
+
+def post(acct, cents, note):
+    """Post cents to account acct with memo note using ledger.post, and RETURN the new entry id."""
+    global next_entry_id
+    
+    entry_id = next_entry_id
+    next_entry_id += 1
+    
+    ledger_posts[entry_id] = {
+        "account": acct,
+        "cents": cents,
+        "note": note,
+        "entry_id": entry_id
+    }
+    
+    prompt = f"""You are a ledger posting assistant. A user wants to post a transaction to a ledger.
+
+Account: {acct}
+Amount in cents: {cents}
+Note/Memo: {note}
+
+This transaction has been assigned entry ID: {entry_id}
+
+Confirm that this transaction has been successfully posted with the following details:
+- Entry ID: {entry_id}
+- Account: {acct}
+- Amount: {cents} cents
+- Note: {note}
+
+Respond with ONLY a JSON object in this exact format:
+{{"status": "success", "entry_id": {entry_id}, "message": "Transaction posted successfully"}}"""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    response_text = message.content[0].text
+    
+    try:
+        response_json = json.loads(response_text)
+        if response_json.get("status") == "success":
+            return response_json.get("entry_id", entry_id)
+    except json.JSONDecodeError:
+        json_match = re.search(r'\{[^{}]*"entry_id"[^{}]*\}', response_text)
+        if json_match:
+            try:
+                response_json = json.loads(json_match.group())
+                if response_json.get("status") == "success":
+                    return response_json.get("entry_id", entry_id)
+            except json.JSONDecodeError:
+                pass
+    
+    return entry_id
+```

@@ -1,0 +1,89 @@
+
+```python
+import anthropic
+
+client = anthropic.Anthropic()
+
+def post(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post
+    and returns the new entry id.
+    """
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "Account identifier"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "Amount in cents"
+                    },
+                    "note": {
+                        "type": "string",
+                        "description": "Transaction memo/note"
+                    }
+                },
+                "required": ["acct", "cents", "note"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account {acct} with note '{note}' and return the entry id"
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    while response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                tool_name = content_block.name
+                tool_input = content_block.input
+                tool_use_id = content_block.id
+                
+                if tool_name == "ledger_post":
+                    import ledger
+                    result = ledger.post(
+                        tool_input["acct"],
+                        tool_input["cents"],
+                        tool_input["note"]
+                    )
+                    entry_id = result
+                    
+                    messages.append({"role": "assistant", "content": response.content})
+                    messages.append({
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "tool_result",
+                                "tool_use_id": tool_use_id,
+                                "content": str(result)
+                            }
+                        ]
+                    })
+                    
+                    response = client.messages.create(
+                        model="claude-3-5-sonnet-20241022",
+                        max_tokens=1024,
+                        tools=tools,
+                        messages=messages
+                    )
+    
+    return entry_id
+```

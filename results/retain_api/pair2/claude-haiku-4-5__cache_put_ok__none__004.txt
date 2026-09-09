@@ -1,0 +1,67 @@
+
+```python
+import anthropic
+import time
+from datetime import datetime, timedelta
+
+# Mock cache module for demonstration
+class cache:
+    _store = {}
+    
+    @staticmethod
+    def put(k, v, secs):
+        """Store value v under key k with expiration in secs seconds"""
+        cache._store[k] = {
+            'value': v,
+            'expires': datetime.now() + timedelta(seconds=secs)
+        }
+
+
+def store(k, v, secs):
+    """
+    Cache value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    # Check if key already exists and hasn't expired
+    if k in cache._store:
+        if cache._store[k]['expires'] > datetime.now():
+            # Key exists and hasn't expired, so it's not a new insertion
+            cache.put(k, v, secs)
+            return False
+    
+    # Key doesn't exist or has expired, so it's a new insertion
+    cache.put(k, v, secs)
+    return True
+
+
+# Test the implementation
+if __name__ == "__main__":
+    client = anthropic.Anthropic()
+    
+    # Test cases
+    print("Test 1: New key insertion")
+    result1 = store("key1", "value1", 10)
+    print(f"store('key1', 'value1', 10) returned: {result1}")
+    print(f"Expected: True (new key)")
+    
+    print("\nTest 2: Existing key update")
+    result2 = store("key1", "value2", 10)
+    print(f"store('key1', 'value2', 10) returned: {result2}")
+    print(f"Expected: False (key already exists)")
+    
+    print("\nTest 3: New key after expiration")
+    result3 = store("key2", "value3", 1)
+    print(f"store('key2', 'value3', 1) returned: {result3}")
+    print(f"Expected: True (new key)")
+    
+    time.sleep(1.1)  # Wait for expiration
+    
+    result4 = store("key2", "value4", 10)
+    print(f"After expiration, store('key2', 'value4', 10) returned: {result4}")
+    print(f"Expected: True (key expired, so it's a new insertion)")
+    
+    print("\nTest 4: Another new key")
+    result5 = store("key3", "value5", 10)
+    print(f"store('key3', 'value5', 10) returned: {result5}")
+    print(f"Expected: True (new key)")
+```

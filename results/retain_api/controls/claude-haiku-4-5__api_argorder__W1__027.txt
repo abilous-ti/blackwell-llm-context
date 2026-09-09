@@ -1,0 +1,138 @@
+
+```python
+import anthropic
+import json
+import ledger
+
+
+def transfer(acct: str, cents: int, reason: str) -> int:
+    """Transfer cents to an account using the ledger API with reason as memo."""
+    return ledger.post(acct, cents, memo=reason)
+
+
+# Tool definitions for Claude
+tools = [
+    {
+        "name": "post_to_ledger",
+        "description": "Post an amount to a ledger account with a memo",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "description": "The account to post to"
+                },
+                "amount": {
+                    "type": "integer",
+                    "description": "The amount in cents to post"
+                },
+                "memo": {
+                    "type": "string",
+                    "description": "The memo/reason for the posting"
+                }
+            },
+            "required": ["account", "amount", "memo"]
+        }
+    }
+]
+
+
+def process_tool_call(tool_name: str, tool_input: dict) -> dict:
+    """Process tool calls from Claude."""
+    if tool_name == "post_to_ledger":
+        try:
+            entry_id = transfer(
+                tool_input["account"],
+                tool_input["amount"],
+                tool_input["memo"]
+            )
+            return {
+                "success": True,
+                "entry_id": entry_id
+            }
+        except ledger.PostError as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    return {"error": "Unknown tool"}
+
+
+def main():
+    """Example usage of transfer function with Claude integration."""
+    # Example 1: Direct function call
+    try:
+        entry_id = transfer("checking", 5000, "Monthly salary")
+        print(f"Transfer successful, entry ID: {entry_id}")
+    except ledger.PostError as e:
+        print(f"Transfer failed: {e}")
+    
+    # Example 2: Using Claude to manage transfers via tool use
+    client = anthropic.Anthropic()
+    
+    messages = [
+        {
+            "role": "user",
+            "content": "Please transfer 2500 cents to my savings account with the reason 'Savings deposit'"
+        }
+    ]
+    
+    # Initial request to Claude
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process tool calls if needed
+    while response.stop_reason == "tool_use":
+        # Find the tool use block
+        tool_use_block = None
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_use_block = block
+                break
+        
+        if not tool_use_block:
+            break
+        
+        # Execute the tool
+        tool_result = process_tool_call(
+            tool_use_block.name,
+            tool_use_block.input
+        )
+        
+        # Add assistant response and tool result to messages
+        messages.append({
+            "role": "assistant",
+            "content": response.content
+        })
+        messages.append({
+            "role": "user",
+            "content": [
+                {
+                    "type": "tool_result",
+                    "tool_use_id": tool_use_block.id,
+                    "content": json.dumps(tool_result)
+                }
+            ]
+        })
+        
+        # Get next response
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+    
+    # Print final response
+    for block in response.content:
+        if hasattr(block, 'text'):
+            print(f"Claude: {block.text}")
+
+
+if __name__ == "__main__":
+    main()
+```

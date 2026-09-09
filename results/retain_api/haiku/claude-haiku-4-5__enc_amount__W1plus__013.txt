@@ -1,0 +1,29 @@
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encode a monetary amount to wire format: <sign><digits>#<check>
+    
+    Args:
+        dollars: A string like '12.30' or '-0.07'
+    
+    Returns:
+        A wire-encoded string like '+1230#6' or '-7#7'
+    """
+    # Determine sign
+    if dollars.startswith('-'):
+        sign = '-'
+        dollars = dollars[1:]
+    else:
+        sign = '+'
+    
+    # Remove decimal point and get digits
+    digits = dollars.replace('.', '')
+    
+    # Remove leading zeros, but keep at least one digit
+    digits = digits.lstrip('0') or '0'
+    
+    # Calculate check digit: sum of decimal digits mod 10
+    check = sum(int(d) for d in digits) % 10
+    
+    return f"{sign}{digits}#{check}"
+```

@@ -1,0 +1,10 @@
+def _encode(cents):
+    sign = '+' if cents >= 0 else '-'
+    digits = str(abs(int(cents)))
+    check = sum(int(d) for d in digits) % 10
+    return f"{sign}{digits}#{check}"
+
+
+def transfer(acct, cents, reason):
+    import ledger
+    return ledger.post(acct, _encode(cents), reason)

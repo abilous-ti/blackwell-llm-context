@@ -1,0 +1,75 @@
+I'll create a money amount serializer. Since this is a "private wire format" without a given spec, I'll design a clear, self-consistent binary/textual format that preserves sign and exact cents.
+
+```python
+```
+
+Let me write the actual file:
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format specification:
+      - The value is normalized to an integer number of cents.
+      - Output is an ASCII string of the form:  "M<sign><cents>#"
+          * 'M'      : magic prefix identifying the wire type (money).
+          * <sign>   : 'P' for non-negative, 'N' for negative.
+          * <cents>  : absolute value of the amount in cents, decimal digits,
+                       with no leading zeros (zero is rendered as '0').
+          * '#'      : terminator.
+
+      Examples:
+          '12.30'  -> 'MP1230#'
+          '-0.07'  -> 'MN7#'
+          '0'      -> 'MP0#'
+          '0.00'   -> 'MP0#'
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Determine sign.
+    negative = False
+    if s[0] in '+-':
+        negative = (s[0] == '-')
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount")
+
+    # Split into whole and fractional parts.
+    if '.' in s:
+        whole, frac = s.split('.', 1)
+        if '.' in frac:
+            raise ValueError("multiple decimal points")
+    else:
+        whole, frac = s, ''
+
+    if whole == '':
+        whole = '0'
+
+    if not whole.isdigit():
+        raise ValueError("invalid whole part: %r" % whole)
+    if frac != '' and not frac.isdigit():
+        raise ValueError("invalid fractional part: %r" % frac)
+
+    # Normalize fractional part to exactly 2 digits (cents).
+    if len(frac) > 2:
+        # Reject sub-cent precision to avoid silent rounding.
+        if any(c != '0' for c in frac[2:]):
+            raise ValueError("sub-cent precision not allowed: %r" % dollars)
+        frac = frac[:2]
+    frac = (frac + '00')[:2]
+
+    cents = int(whole) * 100 + int(frac)
+
+    # Negative zero normalizes to positive zero.
+    if cents == 0:
+        negative = False
+
+    sign = 'N' if negative else 'P'
+    return "M%s%d#" % (sign, cents)

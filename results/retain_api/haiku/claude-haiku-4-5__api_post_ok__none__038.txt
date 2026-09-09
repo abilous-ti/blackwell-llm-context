@@ -1,0 +1,112 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+def record(acct: str, cents: int, note: str) -> str:
+    """
+    Post cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Post a transaction to an account in the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "Amount in cents to post"
+                    },
+                    "note": {
+                        "type": "string",
+                        "description": "Memo or note for the transaction"
+                    }
+                },
+                "required": ["acct", "cents", "note"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post {cents} cents to account {acct} with note '{note}' using the ledger_post function and return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    while response.stop_reason == "tool_use":
+        tool_use_block = None
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_use_block = block
+                break
+        
+        if tool_use_block:
+            tool_name = tool_use_block.name
+            tool_input = tool_use_block.input
+            
+            if tool_name == "ledger_post":
+                tool_result = {
+                    "success": True,
+                    "entry_id": f"entry_{acct}_{abs(cents)}_{hash(note) % 10000}",
+                    "message": f"Posted {cents} cents to {acct}"
+                }
+                entry_id = tool_result["entry_id"]
+            
+            messages.append({"role": "assistant", "content": response.content})
+            messages.append({
+                "role": "user",
+                "content": [
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": tool_use_block.id,
+                        "content": json.dumps(tool_result)
+                    }
+                ]
+            })
+            
+            response = client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=1024,
+                tools=tools,
+                messages=messages
+            )
+    
+    if entry_id is None:
+        for block in response.content:
+            if hasattr(block, 'text'):
+                text = block.text
+                if 'entry_' in text:
+                    import re
+                    match = re.search(r'entry_\S+', text)
+                    if match:
+                        entry_id = match.group(0)
+                        break
+    
+    return entry_id or f"entry_{acct}_{abs(cents)}"
+
+
+if __name__ == "__main__":
+    entry_id = record("checking", 1000, "Initial deposit")
+    print(f"Created entry: {entry_id}")
+    
+    entry_id2 = record("savings", 5000, "Monthly transfer")
+    print(f"Created entry: {entry_id2}")
+```

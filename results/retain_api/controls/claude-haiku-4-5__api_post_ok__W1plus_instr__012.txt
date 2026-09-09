@@ -1,0 +1,45 @@
+
+```python
+import anthropic
+import ledger
+
+
+def record(acct: str, cents: int, note: str) -> int:
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    
+    Args:
+        acct: Account name
+        cents: Amount in cents (integer)
+        note: Memo/note for the transaction
+        
+    Returns:
+        The new entry id from ledger.post
+        
+    Raises:
+        ledger.PostError: If the post operation fails
+    """
+    # Use ledger.post with the correct API contract:
+    # - account is FIRST positional argument
+    # - amount is SECOND positional argument
+    # - memo is REQUIRED keyword-only argument
+    
+    try:
+        # Construct the amount string for the ledger wire encoding
+        # Format: <sign><digits>#<check>
+        # where check = (sum of decimal digits) mod 10
+        sign = '+' if cents >= 0 else '-'
+        abs_cents = abs(cents)
+        digits_str = str(abs_cents)
+        
+        # Calculate Luhn-style check digit
+        digit_sum = sum(int(d) for d in digits_str)
+        check = digit_sum % 10
+        
+        amount_encoded = f"{sign}{digits_str}#{check}"
+        
+        entry_id = ledger.post(acct, amount_encoded, memo=note)
+        return entry_id
+    except ledger.PostError as e:
+        raise
+```

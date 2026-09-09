@@ -1,0 +1,7 @@
+def transfer(acct, cents, reason):
+    """Transfer cents to account with given reason as memo."""
+    try:
+        entry_id = ledger.post(acct, cents, memo=reason)
+        return entry_id
+    except ledger.PostError:
+        raise

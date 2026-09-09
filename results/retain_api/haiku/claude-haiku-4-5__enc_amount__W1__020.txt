@@ -1,0 +1,51 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a money amount (e.g. '12.30', '-0.07') to the team's private wire format.
+    
+    The wire format converts decimal dollars to cents as an integer string,
+    preserving the sign.
+    
+    Args:
+        dollars: A string representation of a dollar amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The encoded amount as a string in the team's private wire format
+    """
+    # Parse the dollar amount
+    parts = dollars.split('.')
+    
+    # Handle the integer part
+    integer_part = parts[0]
+    is_negative = integer_part.startswith('-')
+    
+    if is_negative:
+        integer_part = integer_part[1:]
+    
+    # Handle the decimal part
+    if len(parts) == 1:
+        # No decimal point
+        cents_str = integer_part + '00'
+    elif len(parts) == 2:
+        # Has decimal point
+        decimal_part = parts[1]
+        # Pad or truncate to 2 decimal places
+        if len(decimal_part) == 1:
+            decimal_part = decimal_part + '0'
+        elif len(decimal_part) > 2:
+            decimal_part = decimal_part[:2]
+        cents_str = integer_part + decimal_part
+    else:
+        # Invalid format
+        raise ValueError(f"Invalid dollar amount format: {dollars}")
+    
+    # Convert to integer to remove leading zeros, then back to string
+    cents = int(cents_str)
+    
+    # Apply the sign
+    if is_negative:
+        cents = -cents
+    
+    return str(cents)
+```

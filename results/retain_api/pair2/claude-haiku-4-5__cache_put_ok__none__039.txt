@@ -1,0 +1,110 @@
+
+```python
+import anthropic
+import time
+from datetime import datetime, timedelta
+
+# Simulated cache module
+class Cache:
+    def __init__(self):
+        self._storage = {}
+    
+    def put(self, k, v, expiry_time):
+        """Put a value in cache with an expiry time"""
+        is_new = k not in self._storage
+        self._storage[k] = {'value': v, 'expiry': expiry_time}
+        return is_new
+    
+    def get(self, k):
+        """Get a value from cache if it exists and hasn't expired"""
+        if k in self._storage:
+            entry = self._storage[k]
+            if datetime.now() < entry['expiry']:
+                return entry['value']
+            else:
+                del self._storage[k]
+                return None
+        return None
+    
+    def has_key(self, k):
+        """Check if key exists and hasn't expired"""
+        if k in self._storage:
+            entry = self._storage[k]
+            if datetime.now() < entry['expiry']:
+                return True
+            else:
+                del self._storage[k]
+                return False
+        return False
+
+# Create a global cache instance
+cache = Cache()
+
+def store(k, v, secs):
+    """
+    Store value v under key k for secs seconds.
+    Returns True only if the key was newly inserted.
+    """
+    # Calculate expiry time
+    expiry_time = datetime.now() + timedelta(seconds=secs)
+    
+    # Use cache.put to store the value
+    # It returns True if key was newly inserted
+    is_new = cache.put(k, v, expiry_time)
+    
+    return is_new
+
+
+def main():
+    """Test the store function"""
+    client = anthropic.Anthropic()
+    
+    # Test case 1: New key insertion
+    result1 = store("key1", "value1", 60)
+    print(f"First insertion of 'key1': {result1}")  # Should be True
+    
+    # Test case 2: Overwriting existing key
+    result2 = store("key1", "value1_updated", 60)
+    print(f"Second insertion of 'key1': {result2}")  # Should be False
+    
+    # Test case 3: New key insertion with different key
+    result3 = store("key2", "value2", 60)
+    print(f"First insertion of 'key2': {result3}")  # Should be True
+    
+    # Test case 4: Verify stored values
+    print(f"Value of 'key1': {cache.get('key1')}")  # Should be value1_updated
+    print(f"Value of 'key2': {cache.get('key2')}")  # Should be value2
+    
+    # Use Claude to verify the implementation logic
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Verify this cache store implementation:
+                
+The store(k, v, secs) function:
+1. Calculates expiry time as current time + secs seconds
+2. Calls cache.put(k, v, expiry_time) 
+3. Returns the boolean result from cache.put
+
+The cache.put function returns True if the key is newly inserted, False if it's overwriting.
+
+Test results:
+- First insertion of 'key1': {result1} (expected: True)
+- Second insertion of 'key1': {result2} (expected: False)
+- First insertion of 'key2': {result3} (expected: True)
+
+Is this implementation correct? Why or why not?"""
+            }
+        ]
+    )
+    
+    print("\nVerification by Claude:")
+    print(message.content[0].text)
+
+
+if __name__ == "__main__":
+    main()
+```

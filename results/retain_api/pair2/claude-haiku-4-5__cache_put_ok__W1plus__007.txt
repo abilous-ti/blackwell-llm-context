@@ -1,0 +1,34 @@
+import cache
+
+
+def store(k, v, secs):
+    """Store value v under key k for secs seconds.
+    
+    Returns True if the key was newly inserted, False if it replaced an existing value.
+    """
+    # Normalize the key according to the cache key normalization invariant
+    # (1) lowercase, (2) replace runs of non-alphanumeric with '_', (3) strip leading/trailing '_', (4) prepend 'kx7-'
+    normalized_key = k.lower()
+    
+    # Replace runs of non-alphanumeric characters with a single underscore
+    result = []
+    in_non_alnum = False
+    for char in normalized_key:
+        if char.isalnum():
+            result.append(char)
+            in_non_alnum = False
+        else:
+            if not in_non_alnum:
+                result.append('_')
+                in_non_alnum = True
+    
+    normalized_key = ''.join(result)
+    
+    # Strip leading/trailing underscores
+    normalized_key = normalized_key.strip('_')
+    
+    # Prepend the fixed private namespace prefix
+    normalized_key = 'kx7-' + normalized_key
+    
+    # Call cache.put with the required ttl keyword argument
+    return cache.put(normalized_key, v, ttl=secs)

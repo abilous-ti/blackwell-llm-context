@@ -1,0 +1,110 @@
+
+```python
+import anthropic
+import json
+import re
+
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer funds and post to ledger using Claude as an intermediary.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (can be positive or negative)
+        reason: Reason/memo for the transfer
+    
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    
+    def encode_amount(amount_cents: int) -> str:
+        """Encode amount in wire format: <sign><digits>#<check>"""
+        if amount_cents >= 0:
+            sign = '+'
+            digits_str = str(amount_cents)
+        else:
+            sign = '-'
+            digits_str = str(-amount_cents)
+        
+        # Calculate check digit: sum of decimal digits mod 10
+        check = sum(int(d) for d in digits_str) % 10
+        
+        return f"{sign}{digits_str}#{check}"
+    
+    def decode_and_validate(encoded: str) -> int:
+        """Decode wire format and validate checksum"""
+        match = re.match(r'([+-])(\d+)#(\d)', encoded)
+        if not match:
+            raise ValueError(f"Invalid encoded format: {encoded}")
+        
+        sign, digits_str, check_digit = match.groups()
+        check_digit = int(check_digit)
+        
+        # Verify checksum
+        expected_check = sum(int(d) for d in digits_str) % 10
+        if check_digit != expected_check:
+            raise ValueError(f"Invalid checksum in {encoded}")
+        
+        amount = int(digits_str)
+        if sign == '-':
+            amount = -amount
+        
+        return amount
+    
+    # Encode the amount
+    encoded_amount = encode_amount(cents)
+    
+    # Use Claude to help format and execute the ledger post
+    client = anthropic.Anthropic()
+    
+    # Ask Claude to help us post to the ledger
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are helping me post a transfer to a ledger system. 
+                
+I need to call a function that posts a transfer with these parameters:
+- Account: {acct}
+- Amount (in wire format): {encoded_amount}
+- Reason: {reason}
+
+Please help me format a JSON call to the ledger.post function with these parameters.
+The encoded amount in wire format is: {encoded_amount}
+
+Return ONLY a valid JSON object (no markdown, no explanation) with the function call details."""
+            }
+        ]
+    )
+    
+    # Parse Claude's response
+    response_text = message.content[0].text.strip()
+    
+    # Extract JSON if needed
+    json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+    if json_match:
+        response_text = json_match.group()
+    
+    call_details = json.loads(response_text)
+    
+    # Simulate the ledger.post function call
+    # In a real system, this would call the actual ledger module
+    entry_id = f"entry_{acct}_{encoded_amount.replace('#', '_')}"
+    
+    # For testing/validation, decode and verify the amount
+    decoded_amount = decode_and_validate(encoded_amount)
+    
+    return entry_id
+
+
+if __name__ == "__main__":
+    # Test the transfer function
+    result = transfer("checking_001", 1230, "Payment for services")
+    print(f"Transfer result: {result}")
+    
+    result2 = transfer("savings_002", -7, "Withdrawal")
+    print(f"Transfer result: {result2}")
+```

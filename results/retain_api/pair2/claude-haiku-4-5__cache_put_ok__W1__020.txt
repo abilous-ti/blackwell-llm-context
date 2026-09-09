@@ -1,0 +1,12 @@
+```python
+from cache import put, CacheError
+
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds.
+    Returns True only if the key was newly inserted, False if it replaced an existing value.
+    Raises CacheError if k is empty.
+    """
+    return put(k, v, ttl=secs)
+```

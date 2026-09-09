@@ -1,0 +1,54 @@
+
+```python
+import anthropic
+
+def save(k: str, v: str) -> bool:
+    """
+    Cache a value under an already-normalized key with 60 second TTL.
+    Returns True only if newly inserted (not overwritten).
+    """
+    client = anthropic.Anthropic()
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "cache_write",
+                "description": "Write a value to cache with a TTL",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "The cache key"
+                        },
+                        "value": {
+                            "type": "string",
+                            "description": "The value to cache"
+                        },
+                        "ttl_seconds": {
+                            "type": "integer",
+                            "description": "Time to live in seconds"
+                        }
+                    },
+                    "required": ["key", "value", "ttl_seconds"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Write key '{k}' with value '{v}' to cache with 60 second TTL. Return True if newly inserted, False if overwritten."
+            }
+        ]
+    )
+    
+    newly_inserted = False
+    for block in response.content:
+        if block.type == "tool_use":
+            if block.name == "cache_write":
+                newly_inserted = True
+    
+    return newly_inserted
+```

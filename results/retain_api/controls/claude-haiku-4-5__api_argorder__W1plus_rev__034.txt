@@ -1,0 +1,48 @@
+
+```python
+import anthropic
+import ledger
+
+
+def transfer(acct: str, cents: int, reason: str) -> int:
+    """
+    Transfer money to an account using the ledger system with Claude's help.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (integer)
+        reason: Transfer reason/memo
+    
+    Returns:
+        The entry id from the ledger post
+    
+    Raises:
+        ledger.PostError: If the transfer fails
+    """
+    client = anthropic.Anthropic()
+    
+    # Create a prompt for Claude to generate the encoded amount
+    prompt = f"""Given an amount of {cents} cents, encode it according to the ledger wire-encoding invariant:
+- The format is <sign><digits>#<check>
+- <sign> is '+' for positive amounts, '-' for negative
+- <digits> is the absolute amount in cents as decimal digits (no decimal point)
+- <check> is a single Luhn-style digit equal to (sum of decimal digits in <digits>) mod 10
+
+For {cents} cents, what is the encoded string?
+Respond with ONLY the encoded string, nothing else."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=50,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    encoded_amount = message.content[0].text.strip()
+    
+    # Post to the ledger with the encoded amount
+    entry_id = ledger.post(acct, encoded_amount, memo=reason)
+    
+    return entry_id
+```

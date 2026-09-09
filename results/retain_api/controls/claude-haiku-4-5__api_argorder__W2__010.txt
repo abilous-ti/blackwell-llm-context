@@ -1,0 +1,126 @@
+
+```python
+import anthropic
+import json
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer funds to an account using Claude to generate the wire-encoded amount
+    and post it to the ledger.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (minor units)
+        reason: Memo/reason for the transfer
+        
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    # First, let Claude generate the wire-encoded amount
+    client = anthropic.Anthropic()
+    
+    # Calculate the check digit (Luhn-style: sum of digits mod 10)
+    digits_str = str(abs(cents))
+    digit_sum = sum(int(d) for d in digits_str)
+    check_digit = digit_sum % 10
+    
+    # Determine sign
+    sign = '+' if cents >= 0 else '-'
+    
+    # Create the wire-encoded amount
+    wire_encoded = f"{sign}{digits_str}#{check_digit}"
+    
+    # Use Claude to post the transaction
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are helping me post a ledger entry. I need you to call a function to post a transfer.
+
+Here are the details:
+- Account: {acct}
+- Amount (wire-encoded): {wire_encoded}
+- Reason: {reason}
+
+Please call the ledger.post function with these parameters and return the entry_id from the response.
+Respond with ONLY the entry_id (a string), nothing else."""
+            }
+        ],
+        tools=[
+            {
+                "name": "ledger_post",
+                "description": "Post a transaction to the ledger",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "account": {
+                            "type": "string",
+                            "description": "The account to post to"
+                        },
+                        "amount": {
+                            "type": "string",
+                            "description": "The wire-encoded amount in format <sign><digits>#<check>"
+                        },
+                        "memo": {
+                            "type": "string",
+                            "description": "The reason/memo for the transaction"
+                        }
+                    },
+                    "required": ["account", "amount", "memo"]
+                }
+            }
+        ]
+    )
+    
+    # Process the response
+    for content_block in message.content:
+        if content_block.type == "tool_use":
+            # Claude wants to use the tool, so we call it
+            if content_block.name == "ledger_post":
+                # Simulate the ledger post
+                result = ledger_post(
+                    account=content_block.input["account"],
+                    amount=content_block.input["amount"],
+                    memo=content_block.input["memo"]
+                )
+                return result
+        elif content_block.type == "text":
+            # If Claude just returned text (the entry_id)
+            return content_block.text.strip()
+    
+    # Fallback: if no tool use, try direct posting
+    result = ledger_post(
+        account=acct,
+        amount=wire_encoded,
+        memo=reason
+    )
+    return result
+
+
+def ledger_post(account: str, amount: str, memo: str) -> str:
+    """
+    Mock implementation of ledger.post function
+    In production, this would call the actual ledger module
+    """
+    # Simulate a ledger entry ID
+    import hashlib
+    entry_data = f"{account}{amount}{memo}".encode()
+    entry_id = hashlib.sha256(entry_data).hexdigest()[:16]
+    return entry_id
+
+
+if __name__ == "__main__":
+    # Test the transfer function
+    entry_id = transfer("ACC123", 1230, "Payment for services")
+    print(f"Entry ID: {entry_id}")
+    
+    # Test with negative amount
+    entry_id = transfer("ACC456", -750, "Refund")
+    print(f"Entry ID: {entry_id}")
+    
+    # Test with small amount
+    entry_id = transfer("ACC789", 7, "Small deposit")
+    print(f"Entry ID: {entry_id}")
+```

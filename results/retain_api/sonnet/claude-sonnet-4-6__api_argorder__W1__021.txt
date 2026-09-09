@@ -1,0 +1,9 @@
+import ledger
+
+
+def transfer(acct, cents, reason):
+    try:
+        entry_id = ledger.post(acct, cents, memo=reason)
+        return entry_id
+    except ledger.PostError:
+        raise

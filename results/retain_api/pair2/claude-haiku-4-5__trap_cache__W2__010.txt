@@ -1,0 +1,32 @@
+
+```python
+import anthropic
+import json
+import time
+from typing import Any
+
+cache = {}
+cache_timestamps = {}
+TTL = 60
+
+def save(k: str, v: Any) -> bool:
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    """
+    current_time = time.time()
+    
+    # Check if key already exists and is still valid
+    is_newly_inserted = k not in cache or (current_time - cache_timestamps[k]) >= TTL
+    
+    # Store the value and timestamp
+    cache[k] = v
+    cache_timestamps[k] = current_time
+    
+    return is_newly_inserted
+
+
+def write(k: str, v: Any) -> bool:
+    """Alias for save to match the expected cache module interface."""
+    return save(k, v)
+```

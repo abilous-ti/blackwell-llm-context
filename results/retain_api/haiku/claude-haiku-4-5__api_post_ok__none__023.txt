@@ -1,0 +1,81 @@
+
+```python
+import anthropic
+import json
+import re
+
+# Simulated ledger module for testing
+class LedgerModule:
+    def __init__(self):
+        self.entries = []
+        self.next_id = 1
+    
+    def post(self, acct, cents, note):
+        entry_id = self.next_id
+        self.next_id += 1
+        self.entries.append({
+            'id': entry_id,
+            'account': acct,
+            'cents': cents,
+            'note': note
+        })
+        return entry_id
+
+# Initialize the ledger module
+ledger = LedgerModule()
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    # Create a prompt that asks Claude to generate Python code for the record function
+    prompt = f"""You are a Python code generator. Generate a Python function that:
+1. Takes parameters: acct (account), cents (amount in cents), note (memo)
+2. Calls ledger.post(acct, cents, note) to post the transaction
+3. Returns the entry id returned by ledger.post()
+
+The function should be simple and direct. Just generate the function body that will be executed.
+
+For this specific call:
+- acct = "{acct}"
+- cents = {cents}
+- note = "{note}"
+
+Return only valid Python code that calls ledger.post with these parameters and returns its result. No explanations, just code."""
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    # Extract the code from Claude's response
+    response_text = message.content[0].text
+    
+    # Parse the response to extract just the code
+    # Look for Python code patterns
+    code_match = re.search(r'ledger\.post\([^)]+\)', response_text)
+    
+    if code_match:
+        # Extract and execute the ledger.post call
+        code_snippet = code_match.group(0)
+        # Execute the code to get the result
+        result = eval(code_snippet)
+        return result
+    else:
+        # Fallback: directly call ledger.post
+        return ledger.post(acct, cents, note)
+
+
+# Test the function
+if __name__ == "__main__":
+    # Test with sample data
+    entry_id = record("checking", 10000, "salary deposit")
+    print(f"New entry id: {entry_id}")
+    print(f"Ledger entries: {ledger.entries}")
+```

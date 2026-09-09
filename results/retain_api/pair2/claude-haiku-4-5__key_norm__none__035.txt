@@ -1,0 +1,31 @@
+
+```python
+import anthropic
+
+
+def make_key(label: str) -> str:
+    """
+    Converts a raw label into the team's private cache key using Claude.
+    
+    Args:
+        label: The raw label to convert
+        
+    Returns:
+        The cache key as a string
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"Convert this raw label into our team's private cache key format. Label: {label}. Return only the cache key, nothing else."
+            }
+        ]
+    )
+    
+    cache_key = message.content[0].text.strip()
+    return cache_key
+```

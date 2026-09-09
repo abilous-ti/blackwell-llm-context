@@ -1,0 +1,20 @@
+import ledger
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note.
+    Returns the new entry id.
+    """
+    # Encode cents as wire format: <sign><digits>#<check>
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits = str(abs_cents)
+    
+    # Calculate check digit: sum of decimal digits mod 10
+    check = sum(int(d) for d in digits) % 10
+    
+    # Format: <sign><digits>#<check>
+    encoded = f"{sign}{digits}#{check}"
+    
+    # Post to ledger and return the entry id
+    return ledger.post(acct, encoded, note)

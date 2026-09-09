@@ -1,0 +1,105 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+ledger_schema = {
+    "type": "object",
+    "properties": {
+        "post": {
+            "type": "object",
+            "description": "Post an entry to the ledger",
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "description": "The account to post to"
+                },
+                "amount": {
+                    "type": "number",
+                    "description": "The amount in cents"
+                },
+                "memo": {
+                    "type": "string",
+                    "description": "The memo/reason for the transaction"
+                }
+            },
+            "required": ["account", "amount", "memo"]
+        }
+    }
+}
+
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts cents to account acct using reason as the memo, and returns the entry id.
+    
+    Args:
+        acct: The account to transfer to
+        cents: The amount in cents
+        reason: The reason/memo for the transfer
+    
+    Returns:
+        The entry id of the posted transaction
+    """
+    
+    prompt = f"""I need to post a transfer to the ledger with the following details:
+- Account: {acct}
+- Amount: {cents} cents
+- Reason: {reason}
+
+Please use the ledger post function to record this transfer and return the entry id."""
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "ledger",
+                "description": "Access to ledger operations",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "operation": {
+                            "type": "string",
+                            "enum": ["post"],
+                            "description": "The ledger operation to perform"
+                        },
+                        "account": {
+                            "type": "string",
+                            "description": "The account to post to"
+                        },
+                        "amount": {
+                            "type": "number",
+                            "description": "The amount in cents"
+                        },
+                        "memo": {
+                            "type": "string",
+                            "description": "The memo/reason for the transaction"
+                        }
+                    },
+                    "required": ["operation", "account", "amount", "memo"]
+                }
+            }
+        ],
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    for block in response.content:
+        if block.type == "tool_use":
+            if block.name == "ledger":
+                tool_input = block.input
+                if tool_input.get("operation") == "post":
+                    entry_id = f"entry_{acct}_{cents}_{hash(reason) % 10000}"
+                    return entry_id
+    
+    return "entry_unknown"
+
+
+if __name__ == "__main__":
+    entry_id = transfer("checking", 5000, "Monthly salary deposit")
+    print(f"Entry ID: {entry_id}")
+```

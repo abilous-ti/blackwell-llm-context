@@ -1,0 +1,11 @@
+```python
+import cache
+
+
+def save(k, v):
+    """
+    Cache value v under already-normalized key k for 60 seconds.
+    Returns True if newly inserted, False if replaced existing value.
+    """
+    return cache.put(k, v, ttl=60)
+```

@@ -1,0 +1,56 @@
+I'll analyze this problem. Since there's no specification of the actual "private wire format," I'll design a reasonable, self-consistent serialization that handles money amounts precisely (avoiding float issues) and encodes sign, dollars, and cents.
+
+```python
+from decimal import Decimal, ROUND_HALF_UP
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount to this team's private wire format.
+
+    The wire format is a compact, sign-aware, cents-based representation:
+
+        <SIGN><CENTS>
+
+    where:
+      - SIGN is '+' for non-negative amounts and '-' for negative amounts.
+      - CENTS is the absolute value of the amount expressed as an integer
+        number of cents (i.e. dollars * 100), with no decimal point.
+
+    Examples:
+      '12.30'  -> '+1230'
+      '-0.07'  -> '-7'
+      '0.00'   -> '+0'
+      '-12.34' -> '-1234'
+
+    The input is parsed with Decimal to avoid binary floating point
+    rounding errors. Fractional cents are rounded half-up.
+    """
+    if dollars is None:
+        raise ValueError("amount cannot be None")
+
+    text = dollars.strip()
+    if text == "":
+        raise ValueError("amount cannot be empty")
+
+    # Normalize a leading currency symbol and surrounding whitespace.
+    if text[0] == "$":
+        text = text[1:].strip()
+
+    # Reject anything that isn't a plain decimal number.
+    try:
+        value = Decimal(text)
+    except Exception as exc:  # noqa: BLE001
+        raise ValueError(f"invalid money amount: {dollars!r}") from exc
+
+    if not value.is_finite():
+        raise ValueError(f"invalid money amount: {dollars!r}")
+
+    # Convert to an integer number of cents, rounding half-up.
+    cents = (value * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+    sign = "-" if cents < 0 else "+"
+    magnitude = abs(int(cents))
+
+    return f"{sign}{magnitude}"
+```

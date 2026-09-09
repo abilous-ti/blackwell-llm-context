@@ -1,0 +1,30 @@
+```python
+import ledger
+
+
+def encode_amount(cents):
+    """Encode an amount in cents to the wire format."""
+    sign = '+' if cents >= 0 else '-'
+    digits = str(abs(cents))
+    checksum = sum(int(d) for d in digits) % 10
+    return f"{sign}{digits}#{checksum}"
+
+
+def transfer(acct, cents, reason):
+    """
+    Transfer funds to an account.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (integer)
+        reason: Memo/reason for the transfer
+        
+    Returns:
+        Entry id from the ledger post operation
+        
+    Raises:
+        ledger.PostError: If the operation fails
+    """
+    encoded_amount = encode_amount(cents)
+    return ledger.post(acct, encoded_amount, memo=reason)
+```

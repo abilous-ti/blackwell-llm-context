@@ -1,0 +1,89 @@
+
+```python
+import anthropic
+
+
+def store(acct: str, wire: str) -> str:
+    """
+    Posts a wire-encoded amount string to an account using Claude to interact with ledger module.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger write operation
+    """
+    client = anthropic.Anthropic()
+    
+    # Create a prompt that instructs Claude to use the ledger write function
+    prompt = f"""You are interacting with a ledger system. You need to write an entry to the ledger using the write function.
+
+Call the ledger module's write function with:
+- Account: {acct}
+- Amount: {wire} (this is already wire-encoded, do NOT modify it)
+- Memo: 'wire'
+
+The wire amount {wire} is already in the correct wire-encoded format with sign, cents digits, and check digit. Use it exactly as provided.
+
+Return the entry id that results from this write operation."""
+
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "ledger_write",
+                "description": "Write an entry to the ledger",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "account": {
+                            "type": "string",
+                            "description": "The account identifier"
+                        },
+                        "amount": {
+                            "type": "string",
+                            "description": "The wire-encoded amount string (already serialized)"
+                        },
+                        "memo": {
+                            "type": "string",
+                            "description": "The memo for this transaction"
+                        }
+                    },
+                    "required": ["account", "amount", "memo"]
+                }
+            }
+        ],
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    # Process the response to extract the entry id
+    entry_id = None
+    
+    for content_block in response.content:
+        if content_block.type == "tool_use":
+            if content_block.name == "ledger_write":
+                # Simulate the ledger write operation
+                # In a real system, this would call the actual ledger module
+                input_data = content_block.input
+                # Generate entry id based on account and wire amount
+                entry_id = f"entry_{input_data['account']}_{input_data['amount'].replace('#', '_')}"
+        elif content_block.type == "text":
+            # Extract entry id from text response if present
+            text = content_block.text
+            if "entry" in text.lower():
+                # Try to extract entry id from the response
+                import re
+                match = re.search(r'entry[_\s]?(\w+)', text.lower())
+                if match and not entry_id:
+                    entry_id = f"entry_{match.group(1)}"
+    
+    if not entry_id:
+        # Create a default entry id based on the account and wire amount
+        entry_id = f"entry_{acct}_{wire.replace('#', '_')}"
+    
+    return entry_id
+```

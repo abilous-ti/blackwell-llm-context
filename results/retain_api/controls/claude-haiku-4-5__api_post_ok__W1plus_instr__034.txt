@@ -1,0 +1,23 @@
+
+```python
+import ledger
+
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    
+    Args:
+        acct: account name (str)
+        cents: amount in minor units (integer)
+        note: memo text (str)
+    
+    Returns:
+        The new entry id (>=1)
+    
+    Raises:
+        ledger.PostError: if account is unknown or amount is malformed
+    """
+    return ledger.post(acct, cents, memo=note)
+```

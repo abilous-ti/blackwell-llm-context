@@ -1,0 +1,92 @@
+
+```python
+import anthropic
+
+ledger_module_code = """
+class LedgerEntry:
+    def __init__(self, entry_id, account, amount, memo):
+        self.entry_id = entry_id
+        self.account = account
+        self.amount = amount
+        self.memo = memo
+
+_next_entry_id = 1
+_entries = []
+
+def post(account, amount, memo):
+    global _next_entry_id
+    entry = LedgerEntry(_next_entry_id, account, amount, memo)
+    _entries.append(entry)
+    result_id = _next_entry_id
+    _next_entry_id += 1
+    return result_id
+
+def get_entries():
+    return _entries
+"""
+
+def transfer(acct, cents, reason):
+    """Transfer cents to account using reason as memo and return entry id."""
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Post an entry to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo/reason for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post {cents} cents to account '{acct}' with the reason '{reason}' using the post tool. Return only the entry ID."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    for content_block in response.content:
+        if content_block.type == "tool_use" and content_block.name == "post":
+            tool_input = content_block.input
+            entry_id = eval(ledger_module_code + f"\npost('{tool_input['account']}', {tool_input['amount']}, '{tool_input['memo']}')")
+    
+    if entry_id is None:
+        for content_block in response.content:
+            if hasattr(content_block, 'text'):
+                try:
+                    entry_id = int(''.join(filter(str.isdigit, content_block.text)))
+                except (ValueError, AttributeError):
+                    pass
+    
+    return entry_id
+
+
+if __name__ == "__main__":
+    entry_id = transfer("savings", 5000, "Monthly deposit")
+    print(f"Entry ID: {entry_id}")
+```

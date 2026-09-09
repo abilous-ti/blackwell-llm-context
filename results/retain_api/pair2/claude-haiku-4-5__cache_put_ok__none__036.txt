@@ -1,0 +1,115 @@
+
+```python
+import anthropic
+from anthropic.types.tool_use_block import ToolUseBlock
+
+client = anthropic.Anthropic()
+
+cache = {}
+
+def put(k, v, secs):
+    """Mock cache.put function that stores value v under key k for secs seconds"""
+    cache[k] = (v, secs)
+    return True
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    key_existed = k in cache
+    put(k, v, secs)
+    return not key_existed
+
+def process_tool_call(tool_name, tool_input):
+    """Process tool calls from Claude"""
+    if tool_name == "cache_store":
+        k = tool_input.get("k")
+        v = tool_input.get("v")
+        secs = tool_input.get("secs")
+        result = store(k, v, secs)
+        return {"success": True, "newly_inserted": result, "key": k}
+    return {"error": "Unknown tool"}
+
+def main():
+    """Main function to demonstrate the store function with Claude"""
+    tools = [
+        {
+            "name": "cache_store",
+            "description": "Caches a value under a key for a specified number of seconds. Returns True only if the key was newly inserted.",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "k": {
+                        "type": "string",
+                        "description": "The cache key"
+                    },
+                    "v": {
+                        "type": "string",
+                        "description": "The value to cache"
+                    },
+                    "secs": {
+                        "type": "integer",
+                        "description": "Number of seconds to cache the value"
+                    }
+                },
+                "required": ["k", "v", "secs"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": "Please cache the value 'hello' under key 'greeting' for 300 seconds, then cache 'world' under key 'target' for 600 seconds, and finally try to cache 'goodbye' under 'greeting' again to see if it was newly inserted."
+        }
+    ]
+    
+    print("Starting cache store demonstration...\n")
+    
+    while True:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        if response.stop_reason == "tool_use":
+            tool_calls = [block for block in response.content if isinstance(block, ToolUseBlock)]
+            
+            if not tool_calls:
+                break
+            
+            messages.append({"role": "assistant", "content": response.content})
+            
+            tool_results = []
+            for tool_call in tool_calls:
+                print(f"Tool call: {tool_call.name}")
+                print(f"Input: {tool_call.input}")
+                
+                result = process_tool_call(tool_call.name, tool_call.input)
+                print(f"Result: {result}\n")
+                
+                tool_results.append({
+                    "type": "tool_result",
+                    "tool_use_id": tool_call.id,
+                    "content": str(result)
+                })
+            
+            messages.append({"role": "user", "content": tool_results})
+        else:
+            final_response = next(
+                (block.text for block in response.content if hasattr(block, "text")),
+                None
+            )
+            if final_response:
+                print("Claude's final response:")
+                print(final_response)
+            break
+    
+    print("\nFinal cache state:", cache)
+
+if __name__ == "__main__":
+    main()
+```

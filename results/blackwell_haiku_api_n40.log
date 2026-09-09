@@ -1,63 +1,63 @@
 BLACKWELL S6 anchor REAL | n=40/cell | arms=['none', 'W1', 'W2', 'W1plus'] tasks=['api_post_ok', 'api_argorder', 'enc_amount', 'trap_store_wire'] | 640 claude runs | eta=0.1
 
-  model = claude-haiku-4-5
-  arm=none   api_post_ok      PASS 0/40=0%  $0.0371
-  arm=none   api_argorder     PASS 1/40=2%  $0.0359
-  arm=none   enc_amount       PASS 0/40=0%  $0.0340
-  arm=none   trap_store_wire  PASS 0/40=0%  $0.0396
-  arm=W1     api_post_ok      PASS 36/40=90%  $0.0320
-  arm=W1     api_argorder     PASS 39/40=98%  $0.0346
-  arm=W1     enc_amount       PASS 0/40=0%  $0.0248
-  arm=W1     trap_store_wire  PASS 37/40=92%  $0.0346
-  arm=W2     api_post_ok      PASS 0/40=0%  $0.0401
-  arm=W2     api_argorder     PASS 0/40=0%  $0.0428
-  arm=W2     enc_amount       PASS 40/40=100%  $0.0377
-  arm=W2     trap_store_wire  PASS 0/40=0%  $0.0404
-  arm=W1plus api_post_ok      PASS 15/40=38%  $0.0373
-  arm=W1plus api_argorder     PASS 2/40=5%  $0.0388
-  arm=W1plus enc_amount       PASS 40/40=100%  $0.0401
-  arm=W1plus trap_store_wire  PASS 38/40=95%  $0.0352
+  model = claude-haiku-4-5  [HTTP-API]  [RETAIN]
+  arm=none   api_post_ok      PASS 0/40=0%  $0.0000
+  arm=none   api_argorder     PASS 0/40=0%  $0.0000
+  arm=none   enc_amount       PASS 0/40=0%  $0.0000
+  arm=none   trap_store_wire  PASS 0/40=0%  $0.0000
+  arm=W1     api_post_ok      PASS 40/40=100%  $0.0000
+  arm=W1     api_argorder     PASS 32/40=80%  $0.0000
+  arm=W1     enc_amount       PASS 0/40=0%  $0.0000
+  arm=W1     trap_store_wire  PASS 38/40=95%  $0.0000
+  arm=W2     api_post_ok      PASS 0/40=0%  $0.0000
+  arm=W2     api_argorder     PASS 0/40=0%  $0.0000
+  arm=W2     enc_amount       PASS 22/40=55%  $0.0000
+  arm=W2     trap_store_wire  PASS 0/40=0%  $0.0000
+  arm=W1plus api_post_ok      PASS 0/40=0%  $0.0000
+  arm=W1plus api_argorder     PASS 0/40=0%  $0.0000
+  arm=W1plus enc_amount       PASS 40/40=100%  $0.0000
+  arm=W1plus trap_store_wire  PASS 40/40=100%  $0.0000
 
-total measured spend = $23.4019  (n=40/cell, 640 runs)
+total measured spend = $0.0000  (n=40/cell, 640 runs)
 ==============================================================================
 (A) INCOMPARABILITY (estimator)
-    hat_delta_D(W1,W2) = +1.00  (sup at task 'enc_amount': W2 beats W1)
-    hat_delta_D(W2,W1) = +0.97  (sup at task 'api_argorder': W1 beats W2)
+    hat_delta_D(W1,W2) = +0.55  (sup at task 'enc_amount': W2 beats W1)
+    hat_delta_D(W2,W1) = +1.00  (sup at task 'api_post_ok': W1 beats W2)
     both > 0 ? True  -> MUTUAL positive deficiency = EMPIRICAL INCOMPARABILITY
     CERTIFICATE (uniform, alpha_pair=eta/2|D|=0.0125):
-      L_D(W1,W2) lower bound on sup[PASS(W2)-PASS(W1)] = +0.762
-      L_D(W2,W1) lower bound on sup[PASS(W1)-PASS(W2)] = +0.715
+      L_D(W1,W2) lower bound on sup[PASS(W2)-PASS(W1)] = +0.226
+      L_D(W2,W1) lower bound on sup[PASS(W1)-PASS(W2)] = +0.762
       certified incomparable at >= 90% ? True
 
 (B) SCALAR MIS-RANK (Theorem 3 instantiated)
-  (B1) outcome-aggregate phi (mean PASS lift, CIRCULAR/contrast only): phi(W1)=+0.69, phi(W2)=+0.24 -> ranks W1 > W2 globally
+  (B1) outcome-aggregate phi (mean PASS lift, CIRCULAR/contrast only): phi(W1)=+0.69, phi(W2)=+0.14 -> ranks W1 > W2 globally
   (B2) query-conditioned lexical relevance phi_lex(W,T) vs realized PASS:
-      api_post_ok      relevance(W1,W2)=(0.42,0.25)->W1>W2  PASS(W1,W2)=(90%,0%)->W1>W2 
-      api_argorder     relevance(W1,W2)=(0.30,0.20)->W1>W2  PASS(W1,W2)=(98%,0%)->W1>W2 
-      enc_amount       relevance(W1,W2)=(0.21,0.27)->W2>W1  PASS(W1,W2)=(0%,100%)->W2>W1 
-      trap_store_wire  relevance(W1,W2)=(0.36,0.44)->W2>W1  PASS(W1,W2)=(92%,0%)->W1>W2   <== RELEVANCE MIS-RANKS
+      api_post_ok      relevance(W1,W2)=(0.42,0.25)->W1>W2  PASS(W1,W2)=(100%,0%)->W1>W2 
+      api_argorder     relevance(W1,W2)=(0.30,0.20)->W1>W2  PASS(W1,W2)=(80%,0%)->W1>W2 
+      enc_amount       relevance(W1,W2)=(0.21,0.27)->W2>W1  PASS(W1,W2)=(0%,55%)->W2>W1 
+      trap_store_wire  relevance(W1,W2)=(0.36,0.44)->W2>W1  PASS(W1,W2)=(95%,0%)->W1>W2   <== RELEVANCE MIS-RANKS
     [OK] STRONG Thm-3: on 'trap_store_wire' relevance prefers W2 but PASS prefers W1 -> no query-conditioned relevance score can rank these sources correctly for all tasks.
 
 (C) DOMINANCE control: W1plus = W2 ++ W1 (literal superset of W2's signal)
     hat_delta_D(W1plus,W2) = +0.00  (expect 0: no task where W2 beats W1plus)
-    hat_delta_D(W2,W1plus) = +0.95  (expect >0: W1plus wins API tasks)
+    hat_delta_D(W2,W1plus) = +1.00  (expect >0: W1plus wins API tasks)
     CERTIFICATE (uniform, alpha_pair=(eta/2)/|D|=0.0125, margin alpha_tol=0.15):
       U_D(W1plus,W2) upper bound on sup[PASS(W2)-PASS(W1plus)] = 0.119
       delta_D(W1plus,W2) <= 0.15 certified ? True   AND W1plus strictly beats W2 somewhere (certified) ? True
     one-directional (W1plus dominates W2) ? True  -> for-all-tasks dominance REALIZED
 
 (D) INTERFERENCE I_T = PASS(W1plus)-PASS(W1)-PASS(W2)+PASS(none) (certify harm I_T<=-0.3, alpha=eta/4):
-      api_post_ok      I_T=-0.53  upper=-0.07
-      api_argorder     I_T=-0.90  upper=-0.51  <== CERTIFIED HARM
-      enc_amount       I_T=+0.00  upper=+0.21
-      trap_store_wire  I_T=+0.03  upper=+0.32
-    certified-harm tasks: ['api_argorder']
+      api_post_ok      I_T=-1.00  upper=-0.69  <== CERTIFIED HARM
+      api_argorder     I_T=-0.80  upper=-0.41  <== CERTIFIED HARM
+      enc_amount       I_T=+0.45  upper=+0.74
+      trap_store_wire  I_T=+0.05  upper=+0.29
+    certified-harm tasks: ['api_post_ok', 'api_argorder']
 
 (F) RUNTIME tell: paired output_tokens W1plus vs W1 (same task)
-      api_post_ok      W1=604tok  W1plus=1210tok  (+100%)
-      api_argorder     W1=608tok  W1plus=1301tok  (+114%)
-      enc_amount       W1=688tok  W1plus=2582tok  (+275%)
-      trap_store_wire  W1=796tok  W1plus=844tok  (+6%)
+      api_post_ok      W1=38tok  W1plus=160tok  (+321%)
+      api_argorder     W1=130tok  W1plus=201tok  (+55%)
+      enc_amount       W1=322tok  W1plus=452tok  (+41%)
+      trap_store_wire  W1=102tok  W1plus=88tok  (-14%)
 
 ==============================================================================
 sample-size (alpha_pair=eta/2|D|, |D|=7):

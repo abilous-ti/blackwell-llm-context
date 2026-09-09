@@ -1,0 +1,118 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation, ROUND_DOWN
+
+
+_WIRE_VERSION = 1
+_WIRE_PREFIX = "AMT"
+_SCALE = 4  # internal fixed-point scale: store in ten-thousandths
+
+
+class AmountEncodeError(ValueError):
+    """Raised when a dollar string cannot be encoded to the wire format."""
+
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string to the team's private wire format.
+
+    Wire format (version 1):
+        AMT1:<sign_char><absolute_integer_ten_thousandths>
+
+    Examples:
+        '12.30'  -> 'AMT1:+123000'
+        '-0.07'  -> 'AMT1:-700'
+        '0.00'   -> 'AMT1:+0'
+
+    Parameters
+    ----------
+    dollars:
+        A decimal string representing a dollar amount, e.g. '12.30' or '-0.07'.
+        Must match the pattern: optional leading minus, digits, optional dot
+        followed by 1-4 decimal digits.  Leading/trailing whitespace is stripped.
+
+    Returns
+    -------
+    str
+        The encoded wire-format string.
+
+    Raises
+    ------
+    AmountEncodeError
+        If *dollars* is not a well-formed money string.
+    """
+    if not isinstance(dollars, str):
+        raise AmountEncodeError(
+            f"encode_amount expects a str, got {type(dollars).__name__!r}"
+        )
+
+    raw = dollars.strip()
+
+    # Validate shape before touching Decimal so error messages stay friendly.
+    _PATTERN = re.compile(r'^-?\d+(\.\d{1,4})?$')
+    if not _PATTERN.match(raw):
+        raise AmountEncodeError(
+            f"Not a valid money string: {dollars!r}. "
+            "Expected optional minus, digits, optional decimal point with 1-4 digits."
+        )
+
+    try:
+        value = Decimal(raw)
+    except InvalidOperation as exc:
+        raise AmountEncodeError(f"Cannot parse {dollars!r} as a decimal amount.") from exc
+
+    # Quantise to 4 decimal places (ten-thousandths) for lossless integer storage.
+    quantised = value.quantize(Decimal('0.0001'), rounding=ROUND_DOWN)
+
+    # Convert to integer ten-thousandths (shift 4 decimal places left).
+    ten_thousandths = int(quantised * 10 ** _SCALE)
+
+    # Encode sign explicitly so the format is unambiguous for zero.
+    sign_char = '-' if ten_thousandths < 0 else '+'
+    abs_value = abs(ten_thousandths)
+
+    wire = f"{_WIRE_PREFIX}{_WIRE_VERSION}:{sign_char}{abs_value}"
+    return wire
+
+
+def decode_amount(wire: str) -> str:
+    """Round-trip helper: decode a wire-format string back to a dollar string.
+
+    This is the inverse of encode_amount and is provided for testing /
+    verification purposes only; it is not part of the public contract.
+
+    Parameters
+    ----------
+    wire:
+        A string previously produced by encode_amount.
+
+    Returns
+    -------
+    str
+        Dollar amount with exactly 4 decimal places, e.g. '-0.0700'.
+
+    Raises
+    ------
+    AmountEncodeError
+        If *wire* does not match the expected format.
+    """
+    prefix = f"{_WIRE_PREFIX}{_WIRE_VERSION}:"
+    if not wire.startswith(prefix):
+        raise AmountEncodeError(f"Unrecognised wire prefix in {wire!r}")
+
+    body = wire[len(prefix):]
+    if not body or body[0] not in ('+', '-'):
+        raise AmountEncodeError(f"Missing sign character in wire string {wire!r}")
+
+    sign_char = body[0]
+    digits = body[1:]
+    if not digits.isdigit():
+        raise AmountEncodeError(f"Non-digit payload in wire string {wire!r}")
+
+    ten_thousandths = int(digits)
+    if sign_char == '-':
+        ten_thousandths = -ten_thousandths
+
+    value = Decimal(ten_thousandths) / Decimal(10 ** _SCALE)
+    # Format with 4 decimal places for clarity.
+    return f"{value:.4f}"

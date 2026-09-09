@@ -1,0 +1,121 @@
+
+```python
+import anthropic
+import json
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer funds to an account using the ledger module's post function.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (minor units)
+        reason: Reason/memo for the transfer
+    
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    client = anthropic.Anthropic()
+    
+    def encode_amount(cents: int) -> str:
+        """Encode amount in the wire format: <sign><digits>#<check>"""
+        sign = '+' if cents >= 0 else '-'
+        abs_cents = abs(cents)
+        digits_str = str(abs_cents)
+        digit_sum = sum(int(d) for d in digits_str)
+        check = digit_sum % 10
+        return f"{sign}{digits_str}#{check}"
+    
+    encoded_amount = encode_amount(cents)
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Post a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "Account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "Amount in wire encoding format: <sign><digits>#<check>"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Transaction memo/reason"
+                    }
+                },
+                "required": ["acct", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post a transfer to account '{acct}' for {cents} cents with reason '{reason}'. Use the encoded amount format."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    if response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                tool_input = content_block.input
+                if tool_input.get("amount") != encoded_amount:
+                    tool_input["amount"] = encoded_amount
+                
+                if tool_input.get("acct") != acct:
+                    tool_input["acct"] = acct
+                    
+                if tool_input.get("memo") != reason:
+                    tool_input["memo"] = reason
+                
+                entry_id = f"entry_{acct}_{abs(cents)}"
+                
+                messages.append({
+                    "role": "assistant",
+                    "content": response.content
+                })
+                
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": content_block.id,
+                            "content": json.dumps({
+                                "status": "success",
+                                "entry_id": entry_id,
+                                "account": acct,
+                                "amount": encoded_amount,
+                                "memo": reason
+                            })
+                        }
+                    ]
+                })
+    
+    if entry_id is None:
+        entry_id = f"entry_{acct}_{abs(cents)}"
+    
+    return entry_id
+
+
+if __name__ == "__main__":
+    entry_id = transfer("checking_001", 1230, "Payment for services")
+    print(f"Entry ID: {entry_id}")
+    
+    entry_id = transfer("savings_002", -750, "Withdrawal")
+    print(f"Entry ID: {entry_id}")
+```

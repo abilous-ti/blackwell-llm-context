@@ -1,0 +1,46 @@
+def encode_amount(dollars: str) -> str:
+    """
+    Encode a money amount from dollars string to wire format.
+    
+    Args:
+        dollars: A string representation of dollars (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The wire format representation of the amount
+    """
+    # Remove any whitespace
+    dollars = dollars.strip()
+    
+    # Parse the dollar amount
+    # Handle negative amounts
+    is_negative = dollars.startswith('-')
+    
+    # Remove the sign for processing
+    if is_negative:
+        dollars = dollars[1:].strip()
+    
+    # Split into dollars and cents
+    if '.' in dollars:
+        parts = dollars.split('.')
+        dollar_part = parts[0]
+        cent_part = parts[1]
+    else:
+        dollar_part = dollars
+        cent_part = '00'
+    
+    # Normalize: ensure cent_part is exactly 2 digits
+    if len(cent_part) == 1:
+        cent_part = cent_part + '0'
+    elif len(cent_part) > 2:
+        cent_part = cent_part[:2]
+    
+    # Convert to cents (total amount in cents)
+    if not dollar_part:
+        dollar_part = '0'
+    
+    total_cents = int(dollar_part) * 100 + int(cent_part)
+    
+    if is_negative:
+        total_cents = -total_cents
+    
+    return str(total_cents)

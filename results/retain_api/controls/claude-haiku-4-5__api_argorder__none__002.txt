@@ -1,0 +1,144 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+MODEL_NAME = "claude-3-5-sonnet-20241022"
+
+# Define the ledger tools
+tools = [
+    {
+        "name": "post",
+        "description": "Posts a transaction to a ledger account with a memo and returns an entry id",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "description": "The account identifier to post to"
+                },
+                "amount_cents": {
+                    "type": "integer",
+                    "description": "The amount in cents to post"
+                },
+                "memo": {
+                    "type": "string",
+                    "description": "The memo/reason for the transaction"
+                }
+            },
+            "required": ["account", "amount_cents", "memo"]
+        }
+    }
+]
+
+def process_tool_call(tool_name, tool_input):
+    """Process tool calls and return results"""
+    if tool_name == "post":
+        # Simulate posting to ledger
+        # In a real system, this would interact with actual ledger
+        account = tool_input.get("account")
+        amount_cents = tool_input.get("amount_cents")
+        memo = tool_input.get("memo")
+        
+        # Generate a unique entry ID
+        entry_id = f"entry_{account}_{amount_cents}_{hash(memo) % 10000}"
+        
+        result = {
+            "success": True,
+            "entry_id": entry_id,
+            "account": account,
+            "amount_cents": amount_cents,
+            "memo": memo
+        }
+        return json.dumps(result)
+    
+    return json.dumps({"error": f"Unknown tool: {tool_name}"})
+
+def transfer(acct, cents, reason):
+    """Transfer function that uses Claude to post to ledger and return entry id"""
+    
+    user_message = f"Please post {cents} cents to account {acct} with the reason '{reason}'. Use the post tool and return the entry id."
+    
+    messages = [
+        {"role": "user", "content": user_message}
+    ]
+    
+    # Initial request to Claude
+    response = client.messages.create(
+        model=MODEL_NAME,
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process tool calls in an agentic loop
+    while response.stop_reason == "tool_use":
+        tool_use_block = None
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_use_block = block
+                break
+        
+        if not tool_use_block:
+            break
+        
+        tool_name = tool_use_block.name
+        tool_input = tool_use_block.input
+        
+        # Process the tool call
+        tool_result = process_tool_call(tool_name, tool_input)
+        
+        # Add assistant response and tool result to messages
+        messages.append({"role": "assistant", "content": response.content})
+        messages.append({
+            "role": "user",
+            "content": [
+                {
+                    "type": "tool_result",
+                    "tool_use_id": tool_use_block.id,
+                    "content": tool_result
+                }
+            ]
+        })
+        
+        # Continue the conversation
+        response = client.messages.create(
+            model=MODEL_NAME,
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+    
+    # Extract the entry id from the final response
+    for block in response.content:
+        if hasattr(block, 'text'):
+            # Parse the response to find entry_id
+            text = block.text
+            if "entry_" in text:
+                # Extract entry id from the response
+                import re
+                match = re.search(r'entry_\S+', text)
+                if match:
+                    return match.group(0)
+    
+    # If we can't find entry id in text, check if we have it from tool results
+    for msg in messages:
+        if msg.get("role") == "user" and "tool_result" in str(msg):
+            for content in msg.get("content", []):
+                if isinstance(content, dict) and content.get("type") == "tool_result":
+                    try:
+                        result = json.loads(content.get("content", "{}"))
+                        if "entry_id" in result:
+                            return result["entry_id"]
+                    except json.JSONDecodeError:
+                        pass
+    
+    return None
+
+if __name__ == "__main__":
+    # Test the transfer function
+    entry_id = transfer("checking", 10000, "Salary deposit")
+    print(f"Transfer completed with entry ID: {entry_id}")
+```

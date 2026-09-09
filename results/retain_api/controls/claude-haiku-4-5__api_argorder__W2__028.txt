@@ -1,0 +1,67 @@
+
+```python
+import anthropic
+
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts a transfer to the ledger using Claude to compute the wire encoding.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (can be positive or negative)
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        The entry id returned by the ledger post function
+    """
+    client = anthropic.Anthropic()
+    
+    # Use Claude to encode the amount according to the wire format
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Encode the following monetary amount in wire format:
+Amount in cents: {cents}
+
+Wire format rules:
+- Format: <sign><digits>#<check>
+- <sign> is '+' for positive, '-' for negative
+- <digits> is the absolute value amount in cents (no decimal point)
+- <check> is a single digit equal to (sum of decimal digits in <digits>) mod 10
+
+Return ONLY the encoded string, nothing else."""
+            }
+        ]
+    )
+    
+    encoded_amount = message.content[0].text.strip()
+    
+    # Use Claude to call the ledger post function
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""I need to post a ledger entry with:
+- Account: {acct}
+- Encoded amount: {encoded_amount}
+- Reason: {reason}
+
+Using the ledger module's post function, return the entry id that would be returned.
+Call ledger.post() with the appropriate parameters and return only the entry id result."""
+            }
+        ]
+    )
+    
+    # For this solution, we'll simulate the ledger post call
+    # In a real implementation, this would call the actual ledger.post function
+    from ledger import post
+    
+    entry_id = post(acct, encoded_amount, reason)
+    return entry_id
+```

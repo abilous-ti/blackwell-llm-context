@@ -1,0 +1,93 @@
+
+```python
+import anthropic
+import json
+import re
+
+client = anthropic.Anthropic()
+MODEL_NAME = "claude-3-5-sonnet-20241022"
+
+LEDGER_TOOLS = [
+    {
+        "name": "post",
+        "description": "Posts a transaction to the ledger. Returns the entry id.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "description": "The account to post to"
+                },
+                "amount": {
+                    "type": "integer",
+                    "description": "The amount in cents"
+                },
+                "memo": {
+                    "type": "string",
+                    "description": "The memo for the transaction"
+                }
+            },
+            "required": ["account", "amount", "memo"]
+        }
+    }
+]
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts cents to account acct using reason as the memo.
+    Returns the entry id.
+    """
+    user_message = f"Post {cents} cents to account {acct} with memo '{reason}'"
+    
+    messages = [
+        {"role": "user", "content": user_message}
+    ]
+    
+    while True:
+        response = client.messages.create(
+            model=MODEL_NAME,
+            max_tokens=1024,
+            tools=LEDGER_TOOLS,
+            messages=messages
+        )
+        
+        if response.stop_reason == "end_turn":
+            for block in response.content:
+                if hasattr(block, 'text'):
+                    text_response = block.text
+                    match = re.search(r'entry[_\s]?id[:\s]+([a-zA-Z0-9_-]+)', text_response, re.IGNORECASE)
+                    if match:
+                        return match.group(1)
+            return "Unknown"
+        
+        if response.stop_reason == "tool_use":
+            tool_results = []
+            
+            for block in response.content:
+                if block.type == "tool_use":
+                    if block.name == "post":
+                        input_data = block.input
+                        account = input_data.get("account")
+                        amount = input_data.get("amount")
+                        memo = input_data.get("memo")
+                        
+                        entry_id = f"entry_{account}_{amount}_{hash(memo) % 10000:04d}"
+                        
+                        tool_results.append({
+                            "type": "tool_result",
+                            "tool_use_id": block.id,
+                            "content": json.dumps({"entry_id": entry_id})
+                        })
+            
+            messages.append({"role": "assistant", "content": response.content})
+            messages.append({"role": "user", "content": tool_results})
+        else:
+            break
+    
+    return "Failed"
+
+
+if __name__ == "__main__":
+    entry_id = transfer("checking", 50000, "Monthly salary")
+    print(f"Transfer successful. Entry ID: {entry_id}")
+```

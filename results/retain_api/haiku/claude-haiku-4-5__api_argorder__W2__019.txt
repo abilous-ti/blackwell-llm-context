@@ -1,0 +1,33 @@
+```python
+def transfer(acct, cents, reason):
+    """
+    Posts a monetary transfer to an account using the wire-encoding format.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (integer, can be positive or negative)
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    from ledger import post
+    
+    # Determine sign
+    if cents >= 0:
+        sign = '+'
+        digits_str = str(cents)
+    else:
+        sign = '-'
+        digits_str = str(abs(cents))
+    
+    # Calculate check digit (sum of decimal digits mod 10)
+    check = sum(int(d) for d in digits_str) % 10
+    
+    # Format amount as <sign><digits>#<check>
+    amount = f"{sign}{digits_str}#{check}"
+    
+    # Post to ledger and return entry id
+    entry_id = post(acct, amount, reason)
+    return entry_id
+```

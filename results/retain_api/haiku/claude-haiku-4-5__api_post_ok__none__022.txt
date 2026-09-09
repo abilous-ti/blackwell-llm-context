@@ -1,0 +1,50 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+def post(acct: str, cents: int, note: str) -> str:
+    """
+    Posts cents to account acct with memo note using the ledger module.
+    Returns the new entry id.
+    """
+    prompt = f"""You are a ledger system assistant. I need you to help me post a transaction to the ledger.
+
+Account: {acct}
+Amount in cents: {cents}
+Memo/Note: {note}
+
+Please simulate posting this entry to the ledger and return a unique entry ID that would be generated.
+The entry ID should be a reasonable identifier (like an incrementing number or UUID-like string).
+Return ONLY the entry ID, nothing else."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    entry_id = message.content[0].text.strip()
+    return entry_id
+
+
+def record(acct: str, cents: int, note: str) -> str:
+    """
+    Records a transaction in the ledger.
+    Posts cents to account acct with memo note.
+    Returns the new entry id.
+    """
+    return post(acct, cents, note)
+
+
+if __name__ == "__main__":
+    entry_id = record("savings", 10000, "Monthly deposit")
+    print(f"New entry ID: {entry_id}")
+    
+    entry_id2 = record("checking", -500, "ATM withdrawal")
+    print(f"New entry ID: {entry_id2}")
+```

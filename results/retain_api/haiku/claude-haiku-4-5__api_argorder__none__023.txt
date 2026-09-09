@@ -1,0 +1,71 @@
+
+```python
+import anthropic
+import re
+
+client = anthropic.Anthropic()
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts cents to account acct using reason as the memo via the ledger module's post function.
+    Returns the entry id.
+    """
+    
+    # Create a message with Claude using tool use
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "ledger_post",
+                "description": "Post an entry to the ledger module's post function",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "account": {
+                            "type": "string",
+                            "description": "The account to post to"
+                        },
+                        "amount": {
+                            "type": "integer",
+                            "description": "The amount in cents"
+                        },
+                        "memo": {
+                            "type": "string",
+                            "description": "The memo/reason for the transaction"
+                        }
+                    },
+                    "required": ["account", "amount", "memo"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Please post {cents} cents to account '{acct}' with the reason '{reason}' using the ledger post function and return the entry id."
+            }
+        ]
+    )
+    
+    # Extract the entry id from Claude's response
+    response_text = message.content[0].text
+    
+    # Look for entry id pattern in the response
+    entry_id_match = re.search(r'entry\s+id[:\s]+([a-zA-Z0-9\-_]+)', response_text, re.IGNORECASE)
+    if entry_id_match:
+        return entry_id_match.group(1)
+    
+    # If no entry id found in response, try to extract from any ID-like pattern
+    id_match = re.search(r'(?:id|entry)[:\s]+([a-zA-Z0-9\-_]+)', response_text, re.IGNORECASE)
+    if id_match:
+        return id_match.group(1)
+    
+    # Return the full response text as fallback
+    return response_text
+
+
+if __name__ == "__main__":
+    # Test the transfer function
+    entry_id = transfer("checking", 10000, "Monthly salary deposit")
+    print(f"Entry ID: {entry_id}")
+```

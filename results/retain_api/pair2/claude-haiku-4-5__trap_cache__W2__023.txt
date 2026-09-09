@@ -1,0 +1,69 @@
+
+```python
+import anthropic
+import json
+import time
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# In-memory cache with TTL support
+_cache = {}
+
+def save(k, v):
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    """
+    global _cache
+    
+    # Check if key already exists
+    key_existed = k in _cache
+    
+    # Store the value with timestamp
+    current_time = time.time()
+    _cache[k] = {
+        'value': v,
+        'timestamp': current_time,
+        'ttl': 60
+    }
+    
+    # Return True only if this was a new insertion
+    return not key_existed
+
+
+def _get_cache(k):
+    """
+    Internal helper to get value from cache if it exists and hasn't expired.
+    """
+    global _cache
+    
+    if k not in _cache:
+        return None
+    
+    entry = _cache[k]
+    current_time = time.time()
+    
+    # Check if entry has expired
+    if current_time - entry['timestamp'] > entry['ttl']:
+        del _cache[k]
+        return None
+    
+    return entry['value']
+
+
+def _cleanup_expired():
+    """
+    Internal helper to clean up expired cache entries.
+    """
+    global _cache
+    current_time = time.time()
+    expired_keys = []
+    
+    for k, entry in _cache.items():
+        if current_time - entry['timestamp'] > entry['ttl']:
+            expired_keys.append(k)
+    
+    for k in expired_keys:
+        del _cache[k]
+```

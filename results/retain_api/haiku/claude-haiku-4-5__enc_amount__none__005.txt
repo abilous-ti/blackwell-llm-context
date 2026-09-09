@@ -1,0 +1,48 @@
+
+```python
+import anthropic
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serializes a money amount to the team's private wire format.
+    Uses Claude to understand and implement the encoding format.
+    
+    Args:
+        dollars: A string representing a dollar amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The encoded amount in the team's private wire format
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are a financial wire format expert. I need to encode the dollar amount "{dollars}" into our team's private wire format.
+
+The wire format works as follows:
+- Amounts are encoded as signed integers representing cents
+- The format uses variable-length encoding for efficiency
+- Negative amounts are represented using two's complement
+- Single byte for amounts from -64 to 63 cents
+- Two bytes for larger amounts, with a continuation bit
+
+Please provide ONLY the encoded hex string representation (without '0x' prefix) for the amount "{dollars}".
+
+For example:
+- "0.01" would encode to "01"
+- "-0.01" would encode to "ff"
+- "1.00" would encode to "64"
+- "100.00" would encode to "e803"
+
+Return only the hex string, nothing else."""
+            }
+        ]
+    )
+    
+    encoded = message.content[0].text.strip()
+    return encoded
+```

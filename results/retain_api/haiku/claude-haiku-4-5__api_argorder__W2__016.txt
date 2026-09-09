@@ -1,0 +1,92 @@
+
+```python
+import anthropic
+import json
+import base64
+
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts a transfer to an account using Claude to generate the encoded amount.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in minor units (cents)
+        reason: Memo/reason for the transfer
+        
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    
+    client = anthropic.Anthropic()
+    
+    prompt = f"""You are a financial ledger system. You need to encode a monetary amount for posting to a ledger.
+
+The encoding format is: <sign><digits>#<check>
+- <sign>: '+' for positive, '-' for negative
+- <digits>: amount in MINOR UNITS (integer cents, no decimal point)
+- <check>: single Luhn-style digit equal to (sum of decimal digits in <digits>) mod 10
+
+The amount to encode is {cents} cents (this is already in minor units).
+The account is: {acct}
+The reason/memo is: {reason}
+
+Return ONLY a valid JSON object with these exact fields:
+{{
+  "sign": "+",
+  "digits": "1230",
+  "check": "6",
+  "encoded": "+1230#6"
+}}
+
+Make sure the check digit is correct: it should be (sum of all digits in the digits string) mod 10.
+For {cents} cents, if it's positive use '+', if negative use '-'."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    response_text = message.content[0].text
+    
+    start_idx = response_text.find('{')
+    end_idx = response_text.rfind('}') + 1
+    json_str = response_text[start_idx:end_idx]
+    
+    encoding_data = json.loads(json_str)
+    encoded_amount = encoding_data["encoded"]
+    
+    entry_id = post(acct, encoded_amount, reason)
+    return entry_id
+
+
+def post(acct: str, encoded_amount: str, reason: str) -> str:
+    """
+    Simulates posting to the ledger with the encoded amount.
+    In a real system, this would call the actual ledger module.
+    
+    Args:
+        acct: Account identifier
+        encoded_amount: Amount in wire-encoding format (<sign><digits>#<check>)
+        reason: Memo for the transaction
+        
+    Returns:
+        Entry ID (simulated)
+    """
+    import hashlib
+    
+    entry_data = f"{acct}:{encoded_amount}:{reason}"
+    entry_id = hashlib.md5(entry_data.encode()).hexdigest()[:8]
+    return entry_id
+
+
+if __name__ == "__main__":
+    entry_id = transfer("acct123", 1230, "Test transfer for $12.30")
+    print(f"Entry ID: {entry_id}")
+    
+    entry_id = transfer("acct456", -7, "Test transfer for -$0.07")
+    print(f"Entry ID: {entry_id}")
+```

@@ -1,0 +1,20 @@
+import cache
+
+def normalize_key(k):
+    k = k.lower()
+    parts = []
+    in_run = False
+    for char in k:
+        if char.isalnum():
+            parts.append(char)
+            in_run = False
+        else:
+            if not in_run and parts:
+                parts.append('_')
+                in_run = True
+    key = ''.join(parts).strip('_')
+    return 'kx7-' + key
+
+def store(k, v, secs):
+    normalized = normalize_key(k)
+    return cache.put(normalized, v, secs)

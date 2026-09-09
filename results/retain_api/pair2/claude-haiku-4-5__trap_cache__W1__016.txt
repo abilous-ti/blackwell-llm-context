@@ -1,0 +1,136 @@
+
+```python
+import anthropic
+import json
+from typing import Any
+
+# Mock cache module for demonstration
+class MockCache:
+    def __init__(self):
+        self.store = {}
+    
+    def put(self, key: str, value: Any, *, ttl: int) -> bool:
+        if not key:
+            raise Exception("CacheError")
+        is_new = key not in self.store
+        self.store[key] = {"value": value, "ttl": ttl}
+        return is_new
+
+# Global cache instance
+cache = MockCache()
+
+def save(k: str, v: Any) -> bool:
+    """
+    Save value v under the already-normalized key k with 60 second TTL.
+    
+    Returns True if the key was newly inserted, False if it replaced an existing value.
+    """
+    return cache.put(k, v, ttl=60)
+
+def process_tool_call(tool_name: str, tool_input: dict) -> str:
+    """Process tool calls from Claude"""
+    if tool_name == "save_to_cache":
+        key = tool_input.get("key")
+        value = tool_input.get("value")
+        result = save(key, value)
+        return json.dumps({"success": True, "newly_inserted": result})
+    return json.dumps({"error": f"Unknown tool: {tool_name}"})
+
+def main():
+    """Main function to demonstrate cache operations via Claude"""
+    client = anthropic.Anthropic()
+    
+    # Define the save_to_cache tool
+    tools = [
+        {
+            "name": "save_to_cache",
+            "description": "Save a value to the cache under an already-normalized key with 60 second TTL",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The already-normalized cache key (e.g., 'kx7-hello_world')"
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The value to cache"
+                    }
+                },
+                "required": ["key", "value"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": "Please cache two values: save 'hello world' under key 'kx7-hello_world' and 'test data' under key 'kx7-test_data'"
+        }
+    ]
+    
+    print("Starting cache operations via Claude...")
+    
+    # Agentic loop
+    while True:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        # Check if we're done
+        if response.stop_reason == "end_turn":
+            print("\nConversation complete.")
+            break
+        
+        # Process tool calls
+        if response.stop_reason == "tool_use":
+            # Add assistant's response to messages
+            messages.append({
+                "role": "assistant",
+                "content": response.content
+            })
+            
+            # Process each tool use
+            tool_results = []
+            for content_block in response.content:
+                if content_block.type == "tool_use":
+                    tool_name = content_block.name
+                    tool_input = content_block.input
+                    tool_use_id = content_block.id
+                    
+                    print(f"\nTool called: {tool_name}")
+                    print(f"Input: {tool_input}")
+                    
+                    # Process the tool call
+                    result = process_tool_call(tool_name, tool_input)
+                    print(f"Result: {result}")
+                    
+                    tool_results.append({
+                        "type": "tool_result",
+                        "tool_use_id": tool_use_id,
+                        "content": result
+                    })
+            
+            # Add tool results to messages
+            messages.append({
+                "role": "user",
+                "content": tool_results
+            })
+        else:
+            # No more tool calls, print final response
+            for content_block in response.content:
+                if hasattr(content_block, 'text'):
+                    print(f"\nClaude: {content_block.text}")
+            break
+    
+    # Verify cache contents
+    print("\n--- Cache Contents ---")
+    for key, data in cache.store.items():
+        print(f"Key: {key}, Value: {data['value']}, TTL: {data['ttl']}s")
+
+if __name__ == "__main__":
+    main()
+```

@@ -1,0 +1,27 @@
+I need to make some reasonable assumptions about the ledger module's `write` function since it isn't specified. The key instruction is clear: the `wire` string is already encoded, so I pass it through as-is without re-encoding or decoding.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')
+```
+
+Let me reconsider the `write` signature—it's not given, so I'll use the most natural positional call with the memo. However, to be safe against unknown parameter names, I'll keep it simple and conventional.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, 'wire')
+```
+
+I'll go with the version using an explicit `memo` keyword since the task explicitly names the memo, which is more robust and self-documenting.
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

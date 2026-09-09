@@ -1,0 +1,92 @@
+
+```python
+import anthropic
+import time
+from datetime import datetime, timedelta
+
+# In-memory cache to simulate the cache module
+cache_storage = {}
+
+def cache_put(k, v):
+    """Simulates cache.put - stores value and returns True if key was newly inserted"""
+    is_new = k not in cache_storage
+    cache_storage[k] = v
+    return is_new
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    # Check if key already exists in cache
+    is_new_key = k not in cache_storage
+    
+    # Calculate expiration time
+    expiration_time = datetime.now() + timedelta(seconds=secs)
+    
+    # Store the value with metadata
+    cached_value = {
+        'value': v,
+        'expiration': expiration_time
+    }
+    
+    # Use cache.put to store the value
+    cache_put(k, cached_value)
+    
+    # Return True only if the key was newly inserted
+    return is_new_key
+
+def get_cached_value(k):
+    """Helper function to retrieve cached value if not expired"""
+    if k not in cache_storage:
+        return None
+    
+    cached_item = cache_storage[k]
+    
+    # Check if the cached item has expired
+    if datetime.now() > cached_item['expiration']:
+        del cache_storage[k]
+        return None
+    
+    return cached_item['value']
+
+def main():
+    """Test the store function"""
+    # Test 1: First insertion should return True
+    result1 = store('key1', 'value1', 5)
+    print(f"First insertion of 'key1': {result1}")  # Should be True
+    assert result1 == True, "First insertion should return True"
+    
+    # Test 2: Second insertion with same key should return False
+    result2 = store('key1', 'value2', 5)
+    print(f"Second insertion of 'key1': {result2}")  # Should be False
+    assert result2 == False, "Second insertion should return False"
+    
+    # Test 3: Different key should return True
+    result3 = store('key2', 'value3', 5)
+    print(f"First insertion of 'key2': {result3}")  # Should be True
+    assert result3 == True, "First insertion of different key should return True"
+    
+    # Test 4: Verify cached value retrieval
+    cached_val = get_cached_value('key1')
+    print(f"Cached value for 'key1': {cached_val}")  # Should be 'value2'
+    assert cached_val == 'value2', "Should retrieve the updated value"
+    
+    # Test 5: Test expiration
+    store('temp_key', 'temp_value', 1)
+    print(f"Cached value for 'temp_key' immediately: {get_cached_value('temp_key')}")
+    time.sleep(1.1)
+    expired_val = get_cached_value('temp_key')
+    print(f"Cached value for 'temp_key' after expiration: {expired_val}")  # Should be None
+    assert expired_val is None, "Expired value should return None"
+    
+    # After expiration, re-inserting should return True again
+    result4 = store('temp_key', 'new_temp_value', 5)
+    print(f"Re-insertion of expired 'temp_key': {result4}")  # Should be True
+    assert result4 == True, "Re-insertion of expired key should return True"
+    
+    print("\nAll tests passed!")
+
+if __name__ == '__main__':
+    main()
+```

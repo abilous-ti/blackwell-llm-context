@@ -1,0 +1,74 @@
+
+```python
+import anthropic
+
+import cache
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    return cache.put(k, v, ttl=secs)
+
+
+def main():
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "store_data",
+            "description": "Store data in cache with TTL",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The cache key"
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The value to cache"
+                    },
+                    "ttl_seconds": {
+                        "type": "integer",
+                        "description": "Time to live in seconds"
+                    }
+                },
+                "required": ["key", "value", "ttl_seconds"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": "Please cache the value 'hello world' under key 'greeting' for 3600 seconds"
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    print("Response:", response)
+    
+    if response.stop_reason == "tool_use":
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_input = block.input
+                key = tool_input.get("key")
+                value = tool_input.get("value")
+                ttl = tool_input.get("ttl_seconds")
+                
+                result = store(key, value, ttl)
+                print(f"Stored '{value}' under key '{key}' for {ttl} seconds")
+                print(f"Was newly inserted: {result}")
+
+
+if __name__ == "__main__":
+    main()
+```

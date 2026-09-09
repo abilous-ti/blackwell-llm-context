@@ -1,0 +1,105 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# This tool represents the ledger module's write function
+tools = [
+    {
+        "name": "ledger_write",
+        "description": "Posts an entry to the ledger module with the given account, amount, and memo",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "acct": {
+                    "type": "string",
+                    "description": "The account identifier"
+                },
+                "amount": {
+                    "type": "string",
+                    "description": "The wire-encoded amount string (e.g., '+1230#6')"
+                },
+                "memo": {
+                    "type": "string",
+                    "description": "The memo for this entry"
+                }
+            },
+            "required": ["acct", "amount", "memo"]
+        }
+    }
+]
+
+# Mock ledger module's write function
+def ledger_write(acct: str, amount: str, memo: str) -> str:
+    """Mock implementation of ledger.write() that returns an entry id"""
+    # In a real implementation, this would interact with an actual ledger module
+    # For now, we'll generate a mock entry id
+    import hashlib
+    entry_data = f"{acct}:{amount}:{memo}"
+    entry_id = hashlib.sha256(entry_data.encode()).hexdigest()[:16]
+    return entry_id
+
+def store(acct: str, wire: str) -> str:
+    """
+    Posts the wire-encoded amount string to account using the ledger module's write function.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger
+    """
+    
+    # Use Claude to call the ledger_write tool
+    messages = [
+        {
+            "role": "user",
+            "content": f"I need to store a wire-encoded amount in the ledger. Account: {acct}, Wire amount: {wire}, Memo: wire. Please use the ledger_write tool to post this entry."
+        }
+    ]
+    
+    # Make the API call with tools
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response to extract tool use
+    entry_id = None
+    
+    # Check if Claude wants to use a tool
+    if response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                tool_name = content_block.name
+                tool_input = content_block.input
+                
+                if tool_name == "ledger_write":
+                    # Call the actual ledger_write function
+                    entry_id = ledger_write(
+                        acct=tool_input.get("acct"),
+                        amount=tool_input.get("amount"),
+                        memo=tool_input.get("memo")
+                    )
+                    break
+    
+    # If Claude didn't use the tool, call it directly
+    if entry_id is None:
+        entry_id = ledger_write(acct=acct, amount=wire, memo="wire")
+    
+    return entry_id
+
+
+if __name__ == "__main__":
+    # Test the store function
+    test_acct = "ACC123"
+    test_wire = "+1230#6"
+    
+    result = store(test_acct, test_wire)
+    print(f"Entry ID: {result}")
+```

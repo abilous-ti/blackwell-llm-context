@@ -1,0 +1,76 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Mock ledger module for demonstration
+class MockLedger:
+    def __init__(self):
+        self.entries = {}
+        self.next_id = 1
+    
+    def post(self, acct, cents, note):
+        """Mock post function that simulates ledger.post"""
+        entry_id = self.next_id
+        self.entries[entry_id] = {
+            'id': entry_id,
+            'account': acct,
+            'cents': cents,
+            'note': note
+        }
+        self.next_id += 1
+        return entry_id
+
+# Create a mock ledger instance
+ledger = MockLedger()
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    # Use Claude to help write the record function
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are a Python code generator. Write a simple Python function that:
+1. Calls ledger.post('{acct}', {cents}, '{note}')
+2. Stores and returns the result as the entry id
+
+The function should be straightforward and simple. Just provide the Python code that calls ledger.post and returns the entry id. No explanations, just code.
+
+Here's what the ledger.post function signature looks like:
+ledger.post(acct, cents, note) - returns the entry id
+
+Provide ONLY the Python code to call ledger.post and return the entry id, nothing else."""
+            }
+        ]
+    )
+    
+    # Execute the logic to call ledger.post
+    entry_id = ledger.post(acct, cents, note)
+    return entry_id
+
+
+if __name__ == "__main__":
+    # Test the record function
+    id1 = record("checking", 1000, "Initial deposit")
+    print(f"Entry ID 1: {id1}")
+    
+    id2 = record("savings", 5000, "Transfer to savings")
+    print(f"Entry ID 2: {id2}")
+    
+    id3 = record("checking", -500, "Withdrawal")
+    print(f"Entry ID 3: {id3}")
+    
+    # Verify the entries
+    print("\nLedger entries:")
+    for entry_id, entry in ledger.entries.items():
+        print(f"  {entry}")
+```

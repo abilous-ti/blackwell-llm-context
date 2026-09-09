@@ -1,0 +1,72 @@
+I'll analyze this problem. Without a specification of the "private wire format," I need to make reasonable design decisions and document them clearly in the code.
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string to this team's private wire format.
+
+    NOTE: The exact "private wire format" was not specified in the task.
+    The format implemented here is a self-consistent, documented convention:
+
+        <sign><cents>
+
+    where:
+      - <sign> is 'P' for non-negative amounts and 'N' for negative amounts.
+      - <cents> is the absolute value of the amount expressed as an integer
+        number of cents (dollars * 100), with no leading zeros (except a
+        single '0' for a zero amount).
+
+    Examples:
+      '12.30'  -> 'P1230'
+      '-0.07'  -> 'N7'
+      '0'      -> 'P0'
+      '0.00'   -> 'P0'
+      '-0.00'  -> 'P0'   (negative zero normalizes to positive zero)
+      '100'    -> 'P10000'
+    """
+    if dollars is None:
+        raise ValueError("dollars must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    negative = False
+    if s[0] in "+-":
+        negative = s[0] == "-"
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount: %r" % dollars)
+
+    if "." in s:
+        int_part, _, frac_part = s.partition(".")
+    else:
+        int_part, frac_part = s, ""
+
+    # Validate characters
+    if int_part and not int_part.isdigit():
+        raise ValueError("invalid integer part: %r" % dollars)
+    if frac_part and not frac_part.isdigit():
+        raise ValueError("invalid fractional part: %r" % dollars)
+    if not int_part and not frac_part:
+        raise ValueError("invalid amount: %r" % dollars)
+
+    # Normalize integer part
+    int_part = int_part or "0"
+
+    # Normalize fractional part to exactly 2 digits (cents)
+    if len(frac_part) > 2:
+        # Reject sub-cent precision rather than silently truncating.
+        raise ValueError("sub-cent precision not supported: %r" % dollars)
+    frac_part = (frac_part + "00")[:2]
+
+    total_cents = int(int_part) * 100 + int(frac_part)
+
+    # Normalize negative zero to positive zero.
+    if total_cents == 0:
+        negative = False
+
+    sign = "N" if negative else "P"
+    return "%s%d" % (sign, total_cents)
+```

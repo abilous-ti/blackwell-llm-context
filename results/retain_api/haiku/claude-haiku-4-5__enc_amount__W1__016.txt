@@ -1,0 +1,22 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a money amount to the team's private wire format.
+    
+    The wire format represents money as an integer number of cents,
+    with a sign prefix for negative amounts.
+    
+    Args:
+        dollars: A string representing dollars and cents (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The encoded amount as a string in the private wire format
+    """
+    # Parse the dollar amount as a float, then convert to cents as an integer
+    amount_float = float(dollars)
+    cents = round(amount_float * 100)
+    
+    # Return as string representation of the integer cents value
+    return str(cents)
+```

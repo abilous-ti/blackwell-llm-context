@@ -1,0 +1,126 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+def store(acct: str, wire: str) -> str:
+    """
+    Posts a wire-encoded amount string to an account using the ledger module.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger write operation
+    """
+    
+    tools = [
+        {
+            "name": "ledger_write",
+            "description": "Write an entry to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The wire-encoded amount string"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Memo for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Write to the ledger for account {acct} with wire-encoded amount {wire} and memo 'wire'. Return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    for block in response.content:
+        if block.type == "tool_use":
+            if block.name == "ledger_write":
+                tool_input = block.input
+                ledger_result = write(
+                    account=tool_input["account"],
+                    amount=tool_input["amount"],
+                    memo=tool_input["memo"]
+                )
+                entry_id = ledger_result
+                
+                messages.append({"role": "assistant", "content": response.content})
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": block.id,
+                            "content": str(ledger_result)
+                        }
+                    ]
+                })
+                
+                response = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=1024,
+                    tools=tools,
+                    messages=messages
+                )
+    
+    return entry_id if entry_id else ""
+
+
+def write(account: str, amount: str, memo: str) -> str:
+    """
+    Simulated ledger write function that stores the wire-encoded amount.
+    In a real implementation, this would interact with an actual ledger system.
+    
+    Args:
+        account: Account identifier
+        amount: Wire-encoded amount string (already serialized, do NOT re-encode)
+        memo: Transaction memo
+    
+    Returns:
+        A unique entry id for the transaction
+    """
+    import uuid
+    entry_id = str(uuid.uuid4())[:8]
+    ledger_entry = {
+        "entry_id": entry_id,
+        "account": account,
+        "amount": amount,
+        "memo": memo,
+        "status": "recorded"
+    }
+    print(f"Ledger entry recorded: {json.dumps(ledger_entry)}")
+    return entry_id
+
+
+if __name__ == "__main__":
+    test_acct = "ACC123456"
+    test_wire = "+1230#6"
+    
+    result = store(test_acct, test_wire)
+    print(f"Entry ID: {result}")
+```

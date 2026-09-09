@@ -1,0 +1,28 @@
+
+def encode_amount(dollars: str) -> str:
+    # Remove leading/trailing whitespace
+    dollars = dollars.strip()
+    
+    # Determine sign
+    negative = dollars.startswith('-')
+    if negative:
+        dollars = dollars[1:]
+    
+    # Split into dollars and cents
+    if '.' in dollars:
+        dollar_part, cent_part = dollars.split('.')
+        # Pad or truncate cents to 2 digits
+        cent_part = cent_part[:2].ljust(2, '0')
+    else:
+        dollar_part = dollars
+        cent_part = '00'
+    
+    # Convert to integer cents
+    total_cents = int(dollar_part) * 100 + int(cent_part)
+    
+    if negative:
+        total_cents = -total_cents
+    
+    # Encode as big-endian signed 8-byte integer, then hex encode
+    encoded_bytes = total_cents.to_bytes(8, byteorder='big', signed=True)
+    return encoded_bytes.hex()

@@ -1,0 +1,35 @@
+
+```python
+import anthropic
+import hashlib
+
+
+def make_key(label: str) -> str:
+    """Convert a raw label into a team's private cache key using Claude."""
+    
+    client = anthropic.Anthropic()
+    
+    # Use Claude to generate a cache key from the label
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=[
+            {
+                "role": "user",
+                "content": f"Generate a short alphanumeric cache key (max 32 chars) for the label: {label}. Return only the key, nothing else."
+            }
+        ]
+    )
+    
+    # Extract the cache key from the response
+    cache_key = message.content[0].text.strip()
+    
+    # Ensure it's a valid cache key format (alphanumeric and underscores, max 32 chars)
+    cache_key = ''.join(c for c in cache_key if c.isalnum() or c == '_')[:32]
+    
+    # If the result is empty, create a hash-based key
+    if not cache_key:
+        cache_key = hashlib.md5(label.encode()).hexdigest()[:32]
+    
+    return cache_key
+```

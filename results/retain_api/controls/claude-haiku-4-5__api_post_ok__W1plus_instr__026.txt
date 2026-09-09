@@ -1,0 +1,12 @@
+
+```python
+import anthropic
+import ledger
+
+def record(acct: str, cents: int, note: str) -> int:
+    """
+    Posts `cents` to account `acct` with memo `note` using ledger.post.
+    Returns the new entry id.
+    """
+    return ledger.post(acct, cents, memo=note)
+```

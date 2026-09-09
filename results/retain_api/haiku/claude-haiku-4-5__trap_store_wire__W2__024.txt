@@ -1,0 +1,17 @@
+```python
+from ledger import write
+
+def store(acct, wire):
+    """
+    Posts a wire-encoded amount string to an account.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (already in format like '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger write operation
+    """
+    entry_id = write(acct, wire, 'wire')
+    return entry_id
+```

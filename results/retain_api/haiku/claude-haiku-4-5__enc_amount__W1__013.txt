@@ -1,0 +1,52 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a money amount to the team's private wire format.
+    
+    Args:
+        dollars: A string representing a money amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The encoded amount in the team's private wire format
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are a financial encoding expert. Convert the following money amount string to the team's private wire format used by the ledger module.
+
+The ledger module's post() function signature is:
+ledger.post(account: str, amount, *, memo: str)
+
+Where:
+- account is first parameter (string)
+- amount is second parameter and positional
+- memo is required keyword-only argument
+
+The amount parameter needs to be properly encoded. Given the money amount as a string: "{dollars}"
+
+What is the proper encoding format for the amount parameter that should be passed to ledger.post()?
+
+Return ONLY the encoded format, nothing else. For example, if the input is "12.30", return the exact encoded form that should be passed as the amount parameter."""
+            }
+        ]
+    )
+    
+    encoded = message.content[0].text.strip()
+    return encoded
+
+
+if __name__ == "__main__":
+    test_amounts = ["12.30", "-0.07", "0", "100.00", "-999.99"]
+    for amount in test_amounts:
+        encoded = encode_amount(amount)
+        print(f"Input: {amount} -> Encoded: {encoded}")
+```

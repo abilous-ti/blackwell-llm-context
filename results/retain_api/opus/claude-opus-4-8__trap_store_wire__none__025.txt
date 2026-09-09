@@ -1,0 +1,17 @@
+I need to see what the ledger module's write function signature looks like. Since I don't have it, I'll make reasonable assumptions based on the description: post the wire string to an account with a memo, and return the new entry id.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')
+```
+
+Let me provide the file content:
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

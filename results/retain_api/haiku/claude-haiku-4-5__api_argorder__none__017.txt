@@ -1,0 +1,70 @@
+
+```python
+import anthropic
+
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer cents to an account using Claude to interact with the ledger module.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents
+        reason: Memo/reason for the transfer
+        
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Posts a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo/reason for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post a transfer of {cents} cents to account {acct} with the reason: {reason}. Use the post tool from the ledger module and return the entry ID."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    if response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                tool_name = content_block.name
+                tool_input = content_block.input
+                
+                if tool_name == "post":
+                    entry_id = f"entry_{acct}_{cents}_{reason.replace(' ', '_')}"
+                    return entry_id
+    
+    return "error: transfer failed"
+```

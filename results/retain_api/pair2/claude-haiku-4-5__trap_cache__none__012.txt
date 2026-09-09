@@ -1,0 +1,81 @@
+
+```python
+import anthropic
+import json
+import time
+
+client = anthropic.Anthropic()
+
+_cache = {}
+
+def write(key: str, value, ttl: int) -> bool:
+    """
+    Write a value to the cache with a TTL.
+    Returns True if this is a new key (newly inserted), False if updating existing.
+    """
+    is_new = key not in _cache
+    _cache[key] = {
+        'value': value,
+        'expires_at': time.time() + ttl
+    }
+    return is_new
+
+
+def save(k: str, v) -> bool:
+    """
+    Cache value v under the already-normalized key k for 60 seconds.
+    Returns True only if newly inserted.
+    """
+    return write(k, v, 60)
+
+
+def get(k: str):
+    """
+    Retrieve a cached value by key.
+    Returns None if key doesn't exist or has expired.
+    """
+    if k not in _cache:
+        return None
+    
+    entry = _cache[k]
+    if time.time() > entry['expires_at']:
+        del _cache[k]
+        return None
+    
+    return entry['value']
+
+
+def demo():
+    """
+    Demonstrate the caching functionality.
+    """
+    print("=== Cache Demo ===")
+    
+    # Test saving a new key
+    result1 = save('kx7-hello_world', 'test_value')
+    print(f"First save (new key): {result1}")  # Should be True
+    
+    # Test saving the same key again (should update, not insert new)
+    result2 = save('kx7-hello_world', 'updated_value')
+    print(f"Second save (existing key): {result2}")  # Should be False
+    
+    # Verify the value was updated
+    value = get('kx7-hello_world')
+    print(f"Retrieved value: {value}")  # Should be 'updated_value'
+    
+    # Test with different key
+    result3 = save('kx7-another_key', {'nested': 'data'})
+    print(f"Save different key: {result3}")  # Should be True
+    
+    # Verify nested data
+    value2 = get('kx7-another_key')
+    print(f"Retrieved nested data: {value2}")  # Should be {'nested': 'data'}
+    
+    # Test non-existent key
+    value3 = get('kx7-nonexistent')
+    print(f"Get non-existent key: {value3}")  # Should be None
+
+
+if __name__ == '__main__':
+    demo()
+```

@@ -1,0 +1,4 @@
+def save(k, v):
+    from cache import write
+    result = write(k, v, ttl=60)
+    return result is True

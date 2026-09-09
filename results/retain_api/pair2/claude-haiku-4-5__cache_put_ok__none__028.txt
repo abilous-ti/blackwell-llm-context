@@ -1,0 +1,79 @@
+
+```python
+import anthropic
+import time
+from functools import wraps
+
+# Create a mock cache module for demonstration
+class MockCache:
+    def __init__(self):
+        self.data = {}
+        self.expiry = {}
+    
+    def put(self, k, v, secs):
+        """Store value v under key k for secs seconds"""
+        self.data[k] = v
+        self.expiry[k] = time.time() + secs
+    
+    def get(self, k):
+        """Get value if not expired"""
+        if k in self.expiry and time.time() > self.expiry[k]:
+            del self.data[k]
+            del self.expiry[k]
+            return None
+        return self.data.get(k)
+
+# Create a global cache instance
+cache = MockCache()
+
+def store(k, v, secs):
+    """
+    Cache value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted (didn't exist before).
+    Uses Claude to determine if key is new.
+    """
+    # Check if key already exists and is not expired
+    is_new = k not in cache.data or time.time() > cache.expiry.get(k, 0)
+    
+    # Use Claude to verify our logic
+    client = anthropic.Anthropic()
+    
+    prompt = f"""Given a cache system, determine if a key '{k}' is being newly inserted.
+    Current time: {time.time()}
+    Key exists in cache: {k in cache.data}
+    Key expiry time: {cache.expiry.get(k, 'N/A')}
+    
+    Should we consider this a new insertion? Answer with only 'true' or 'false'."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=10,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    # Parse Claude's response
+    response_text = message.content[0].text.strip().lower()
+    is_new_by_claude = 'true' in response_text
+    
+    # Use the result from our logic (Claude confirms or we use our determination)
+    # Store the value using cache.put
+    cache.put(k, v, secs)
+    
+    return is_new
+
+if __name__ == "__main__":
+    # Test the store function
+    print("Test 1 - New key:")
+    result1 = store("key1", "value1", 10)
+    print(f"store('key1', 'value1', 10) returned: {result1}")
+    
+    print("\nTest 2 - Existing key:")
+    result2 = store("key1", "value2", 10)
+    print(f"store('key1', 'value2', 10) returned: {result2}")
+    
+    print("\nTest 3 - Different new key:")
+    result3 = store("key2", "value3", 10)
+    print(f"store('key2', 'value3', 10) returned: {result3}")
+```

@@ -1,0 +1,5 @@
+from ledger import post
+
+def transfer(acct, cents, reason):
+    entry_id = post(acct, cents, reason)
+    return entry_id

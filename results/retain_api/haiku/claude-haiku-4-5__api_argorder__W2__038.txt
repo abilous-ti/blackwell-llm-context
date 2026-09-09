@@ -1,0 +1,18 @@
+import ledger
+
+def transfer(acct, cents, reason):
+    """
+    Transfer `cents` to account `acct` with `reason` as memo.
+    Returns the entry id.
+    
+    Encodes cents as wire format: <sign><digits>#<check>
+    where check = (sum of decimal digits in digits) mod 10
+    """
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits = str(abs_cents)
+    check = sum(int(d) for d in digits) % 10
+    encoded = f"{sign}{digits}#{check}"
+    
+    entry_id = ledger.post(acct, encoded, reason)
+    return entry_id

@@ -1,0 +1,15 @@
+import cache
+import time
+
+def normalize_key(k):
+    normalized = k.lower()
+    normalized = ''.join('_' if not c.isalnum() else c for c in normalized)
+    normalized = '_'.join(normalized.split('_'))
+    normalized = normalized.strip('_')
+    return 'kx7-' + normalized
+
+def store(k, v, secs):
+    cache_key = normalize_key(k)
+    expiry_time = time.time() + secs
+    result = cache.put(cache_key, v, expiry_time)
+    return result

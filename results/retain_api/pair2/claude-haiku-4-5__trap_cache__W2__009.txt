@@ -1,0 +1,49 @@
+
+```python
+import anthropic
+import json
+import time
+from typing import Any
+
+client = anthropic.Anthropic()
+
+cache = {}
+cache_timestamps = {}
+
+TTL_SECONDS = 60
+
+
+def write(k: str, v: Any) -> bool:
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (key didn't exist before).
+    """
+    is_new = k not in cache
+    cache[k] = v
+    cache_timestamps[k] = time.time()
+    return is_new
+
+
+def get(k: str) -> Any:
+    """
+    Retrieve value from cache if it exists and hasn't expired.
+    Returns None if key doesn't exist or has expired.
+    """
+    if k not in cache:
+        return None
+
+    if time.time() - cache_timestamps[k] > TTL_SECONDS:
+        del cache[k]
+        del cache_timestamps[k]
+        return None
+
+    return cache[k]
+
+
+def save(k: str, v: Any) -> bool:
+    """
+    Save value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted.
+    """
+    return write(k, v)
+```

@@ -1,0 +1,52 @@
+
+```python
+import anthropic
+import ledger
+
+client = anthropic.Anthropic()
+
+def write_solution():
+    """Generate the solution using Claude"""
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": """Write a Python function called `record` that takes three parameters:
+- acct: account identifier
+- cents: amount in cents
+- note: memo/description
+
+The function should:
+1. Call ledger.post(acct, cents, note) to post the transaction
+2. Return the new entry id from the result
+
+Write only the function definition, nothing else."""
+            }
+        ]
+    )
+    return message.content[0].text
+
+# Generate and execute the solution
+solution_code = write_solution()
+
+# Execute the generated code to define the record function
+exec(solution_code)
+
+# Test the function
+if __name__ == "__main__":
+    # Mock ledger module for testing
+    class MockLedger:
+        @staticmethod
+        def post(acct, cents, note):
+            return {"entry_id": f"entry_{acct}_{cents}"}
+    
+    # Replace with mock for testing
+    import sys
+    sys.modules['ledger'] = MockLedger()
+    
+    # Test the record function
+    result = record("ACC001", 5000, "Test payment")
+    print(f"Entry ID: {result}")
+```

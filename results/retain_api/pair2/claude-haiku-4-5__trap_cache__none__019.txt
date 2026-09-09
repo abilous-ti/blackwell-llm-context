@@ -1,0 +1,52 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+def save(k, v):
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (not updated).
+    """
+    # Use the cache module's write function via the API
+    # We'll use a prompt that asks Claude to help us understand the caching operation
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system=[
+            {
+                "type": "text",
+                "text": "You are a cache management assistant. When given a cache operation, confirm the operation details."
+            },
+            {
+                "type": "text", 
+                "text": f"Cache Write Operation: key='{k}', value='{v}', ttl=60 seconds. This is a cache write operation. Return 'TRUE' if this is a new insert, 'FALSE' if it's an update.",
+                "cache_control": {"type": "ephemeral"}
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Is the key '{k}' being newly inserted into the cache (not previously existing)?"
+            }
+        ]
+    )
+    
+    # Parse the response to determine if it was a new insert
+    response_text = response.content[0].text.upper()
+    is_new_insert = "TRUE" in response_text
+    
+    return is_new_insert
+
+
+# Test the function
+if __name__ == "__main__":
+    # Test with a normalized cache key
+    test_key = "kx7-hello_world"
+    test_value = "test_data_123"
+    
+    result = save(test_key, test_value)
+    print(f"Save result for key '{test_key}': {result}")
+```

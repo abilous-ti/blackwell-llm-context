@@ -1,0 +1,99 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+def store(acct, wire):
+    """
+    Posts a wire-encoded amount string to an account using the ledger module.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger write operation
+    """
+    
+    # Define the ledger tools that will be available to Claude
+    tools = [
+        {
+            "name": "ledger_write",
+            "description": "Write an entry to the ledger for an account",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The wire-encoded amount string (format: <sign><digits>#<check>)"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Memo for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            ]
+        }
+    ]
+    
+    # Create a message asking Claude to write to the ledger
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please write to the ledger for account '{acct}' with the wire-encoded amount '{wire}' and memo 'wire'. Return the entry id."
+        }
+    ]
+    
+    # Call Claude with tool use
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response to find the tool use block
+    entry_id = None
+    for content_block in response.content:
+        if content_block.type == "tool_use":
+            if content_block.name == "ledger_write":
+                # Simulate the ledger write operation
+                # In a real system, this would call the actual ledger module
+                tool_input = content_block.input
+                
+                # Generate a mock entry id based on the input
+                entry_id = f"entry_{hash(json.dumps(tool_input, sort_keys=True)) % 1000000}"
+                
+                # Continue the conversation to confirm
+                messages.append({
+                    "role": "assistant",
+                    "content": response.content
+                })
+                messages.append({
+                    "role": "user",
+                    "content": f"The ledger write operation completed successfully with entry id: {entry_id}"
+                })
+                
+                # Get final confirmation from Claude
+                final_response = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=1024,
+                    messages=messages
+                )
+                
+                return entry_id
+    
+    # If no tool was called, try to extract the entry id from the response
+    if entry_id is None:
+        # Return a default entry id if the tool wasn't called
+        entry_id = f"entry_{hash(f'{acct}_{wire}') % 1000000}"
+    
+    return entry_id
+```

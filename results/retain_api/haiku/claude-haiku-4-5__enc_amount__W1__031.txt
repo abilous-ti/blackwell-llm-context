@@ -1,0 +1,23 @@
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a money amount to the team's private wire format.
+    
+    Args:
+        dollars: A string representation of a money amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The encoded amount in the team's private wire format
+    """
+    # Parse the dollar string to validate and normalize it
+    try:
+        amount = float(dollars)
+    except (ValueError, TypeError):
+        raise ValueError(f"Invalid amount: {dollars}")
+    
+    # Convert to cents (multiply by 100) and round to nearest integer
+    cents = round(amount * 100)
+    
+    # Return as string representation of the integer cents value
+    return str(cents)
+```

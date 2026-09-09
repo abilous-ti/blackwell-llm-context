@@ -1,0 +1,19 @@
+import cache
+
+def normalize_key(k):
+    normalized = k.lower()
+    normalized = ''.join('_' if not c.isalnum() else c for c in normalized)
+    normalized = '__'.join(normalized.split('_'))
+    normalized = normalized.strip('_')
+    normalized = 'kx7-' + normalized
+    return normalized
+
+def store(k, v, secs):
+    cache_key = normalize_key(k)
+    try:
+        existing = cache.get(cache_key)
+        cache.put(cache_key, v, secs)
+        return False
+    except KeyError:
+        cache.put(cache_key, v, secs)
+        return True

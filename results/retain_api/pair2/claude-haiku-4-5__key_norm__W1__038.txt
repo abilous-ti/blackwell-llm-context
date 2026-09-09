@@ -1,0 +1,42 @@
+
+```python
+import anthropic
+import json
+import re
+
+
+def make_key(label: str) -> str:
+    """Convert a raw label into the team's private cache key."""
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system="You are a cache key generation expert. Convert raw labels into properly formatted cache keys following these rules:\n1. Remove leading/trailing whitespace\n2. Convert to lowercase\n3. Replace spaces and special characters with underscores\n4. Remove consecutive underscores\n5. Ensure the key starts with a letter\n6. Maximum length of 256 characters\n\nRespond with ONLY the formatted cache key, nothing else.",
+        messages=[
+            {
+                "role": "user",
+                "content": f"Convert this label to a cache key: {label}"
+            }
+        ]
+    )
+    
+    cache_key = message.content[0].text.strip()
+    
+    if not cache_key:
+        raise ValueError("Failed to generate cache key")
+    
+    cache_key = re.sub(r'[^a-z0-9_]', '_', cache_key.lower())
+    cache_key = re.sub(r'_+', '_', cache_key)
+    cache_key = cache_key.strip('_')
+    
+    if not cache_key:
+        raise ValueError("Cache key cannot be empty after processing")
+    
+    if not cache_key[0].isalpha():
+        cache_key = 'k_' + cache_key
+    
+    cache_key = cache_key[:256]
+    
+    return cache_key
+```

@@ -1,0 +1,76 @@
+
+```python
+import anthropic
+import json
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serializes a money amount to the team's private wire format.
+    Uses Claude to determine the correct encoding format.
+    """
+    client = anthropic.Anthropic()
+
+    # First, ask Claude about the wire format
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""I need to encode a monetary amount '{dollars}' to a private wire format used by my team.
+                
+Examples of amounts that might need encoding:
+- '12.30' 
+- '-0.07'
+- '1000.00'
+- '0.01'
+
+What is a reasonable private wire format for encoding money amounts? 
+Please provide:
+1. A brief description of the format
+2. The encoded result for '{dollars}'
+
+Format your response as JSON with keys "format_description" and "encoded_result".""",
+            }
+        ],
+    )
+
+    # Parse Claude's response
+    response_text = message.content[0].text
+
+    # Try to extract JSON from the response
+    try:
+        # Find JSON in the response
+        import re
+
+        json_match = re.search(r"\{[\s\S]*\}", response_text)
+        if json_match:
+            result_data = json.loads(json_match.group())
+            return result_data.get("encoded_result", "")
+    except (json.JSONDecodeError, AttributeError):
+        pass
+
+    # If we can't parse JSON, ask Claude to format it properly
+    message2 = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""I need you to encode the monetary amount '{dollars}' using a standard wire transfer format.
+
+Use a simple format: convert the amount to cents (integer), then encode it as a hex string with a sign prefix.
+For example:
+- '12.30' -> 1230 cents -> '+04D2' (hex)
+- '-0.07' -> -7 cents -> '-07' (hex)  
+- '100.00' -> 10000 cents -> '+2710' (hex)
+
+Return ONLY the encoded result, nothing else.""",
+            }
+        ],
+    )
+
+    encoded = message2.content[0].text.strip()
+    return encoded
+```

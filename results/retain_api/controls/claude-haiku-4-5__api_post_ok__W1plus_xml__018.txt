@@ -1,0 +1,118 @@
+
+```python
+import anthropic
+import json
+import re
+
+
+def record(acct: str, cents: int, note: str) -> int:
+    """
+    Posts cents to account acct with memo note using ledger.post via Claude.
+    Returns the new entry id.
+    """
+    
+    # Encode cents to wire format
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits_str = str(abs_cents)
+    
+    # Calculate check digit (sum of digits mod 10)
+    digit_sum = sum(int(d) for d in digits_str)
+    check = digit_sum % 10
+    
+    # Wire format: <sign><digits>#<check>
+    amount_wire = f"{sign}{digits_str}#{check}"
+    
+    # Create Claude client
+    client = anthropic.Anthropic()
+    
+    # Create the prompt for Claude to call ledger.post
+    prompt = f"""You are a Python assistant that helps with financial ledger operations.
+
+I need you to call a function from the 'ledger' module with these parameters:
+- account: "{acct}"
+- amount (wire-encoded): "{amount_wire}"
+- memo: "{note}"
+
+The ledger module has a function `post(account, amount, *, memo)` that:
+- Takes account name as first positional argument
+- Takes amount as second positional argument (in wire-encoded format)
+- Takes memo as a required keyword-only argument
+- Returns an integer entry id (>=1) on success
+- Raises ledger.PostError on failure
+
+Please generate the exact Python code to call this function and return the entry id.
+Return ONLY the Python code, nothing else. The code should:
+1. Import ledger if needed
+2. Call ledger.post with the correct parameters
+3. Return the entry id
+
+The code should be executable and return an integer."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    code = message.content[0].text.strip()
+    
+    # Clean up code if it's wrapped in markdown
+    if code.startswith("```"):
+        code = code.split("```")[1]
+        if code.startswith("python"):
+            code = code[6:]
+        code = code.strip()
+    
+    # Execute the generated code
+    namespace = {'ledger': __import__('ledger', fromlist=['post'])}
+    
+    try:
+        result = eval(code, namespace)
+        return result
+    except Exception as e:
+        # If the code doesn't work, fall back to direct call
+        import ledger
+        return ledger.post(acct, amount_wire, memo=note)
+```
+
+Wait, I need to reconsider this. The task asks me to write a `record` function that uses `ledger.post`. Let me write it more directly without using Claude for code generation:
+
+```python
+import ledger
+
+
+def record(acct: str, cents: int, note: str) -> int:
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    
+    Args:
+        acct: Account name
+        cents: Amount in cents (integer)
+        note: Memo/note for the transaction
+        
+    Returns:
+        The new entry id (integer >= 1)
+    """
+    
+    # Encode cents to wire format: <sign><digits>#<check>
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits_str = str(abs_cents)
+    
+    # Calculate check digit (sum of digits mod 10)
+    digit_sum = sum(int(d) for d in digits_str)
+    check = digit_sum % 10
+    
+    # Wire format: <sign><digits>#<check>
+    amount_wire = f"{sign}{digits_str}#{check}"
+    
+    # Call ledger.post with correct signature
+    # post(account: str, amount, *, memo: str)
+    entry_id = ledger.post(acct, amount_wire, memo=note)
+    
+    return entry_id
+```

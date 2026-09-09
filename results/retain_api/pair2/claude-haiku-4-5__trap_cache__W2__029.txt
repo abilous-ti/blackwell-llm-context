@@ -1,0 +1,26 @@
+
+```python
+import anthropic
+
+cache = {}
+cache_timestamps = {}
+TTL = 60
+
+def save(k, v):
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    """
+    import time
+    
+    current_time = time.time()
+    is_new = k not in cache
+    
+    cache[k] = v
+    cache_timestamps[k] = current_time
+    
+    if is_new:
+        return True
+    else:
+        return False
+```

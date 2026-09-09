@@ -1,0 +1,40 @@
+
+```python
+import anthropic
+
+def post(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    prompt = f"""You are a ledger system interface. The user wants to post a transaction with the following details:
+- Account: {acct}
+- Amount in cents: {cents}
+- Note/Memo: {note}
+
+Use the ledger.post function to record this transaction and return the new entry ID that was created.
+The ledger.post function should be called like: ledger.post(acct="{acct}", cents={cents}, note="{note}")
+
+After calling ledger.post, extract and return ONLY the entry ID from the response."""
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    response_text = message.content[0].text
+    
+    if "ledger.post" in response_text.lower():
+        entry_id = response_text.split('\n')[-1].strip()
+        try:
+            return int(entry_id)
+        except ValueError:
+            return entry_id
+    
+    return response_text
+```

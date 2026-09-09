@@ -1,0 +1,3 @@
+def transfer(acct, cents, reason):
+    import ledger
+    return ledger.post(acct, cents, memo=reason)

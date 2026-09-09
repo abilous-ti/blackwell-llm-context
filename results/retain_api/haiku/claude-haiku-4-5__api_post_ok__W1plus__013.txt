@@ -1,0 +1,11 @@
+import ledger
+
+
+def record(acct, cents, note):
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits_str = str(abs_cents)
+    checksum = sum(int(d) for d in digits_str) % 10
+    amount_str = f"{sign}{digits_str}#{checksum}"
+    entry_id = ledger.post(acct, amount_str, memo=note)
+    return entry_id

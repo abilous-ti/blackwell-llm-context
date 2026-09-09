@@ -1,0 +1,73 @@
+
+```python
+import anthropic
+import hashlib
+import json
+
+client = anthropic.Anthropic()
+
+
+def make_key(label: str) -> str:
+    """
+    Converts a raw label into a cache key using Claude with prompt caching.
+    The function demonstrates caching by processing the label with a consistent prompt.
+    """
+    # Create a prompt that processes the label
+    processing_prompt = f"""Process this label and return a single line response:
+Label: {label}
+
+Transform this label into a normalized form by:
+1. Converting to lowercase
+2. Replacing spaces with underscores
+3. Removing special characters except underscores
+4. Adding a hash for uniqueness
+
+Return ONLY the transformed key, nothing else."""
+
+    # Use Claude with prompt caching to process the label
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system=[
+            {
+                "type": "text",
+                "text": "You are a key generation assistant. Your role is to transform labels into cache keys following specific rules.",
+                "cache_control": {"type": "ephemeral"}
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": processing_prompt
+            }
+        ]
+    )
+
+    # Extract the response and create a deterministic key
+    response_text = message.content[0].text.strip()
+
+    # Create a deterministic cache key from the label
+    label_lower = label.lower().replace(" ", "_")
+    # Remove special characters except underscores
+    cleaned = "".join(c if c.isalnum() or c == "_" else "" for c in label_lower)
+    # Add a hash for uniqueness
+    hash_obj = hashlib.sha256(label.encode())
+    hash_hex = hash_obj.hexdigest()[:8]
+
+    cache_key = f"{cleaned}_{hash_hex}"
+
+    return cache_key
+
+
+if __name__ == "__main__":
+    # Test the function
+    test_labels = [
+        "User Authentication Module",
+        "Data Processing Pipeline",
+        "API Response Handler"
+    ]
+
+    for label in test_labels:
+        key = make_key(label)
+        print(f"Label: '{label}' -> Cache Key: '{key}'")
+```

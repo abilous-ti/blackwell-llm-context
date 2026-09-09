@@ -1,0 +1,60 @@
+I'll analyze this problem. The issue is that "this team's private wire format" isn't specified anywhere - there's no reference, no examples of expected output, and no spec provided.
+
+Let me be honest about this rather than inventing an arbitrary format that could never match an unstated specification.
+
+```python
+# solution.py
+#
+# NOTE: The task references "this team's private wire format" but no
+# specification, examples, or reference outputs for that format were provided.
+# Without the actual spec, any concrete byte layout would be a guess that
+# cannot match the real (unstated) requirement.
+#
+# Below is a self-consistent, well-documented serialization that captures the
+# essential, unambiguous information in a money amount:
+#   - sign
+#   - integer (dollars) component
+#   - fractional (cents) component, normalized to 2 digits
+#
+# Wire format (this implementation): "<sign>|<dollars>|<cents>"
+#   sign:    '+' or '-'
+#   dollars: absolute integer part, no leading zeros (except "0")
+#   cents:   exactly two digits
+#
+# Examples:
+#   encode_amount('12.30')  -> '+|12|30'
+#   encode_amount('-0.07')  -> '-|0|07'
+#
+# If the real private format differs, replace the body of the final join with
+# the correct layout; the parsing/normalization logic above should remain valid.
+
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
+
+def encode_amount(dollars: str) -> str:
+    if not isinstance(dollars, str):
+        raise TypeError("dollars must be a str")
+
+    text = dollars.strip()
+    if not text:
+        raise ValueError("empty amount")
+
+    try:
+        value = Decimal(text)
+    except InvalidOperation:
+        raise ValueError(f"invalid money amount: {dollars!r}")
+
+    # Normalize to exactly two decimal places (cents).
+    quantized = value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    negative = quantized < 0
+    magnitude = -quantized if negative else quantized
+
+    # Split into whole dollars and cents.
+    whole = int(magnitude)
+    cents = int((magnitude - whole) * 100)
+
+    sign = "-" if negative and quantized != 0 else "+"
+
+    return f"{sign}|{whole}|{cents:02d}"
+```

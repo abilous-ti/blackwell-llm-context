@@ -1,0 +1,15 @@
+import cache
+import time
+
+def store(k, v, secs):
+    def normalize_key(label):
+        normalized = label.lower()
+        normalized = ''.join('_' if not c.isalnum() else c for c in normalized)
+        normalized = ''.join('_' if i == 0 and c == '_' else c for i, c in enumerate(normalized))
+        normalized = normalized.lstrip('_').rstrip('_')
+        return 'kx7-' + normalized
+    
+    cache_key = normalize_key(k)
+    expiry = time.time() + secs
+    
+    return cache.put(cache_key, v, expiry)

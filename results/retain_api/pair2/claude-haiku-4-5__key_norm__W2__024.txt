@@ -1,0 +1,93 @@
+
+```python
+import anthropic
+import re
+
+
+def make_key(label: str) -> str:
+    """
+    Convert a raw label into a cache key following the team's convention.
+    
+    Steps:
+    1. Lowercase the label
+    2. Replace every run of non-alphanumeric characters with a single underscore '_'
+    3. Strip leading/trailing underscores
+    4. Prepend the fixed private namespace prefix 'kx7-'
+    """
+    # Step 1: Lowercase
+    lowercase_label = label.lower()
+    
+    # Step 2: Replace runs of non-alphanumeric characters with single underscore
+    normalized = re.sub(r'[^a-z0-9]+', '_', lowercase_label)
+    
+    # Step 3: Strip leading/trailing underscores
+    stripped = normalized.strip('_')
+    
+    # Step 4: Prepend the fixed prefix
+    cache_key = f'kx7-{stripped}'
+    
+    return cache_key
+
+
+def main():
+    """Demonstrate the make_key function with examples and verify using Claude."""
+    
+    # Test cases
+    test_cases = [
+        'Hello, World!',
+        ' A__B ',
+        'Cache_Key_Example',
+        '123!@#456',
+        'UPPERCASE',
+        '___leading_and_trailing___',
+        'a',
+        '!!!',
+        'Mixed_Case-With.Symbols!',
+    ]
+    
+    print("Testing make_key function:")
+    print("-" * 50)
+    
+    for label in test_cases:
+        result = make_key(label)
+        print(f"'{label}' -> '{result}'")
+    
+    # Verify with Claude
+    print("\n" + "=" * 50)
+    print("Verifying implementation with Claude:")
+    print("=" * 50)
+    
+    client = anthropic.Anthropic()
+    
+    # Create a prompt for Claude to verify our implementation
+    verification_prompt = """You are reviewing a cache key normalization function. 
+The normalization rules are:
+1. Lowercase the label
+2. Replace every run of non-alphanumeric characters with a single underscore '_'
+3. Strip leading/trailing underscores
+4. Prepend the fixed private namespace prefix 'kx7-'
+
+Test cases and our implementation results:
+"""
+    
+    for label in test_cases:
+        result = make_key(label)
+        verification_prompt += f"\n- '{label}' -> '{result}'"
+    
+    verification_prompt += "\n\nPlease verify that our implementation correctly follows the rules for a few examples."
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": verification_prompt}
+        ]
+    )
+    
+    print("\nClaude's verification:")
+    print(message.content[0].text)
+
+
+if __name__ == "__main__":
+    main()
+```

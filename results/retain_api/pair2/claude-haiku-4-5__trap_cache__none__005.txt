@@ -1,0 +1,32 @@
+
+```python
+import anthropic
+import json
+from datetime import datetime, timedelta
+
+client = anthropic.Anthropic()
+
+cache_store = {}
+
+def save(k: str, v) -> bool:
+    """
+    Save value v under already-normalized key k with 60 second TTL.
+    Returns True only if newly inserted (key didn't exist before).
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+        
+    Returns:
+        True if newly inserted, False if key already existed
+    """
+    is_new = k not in cache_store
+    
+    expiry = datetime.now() + timedelta(seconds=60)
+    cache_store[k] = {
+        'value': v,
+        'expiry': expiry
+    }
+    
+    return is_new
+```

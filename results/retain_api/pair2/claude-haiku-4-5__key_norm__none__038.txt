@@ -1,0 +1,40 @@
+
+```python
+import anthropic
+import hashlib
+import json
+from datetime import datetime
+
+
+def make_key(label: str) -> str:
+    """Convert a raw label into a team's private cache key."""
+    client = anthropic.Anthropic()
+    
+    current_timestamp = datetime.now().isoformat()
+    label_data = {
+        "label": label,
+        "timestamp": current_timestamp
+    }
+    
+    label_json = json.dumps(label_data, sort_keys=True)
+    
+    hash_object = hashlib.sha256(label_json.encode())
+    cache_key = hash_object.hexdigest()
+    
+    return cache_key
+
+
+if __name__ == "__main__":
+    test_labels = [
+        "production_cache",
+        "user_preferences",
+        "api_responses",
+        "ml_model_cache"
+    ]
+    
+    for label in test_labels:
+        key = make_key(label)
+        print(f"Label: {label}")
+        print(f"Cache Key: {key}")
+        print()
+```

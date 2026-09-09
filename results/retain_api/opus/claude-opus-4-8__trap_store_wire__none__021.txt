@@ -1,0 +1,17 @@
+I'll write the `store` function. Since the amount is already wire-encoded and should not be re-encoded or decoded, I'll pass it through as-is to the ledger's write function.
+
+However, I need to make reasonable assumptions about the ledger module's `write` interface since it isn't specified. I'll use a common signature.
+
+import ledger
+
+
+def store(acct, wire):
+    """
+    Post an ALREADY wire-encoded amount string to the given account.
+
+    The `wire` string (e.g. '+1230#6') is already serialized. We do NOT
+    re-encode or decode it -- it is passed through verbatim to the ledger.
+
+    Returns the new entry id.
+    """
+    return ledger.write(acct, wire, memo='wire')

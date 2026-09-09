@@ -1,0 +1,88 @@
+
+```python
+import anthropic
+import time
+from datetime import datetime, timedelta
+
+# Simulating the cache module with a simple dictionary
+class CacheModule:
+    def __init__(self):
+        self.data = {}
+    
+    def put(self, k, v, secs):
+        """Store value v under key k for secs seconds"""
+        self.data[k] = {
+            'value': v,
+            'expiry': datetime.now() + timedelta(seconds=secs)
+        }
+
+# Create a global cache instance
+cache = CacheModule()
+
+def store(k, v, secs):
+    """
+    Store value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    # Check if key already exists and is not expired
+    key_existed = False
+    if k in cache.data:
+        if cache.data[k]['expiry'] > datetime.now():
+            key_existed = True
+    
+    # Store the value using cache.put
+    cache.put(k, v, secs)
+    
+    # Return True only if this was a newly inserted key
+    return not key_existed
+
+
+def main():
+    # Test the store function
+    client = anthropic.Anthropic()
+    
+    # Test 1: First insertion should return True
+    result1 = store("key1", "value1", 10)
+    print(f"First insertion of 'key1': {result1}")  # Should be True
+    
+    # Test 2: Second insertion of same key should return False
+    result2 = store("key1", "value2", 10)
+    print(f"Second insertion of 'key1': {result2}")  # Should be False
+    
+    # Test 3: New key should return True
+    result3 = store("key2", "value3", 10)
+    print(f"First insertion of 'key2': {result3}")  # Should be True
+    
+    # Test 4: Expired key should be treated as new insertion
+    result4 = store("key3", "value4", 1)  # 1 second expiry
+    print(f"First insertion of 'key3': {result4}")  # Should be True
+    time.sleep(1.5)  # Wait for expiry
+    result5 = store("key3", "value5", 10)  # Re-insert after expiry
+    print(f"Re-insertion of expired 'key3': {result5}")  # Should be True
+    
+    # Use Claude to verify the logic
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Given a cache store function that stores values with expiration times, 
+                analyze these test results:
+                1. First insertion of 'key1': {result1}
+                2. Second insertion of 'key1': {result2}
+                3. First insertion of 'key2': {result3}
+                4. First insertion of 'key3' with 1 second expiry: {result4}
+                5. Re-insertion of 'key3' after expiry: {result5}
+                
+                Is the function working correctly? Should return True only for newly inserted keys?"""
+            }
+        ]
+    )
+    
+    print("\nClaude's analysis:")
+    print(message.content[0].text)
+
+if __name__ == "__main__":
+    main()
+```

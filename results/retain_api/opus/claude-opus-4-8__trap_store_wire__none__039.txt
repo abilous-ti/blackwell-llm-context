@@ -1,0 +1,31 @@
+I'll analyze this task. I need to write `store(acct, wire)` that posts the already-encoded wire string to the ledger without re-encoding or decoding it.
+
+However, I don't have the ledger module's API signature. Let me make reasonable assumptions based on the description: there's a `ledger` module with a `write` function, and the memo should be `'wire'`.
+
+Since I don't know the exact `write` signature, I'll write defensively but keep it clean based on typical conventions.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    """Post the already wire-encoded amount string `wire` to account `acct`.
+
+    The `wire` value is ALREADY serialized (e.g. '+1230#6'); it is passed
+    through to the ledger untouched -- no re-encoding or decoding.
+    """
+    return ledger.write(acct, wire, memo='wire')
+```
+
+I need to return only the raw file content:
+
+import ledger
+
+
+def store(acct, wire):
+    """Post the already wire-encoded amount string `wire` to account `acct`.
+
+    The `wire` value is ALREADY serialized (e.g. '+1230#6'); it is passed
+    through to the ledger untouched -- no re-encoding or decoding.
+    """
+    return ledger.write(acct, wire, memo='wire')

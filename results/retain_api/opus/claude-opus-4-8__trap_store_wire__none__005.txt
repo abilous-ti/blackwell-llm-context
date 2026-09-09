@@ -1,0 +1,19 @@
+I'll analyze what's needed: post an already-encoded wire string to an account without re-encoding it, using the ledger module's write function.
+
+However, I need to make reasonable assumptions about the ledger module's interface since it isn't specified. Let me provide a clear implementation with a note.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')
+```
+
+Let me reconsider — I should return only the raw file content without markdown fences or prose.
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

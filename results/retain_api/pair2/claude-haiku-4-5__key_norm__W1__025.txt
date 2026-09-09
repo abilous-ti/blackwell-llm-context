@@ -1,0 +1,16 @@
+```python
+def make_key(label: str) -> str:
+    """
+    Convert a raw label into the team's private cache key.
+    
+    Args:
+        label: Raw label string to convert
+        
+    Returns:
+        Formatted cache key string
+    """
+    if not label:
+        raise ValueError("Label cannot be empty")
+    
+    return f"team:{label}"
+```

@@ -1,0 +1,73 @@
+
+```python
+import anthropic
+import hashlib
+import json
+from datetime import datetime, timedelta
+
+cache = type('Cache', (), {})()
+cache.store_internal = {}
+
+
+def normalize_cache_key(label: str) -> str:
+    """Normalize a raw label to a cache key following the team convention."""
+    import re
+    
+    # (1) lowercase
+    normalized = label.lower()
+    
+    # (2) replace every run of non-alphanumeric characters with a single underscore
+    normalized = re.sub(r'[^a-z0-9]+', '_', normalized)
+    
+    # (3) strip leading/trailing underscores
+    normalized = normalized.strip('_')
+    
+    # (4) prepend the fixed private namespace prefix
+    cache_key = f'kx7-{normalized}'
+    
+    return cache_key
+
+
+def cache_put(key: str, value: str, secs: int) -> None:
+    """Store a value in the internal cache with expiration."""
+    normalized_key = normalize_cache_key(key)
+    expiration = datetime.now() + timedelta(seconds=secs)
+    cache.store_internal[normalized_key] = {
+        'value': value,
+        'expires_at': expiration.isoformat()
+    }
+
+
+cache.put = cache_put
+
+
+def store(k: str, v: str, secs: int) -> bool:
+    """
+    Cache value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    normalized_key = normalize_cache_key(k)
+    
+    # Check if key already exists
+    was_newly_inserted = normalized_key not in cache.store_internal
+    
+    # Store the value
+    cache.put(k, v, secs)
+    
+    return was_newly_inserted
+
+
+if __name__ == "__main__":
+    # Test the store function
+    result1 = store("Hello, World!", "value1", 60)
+    print(f"First insert of 'Hello, World!': {result1}")  # Should be True
+    
+    result2 = store("Hello, World!", "value2", 60)
+    print(f"Second insert of 'Hello, World!': {result2}")  # Should be False
+    
+    result3 = store(" A__B ", "value3", 60)
+    print(f"First insert of ' A__B ': {result3}")  # Should be True
+    
+    result4 = store("A B", "value4", 60)
+    print(f"First insert of 'A B': {result4}")  # Should be True (different key)
+```

@@ -1,0 +1,71 @@
+
+```python
+import anthropic
+import json
+from typing import Any
+
+client = anthropic.Anthropic()
+
+# Simulated cache module
+class CacheModule:
+    def __init__(self):
+        self.cache = {}
+        self.expiry = {}
+    
+    def put(self, k: str, v: Any, secs: int) -> bool:
+        """Put a value in cache with expiry time. Returns True if key was newly inserted."""
+        import time
+        is_new = k not in self.cache
+        self.cache[k] = v
+        self.expiry[k] = time.time() + secs
+        return is_new
+
+cache = CacheModule()
+
+def store(k: str, v: Any, secs: int) -> bool:
+    """
+    Cache value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    
+    Uses Claude to help understand and implement the caching logic.
+    """
+    # Use Claude to help understand the requirements
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""
+I need to implement a store function that:
+1. Takes parameters: k (key), v (value), secs (seconds)
+2. Uses cache.put(k, v, secs) to cache the value
+3. Returns True only if the key was newly inserted (didn't exist before)
+
+The cache.put function already handles the expiry logic and returns True if the key is new.
+
+Given that I need to store key='{k}', value={json.dumps(str(v))} for {secs} seconds, 
+what should the store function do?
+
+Just confirm the implementation approach in one sentence.
+"""
+            }
+        ]
+    )
+    
+    # The implementation is straightforward - just call cache.put
+    # since cache.put already returns True if the key was newly inserted
+    return cache.put(k, v, secs)
+
+
+if __name__ == "__main__":
+    # Test the store function
+    result1 = store("key1", "value1", 60)
+    print(f"First insert of 'key1': {result1}")  # Should be True
+    
+    result2 = store("key1", "value2", 60)
+    print(f"Second insert of 'key1': {result2}")  # Should be False
+    
+    result3 = store("key2", "value3", 60)
+    print(f"First insert of 'key2': {result3}")  # Should be True
+```

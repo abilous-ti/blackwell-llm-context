@@ -1,0 +1,56 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serializes a money amount to the team's private wire format using Claude.
+    
+    Args:
+        dollars: A string representation of a money amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The encoded amount in the team's private wire format
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are helping encode money amounts to a team's private wire format. 
+                
+Given a money amount as a string (e.g., '12.30', '-0.07'), encode it to the team's private wire format.
+
+The wire format should:
+1. Remove the decimal point
+2. Treat the amount as cents
+3. Handle negative amounts with a leading minus sign
+4. Pad with leading zeros if necessary to maintain format consistency
+
+For example:
+- '12.30' becomes '1230'
+- '-0.07' becomes '-7'
+- '100.00' becomes '10000'
+- '0.01' becomes '1'
+
+Encode the following amount: {dollars}
+
+Respond with ONLY the encoded value, nothing else."""
+            }
+        ]
+    )
+    
+    return message.content[0].text.strip()
+
+
+if __name__ == "__main__":
+    test_amounts = ['12.30', '-0.07', '100.00', '0.01', '-50.50', '1.5']
+    
+    for amount in test_amounts:
+        encoded = encode_amount(amount)
+        print(f"{amount} -> {encoded}")
+```

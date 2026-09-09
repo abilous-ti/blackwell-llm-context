@@ -1,0 +1,95 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+SYSTEM_PROMPT = """You are a Python code expert. You will be given a function signature and requirements, and you must generate correct Python code.
+
+The cache module has this API:
+- cache.put(key: str, value, *, ttl: int) -> bool
+  - key (str): FIRST positional argument
+  - value: SECOND positional argument
+  - ttl (int): REQUIRED keyword-only argument (in seconds)
+  - Returns True if key was NEWLY inserted, False if it REPLACED existing value
+  - Raises cache.CacheError on empty key (not ValueError, not KeyError)
+
+You must write a function that uses this API correctly."""
+
+def generate_store_function():
+    """Generate the store function using Claude with prompt caching."""
+    
+    messages = [
+        {
+            "role": "user",
+            "content": """Write a Python function with this signature:
+def store(k, v, secs):
+    '''Cache value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.'''
+    
+Requirements:
+1. Use cache.put(key, value, *, ttl=seconds)
+2. Pass k as the key (first positional argument)
+3. Pass v as the value (second positional argument)
+4. Pass secs as the ttl keyword-only argument
+5. Return the boolean result from cache.put
+6. The function should only work with the cache.put API as specified
+
+Generate ONLY the function definition, no imports, no other code."""
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=300,
+        system=[
+            {
+                "type": "text",
+                "text": SYSTEM_PROMPT,
+                "cache_control": {"type": "ephemeral"}
+            }
+        ],
+        messages=messages
+    )
+    
+    return response.content[0].text
+
+def main():
+    # Generate the function
+    function_code = generate_store_function()
+    
+    # Extract just the function definition (in case Claude adds extra text)
+    lines = function_code.strip().split('\n')
+    function_lines = []
+    in_function = False
+    
+    for line in lines:
+        if line.startswith('def store('):
+            in_function = True
+        if in_function:
+            function_lines.append(line)
+    
+    final_code = '\n'.join(function_lines)
+    
+    # Write to solution.py
+    with open('solution.py', 'w') as f:
+        f.write(final_code + '\n')
+    
+    print("Generated solution.py successfully")
+    print("Content:")
+    print(final_code)
+
+if __name__ == "__main__":
+    main()
+```
+
+Wait, I need to reconsider. The user is asking me to write the `store` function directly, not to generate it with Claude. Let me provide the correct implementation:
+
+```python
+def store(k, v, secs):
+    """Cache value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted."""
+    import cache
+    return cache.put(k, v, ttl=secs)
+```

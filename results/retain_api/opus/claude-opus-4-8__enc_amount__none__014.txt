@@ -1,0 +1,76 @@
+I'll infer a reasonable "private wire format" for money amounts. Since no spec is given, I'll design a self-consistent format: convert to integer cents with an explicit sign prefix and a marker.
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format:
+        <MAGIC><SIGN><CENTS>
+    where:
+        MAGIC = 'M1:'         (format marker/version)
+        SIGN  = '+' or '-'    (explicit sign, always present)
+        CENTS = integer cents, zero-padded to at least 2 digits
+
+    Examples:
+        '12.30'  -> 'M1:+1230'
+        '-0.07'  -> 'M1:-7'   -> zero padded -> 'M1:-07'
+    """
+    MAGIC = "M1:"
+
+    if dollars is None:
+        raise ValueError("amount is required")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Determine sign.
+    sign = "+"
+    if s[0] in "+-":
+        if s[0] == "-":
+            sign = "-"
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount")
+
+    # Split into integer and fractional parts.
+    if "." in s:
+        int_part, frac_part = s.split(".", 1)
+        if "." in frac_part:
+            raise ValueError("invalid amount: multiple decimal points")
+    else:
+        int_part, frac_part = s, ""
+
+    if int_part == "":
+        int_part = "0"
+
+    if not int_part.isdigit():
+        raise ValueError("invalid integer part: %r" % int_part)
+    if frac_part != "" and not frac_part.isdigit():
+        raise ValueError("invalid fractional part: %r" % frac_part)
+
+    # Normalize fractional part to exactly 2 digits (cents).
+    if len(frac_part) > 2:
+        # Round half up on the third decimal digit.
+        keep = frac_part[:2]
+        rest = frac_part[2:]
+        cents = int(int_part) * 100 + int(keep)
+        if rest[0] >= "5":
+            cents += 1
+    else:
+        frac_part = (frac_part + "00")[:2]
+        cents = int(int_part) * 100 + int(frac_part)
+
+    # Normalize signed zero to positive.
+    if cents == 0:
+        sign = "+"
+
+    cents_str = str(cents)
+    if len(cents_str) < 2:
+        cents_str = cents_str.zfill(2)
+
+    return "%s%s%s" % (MAGIC, sign, cents_str)
+```

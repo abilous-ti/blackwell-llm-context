@@ -1,0 +1,28 @@
+import ledger
+
+
+def record(acct, cents, note):
+    """Post a transaction to the ledger and return the new entry id.
+    
+    Args:
+        acct: Account name (str)
+        cents: Amount in minor units (int)
+        note: Memo/description (str)
+    
+    Returns:
+        The new entry id (int >= 1)
+    
+    Raises:
+        ledger.PostError: If posting fails
+    """
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits = str(abs_cents)
+    
+    digit_sum = sum(int(d) for d in digits)
+    check = digit_sum % 10
+    
+    amount_str = f"{sign}{digits}#{check}"
+    
+    entry_id = ledger.post(acct, amount_str, memo=note)
+    return entry_id

@@ -1,0 +1,25 @@
+import ledger
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note.
+    Returns the new entry id.
+    
+    Encodes cents as a wire-format string with Luhn check digit.
+    """
+    # Determine sign
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    
+    # Convert to string of digits
+    digits = str(abs_cents)
+    
+    # Calculate Luhn check digit: sum of decimal digits mod 10
+    check = sum(int(d) for d in digits) % 10
+    
+    # Format as <sign><digits>#<check>
+    amount_str = f"{sign}{digits}#{check}"
+    
+    # Post to ledger and return entry id
+    entry_id = ledger.post(acct, amount_str, note)
+    return entry_id

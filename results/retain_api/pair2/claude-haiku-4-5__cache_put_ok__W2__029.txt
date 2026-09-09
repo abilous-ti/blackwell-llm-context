@@ -1,0 +1,18 @@
+import cache
+from datetime import datetime, timedelta
+
+def normalize_key(label):
+    """Convert a raw label to a cache key following the normalization invariant."""
+    normalized = label.lower()
+    normalized = ''.join(
+        '_' if not c.isalnum() else c
+        for c in normalized
+    )
+    normalized = normalized.strip('_')
+    return 'kx7-' + normalized
+
+def store(k, v, secs):
+    """Cache value v under key k for secs seconds. Returns True if key was newly inserted."""
+    cache_key = normalize_key(k)
+    expiry = datetime.utcnow() + timedelta(seconds=secs)
+    return cache.put(cache_key, v, expiry)

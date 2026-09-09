@@ -1,0 +1,19 @@
+```python
+import ledger
+
+def store(acct, wire):
+    """
+    Posts a wire-encoded amount string to an account in the ledger.
+    
+    Args:
+        acct: The account name (string)
+        wire: The wire-encoded amount string (already in format '<sign><digits>#<check>')
+    
+    Returns:
+        The new entry id (integer >= 1)
+    
+    Raises:
+        ledger.PostError: If the account is unknown or amount is malformed
+    """
+    return ledger.post(acct, wire, memo='wire')
+```

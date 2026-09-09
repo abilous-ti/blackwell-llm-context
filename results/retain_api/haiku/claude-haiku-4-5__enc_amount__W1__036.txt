@@ -1,0 +1,52 @@
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encode a money amount string to the team's private wire format.
+    
+    Takes a string representation of dollars (e.g., '12.30', '-0.07')
+    and converts it to the internal wire format for the ledger module.
+    
+    The wire format stores amounts as integer cents to avoid floating-point
+    precision issues.
+    """
+    # Remove any whitespace
+    dollars = dollars.strip()
+    
+    # Handle the sign
+    is_negative = dollars.startswith('-')
+    if is_negative:
+        dollars = dollars[1:].strip()
+    
+    # Split on decimal point
+    if '.' in dollars:
+        parts = dollars.split('.')
+        if len(parts) != 2:
+            raise ValueError(f"Invalid amount format: {dollars}")
+        whole_part = parts[0] or '0'
+        frac_part = parts[1]
+    else:
+        whole_part = dollars
+        frac_part = ''
+    
+    # Validate whole part
+    if not whole_part.isdigit():
+        raise ValueError(f"Invalid whole part: {whole_part}")
+    
+    # Validate and normalize fractional part to exactly 2 digits
+    if len(frac_part) > 2:
+        raise ValueError(f"Too many decimal places: {frac_part}")
+    
+    frac_part = frac_part.ljust(2, '0')
+    if not frac_part.isdigit():
+        raise ValueError(f"Invalid fractional part: {frac_part}")
+    
+    # Convert to cents
+    cents = int(whole_part) * 100 + int(frac_part)
+    
+    # Apply sign
+    if is_negative:
+        cents = -cents
+    
+    # Wire format: encode as string representation of cents
+    return str(cents)
+```

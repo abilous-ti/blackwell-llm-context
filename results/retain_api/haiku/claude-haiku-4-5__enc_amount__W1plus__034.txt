@@ -1,0 +1,31 @@
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encode a dollar amount to wire format: <sign><digits>#<check>
+    where <digits> is the amount in minor units (cents) and <check> is the Luhn digit.
+    """
+    # Parse the input
+    is_negative = dollars.startswith('-')
+    amount_str = dollars.lstrip('+-')
+    
+    # Split on decimal point
+    if '.' in amount_str:
+        integer_part, decimal_part = amount_str.split('.')
+        # Pad or truncate decimal to 2 digits
+        decimal_part = (decimal_part + '00')[:2]
+    else:
+        integer_part = amount_str
+        decimal_part = '00'
+    
+    # Convert to minor units (cents)
+    minor_units = int(integer_part) * 100 + int(decimal_part)
+    digits_str = str(minor_units)
+    
+    # Calculate Luhn check digit
+    digit_sum = sum(int(d) for d in digits_str)
+    check = digit_sum % 10
+    
+    # Build wire format
+    sign = '-' if is_negative else '+'
+    return f"{sign}{digits_str}#{check}"
+```

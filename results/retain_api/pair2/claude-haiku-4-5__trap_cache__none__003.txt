@@ -1,0 +1,34 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# In-memory cache for demonstration
+_cache = {}
+_cache_timestamps = {}
+
+def write(key, value, ttl):
+    """Write a value to the cache with a TTL."""
+    import time
+    _cache[key] = value
+    _cache_timestamps[key] = time.time() + ttl
+    return True
+
+def save(k, v):
+    """
+    Cache value v under the already-normalized key k for 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    """
+    import time
+    
+    # Check if key already exists (for determining if newly inserted)
+    is_new = k not in _cache
+    
+    # Use the cache module's write function to save with 60 second TTL
+    write(k, v, 60)
+    
+    # Return True only if this was a new insertion
+    return is_new
+```

@@ -1,0 +1,79 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the team's
+    private wire format.
+
+    Wire format specification (internal):
+      - Amounts are transmitted as a fixed-point string of cents (integer),
+        prefixed with a sign character:
+          '+' for zero or positive values
+          '-' for negative values
+      - Examples:
+            '12.30'  ->  '+1230'
+            '-0.07'  ->  '-7'
+            '0.00'   ->  '+0'
+            '1.00'   ->  '+100'
+            '-3.50'  ->  '-350'
+
+    Raises:
+        ValueError: if `dollars` is not a valid decimal money string.
+    """
+    if not isinstance(dollars, str):
+        raise ValueError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("encode_amount received an empty string")
+
+    # Validate shape: optional leading minus, digits, optional dot + up to 2 digits
+    pattern = re.compile(r'^-?(\d+)(\.\d{1,2})?$')
+    if not pattern.match(stripped):
+        raise ValueError(
+            f"encode_amount: invalid money string {dollars!r}; "
+            "expected format like '12.30' or '-0.07'"
+        )
+
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation as exc:
+        raise ValueError(f"encode_amount: cannot parse {dollars!r} as Decimal") from exc
+
+    # Quantize to exactly two decimal places to guard against single-decimal input
+    try:
+        value = value.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    except InvalidOperation as exc:
+        raise ValueError(f"encode_amount: amount {dollars!r} out of representable range") from exc
+
+    # Convert to integer cents
+    cents = int(value * 100)
+
+    # Apply sign prefix
+    if cents < 0:
+        wire = f"-{abs(cents)}"
+    else:
+        wire = f"+{cents}"
+
+    return wire
+
+
+if __name__ == "__main__":
+    # Quick smoke-test (not part of the public API)
+    _cases = [
+        ("12.30", "+1230"),
+        ("-0.07", "-7"),
+        ("0.00", "+0"),
+        ("1.00", "+100"),
+        ("-3.50", "-350"),
+        ("0.1", "+10"),
+        ("999.99", "+99999"),
+    ]
+    for _input, _expected in _cases:
+        _result = encode_amount(_input)
+        _status = "OK" if _result == _expected else f"FAIL (expected {_expected!r})"
+        print(f"encode_amount({_input!r}) -> {_result!r}  {_status}")

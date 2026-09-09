@@ -1,0 +1,94 @@
+
+```python
+import anthropic
+import time
+import json
+from typing import Optional
+
+# Simulated cache module
+class cache:
+    _storage = {}
+    
+    @staticmethod
+    def put(k: str, v, secs: int) -> bool:
+        """Store value v under key k for secs seconds. Returns True if key was newly inserted."""
+        is_new = k not in cache._storage
+        cache._storage[k] = {
+            'value': v,
+            'expiry': time.time() + secs
+        }
+        return is_new
+
+def store(k: str, v, secs: int) -> bool:
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    client = anthropic.Anthropic()
+    
+    # Define the tool that wraps cache.put
+    tools = [
+        {
+            "name": "cache_put",
+            "description": "Store a value in cache under a key for a specified number of seconds",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The cache key"
+                    },
+                    "value": {
+                        "description": "The value to cache"
+                    },
+                    "seconds": {
+                        "type": "integer",
+                        "description": "Number of seconds to cache the value"
+                    }
+                },
+                "required": ["key", "value", "seconds"]
+            }
+        }
+    ]
+    
+    # Create a message to Claude asking it to use the cache_put tool
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=[
+            {
+                "role": "user",
+                "content": f"Please cache the value {json.dumps(v)} under key '{k}' for {secs} seconds and tell me if it was a new key insertion."
+            }
+        ]
+    )
+    
+    # Process the response
+    result = False
+    for content_block in message.content:
+        if content_block.type == "tool_use":
+            if content_block.name == "cache_put":
+                # Extract the tool input
+                tool_input = content_block.input
+                # Call cache.put with the parameters from Claude
+                result = cache.put(
+                    tool_input.get("key"),
+                    tool_input.get("value"),
+                    tool_input.get("seconds")
+                )
+    
+    return result
+
+
+if __name__ == "__main__":
+    # Test the store function
+    result1 = store("test_key", "test_value", 10)
+    print(f"First insertion of 'test_key': {result1}")  # Should be True
+    
+    result2 = store("test_key", "new_value", 10)
+    print(f"Second insertion of 'test_key': {result2}")  # Should be False
+    
+    result3 = store("another_key", {"data": "complex"}, 5)
+    print(f"First insertion of 'another_key': {result3}")  # Should be True
+```

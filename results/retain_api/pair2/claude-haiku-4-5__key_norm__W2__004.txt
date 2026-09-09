@@ -1,0 +1,44 @@
+
+```python
+import anthropic
+import re
+
+
+def make_key(label: str) -> str:
+    """Convert a raw label into a cache key following team conventions.
+    
+    Steps:
+    1. Lowercase the label
+    2. Replace every run of non-alphanumeric characters with a single underscore '_'
+    3. Strip leading/trailing underscores
+    4. Prepend the fixed private namespace prefix 'kx7-'
+    """
+    # Step 1: lowercase
+    lowercased = label.lower()
+    
+    # Step 2: replace runs of non-alphanumeric characters with single underscore
+    normalized = re.sub(r'[^a-z0-9]+', '_', lowercased)
+    
+    # Step 3: strip leading/trailing underscores
+    stripped = normalized.strip('_')
+    
+    # Step 4: prepend 'kx7-'
+    cache_key = f'kx7-{stripped}'
+    
+    return cache_key
+
+
+# Test the function with the provided examples
+if __name__ == "__main__":
+    # Test case 1: 'Hello, World!' -> 'kx7-hello_world'
+    result1 = make_key('Hello, World!')
+    print(f"make_key('Hello, World!') = '{result1}'")
+    assert result1 == 'kx7-hello_world', f"Expected 'kx7-hello_world', got '{result1}'"
+    
+    # Test case 2: ' A__B ' -> 'kx7-a_b'
+    result2 = make_key(' A__B ')
+    print(f"make_key(' A__B ') = '{result2}'")
+    assert result2 == 'kx7-a_b', f"Expected 'kx7-a_b', got '{result2}'"
+    
+    print("All tests passed!")
+```

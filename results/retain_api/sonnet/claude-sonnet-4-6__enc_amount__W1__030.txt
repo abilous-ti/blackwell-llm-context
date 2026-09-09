@@ -1,0 +1,50 @@
+# solution.py
+
+import re
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the
+    team's private wire format.
+
+    Wire format: "<sign><integer_digits>.<cent_digits_2>"
+    where sign is '-' for negative values and '' for non-negative,
+    integer part and cent part are always present, cents are zero-padded
+    to exactly 2 digits, and leading zeros in the integer part are
+    stripped (minimum '0').
+
+    Examples:
+        '12.30'  -> '12.30'
+        '-0.07'  -> '-0.07'
+        '1'      -> '1.00'
+        '-5'     -> '-5.00'
+        '0.1'    -> '0.10'
+    """
+    dollars = dollars.strip()
+
+    pattern = r'^(-?)(\d+)(?:\.(\d+))?$'
+    match = re.match(pattern, dollars)
+    if not match:
+        raise ValueError(f"Invalid amount string: {dollars!r}")
+
+    sign, integer_part, fractional_part = match.groups()
+
+    # Strip leading zeros from integer part, keeping at least '0'
+    integer_part = integer_part.lstrip('0') or '0'
+
+    # Normalize fractional part to exactly 2 decimal places
+    if fractional_part is None:
+        fractional_part = '00'
+    elif len(fractional_part) == 1:
+        fractional_part = fractional_part + '0'
+    elif len(fractional_part) > 2:
+        # Truncate to 2 digits (no rounding; caller is responsible)
+        fractional_part = fractional_part[:2]
+    # else exactly 2 digits, use as-is
+
+    # Normalize negative zero to positive zero
+    if sign == '-' and integer_part == '0' and fractional_part == '00':
+        sign = ''
+
+    return f"{sign}{integer_part}.{fractional_part}"

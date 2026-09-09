@@ -1,0 +1,19 @@
+def encode_amount(dollars: str) -> str:
+    sign = ''
+    s = dollars.strip()
+    if s.startswith('-'):
+        sign = '-'
+        s = s[1:]
+    elif s.startswith('+'):
+        s = s[1:]
+
+    if '.' in s:
+        whole, frac = s.split('.', 1)
+    else:
+        whole, frac = s, ''
+
+    whole = whole or '0'
+    frac = (frac + '00')[:2]
+
+    cents = int(whole) * 100 + int(frac)
+    return f"{sign}{cents}"

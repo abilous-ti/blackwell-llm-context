@@ -1,0 +1,64 @@
+
+```python
+import anthropic
+
+
+def transfer(acct, cents, reason):
+    """Transfer cents to account acct with reason as memo using Claude's tools."""
+    client = anthropic.Anthropic()
+    
+    # Create the message with the transfer request
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "post",
+                "description": "Post a transaction to a ledger account",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "account": {
+                            "type": "string",
+                            "description": "The account to post to"
+                        },
+                        "amount": {
+                            "type": "integer",
+                            "description": "The amount in cents"
+                        },
+                        "memo": {
+                            "type": "string",
+                            "description": "The memo/reason for the transaction"
+                        }
+                    },
+                    "required": ["account", "amount", "memo"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Please post {cents} cents to account {acct} with the reason: {reason}"
+            }
+        ]
+    )
+    
+    # Extract the tool use from the response
+    for content_block in message.content:
+        if content_block.type == "tool_use":
+            # Process the tool call
+            tool_result = process_tool_call(content_block.name, content_block.input)
+            return tool_result
+    
+    return None
+
+
+def process_tool_call(tool_name, tool_input):
+    """Process the tool call and return the entry id."""
+    if tool_name == "post":
+        # Simulate posting to ledger and return entry id
+        # In a real scenario, this would call the actual ledger.post function
+        entry_id = f"entry_{tool_input['account']}_{tool_input['amount']}"
+        return entry_id
+    return None
+```

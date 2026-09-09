@@ -1,0 +1,40 @@
+
+```python
+import anthropic
+import json
+
+def make_key(label: str) -> str:
+    """
+    Converts a raw label into our team's private cache key using Claude.
+    
+    Args:
+        label: Raw label to convert into a cache key
+        
+    Returns:
+        A properly formatted cache key string
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Convert this label into a cache key following these rules:
+1. Use lowercase letters and numbers only
+2. Replace spaces and special characters with underscores
+3. Remove any leading/trailing underscores
+4. Keep it under 50 characters
+5. Make it URL-safe and database-safe
+
+Label: "{label}"
+
+Return ONLY the cache key string, nothing else."""
+            }
+        ]
+    )
+    
+    cache_key = message.content[0].text.strip()
+    return cache_key
+```

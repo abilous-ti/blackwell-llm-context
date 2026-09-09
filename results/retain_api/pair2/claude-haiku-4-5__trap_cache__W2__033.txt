@@ -1,0 +1,22 @@
+```python
+import time
+from cache import write
+
+# Track which keys we've seen to know if it's a new insert
+_seen_keys = {}
+
+def save(k, v):
+    """
+    Cache value v under normalized key k with 60 second TTL.
+    Returns True only if this is a newly inserted key (not previously cached).
+    """
+    is_new = k not in _seen_keys
+    
+    # Write to cache with 60 second TTL
+    write(k, v, ttl=60)
+    
+    # Mark this key as seen
+    _seen_keys[k] = time.time()
+    
+    return is_new
+```

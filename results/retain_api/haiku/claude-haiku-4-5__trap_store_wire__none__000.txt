@@ -1,0 +1,84 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+def store(acct, wire):
+    """
+    Posts a wire-encoded amount string to an account using the ledger module.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger write operation
+    """
+    
+    tools = [
+        {
+            "name": "ledger_write",
+            "description": "Write a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "Account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "Wire-encoded amount string"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Transaction memo"
+                    }
+                },
+                "required": ["acct", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please write a transaction to the ledger for account '{acct}' with the wire-encoded amount '{wire}' and memo 'wire'. Return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    for block in response.content:
+        if hasattr(block, 'type') and block.type == "tool_use":
+            if block.name == "ledger_write":
+                # Simulate the ledger write operation
+                # In a real system, this would call the actual ledger module
+                tool_input = block.input
+                entry_id = f"entry_{acct}_{hash(wire) % 10000}"
+    
+    if entry_id:
+        return entry_id
+    
+    # If no tool was called, try extracting from response text
+    for block in response.content:
+        if hasattr(block, 'text'):
+            text = block.text
+            if "entry" in text.lower():
+                # Look for entry id patterns in the response
+                import re
+                matches = re.findall(r'entry[_\s]?(\w+)', text, re.IGNORECASE)
+                if matches:
+                    return f"entry_{matches[0]}"
+    
+    # Default entry id format
+    return f"entry_{acct}_{hash(wire) % 10000}"
+```

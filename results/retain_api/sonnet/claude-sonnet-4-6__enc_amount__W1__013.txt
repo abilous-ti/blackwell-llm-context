@@ -1,0 +1,56 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the
+    team-private wire format.
+
+    Wire format specification (team-internal):
+        - Amounts are transmitted as signed integer cents (no decimal point).
+        - Negative amounts use a leading '-'.
+        - No leading zeros (except the value zero itself, represented as '0').
+        - The string is prefixed with the literal tag 'AMT:' so the
+          receiver can distinguish amount fields from other wire tokens.
+
+    Examples:
+        '12.30'  -> 'AMT:1230'
+        '-0.07'  -> 'AMT:-7'
+        '0.00'   -> 'AMT:0'
+        '1.00'   -> 'AMT:100'
+        '-1.99'  -> 'AMT:-199'
+
+    Raises:
+        ValueError: if `dollars` is not a well-formed decimal money string.
+    """
+    if not isinstance(dollars, str):
+        raise ValueError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("encode_amount received an empty string")
+
+    # Validate format: optional leading '-', digits, optional '.' followed by
+    # exactly 1 or 2 decimal digits.
+    pattern = re.compile(r'^-?\d+(\.\d{1,2})?$')
+    if not pattern.match(stripped):
+        raise ValueError(
+            f"encode_amount: {dollars!r} is not a valid money string "
+            "(expected optional '-', integer digits, optional '.XX')"
+        )
+
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation as exc:
+        raise ValueError(f"encode_amount: cannot parse {dollars!r} as Decimal") from exc
+
+    # Round to exactly 2 decimal places (handles inputs like '1.5' -> 1.50)
+    value = value.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+    # Convert to integer cents
+    cents = int(value * 100)
+
+    return f"AMT:{cents}"

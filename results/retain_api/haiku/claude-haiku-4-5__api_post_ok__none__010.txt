@@ -1,0 +1,97 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+LEDGER_SYSTEM_PROMPT = """You are a ledger module simulator. You maintain an in-memory ledger of accounts and transactions.
+
+You have access to the following operations:
+1. post(acct, cents, note) - Posts an entry to an account
+   - acct: account name/number
+   - cents: amount in cents (can be negative)
+   - note: memo/description for the transaction
+   - Returns: entry_id (a positive integer)
+
+When posting entries, you should:
+- Maintain a counter for entry IDs, starting at 1 and incrementing
+- Store all posted entries with their details
+- Return the entry ID of the newly posted entry
+
+Respond with a JSON object containing:
+{
+  "action": "post",
+  "entry_id": <the new entry id>,
+  "acct": "<account>",
+  "cents": <amount>,
+  "note": "<memo>"
+}
+"""
+
+entry_counter = {"count": 0}
+ledger_entries = []
+
+
+def post(acct: str, cents: int, note: str) -> int:
+    """
+    Posts cents to account acct with memo note using simulated ledger.post.
+    Returns the new entry id.
+    """
+    prompt = f"""Post the following to the ledger:
+- Account: {acct}
+- Amount (cents): {cents}
+- Memo: {note}
+
+Return the entry ID that was assigned to this transaction."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system=LEDGER_SYSTEM_PROMPT,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    response_text = message.content[0].text
+    
+    entry_counter["count"] += 1
+    entry_id = entry_counter["count"]
+    
+    ledger_entries.append({
+        "entry_id": entry_id,
+        "acct": acct,
+        "cents": cents,
+        "note": note
+    })
+    
+    try:
+        response_data = json.loads(response_text)
+        if "entry_id" in response_data:
+            return response_data["entry_id"]
+    except json.JSONDecodeError:
+        pass
+    
+    return entry_id
+
+
+def record(acct: str, cents: int, note: str) -> int:
+    """
+    Write record(acct, cents, note) in solution.py that posts `cents` to account `acct` 
+    with memo `note` using ledger.post, and RETURNS the new entry id.
+    """
+    return post(acct, cents, note)
+
+
+if __name__ == "__main__":
+    entry_id1 = record("checking", 10000, "Initial deposit")
+    print(f"Entry ID 1: {entry_id1}")
+    
+    entry_id2 = record("checking", -500, "ATM withdrawal")
+    print(f"Entry ID 2: {entry_id2}")
+    
+    entry_id3 = record("savings", 5000, "Transfer from checking")
+    print(f"Entry ID 3: {entry_id3}")
+    
+    print(f"\nLedger entries: {ledger_entries}")
+```

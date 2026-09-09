@@ -1,0 +1,13 @@
+def transfer(acct, cents, reason):
+    import ledger
+    
+    # Encode cents to wire format
+    sign = '+' if cents >= 0 else '-'
+    digits = str(abs(cents))
+    check = sum(int(d) for d in digits) % 10
+    encoded_amount = f"{sign}{digits}#{check}"
+    
+    # Call ledger.post with correct signature
+    entry_id = ledger.post(acct, encoded_amount, memo=reason)
+    
+    return entry_id

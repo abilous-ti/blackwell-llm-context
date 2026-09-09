@@ -1,0 +1,62 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the team's
+    private wire format.
+
+    Wire format specification:
+      - Represented as a fixed-point integer string of cents (100ths of a dollar),
+        prefixed with 'AMT:' and suffixed with a two-digit fractional indicator.
+      - Pattern:  AMT:<sign><total_cents>C
+        where <sign> is '-' for negative values and '' for non-negative,
+        and <total_cents> is the absolute number of cents as a plain integer,
+        and 'C' is the literal currency-unit sentinel.
+
+    Examples:
+      '12.30'  -> 'AMT:1230C'
+      '-0.07'  -> 'AMT:-7C'
+      '0.00'   -> 'AMT:0C'
+      '1.00'   -> 'AMT:100C'
+      '-12.30' -> 'AMT:-1230C'
+
+    Raises:
+        ValueError: if the input string is not a valid money amount.
+    """
+    if not isinstance(dollars, str):
+        raise ValueError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    dollars = dollars.strip()
+
+    # Validate format: optional leading minus, digits, optional decimal point
+    # with exactly 1 or 2 decimal digits.
+    if not re.fullmatch(r'-?\d+(\.\d{1,2})?', dollars):
+        raise ValueError(
+            f"Invalid money amount {dollars!r}; expected format like '12.30' or '-0.07'"
+        )
+
+    try:
+        value = Decimal(dollars)
+    except InvalidOperation as exc:
+        raise ValueError(f"Cannot parse {dollars!r} as a decimal: {exc}") from exc
+
+    # Quantize to exactly 2 decimal places (cents).
+    try:
+        cents_decimal = value.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    except InvalidOperation as exc:
+        raise ValueError(f"Amount {dollars!r} out of representable range: {exc}") from exc
+
+    # Convert to integer cents.
+    cents_int = int(cents_decimal * 100)
+
+    # Build wire string.
+    if cents_int < 0:
+        wire = f"AMT:-{abs(cents_int)}C"
+    else:
+        wire = f"AMT:{cents_int}C"
+
+    return wire

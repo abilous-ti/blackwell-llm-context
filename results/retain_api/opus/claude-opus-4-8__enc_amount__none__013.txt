@@ -1,0 +1,63 @@
+I'll analyze this problem. Since there's no existing specification for "this team's private wire format," I'll design a reasonable, self-consistent serialization format for money amounts that handles the given examples (`'12.30'`, `'-0.07'`).
+
+I'll encode the amount as an integer number of cents (minor units), which is a common and unambiguous wire representation for money, avoiding floating-point issues.
+
+solution.py:
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format: a signed integer count of cents (minor units) rendered as a
+    decimal string, prefixed with a marker so the receiver can distinguish it
+    from other encodings.
+
+    Examples:
+        '12.30'  -> 'M:1230'
+        '-0.07'  -> 'M:-7'
+        '0.00'   -> 'M:0'
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Determine sign.
+    negative = False
+    if s[0] in "+-":
+        negative = s[0] == "-"
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount: %r" % (dollars,))
+
+    # Split into integer and fractional parts.
+    if "." in s:
+        int_part, frac_part = s.split(".", 1)
+        if "." in frac_part:
+            raise ValueError("multiple decimal points: %r" % (dollars,))
+    else:
+        int_part, frac_part = s, ""
+
+    if int_part == "":
+        int_part = "0"
+
+    if not int_part.isdigit():
+        raise ValueError("invalid integer part: %r" % (dollars,))
+    if frac_part != "" and not frac_part.isdigit():
+        raise ValueError("invalid fractional part: %r" % (dollars,))
+
+    # Normalize fractional part to exactly 2 digits (cents).
+    if len(frac_part) > 2:
+        # Reject sub-cent precision rather than silently truncating.
+        raise ValueError("more than 2 decimal places: %r" % (dollars,))
+    frac_part = (frac_part + "00")[:2]
+
+    cents = int(int_part) * 100 + int(frac_part)
+    if negative:
+        cents = -cents
+
+    return "M:%d" % cents

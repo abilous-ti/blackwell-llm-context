@@ -1,0 +1,18 @@
+
+```python
+import anthropic
+import ledger
+
+
+def record(acct, cents, note):
+    """Posts cents to account acct with memo note using ledger.post."""
+    # Convert cents to the expected amount format for ledger.post
+    # The ledger.post function expects an amount parameter
+    amount = cents
+    
+    # Call ledger.post with the correct signature:
+    # post(account: str, amount, *, memo: str)
+    entry_id = ledger.post(acct, amount, memo=note)
+    
+    return entry_id
+```

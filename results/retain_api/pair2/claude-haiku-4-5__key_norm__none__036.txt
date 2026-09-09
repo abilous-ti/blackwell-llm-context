@@ -1,0 +1,55 @@
+
+```python
+import anthropic
+import hashlib
+
+
+def make_key(label: str) -> str:
+    """Convert a raw label into a cache key using Claude API with prompt caching."""
+    client = anthropic.Anthropic()
+    
+    # Use Claude with prompt caching to generate a consistent cache key
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        system=[
+            {
+                "type": "text",
+                "text": "You are a cache key generator. When given a label, you must return ONLY a valid cache key string. A valid cache key must be alphanumeric and use underscores, starting with a letter or underscore, and be between 1-64 characters long. Never include any explanation or additional text.",
+                "cache_control": {"type": "ephemeral"}
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Generate a cache key for the label: {label}"
+            }
+        ]
+    )
+    
+    # Extract the key from the response
+    key = message.content[0].text.strip()
+    
+    # Ensure the key is valid by sanitizing it
+    # Remove any invalid characters and ensure it starts with a letter or underscore
+    sanitized_key = ""
+    for char in key:
+        if char.isalnum() or char == "_":
+            sanitized_key += char
+    
+    # If the key is empty or doesn't start with a letter/underscore, prefix with underscore
+    if not sanitized_key:
+        sanitized_key = "_"
+    elif not (sanitized_key[0].isalpha() or sanitized_key[0] == "_"):
+        sanitized_key = "_" + sanitized_key
+    
+    # Truncate to 64 characters if necessary
+    sanitized_key = sanitized_key[:64]
+    
+    # If still empty, use a hash-based fallback
+    if not sanitized_key:
+        hash_digest = hashlib.sha256(label.encode()).hexdigest()[:63]
+        sanitized_key = "_" + hash_digest
+    
+    return sanitized_key
+```

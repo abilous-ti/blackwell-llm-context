@@ -1,0 +1,20 @@
+import cache
+from datetime import datetime, timedelta
+
+def normalize_key(label):
+    normalized = label.lower()
+    normalized = ''.join('_' if not c.isalnum() else c for c in normalized)
+    while '__' in normalized:
+        normalized = normalized.replace('__', '_')
+    normalized = normalized.strip('_')
+    return f'kx7-{normalized}'
+
+def store(k, v, secs):
+    cache_key = normalize_key(k)
+    expiration = datetime.utcnow() + timedelta(seconds=secs)
+    
+    existing = getattr(cache, 'get', lambda x: None)(cache_key)
+    
+    cache.put(cache_key, {'value': v, 'expiration': expiration.timestamp()})
+    
+    return existing is None

@@ -1,0 +1,70 @@
+
+```python
+import anthropic
+
+client = anthropic.Anthropic()
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """Transfer funds to an account using Claude as an AI backbone."""
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Post a transfer to an account in the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo/reason for the transfer"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post a transfer of {cents} cents to account {acct} with reason: {reason}. Use the post tool to complete this transfer."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    if response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                tool_name = content_block.name
+                tool_input = content_block.input
+                tool_use_id = content_block.id
+                
+                if tool_name == "post":
+                    entry_id = f"entry_{tool_use_id}"
+                    return entry_id
+    
+    return ""
+
+
+if __name__ == "__main__":
+    acct = "checking"
+    cents = 10000
+    reason = "Monthly salary"
+    
+    entry_id = transfer(acct, cents, reason)
+    print(f"Transfer completed. Entry ID: {entry_id}")
+```

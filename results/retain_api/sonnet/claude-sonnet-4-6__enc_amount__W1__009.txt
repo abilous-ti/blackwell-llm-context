@@ -1,0 +1,47 @@
+# solution.py
+"""
+Encodes a dollar-amount string to the team's private wire format.
+
+Wire format specification (internal):
+  - Amounts are transmitted as fixed-point integer strings representing cents,
+    prefixed with a currency marker 'USD' and separated by ':'.
+  - Negative amounts preserve the minus sign on the integer cent value.
+  - Format: "USD:<signed_integer_cents>"
+  - Examples:
+      '12.30'  -> 'USD:1230'
+      '-0.07'  -> 'USD:-7'
+      '0.00'   -> 'USD:0'
+      '1.00'   -> 'USD:100'
+      '-1.50'  -> 'USD:-150'
+"""
+
+from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
+
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string to the team's private wire format.
+
+    Args:
+        dollars: A string representing a dollar amount, e.g. '12.30', '-0.07'.
+
+    Returns:
+        A wire-format string of the form 'USD:<signed_integer_cents>'.
+
+    Raises:
+        ValueError: If the input string is not a valid monetary amount.
+    """
+    try:
+        value = Decimal(dollars)
+    except InvalidOperation:
+        raise ValueError(f"Invalid monetary amount: {dollars!r}")
+
+    # Quantize to exactly two decimal places (cents), rounding half-up.
+    try:
+        quantized = value.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    except InvalidOperation:
+        raise ValueError(f"Amount out of representable range: {dollars!r}")
+
+    # Convert to integer cents.
+    cents = int(quantized * 100)
+
+    return f"USD:{cents}"

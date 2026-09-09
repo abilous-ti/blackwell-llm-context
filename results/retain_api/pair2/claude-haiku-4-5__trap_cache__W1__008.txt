@@ -1,0 +1,224 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# In-memory cache implementation
+cache_store = {}
+cache_ttl = {}
+
+class CacheError(Exception):
+    """Custom exception for cache errors"""
+    pass
+
+class CacheModule:
+    """Mock cache module that follows the house API contract"""
+    
+    def put(self, key: str, value, *, ttl: int) -> bool:
+        """
+        Put a value in the cache with a TTL.
+        
+        Args:
+            key: The cache key (must be non-empty, already normalized)
+            value: The value to cache
+            ttl: Time to live in seconds (required keyword-only argument)
+            
+        Returns:
+            True if key was newly inserted, False if it replaced existing value
+            
+        Raises:
+            CacheError: If key is empty
+        """
+        if not key:
+            raise CacheError("Cache key cannot be empty")
+        
+        # Check if this is a new key or replacement
+        is_new = key not in cache_store
+        
+        # Store the value and TTL
+        cache_store[key] = value
+        cache_ttl[key] = ttl
+        
+        return is_new
+
+# Create a global cache instance
+cache = CacheModule()
+
+def save(k: str, v) -> bool:
+    """
+    Save a value to the cache under the given key with a 60-second TTL.
+    
+    Args:
+        k: The already-normalized cache key
+        v: The value to cache
+        
+    Returns:
+        True if the key was newly inserted, False if it replaced an existing value
+    """
+    return cache.put(k, v, ttl=60)
+
+def process_tool_call(tool_name: str, tool_input: dict) -> str:
+    """Process tool calls from Claude"""
+    if tool_name == "save_to_cache":
+        key = tool_input.get("key")
+        value = tool_input.get("value")
+        result = save(key, value)
+        return json.dumps({"success": True, "newly_inserted": result, "message": f"Saved key '{key}' to cache (newly inserted: {result})"})
+    return json.dumps({"error": f"Unknown tool: {tool_name}"})
+
+def main():
+    """Main function to demonstrate cache usage with Claude"""
+    
+    # Define the tool for Claude to use
+    tools = [
+        {
+            "name": "save_to_cache",
+            "description": "Save a value to the cache under a normalized key with 60-second TTL",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The already-normalized cache key (e.g., 'kx7-hello_world')"
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The value to cache"
+                    }
+                },
+                "required": ["key", "value"]
+            }
+        }
+    ]
+    
+    # Start a conversation with Claude
+    messages = [
+        {
+            "role": "user",
+            "content": "Please cache the value 'test_data' under the key 'kx7-hello_world' and let me know if it was newly inserted or replaced an existing value."
+        }
+    ]
+    
+    print("User: Please cache the value 'test_data' under the key 'kx7-hello_world'")
+    
+    # Make the initial request to Claude
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process Claude's response
+    while response.stop_reason == "tool_use":
+        # Find the tool use block
+        tool_use_block = None
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_use_block = block
+                break
+        
+        if not tool_use_block:
+            break
+        
+        # Process the tool call
+        tool_result = process_tool_call(tool_use_block.name, tool_use_block.input)
+        
+        # Add assistant response and tool result to messages
+        messages.append({"role": "assistant", "content": response.content})
+        messages.append({
+            "role": "user",
+            "content": [
+                {
+                    "type": "tool_result",
+                    "tool_use_id": tool_use_block.id,
+                    "content": tool_result
+                }
+            ]
+        })
+        
+        # Continue the conversation
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+    
+    # Extract the final text response
+    final_response = ""
+    for block in response.content:
+        if hasattr(block, "text"):
+            final_response = block.text
+            break
+    
+    print(f"Claude: {final_response}")
+    
+    # Verify the cache state
+    print(f"\nCache state: {cache_store}")
+    print(f"Cache TTLs: {cache_ttl}")
+    
+    # Test replacing an existing value
+    print("\n--- Testing replacement ---")
+    messages.append({"role": "assistant", "content": response.content})
+    messages.append({
+        "role": "user",
+        "content": "Now please cache the value 'updated_data' under the same key 'kx7-hello_world' to replace the existing value."
+    })
+    
+    print("User: Cache 'updated_data' under 'kx7-hello_world' to replace the existing value")
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the replacement tool call
+    while response.stop_reason == "tool_use":
+        tool_use_block = None
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_use_block = block
+                break
+        
+        if not tool_use_block:
+            break
+        
+        tool_result = process_tool_call(tool_use_block.name, tool_use_block.input)
+        
+        messages.append({"role": "assistant", "content": response.content})
+        messages.append({
+            "role": "user",
+            "content": [
+                {
+                    "type": "tool_result",
+                    "tool_use_id": tool_use_block.id,
+                    "content": tool_result
+                }
+            ]
+        })
+        
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+    
+    # Extract and print the final response
+    for block in response.content:
+        if hasattr(block, "text"):
+            print(f"Claude: {block.text}")
+            break
+    
+    print(f"\nFinal cache state: {cache_store}")
+    print(f"Final cache TTLs: {cache_ttl}")
+
+if __name__ == "__main__":
+    main()
+```

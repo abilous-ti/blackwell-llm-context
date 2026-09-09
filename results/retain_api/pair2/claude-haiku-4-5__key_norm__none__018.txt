@@ -1,0 +1,31 @@
+
+```python
+import anthropic
+
+
+def make_key(label: str) -> str:
+    """Converts a raw label into our team's private cache key using Claude."""
+    client = anthropic.Anthropic()
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system="You are a cache key generator for a development team. Convert raw labels into consistent, URL-safe cache keys. Rules: lowercase, replace spaces with underscores, remove special characters except underscores, keep it concise. Return ONLY the cache key, nothing else.",
+        messages=[{"role": "user", "content": f"Convert this label to a cache key: {label}"}],
+    )
+
+    return message.content[0].text.strip()
+
+
+if __name__ == "__main__":
+    test_labels = [
+        "User Profile Data",
+        "API Response Cache",
+        "Database Query Results!",
+        "Feature Flag Configuration",
+    ]
+
+    for label in test_labels:
+        key = make_key(label)
+        print(f"'{label}' -> '{key}'")
+```

@@ -1,0 +1,49 @@
+# solution.py
+
+import re
+
+_AMOUNT_PATTERN = re.compile(
+    r'^(?P<sign>-?)(?P<dollars>\d+)\.(?P<cents>\d{2})$'
+)
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the
+    team-private wire format.
+
+    Wire format: "<sign><dollars_no_leading_zeros>.<cents>c"
+    where:
+      - sign is '-' for negative values, '' for non-negative
+      - dollars portion has leading zeros stripped (but '0' stays '0')
+      - cents is always exactly two digits
+      - a literal 'c' suffix marks the field as a canonical cent-amount
+
+    Examples:
+      '12.30'  -> '12.30c'
+      '-0.07'  -> '-0.07c'
+      '100.00' -> '100.00c'
+      '0.01'   -> '0.01c'
+    """
+    if not isinstance(dollars, str):
+        raise TypeError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    m = _AMOUNT_PATTERN.match(dollars.strip())
+    if m is None:
+        raise ValueError(
+            f"encode_amount: invalid amount string {dollars!r}; "
+            "expected optional '-', digits, '.', exactly two decimal digits"
+        )
+
+    sign = m.group('sign')          # '' or '-'
+    dollar_part = m.group('dollars')
+    cent_part = m.group('cents')
+
+    # Strip spurious leading zeros from the dollar part, but keep at least '0'
+    dollar_part = str(int(dollar_part)) if dollar_part else '0'
+
+    # Reject negative zero as a sign/value mismatch only when both parts are zero
+    # (-0.00 is normalised to 0.00)
+    if sign == '-' and dollar_part == '0' and cent_part == '00':
+        sign = ''
+
+    return f"{sign}{dollar_part}.{cent_part}c"

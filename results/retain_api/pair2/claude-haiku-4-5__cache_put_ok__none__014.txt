@@ -1,0 +1,89 @@
+
+```python
+import anthropic
+import json
+import time
+
+cache = {}
+cache_expiry = {}
+
+def put(k, v):
+    """Simple cache put function"""
+    cache[k] = v
+    cache_expiry[k] = float('inf')
+
+def get_cache_state():
+    """Get current cache state for Claude to analyze"""
+    current_time = time.time()
+    return {
+        "cache": cache,
+        "cache_expiry": cache_expiry,
+        "current_time": current_time
+    }
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    Uses Claude to help track cache state and expiry.
+    """
+    current_time = time.time()
+    
+    # Check if key exists and has not expired
+    key_exists = k in cache
+    if key_exists and k in cache_expiry:
+        if cache_expiry[k] > current_time:
+            # Key exists and has not expired, so it's not newly inserted
+            is_new = False
+        else:
+            # Key exists but has expired, treat as new
+            is_new = True
+    else:
+        # Key doesn't exist, so it's newly inserted
+        is_new = True
+    
+    # Use Claude to help manage the cache state with expiry
+    client = anthropic.Anthropic()
+    
+    cache_state = get_cache_state()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are a cache manager. I need to store a value with expiry.
+
+Current cache state:
+{json.dumps(cache_state, default=str)}
+
+Operation: Store key '{k}' with value '{v}' for {secs} seconds.
+
+Please confirm:
+1. Is this a NEW key insertion? (True if key didn't exist before or has expired)
+2. The expiry time should be: {current_time + secs}
+
+Respond with JSON: {{"is_new": true/false, "should_store": true}}"""
+            }
+        ]
+    )
+    
+    try:
+        response_text = message.content[0].text
+        # Parse the JSON response from Claude
+        json_start = response_text.find('{')
+        json_end = response_text.rfind('}') + 1
+        if json_start >= 0 and json_end > json_start:
+            response_json = json.loads(response_text[json_start:json_end])
+            if response_json.get("should_store"):
+                put(k, v)
+                cache_expiry[k] = current_time + secs
+            is_new = response_json.get("is_new", is_new)
+    except (json.JSONDecodeError, IndexError, AttributeError):
+        # Fallback if Claude's response can't be parsed
+        put(k, v)
+        cache_expiry[k] = current_time + secs
+    
+    return is_new
+```

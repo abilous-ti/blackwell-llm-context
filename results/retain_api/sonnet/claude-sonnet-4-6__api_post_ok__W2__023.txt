@@ -1,0 +1,18 @@
+import ledger
+
+
+def _encode_amount(cents: int) -> str:
+    if cents < 0:
+        sign = '-'
+        digits = str(-cents)
+    else:
+        sign = '+'
+        digits = str(cents)
+    check = sum(int(d) for d in digits) % 10
+    return f"{sign}{digits}#{check}"
+
+
+def record(acct, cents, note):
+    encoded = _encode_amount(cents)
+    entry_id = ledger.post(acct, encoded, note)
+    return entry_id

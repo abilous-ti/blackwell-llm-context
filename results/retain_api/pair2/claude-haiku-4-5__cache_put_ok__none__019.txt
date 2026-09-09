@@ -1,0 +1,80 @@
+
+```python
+import anthropic
+import time
+
+# Since we don't have access to the actual cache module,
+# we'll create a mock implementation for demonstration
+class MockCache:
+    def __init__(self):
+        self.data = {}
+        self.expiry = {}
+    
+    def put(self, k, v, secs):
+        """Store value v under key k for secs seconds"""
+        was_new = k not in self.data
+        self.data[k] = v
+        self.expiry[k] = time.time() + secs
+        return was_new
+
+# Initialize mock cache
+cache = MockCache()
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    
+    Args:
+        k: The cache key
+        v: The value to store
+        secs: Number of seconds to cache the value
+    
+    Returns:
+        True if the key was newly inserted, False otherwise
+    """
+    return cache.put(k, v, secs)
+
+
+def main():
+    client = anthropic.Anthropic()
+    
+    # Test the store function
+    print("Testing store function:")
+    
+    # First insert should return True
+    result1 = store("test_key", "test_value", 10)
+    print(f"First insert (should be True): {result1}")
+    
+    # Second insert with same key should return False
+    result2 = store("test_key", "new_value", 10)
+    print(f"Second insert with same key (should be False): {result2}")
+    
+    # Different key should return True
+    result3 = store("another_key", "another_value", 10)
+    print(f"Insert with different key (should be True): {result3}")
+    
+    # Use Claude to verify the implementation
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""I have implemented a store(k, v, secs) function that caches values and returns True only if the key was newly inserted. Here are the test results:
+- First insert: {result1}
+- Second insert with same key: {result2}
+- Insert with different key: {result3}
+
+Does this implementation correctly return True only for newly inserted keys?"""
+            }
+        ]
+    )
+    
+    print("\nClaude's verification:")
+    print(message.content[0].text)
+
+
+if __name__ == "__main__":
+    main()
+```

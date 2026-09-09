@@ -1,0 +1,39 @@
+
+```python
+import anthropic
+
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    # Use Claude to execute the ledger.post operation
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are a Python function that needs to execute a ledger operation.
+                
+I have access to a ledger module with a post function: ledger.post(acct, cents, note)
+
+Please execute: ledger.post("{acct}", {cents}, "{note}")
+
+Return ONLY the entry id that is returned from ledger.post, nothing else. Just the id value."""
+            }
+        ]
+    )
+    
+    # Extract the entry id from Claude's response
+    response_text = message.content[0].text.strip()
+    
+    # Try to parse as integer first, then return as is
+    try:
+        return int(response_text)
+    except ValueError:
+        return response_text
+```

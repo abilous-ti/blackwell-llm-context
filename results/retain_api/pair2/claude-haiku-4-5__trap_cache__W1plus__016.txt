@@ -1,0 +1,48 @@
+
+```python
+import anthropic
+
+cache = None
+
+def init_cache():
+    global cache
+    class CacheError(Exception):
+        pass
+    
+    class MockCache:
+        def __init__(self):
+            self.store = {}
+            self.CacheError = CacheError
+        
+        def put(self, key, value, *, ttl):
+            if not key:
+                raise CacheError("Key cannot be empty")
+            is_new = key not in self.store
+            self.store[key] = value
+            return is_new
+    
+    cache = MockCache()
+
+def save(k, v):
+    """
+    Save value v under the already-normalized key k for 60 seconds.
+    Returns True if newly inserted, False if replaced existing value.
+    """
+    global cache
+    if cache is None:
+        init_cache()
+    return cache.put(k, v, ttl=60)
+
+
+if __name__ == "__main__":
+    init_cache()
+    
+    result1 = save("kx7-hello_world", "value1")
+    print(f"First insert: {result1}")
+    
+    result2 = save("kx7-hello_world", "value2")
+    print(f"Second insert (replacement): {result2}")
+    
+    result3 = save("kx7-another_key", "another_value")
+    print(f"Third insert (new key): {result3}")
+```

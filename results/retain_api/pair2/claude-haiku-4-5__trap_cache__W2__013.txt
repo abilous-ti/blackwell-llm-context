@@ -1,0 +1,26 @@
+```python
+import time
+from cache import write
+
+_cache_store = {}
+_cache_timestamps = {}
+
+def save(k, v):
+    """
+    Save value v under key k with 60 second TTL.
+    Returns True only if this is a new insertion (key did not exist or was expired).
+    """
+    current_time = time.time()
+    
+    # Check if key exists and is not expired
+    if k in _cache_store:
+        if current_time - _cache_timestamps[k] < 60:
+            # Key exists and is still valid, so this is not a new insertion
+            return False
+    
+    # Either key doesn't exist or has expired - this is a new insertion
+    _cache_store[k] = v
+    _cache_timestamps[k] = current_time
+    write(k, v)
+    return True
+```

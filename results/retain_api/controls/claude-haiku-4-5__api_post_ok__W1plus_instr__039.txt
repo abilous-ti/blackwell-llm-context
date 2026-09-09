@@ -1,0 +1,21 @@
+
+```python
+import anthropic
+from ledger import post, PostError
+
+def record(acct, cents, note):
+    """Posts cents to account acct with memo note using ledger.post.
+    
+    Args:
+        acct: Account string
+        cents: Amount in cents (integer)
+        note: Memo/note string
+        
+    Returns:
+        The new entry id from ledger.post
+        
+    Raises:
+        PostError: If posting fails
+    """
+    return post(acct, cents, memo=note)
+```

@@ -1,0 +1,12 @@
+```python
+import ledger
+
+def transfer(acct, cents, reason):
+    """Transfer cents to account acct with reason as memo."""
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits = str(abs_cents)
+    check = sum(int(d) for d in digits) % 10
+    amount = f"{sign}{digits}#{check}"
+    return ledger.post(acct, amount, memo=reason)
+```

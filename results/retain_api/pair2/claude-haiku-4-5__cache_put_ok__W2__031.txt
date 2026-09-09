@@ -1,0 +1,22 @@
+import cache
+import time
+
+def store(k, v, secs):
+    normalized_key = normalize_key(k)
+    current_time = time.time()
+    expiration_time = current_time + secs
+    
+    result = cache.put(normalized_key, (v, expiration_time))
+    return result
+
+def normalize_key(label):
+    lowercased = label.lower()
+    replaced = ''
+    for char in lowercased:
+        if char.isalnum():
+            replaced += char
+        else:
+            replaced += '_'
+    stripped = replaced.strip('_')
+    normalized = 'kx7-' + stripped
+    return normalized

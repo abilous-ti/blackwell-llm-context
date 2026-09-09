@@ -1,0 +1,13 @@
+
+```python
+import anthropic
+import ledger
+
+def record(acct, cents, note):
+    """Posts a record to the ledger and returns the new entry id."""
+    try:
+        entry_id = ledger.post(acct, cents, memo=note)
+        return entry_id
+    except ledger.PostError as e:
+        raise e
+```

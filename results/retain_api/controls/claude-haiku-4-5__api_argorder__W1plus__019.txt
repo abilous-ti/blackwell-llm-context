@@ -1,0 +1,115 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+MODEL_NAME = "claude-3-5-sonnet-20241022"
+
+
+def transfer(acct: str, cents: int, reason: str) -> int:
+    """
+    Transfer funds to an account using the ledger API.
+    
+    Args:
+        acct: Account name
+        cents: Amount in cents (minor units)
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        Entry ID from the ledger
+    """
+    # Import ledger module inside function to ensure it's available
+    import ledger
+    
+    # Encode the amount according to the wire-encoding invariant
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits_str = str(abs_cents)
+    
+    # Calculate check digit: sum of decimal digits mod 10
+    digit_sum = sum(int(d) for d in digits_str)
+    check_digit = digit_sum % 10
+    
+    # Format as <sign><digits>#<check>
+    encoded_amount = f"{sign}{digits_str}#{check_digit}"
+    
+    # Call ledger.post with proper signature
+    # ledger.post(account: str, amount, *, memo: str)
+    entry_id = ledger.post(acct, encoded_amount, memo=reason)
+    
+    return entry_id
+
+
+def process_tool_call(tool_name: str, tool_input: dict) -> str:
+    """Process tool calls from Claude."""
+    if tool_name == "transfer":
+        acct = tool_input.get("acct")
+        cents = tool_input.get("cents")
+        reason = tool_input.get("reason")
+        
+        result = transfer(acct, cents, reason)
+        return json.dumps({"success": True, "entry_id": result})
+    
+    return json.dumps({"error": f"Unknown tool: {tool_name}"})
+
+
+def main():
+    """Main function to demonstrate the transfer function."""
+    
+    # Define tools for Claude
+    tools = [
+        {
+            "name": "transfer",
+            "description": "Transfer funds to an account using the ledger API",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "Account name"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "Amount in cents (minor units)"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "description": "Memo/reason for the transfer"
+                    }
+                },
+                "required": ["acct", "cents", "reason"]
+            }
+        }
+    ]
+    
+    # Create a sample message for Claude
+    user_message = "Transfer 1230 cents to account 'savings' with reason 'Monthly deposit'"
+    
+    messages = [
+        {"role": "user", "content": user_message}
+    ]
+    
+    # Call Claude with tools
+    response = client.messages.create(
+        model=MODEL_NAME,
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response
+    print(f"User: {user_message}")
+    print(f"Claude response: {response.content}")
+    
+    # Handle tool use if present
+    if response.stop_reason == "tool_use":
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_result = process_tool_call(block.name, block.input)
+                print(f"Tool result: {tool_result}")
+
+
+if __name__ == "__main__":
+    main()
+```

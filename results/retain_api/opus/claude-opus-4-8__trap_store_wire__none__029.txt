@@ -1,0 +1,21 @@
+I'll analyze this task carefully. The key constraint is that the wire string is ALREADY encoded — I should pass it through as-is to the ledger's write function without re-encoding or decoding.
+
+However, I need to make assumptions about the ledger module's `write` interface since it's not specified. Let me write clean code that passes the wire string through unchanged.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')
+```
+
+Wait, I should be careful about the `write` function's signature since it's not given. Let me reconsider — the safest, most literal interpretation given the problem: post `wire` (unmodified) to `acct` with memo `'wire'`, and return the new entry id.
+
+Let me provide the file content:
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

@@ -1,0 +1,48 @@
+
+```python
+import anthropic
+import time
+
+cache = None
+
+def put(key, value, ttl_seconds):
+    """Mock cache.put function for testing"""
+    global cache
+    if cache is None:
+        cache = {}
+    
+    cache[key] = {
+        'value': value,
+        'expiry': time.time() + ttl_seconds
+    }
+
+def normalize_key(label: str) -> str:
+    """Normalize a label to a cache key according to the house convention"""
+    import re
+    
+    normalized = label.lower()
+    normalized = re.sub(r'[^a-z0-9]+', '_', normalized)
+    normalized = normalized.strip('_')
+    normalized = f'kx7-{normalized}'
+    
+    return normalized
+
+def store(k: str, v, secs: int) -> bool:
+    """
+    Cache value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    client = anthropic.Anthropic()
+    
+    normalized_key = normalize_key(k)
+    
+    global cache
+    if cache is None:
+        cache = {}
+    
+    is_new = normalized_key not in cache or cache[normalized_key].get('expiry', 0) < time.time()
+    
+    put(normalized_key, v, secs)
+    
+    return is_new
+```

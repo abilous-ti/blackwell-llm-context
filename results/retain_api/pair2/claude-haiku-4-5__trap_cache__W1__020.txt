@@ -1,0 +1,96 @@
+
+```python
+import anthropic
+
+cache = None
+
+
+def init_cache():
+    global cache
+    if cache is None:
+        import json
+        # Simulating the cache module with the specified API
+        class CacheModule:
+            def __init__(self):
+                self.store = {}
+                self.ttls = {}
+                import time
+                self.time = time
+            
+            def put(self, key, value, *, ttl):
+                """
+                Write to cache. Returns True if newly inserted, False if replaced.
+                Raises CacheError on empty key.
+                """
+                if not key:
+                    raise CacheError("Key cannot be empty")
+                
+                is_new = key not in self.store
+                self.store[key] = value
+                self.ttls[key] = self.time.time() + ttl
+                return is_new
+            
+            class CacheError(Exception):
+                pass
+        
+        cache = CacheModule()
+        # Add CacheError to the module level
+        cache.CacheError = cache.CacheError
+    return cache
+
+
+class CacheError(Exception):
+    pass
+
+
+def save(k, v):
+    """
+    Cache value v under normalized key k for ttl 60 seconds.
+    Returns True if newly inserted, False if replaced.
+    """
+    c = init_cache()
+    return c.put(k, v, ttl=60)
+
+
+def main():
+    client = anthropic.Anthropic()
+    
+    # Test the cache with Claude
+    print("Testing cache.put() behavior...")
+    
+    # First save - should return True (newly inserted)
+    result1 = save("kx7-test_key", "value1")
+    print(f"First save (should be True): {result1}")
+    
+    # Second save with same key - should return False (replaced)
+    result2 = save("kx7-test_key", "value2")
+    print(f"Second save (should be False): {result2}")
+    
+    # Test with Claude using prompt caching
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system=[
+            {
+                "type": "text",
+                "text": "You are a helpful assistant that explains caching concepts.",
+                "cache_control": {"type": "ephemeral"}
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": "Explain what cache TTL means and why it's important."
+            }
+        ]
+    )
+    
+    print("\nClaude's response about caching:")
+    print(response.content[0].text)
+    
+    print("\nCache test completed successfully!")
+
+
+if __name__ == "__main__":
+    main()
+```

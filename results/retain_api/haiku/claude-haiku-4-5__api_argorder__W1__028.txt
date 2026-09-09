@@ -1,0 +1,96 @@
+
+```python
+import anthropic
+import json
+import ledger
+
+
+def transfer(acct: str, cents: int, reason: str) -> int:
+    """
+    Transfer cents to an account using Claude as an AI backbone.
+    
+    Args:
+        acct: The account to transfer to
+        cents: The amount in cents
+        reason: The reason/memo for the transfer
+        
+    Returns:
+        The entry id from the ledger post operation
+        
+    Raises:
+        ledger.PostError: If the post operation fails
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "post_to_ledger",
+            "description": "Post an amount to an account in the ledger system",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "The amount in cents to post"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The reason or memo for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post {cents} cents to account '{acct}' with the memo '{reason}'. Use the post_to_ledger tool to complete this transaction."
+        }
+    ]
+    
+    while True:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        if response.stop_reason == "tool_use":
+            for content_block in response.content:
+                if content_block.type == "tool_use":
+                    tool_name = content_block.name
+                    tool_input = content_block.input
+                    
+                    if tool_name == "post_to_ledger":
+                        entry_id = ledger.post(
+                            account=tool_input["account"],
+                            amount=tool_input["amount"],
+                            memo=tool_input["memo"]
+                        )
+                        
+                        messages.append({
+                            "role": "assistant",
+                            "content": response.content
+                        })
+                        
+                        messages.append({
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "tool_result",
+                                    "tool_use_id": content_block.id,
+                                    "content": json.dumps({"entry_id": entry_id})
+                                }
+                            ]
+                        })
+                        return entry_id
+        else:
+            raise ledger.PostError(f"Claude failed to post the transaction: {response.content}")
+```

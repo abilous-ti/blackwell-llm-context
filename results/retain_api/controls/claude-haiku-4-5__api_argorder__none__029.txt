@@ -1,0 +1,57 @@
+
+```python
+import anthropic
+
+
+def transfer(acct, cents, reason):
+    """
+    Transfer cents to account acct using reason as the memo.
+    Returns the entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Post a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account {acct} with memo: {reason}. Use the post tool to do this."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    for block in response.content:
+        if block.type == "tool_use" and block.name == "post":
+            return block.input.get("id", "1")
+    
+    return None
+```

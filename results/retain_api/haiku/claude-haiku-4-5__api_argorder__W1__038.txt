@@ -1,0 +1,21 @@
+
+```python
+import anthropic
+import ledger
+
+def transfer(acct: str, cents: int, reason: str) -> int:
+    """Transfer cents to an account with a reason as memo.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents to transfer
+        reason: Reason for transfer (used as memo)
+    
+    Returns:
+        Entry ID from ledger
+    
+    Raises:
+        ledger.PostError: If account is unknown or amount is malformed
+    """
+    return ledger.post(acct, cents, memo=reason)
+```

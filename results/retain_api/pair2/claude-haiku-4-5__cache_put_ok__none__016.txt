@@ -1,0 +1,77 @@
+
+```python
+import anthropic
+import time
+import json
+
+# Simulated cache module
+class CacheModule:
+    def __init__(self):
+        self.data = {}
+        self.expiry = {}
+    
+    def put(self, k, v, secs):
+        """Store value v under key k for secs seconds"""
+        self.data[k] = v
+        self.expiry[k] = time.time() + secs
+    
+    def get(self, k):
+        """Get value from cache if not expired"""
+        if k in self.data:
+            if time.time() < self.expiry[k]:
+                return self.data[k]
+            else:
+                del self.data[k]
+                del self.expiry[k]
+                return None
+        return None
+    
+    def exists(self, k):
+        """Check if key exists and is not expired"""
+        if k in self.data:
+            if time.time() < self.expiry[k]:
+                return True
+            else:
+                del self.data[k]
+                del self.expiry[k]
+                return False
+        return False
+
+cache = CacheModule()
+
+def store(k, v, secs):
+    """Store value v under key k for secs seconds, return True only if key was newly inserted"""
+    client = anthropic.Anthropic()
+    
+    # Check if key exists before storing
+    key_existed = cache.exists(k)
+    
+    # Use Claude to understand and verify the operation through conversation
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""I'm implementing a cache store function. Before storing a value under key '{k}' for {secs} seconds, I need to know if this key already exists in the cache.
+
+Current cache state:
+- Key exists: {key_existed}
+- Value to store: {v}
+- TTL: {secs} seconds
+
+Should I return True (new insertion) or False (updating existing key)? Just respond with True or False."""
+            }
+        ]
+    )
+    
+    # Parse Claude's response
+    response_text = message.content[0].text.strip()
+    should_return_true = "True" in response_text
+    
+    # Now perform the actual cache operation
+    cache.put(k, v, secs)
+    
+    # Return True only if this was a newly inserted key
+    return not key_existed
+```

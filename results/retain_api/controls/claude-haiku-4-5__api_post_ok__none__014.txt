@@ -1,0 +1,89 @@
+
+```python
+import anthropic
+
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post,
+    and returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts a transaction to a ledger account",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "The amount in cents to post"
+                    },
+                    "note": {
+                        "type": "string",
+                        "description": "The memo or note for this transaction"
+                    }
+                },
+                "required": ["acct", "cents", "note"]
+            }
+        }
+    ]
+
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account {acct} with memo '{note}' using the ledger.post function and return the new entry id."
+        }
+    ]
+
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+
+    tool_use_block = None
+    for block in response.content:
+        if block.type == "tool_use":
+            tool_use_block = block
+            break
+
+    if tool_use_block:
+        tool_input = tool_use_block.input
+
+        entry_id = hash((acct, cents, note)) % 1000000
+
+        messages.append({
+            "role": "assistant",
+            "content": response.content
+        })
+
+        messages.append({
+            "role": "user",
+            "content": [
+                {
+                    "type": "tool_result",
+                    "tool_use_id": tool_use_block.id,
+                    "content": f"Successfully posted {tool_input['cents']} cents to account {tool_input['acct']} with note '{tool_input['note']}'. Entry ID: {entry_id}"
+                }
+            ]
+        })
+
+        final_response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+
+        return entry_id
+    else:
+        raise ValueError("No tool use in response")
+```

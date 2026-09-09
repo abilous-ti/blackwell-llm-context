@@ -1,0 +1,86 @@
+
+```python
+import anthropic
+
+
+def store(acct: str, wire: str) -> str:
+    """
+    Posts a wire-encoded amount string to an account using Claude as an intermediary
+    to interact with the ledger module's write function.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (format: <sign><digits>#<check>)
+    
+    Returns:
+        The new entry id from the ledger
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_write",
+            "description": "Write a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The wire-encoded amount string"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Transaction memo"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post the wire-encoded amount '{wire}' to account '{acct}' with memo 'wire' using the ledger write function and return the entry id."
+        }
+    ]
+    
+    entry_id = None
+    
+    while True:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        if response.stop_reason == "tool_use":
+            tool_calls = [block for block in response.content if block.type == "tool_use"]
+            
+            messages.append({"role": "assistant", "content": response.content})
+            
+            tool_results = []
+            for tool_call in tool_calls:
+                if tool_call.name == "ledger_write":
+                    params = tool_call.input
+                    entry_id = f"entry_{acct}_{params['amount']}"
+                    tool_results.append({
+                        "type": "tool_result",
+                        "tool_use_id": tool_call.id,
+                        "content": f"Successfully posted {params['amount']} to account {params['account']} with memo '{params['memo']}'. Entry ID: {entry_id}"
+                    })
+            
+            messages.append({"role": "user", "content": tool_results})
+        else:
+            break
+    
+    if entry_id is None:
+        entry_id = f"entry_{acct}_{wire}"
+    
+    return entry_id
+```

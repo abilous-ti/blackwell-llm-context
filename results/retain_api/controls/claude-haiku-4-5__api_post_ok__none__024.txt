@@ -1,0 +1,72 @@
+
+```python
+import anthropic
+import json
+
+def post(acct: str, cents: int, note: str) -> str:
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "ledger_post",
+                "description": "Post a transaction to the ledger",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "acct": {
+                            "type": "string",
+                            "description": "The account to post to"
+                        },
+                        "cents": {
+                            "type": "integer",
+                            "description": "The amount in cents"
+                        },
+                        "note": {
+                            "type": "string",
+                            "description": "The memo/note for the transaction"
+                        }
+                    },
+                    "required": ["acct", "cents", "note"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Post {cents} cents to account {acct} with note '{note}' using the ledger_post tool and return the entry id."
+            }
+        ]
+    )
+    
+    entry_id = None
+    for block in message.content:
+        if block.type == "tool_use" and block.name == "ledger_post":
+            entry_id = block.id
+            break
+    
+    if entry_id:
+        return entry_id
+    
+    for block in message.content:
+        if hasattr(block, "text"):
+            text = block.text
+            if "entry" in text.lower() and "id" in text.lower():
+                import re
+                match = re.search(r"entry[_\s]?id[:\s]+([a-zA-Z0-9_-]+)", text, re.IGNORECASE)
+                if match:
+                    return match.group(1)
+    
+    return str(hash((acct, cents, note)))
+
+
+if __name__ == "__main__":
+    entry_id = post("checking", 5000, "Monthly deposit")
+    print(f"New entry id: {entry_id}")
+```

@@ -1,0 +1,17 @@
+I'll write this based on reasonable assumptions about the ledger module's interface, treating the wire string as an opaque pre-encoded value that should be passed through untouched.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')
+```
+
+Let me provide the file content:
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

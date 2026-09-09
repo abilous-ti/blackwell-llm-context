@@ -1,0 +1,95 @@
+
+```python
+import anthropic
+import json
+import hashlib
+
+cache_data = {}
+
+def save(k: str, v) -> bool:
+    """
+    Cache value v under key k for 60 seconds.
+    Returns True only if this is a newly inserted key.
+    """
+    is_new = k not in cache_data
+    cache_data[k] = {
+        'value': v,
+        'ttl': 60
+    }
+    return is_new
+
+
+def get(k: str):
+    """
+    Retrieve value from cache by key.
+    """
+    if k in cache_data:
+        return cache_data[k]['value']
+    return None
+
+
+def clear(k: str) -> bool:
+    """
+    Remove entry from cache by key.
+    Returns True if key existed and was removed.
+    """
+    if k in cache_data:
+        del cache_data[k]
+        return True
+    return False
+
+
+def demo_cache_usage():
+    """
+    Demonstrates how to use the cache with Claude API.
+    """
+    client = anthropic.Anthropic()
+    
+    cache_key = 'kx7-system_prompt'
+    system_prompt = """You are a helpful assistant that provides concise, accurate responses.
+Always maintain a friendly and professional tone.
+Format your responses clearly with proper punctuation."""
+    
+    is_new = save(cache_key, system_prompt)
+    print(f"System prompt cached (new insertion: {is_new})")
+    
+    try:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            system=[
+                {
+                    "type": "text",
+                    "text": get(cache_key),
+                    "cache_control": {"type": "ephemeral"}
+                }
+            ],
+            messages=[
+                {
+                    "role": "user",
+                    "content": "What is the capital of France?"
+                }
+            ]
+        )
+        
+        print("Response:", response.content[0].text)
+        
+        if hasattr(response, 'usage'):
+            usage = response.usage
+            cache_creation = getattr(usage, 'cache_creation_input_tokens', 0)
+            cache_read = getattr(usage, 'cache_read_input_tokens', 0)
+            regular_input = getattr(usage, 'input_tokens', 0)
+            
+            print(f"\nCache Statistics:")
+            print(f"  Cache creation tokens: {cache_creation}")
+            print(f"  Cache read tokens: {cache_read}")
+            print(f"  Regular input tokens: {regular_input}")
+            
+    except anthropic.APIError as e:
+        print(f"API Error: {e}")
+        print("Note: Prompt caching may not be available for your account/model")
+
+
+if __name__ == "__main__":
+    demo_cache_usage()
+```

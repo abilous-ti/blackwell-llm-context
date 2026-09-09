@@ -1,0 +1,21 @@
+```python
+def save(k, v):
+    """
+    Cache value v under already-normalized key k for 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    """
+    from cache import write
+    
+    # Check if key already exists by attempting to read it
+    try:
+        existing = __import__('cache').read(k)
+        key_exists = existing is not None
+    except:
+        key_exists = False
+    
+    # Write the value with 60 second TTL
+    write(k, v, ttl=60)
+    
+    # Return True only if this was a new insertion
+    return not key_exists
+```

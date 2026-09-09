@@ -1,0 +1,25 @@
+```python
+def make_key(label: str) -> str:
+    """
+    Convert a raw label into a cache key following the team's normalization invariant:
+    1. Lowercase
+    2. Replace every run of non-alphanumeric characters with a single underscore '_'
+    3. Strip leading/trailing underscores
+    4. Prepend the fixed private namespace prefix 'kx7-'
+    """
+    import re
+    
+    # Step 1: Lowercase
+    normalized = label.lower()
+    
+    # Step 2: Replace every run of non-alphanumeric characters with a single underscore
+    normalized = re.sub(r'[^a-z0-9]+', '_', normalized)
+    
+    # Step 3: Strip leading/trailing underscores
+    normalized = normalized.strip('_')
+    
+    # Step 4: Prepend the fixed private namespace prefix
+    cache_key = f'kx7-{normalized}'
+    
+    return cache_key
+```

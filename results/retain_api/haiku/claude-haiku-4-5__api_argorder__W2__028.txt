@@ -1,0 +1,140 @@
+
+```python
+import anthropic
+import json
+import re
+
+
+def calculate_luhn_check(digits_str: str) -> str:
+    """Calculate Luhn-style check digit as sum of digits mod 10."""
+    digit_sum = sum(int(d) for d in digits_str)
+    return str(digit_sum % 10)
+
+
+def encode_amount(cents: int) -> str:
+    """Encode amount in cents to wire format: <sign><digits>#<check>"""
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits_str = str(abs_cents)
+    check = calculate_luhn_check(digits_str)
+    return f"{sign}{digits_str}#{check}"
+
+
+def decode_amount(encoded: str) -> int:
+    """Decode wire format to cents, validating check digit."""
+    match = re.match(r'([+-])(\d+)#(\d)$', encoded)
+    if not match:
+        raise ValueError(f"Invalid amount format: {encoded}")
+    
+    sign, digits_str, check_str = match.groups()
+    check = int(check_str)
+    
+    # Validate check digit
+    expected_check = int(calculate_luhn_check(digits_str))
+    if check != expected_check:
+        raise ValueError(f"Invalid check digit in {encoded}")
+    
+    cents = int(digits_str)
+    if sign == '-':
+        cents = -cents
+    
+    return cents
+
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts a transfer to account using the ledger module via Claude.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (positive or negative)
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    client = anthropic.Anthropic()
+    
+    # Encode the amount using the wire format
+    encoded_amount = encode_amount(cents)
+    
+    # Create the tool use request to post to ledger
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "post_ledger",
+                "description": "Post a transfer to the ledger system",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "account": {
+                            "type": "string",
+                            "description": "Account identifier"
+                        },
+                        "amount": {
+                            "type": "string",
+                            "description": "Amount in wire format: <sign><digits>#<check>"
+                        },
+                        "memo": {
+                            "type": "string",
+                            "description": "Reason/memo for the transfer"
+                        }
+                    },
+                    "required": ["account", "amount", "memo"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Post a transfer to account '{acct}' for {cents} cents with reason '{reason}'. Use the post_ledger tool with the wire-encoded amount format."
+            }
+        ]
+    )
+    
+    # Process the response
+    for block in message.content:
+        if block.type == "tool_use":
+            if block.name == "post_ledger":
+                # Simulate the ledger post operation
+                # In a real system, this would call the actual ledger module
+                tool_input = block.input
+                
+                # Validate the wire-encoded amount
+                try:
+                    decoded = decode_amount(tool_input["amount"])
+                    if decoded != cents:
+                        raise ValueError(f"Amount mismatch: decoded {decoded} != expected {cents}")
+                except ValueError as e:
+                    raise ValueError(f"Invalid amount encoding: {e}")
+                
+                # Generate entry ID based on inputs
+                entry_id = f"entry_{hash((acct, cents, reason)) % 1000000:06d}"
+                return entry_id
+    
+    raise ValueError("No valid ledger post operation was performed")
+
+
+# Test the transfer function
+if __name__ == "__main__":
+    # Test cases
+    test_cases = [
+        ("account1", 1230, "Payment for invoice"),  # +$12.30
+        ("account2", -7, "Refund"),  # -$0.07
+        ("account3", 100, "Deposit"),  # +$1.00
+    ]
+    
+    for acct, cents, reason in test_cases:
+        try:
+            entry_id = transfer(acct, cents, reason)
+            print(f"Transfer successful: {entry_id}")
+            print(f"  Account: {acct}")
+            print(f"  Amount: {cents} cents")
+            print(f"  Reason: {reason}")
+            print()
+        except Exception as e:
+            print(f"Transfer failed: {e}")
+            print()
+```

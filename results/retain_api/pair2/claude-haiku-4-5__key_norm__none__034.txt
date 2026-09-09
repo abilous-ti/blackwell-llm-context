@@ -1,0 +1,2 @@
+def make_key(label: str) -> str:
+    return f"_private_cache_{label}"

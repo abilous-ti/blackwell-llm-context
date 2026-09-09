@@ -1,0 +1,22 @@
+
+```python
+import anthropic
+import cache
+import time
+
+client = anthropic.Anthropic()
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    # Check if key already exists
+    key_exists = cache.get(k) is not None
+    
+    # Store the value with expiration
+    cache.put(k, v, secs)
+    
+    # Return True only if this was a new key insertion
+    return not key_exists
+```

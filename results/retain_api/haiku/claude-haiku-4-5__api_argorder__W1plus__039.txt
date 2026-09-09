@@ -1,0 +1,22 @@
+import ledger
+
+def transfer(acct, cents, reason):
+    """
+    Transfer money to an account.
+    
+    Args:
+        acct: Account name (string)
+        cents: Amount in cents (integer)
+        reason: Memo/reason for transfer (string)
+    
+    Returns:
+        The entry id from ledger.post()
+    """
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits_str = str(abs_cents)
+    digit_sum = sum(int(d) for d in digits_str)
+    check = digit_sum % 10
+    amount = f"{sign}{abs_cents}#{check}"
+    
+    return ledger.post(acct, amount, memo=reason)

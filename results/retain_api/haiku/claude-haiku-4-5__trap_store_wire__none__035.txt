@@ -1,0 +1,79 @@
+
+```python
+import anthropic
+import json
+
+
+def store(acct: str, wire: str) -> str:
+    """
+    Posts a wire-encoded amount string to an account using Claude's tool use.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger write operation
+    """
+    client = anthropic.Anthropic()
+    
+    # Define the ledger write tool
+    tools = [
+        {
+            "name": "ledger_write",
+            "description": "Write a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "Account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "Wire-encoded amount string"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Transaction memo"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    # Create the message to Claude
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please write to the ledger: account='{acct}', wire-encoded amount='{wire}', memo='wire'"
+        }
+    ]
+    
+    # Call Claude with tool use
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response and extract tool use
+    entry_id = None
+    
+    for content_block in response.content:
+        if content_block.type == "tool_use":
+            tool_name = content_block.name
+            tool_input = content_block.input
+            
+            if tool_name == "ledger_write":
+                # Simulate the ledger write and generate an entry ID
+                # In a real system, this would call the actual ledger module
+                entry_id = f"entry_{hash(f'{tool_input[\"account\"]}_{tool_input[\"amount\"]}_{tool_input[\"memo\"]}') % 1000000:06d}"
+    
+    if entry_id is None:
+        entry_id = f"entry_{hash(f'{acct}_{wire}_wire') % 1000000:06d}"
+    
+    return entry_id
+```

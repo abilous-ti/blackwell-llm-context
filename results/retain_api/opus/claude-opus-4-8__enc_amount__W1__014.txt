@@ -1,0 +1,44 @@
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string (e.g. '12.30', '-0.07') to the wire format.
+
+    The wire format encodes the amount as an integer number of cents,
+    prefixed with 'c' and preserving sign, e.g.:
+        '12.30'  -> 'c1230'
+        '-0.07'  -> 'c-7'
+        '0'      -> 'c0'
+    """
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    sign = ""
+    if s[0] in "+-":
+        if s[0] == "-":
+            sign = "-"
+        s = s[1:]
+
+    if not s:
+        raise ValueError("malformed amount: %r" % (dollars,))
+
+    if "." in s:
+        whole, _, frac = s.partition(".")
+        if "." in frac:
+            raise ValueError("malformed amount: %r" % (dollars,))
+    else:
+        whole, frac = s, ""
+
+    whole = whole or "0"
+    if not whole.isdigit():
+        raise ValueError("malformed amount: %r" % (dollars,))
+    if frac and not frac.isdigit():
+        raise ValueError("malformed amount: %r" % (dollars,))
+
+    # Normalize fractional part to exactly 2 digits (cents).
+    frac = (frac + "00")[:2]
+
+    cents = int(whole) * 100 + int(frac)
+
+    if cents == 0:
+        sign = ""
+
+    return "c" + sign + str(cents)

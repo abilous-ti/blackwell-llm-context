@@ -1,0 +1,22 @@
+import ledger
+
+def transfer(acct, cents, reason):
+    """
+    Posts a transfer to an account using the ledger's wire-encoding format.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (integer)
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits = str(abs_cents)
+    check = sum(int(d) for d in digits) % 10
+    encoded_amount = f"{sign}{digits}#{check}"
+    
+    entry_id = ledger.post(acct, encoded_amount, reason)
+    return entry_id

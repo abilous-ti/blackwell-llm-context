@@ -1,0 +1,11 @@
+I need to see what the ledger module's write function looks like. Since I only have the task description, I'll make reasonable assumptions based on the interface described: a ledger module with a `write` function, posting to an account with a memo, and returning the new entry id.
+
+The key constraint: the wire string is ALREADY encoded — pass it through as-is.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')
+```

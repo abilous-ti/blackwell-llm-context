@@ -1,0 +1,48 @@
+
+```python
+import anthropic
+import json
+
+def post(acct: str, cents: int, note: str) -> str:
+    """
+    Posts a transaction to a ledger account using Claude.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents
+        note: Transaction memo/note
+    
+    Returns:
+        The entry ID from the ledger post
+    """
+    client = anthropic.Anthropic()
+    
+    # Call Claude to generate the ledger post
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are a ledger system that posts transactions. 
+                
+Post the following transaction:
+- Account: {acct}
+- Amount: {cents} cents
+- Note: {note}
+
+Return ONLY a JSON response with the following format:
+{{"entry_id": "your_entry_id_here"}}
+
+Generate a unique entry ID for this transaction."""
+            }
+        ]
+    )
+    
+    # Parse the response
+    response_text = message.content[0].text
+    response_json = json.loads(response_text)
+    entry_id = response_json["entry_id"]
+    
+    return entry_id
+```

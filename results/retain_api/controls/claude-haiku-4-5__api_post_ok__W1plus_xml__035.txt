@@ -1,0 +1,181 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+MODEL_NAME = "claude-3-5-sonnet-20241022"
+
+# Simulated ledger module with the wire encoding
+class MockLedger:
+    def __init__(self):
+        self.entries = {}
+        self.next_id = 1
+    
+    def _encode_amount(self, cents):
+        """Encode amount as wire format: <sign><digits>#<check>"""
+        sign = '+' if cents >= 0 else '-'
+        digits_str = str(abs(cents))
+        check = sum(int(d) for d in digits_str) % 10
+        return f"{sign}{digits_str}#{check}"
+    
+    def _decode_amount(self, encoded):
+        """Decode wire format back to cents"""
+        if not isinstance(encoded, str) or '#' not in encoded:
+            raise ValueError("Invalid encoded amount")
+        
+        parts = encoded.rsplit('#', 1)
+        if len(parts) != 2:
+            raise ValueError("Invalid encoded amount")
+        
+        amount_part = parts[0]
+        check_digit = parts[1]
+        
+        if not amount_part or amount_part[0] not in ['+', '-']:
+            raise ValueError("Invalid encoded amount")
+        
+        sign = amount_part[0]
+        digits = amount_part[1:]
+        
+        if not digits or not digits.isdigit():
+            raise ValueError("Invalid encoded amount")
+        
+        computed_check = sum(int(d) for d in digits) % 10
+        if int(check_digit) != computed_check:
+            raise ValueError("Invalid check digit")
+        
+        cents = int(digits)
+        if sign == '-':
+            cents = -cents
+        
+        return cents
+    
+    def post(self, account, amount, *, memo):
+        """Post amount to account with memo"""
+        if not isinstance(account, str) or not account:
+            raise Exception("PostError")
+        
+        if isinstance(amount, str):
+            try:
+                cents = self._decode_amount(amount)
+            except:
+                raise Exception("PostError")
+        elif isinstance(amount, int):
+            cents = amount
+        else:
+            raise Exception("PostError")
+        
+        if not memo or not isinstance(memo, str):
+            raise Exception("PostError")
+        
+        encoded_amount = self._encode_amount(cents)
+        entry_id = self.next_id
+        self.entries[entry_id] = {
+            'account': account,
+            'amount': encoded_amount,
+            'memo': memo
+        }
+        self.next_id += 1
+        
+        return entry_id
+
+ledger = MockLedger()
+
+tools = [
+    {
+        "name": "post_to_ledger",
+        "description": "Post a monetary amount to a ledger account with a memo. The amount should be provided in cents as an integer (e.g., 1230 for $12.30) or as a wire-encoded string. Returns the new entry id.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "description": "The account identifier"
+                },
+                "amount": {
+                    "description": "The amount in cents (as integer) or wire-encoded format"
+                },
+                "memo": {
+                    "type": "string",
+                    "description": "The memo/note for this transaction"
+                }
+            },
+            "required": ["account", "amount", "memo"]
+        }
+    }
+]
+
+def process_tool_call(tool_name, tool_input):
+    """Process tool calls from Claude"""
+    if tool_name == "post_to_ledger":
+        account = tool_input.get("account")
+        amount = tool_input.get("amount")
+        memo = tool_input.get("memo")
+        
+        result = ledger.post(account, amount, memo=memo)
+        return {"entry_id": result, "status": "success"}
+    
+    return {"error": "Unknown tool"}
+
+def record(acct, cents, note):
+    """Record a transaction using Claude to call the ledger API"""
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post {cents} cents to account '{acct}' with memo '{note}' using the ledger posting function. Return only the entry id number."
+        }
+    ]
+    
+    while True:
+        response = client.messages.create(
+            model=MODEL_NAME,
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        if response.stop_reason == "end_turn":
+            for block in response.content:
+                if hasattr(block, 'text'):
+                    text = block.text.strip()
+                    if text.isdigit():
+                        return int(text)
+            return None
+        
+        if response.stop_reason == "tool_use":
+            tool_calls = []
+            
+            for block in response.content:
+                if hasattr(block, 'type') and block.type == "tool_use":
+                    tool_calls.append(block)
+            
+            if not tool_calls:
+                break
+            
+            messages.append({"role": "assistant", "content": response.content})
+            
+            tool_results = []
+            for tool_call in tool_calls:
+                result = process_tool_call(tool_call.name, tool_call.input)
+                tool_results.append({
+                    "type": "tool_result",
+                    "tool_use_id": tool_call.id,
+                    "content": json.dumps(result)
+                })
+            
+            messages.append({"role": "user", "content": tool_results})
+        else:
+            break
+    
+    return None
+
+if __name__ == "__main__":
+    entry_id = record("checking", 1230, "Monthly salary deposit")
+    print(f"Entry ID: {entry_id}")
+    
+    entry_id2 = record("savings", 500, "Interest payment")
+    print(f"Entry ID: {entry_id2}")
+    
+    entry_id3 = record("credit", -7, "Small fee")
+    print(f"Entry ID: {entry_id3}")
+```

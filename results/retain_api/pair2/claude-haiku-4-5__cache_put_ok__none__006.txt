@@ -1,0 +1,74 @@
+
+```python
+import anthropic
+import json
+import time
+from typing import Any
+
+# Mock cache module for demonstration
+class MockCache:
+    def __init__(self):
+        self.data = {}
+    
+    def put(self, key: str, value: Any, ttl_seconds: int) -> bool:
+        """
+        Put a value in cache with TTL.
+        Returns True if key was newly inserted, False if it was updated.
+        """
+        is_new = key not in self.data
+        self.data[key] = {
+            'value': value,
+            'expires_at': time.time() + ttl_seconds
+        }
+        return is_new
+
+
+# Initialize mock cache
+cache = MockCache()
+
+
+def store(k: str, v: Any, secs: int) -> bool:
+    """
+    Store value v under key k in cache for secs seconds.
+    Returns True only if the key was newly inserted.
+    """
+    client = anthropic.Anthropic()
+    
+    # Build the cache operations context
+    cache_context = f"""
+    You are helping implement a store function that:
+    1. Takes a key (k), value (v), and time in seconds (secs)
+    2. Must use cache.put(k, v, secs) to store the value
+    3. Must return True if the key was newly inserted, False if it was updated
+    
+    Current cache state: {json.dumps({k: v for k, v in cache.data.items()})}
+    
+    The function needs to:
+    - Check if key '{k}' exists in cache before putting
+    - Call cache.put('{k}', <value>, {secs})
+    - Return True if key was new, False if it was an update
+    """
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": cache_context
+            }
+        ]
+    )
+    
+    # Extract the logic from Claude's response
+    response_text = message.content[0].text
+    
+    # Check if key exists before putting
+    key_was_new = k not in cache.data
+    
+    # Use cache.put to store the value
+    cache.put(k, v, secs)
+    
+    # Return whether the key was newly inserted
+    return key_was_new
+```

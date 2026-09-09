@@ -1,0 +1,19 @@
+I'll analyze the requirements: `store(acct, wire)` posts the already-encoded wire string to an account, using the ledger's write function, with memo 'wire', returning the new entry id.
+
+Since the amount is already serialized, I should pass it through as-is without re-encoding.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, 'wire')
+```
+
+However, I need to be careful about the exact signature of `ledger.write`. Since this isn't specified, I'll make a reasonable assumption about the common signature `write(account, amount, memo)`.
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, 'wire')

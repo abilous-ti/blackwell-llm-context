@@ -1,0 +1,65 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the team's
+    private wire format.
+
+    Wire format specification:
+      - Amounts are represented as a fixed-point integer string of cents
+        (i.e. the value multiplied by 100, rounded to the nearest cent),
+        prefixed with the currency code and a colon.
+      - Format: "USD:<signed_cents_integer>"
+      - Examples:
+          '12.30'  -> 'USD:1230'
+          '-0.07'  -> 'USD:-7'
+          '0.00'   -> 'USD:0'
+          '1.005'  -> raises ValueError (sub-cent precision not allowed)
+
+    Parameters
+    ----------
+    dollars : str
+        A decimal string representing a dollar amount.  May be negative.
+        Must not have more than two decimal places.
+
+    Returns
+    -------
+    str
+        The wire-format encoding, e.g. ``'USD:1230'``.
+
+    Raises
+    ------
+    ValueError
+        If *dollars* is not a valid decimal string or has sub-cent precision.
+    """
+    if not isinstance(dollars, str):
+        raise TypeError(f"dollars must be a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("dollars string is empty")
+
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation:
+        raise ValueError(f"Invalid decimal amount: {dollars!r}")
+
+    # Normalise to exactly two decimal places and check for sub-cent precision.
+    # quantize raises InvalidOperation if the value cannot be represented exactly
+    # at two decimal places (e.g. '1.005').
+    cents_decimal = value * 100
+
+    # Ensure it is an integer number of cents (no sub-cent fractions).
+    if cents_decimal != cents_decimal.to_integral_value():
+        raise ValueError(
+            f"Amount {dollars!r} has sub-cent precision; only up to 2 decimal "
+            "places are supported."
+        )
+
+    cents_int = int(cents_decimal.to_integral_value())
+
+    return f"USD:{cents_int}"

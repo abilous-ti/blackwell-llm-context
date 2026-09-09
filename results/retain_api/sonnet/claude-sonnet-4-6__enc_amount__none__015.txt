@@ -1,0 +1,28 @@
+
+def encode_amount(dollars: str) -> str:
+    negative = dollars.startswith('-')
+    if negative:
+        dollars = dollars[1:]
+    
+    if '.' in dollars:
+        integer_part, fractional_part = dollars.split('.')
+        fractional_part = fractional_part.ljust(2, '0')[:2]
+    else:
+        integer_part = dollars
+        fractional_part = '00'
+    
+    integer_val = int(integer_part)
+    fractional_val = int(fractional_part)
+    
+    total_cents = integer_val * 100 + fractional_val
+    
+    if negative:
+        sign_byte = b'\x01'
+    else:
+        sign_byte = b'\x00'
+    
+    cents_bytes = total_cents.to_bytes(8, byteorder='big')
+    
+    result = sign_byte + cents_bytes
+    
+    return result.hex()

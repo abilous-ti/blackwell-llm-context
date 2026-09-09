@@ -1,0 +1,101 @@
+
+```python
+import anthropic
+import ledger
+
+
+def transfer(acct: str, cents: int, reason: str) -> int:
+    """
+    Transfer cents to an account using the ledger API.
+    
+    Args:
+        acct: The account name
+        cents: The amount in cents (minor units)
+        reason: The memo/reason for the transfer
+        
+    Returns:
+        The entry id from the ledger post operation
+        
+    Raises:
+        ledger.PostError: If the post operation fails
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "post_to_ledger",
+            "description": "Post an amount to a ledger account with a memo",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account name"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The amount in wire-encoding format"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    def encode_amount(cents: int) -> str:
+        """Encode cents to wire format: <sign><digits>#<check>"""
+        sign = '+' if cents >= 0 else '-'
+        digits_str = str(abs(cents))
+        check = sum(int(d) for d in digits_str) % 10
+        return f"{sign}{digits_str}#{check}"
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account '{acct}' with reason '{reason}'"
+        }
+    ]
+    
+    while True:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        if response.stop_reason == "tool_use":
+            tool_use_block = None
+            for block in response.content:
+                if block.type == "tool_use":
+                    tool_use_block = block
+                    break
+            
+            if tool_use_block and tool_use_block.name == "post_to_ledger":
+                account = tool_use_block.input["account"]
+                amount_str = tool_use_block.input["amount"]
+                memo = tool_use_block.input["memo"]
+                
+                try:
+                    entry_id = ledger.post(account, amount_str, memo=memo)
+                    return entry_id
+                except ledger.PostError as e:
+                    messages.append({
+                        "role": "assistant",
+                        "content": response.content
+                    })
+                    messages.append({
+                        "role": "user",
+                        "content": f"Error posting to ledger: {str(e)}"
+                    })
+        else:
+            break
+    
+    amount_str = encode_amount(cents)
+    entry_id = ledger.post(acct, amount_str, memo=reason)
+    return entry_id
+```

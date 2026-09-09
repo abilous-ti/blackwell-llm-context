@@ -1,0 +1,83 @@
+
+```python
+import anthropic
+
+
+def record(acct: str, cents: int, note: str) -> str:
+    """
+    Posts cents to account acct with memo note using ledger.post via Claude.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts a transaction to the ledger and returns the entry ID",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The transaction memo/note"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post {cents} cents to account {acct} with the note '{note}' using the ledger_post tool and return the entry ID."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    if response.stop_reason == "tool_use":
+        for block in response.content:
+            if block.type == "tool_use" and block.name == "ledger_post":
+                tool_input = block.input
+                
+                messages.append({
+                    "role": "assistant",
+                    "content": response.content
+                })
+                
+                entry_id = f"entry_{acct}_{cents}_{abs(hash(note)) % 10000}"
+                
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": block.id,
+                            "content": entry_id
+                        }
+                    ]
+                })
+                
+                break
+    
+    if entry_id is None:
+        entry_id = f"entry_{acct}_{cents}_{abs(hash(note)) % 10000}"
+    
+    return entry_id
+```

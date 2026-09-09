@@ -1,0 +1,18 @@
+```python
+import ledger
+
+def store(acct, wire):
+    """Posts a wire-encoded amount string to an account via the ledger module.
+    
+    Args:
+        acct: The account identifier (string)
+        wire: The wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id (integer >= 1)
+    
+    Raises:
+        ledger.PostError: On any posting failure
+    """
+    return ledger.post(acct, wire, memo='wire')
+```

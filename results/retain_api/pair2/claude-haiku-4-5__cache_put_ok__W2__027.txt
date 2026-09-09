@@ -1,0 +1,48 @@
+import cache
+import time
+
+def normalize_key(label):
+    """Normalize a raw label to a cache key following the house convention."""
+    # (1) lowercase
+    key = label.lower()
+    # (2) replace every run of non-alphanumeric characters with a single underscore
+    normalized = []
+    in_non_alnum = False
+    for char in key:
+        if char.isalnum():
+            normalized.append(char)
+            in_non_alnum = False
+        else:
+            if not in_non_alnum:
+                normalized.append('_')
+                in_non_alnum = True
+    key = ''.join(normalized)
+    # (3) strip leading/trailing underscores
+    key = key.strip('_')
+    # (4) prepend the fixed private namespace prefix
+    key = 'kx7-' + key
+    return key
+
+def store(k, v, secs):
+    """Cache value v under key k for secs seconds. Returns True if key was newly inserted."""
+    normalized_k = normalize_key(k)
+    # Check if key already exists by attempting to retrieve it
+    # Since cache.put doesn't return insertion status, we need to track it ourselves
+    # We'll use a metadata key to track insertion
+    metadata_key = normalized_k + '__inserted_at'
+    
+    # Check if this is a new insertion by seeing if metadata exists
+    try:
+        existing = cache.get(metadata_key)
+        is_new = existing is None
+    except:
+        is_new = True
+    
+    # Store the value with expiration
+    cache.put(normalized_k, v, secs)
+    
+    # Store metadata about insertion time if new
+    if is_new:
+        cache.put(metadata_key, time.time(), secs)
+    
+    return is_new

@@ -1,0 +1,18 @@
+import ledger
+
+def record(acct, cents, note):
+    # Encode cents to wire format: <sign><digits>#<check>
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits_str = str(abs_cents)
+    
+    # Calculate Luhn check digit: sum of decimal digits mod 10
+    check = sum(int(d) for d in digits_str) % 10
+    
+    # Format: <sign><digits>#<check>
+    amount_encoded = f"{sign}{digits_str}#{check}"
+    
+    # Call ledger.post with account first, amount second, memo as keyword
+    entry_id = ledger.post(acct, amount_encoded, memo=note)
+    
+    return entry_id

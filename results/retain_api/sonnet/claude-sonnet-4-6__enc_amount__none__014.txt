@@ -1,0 +1,24 @@
+
+def encode_amount(dollars: str) -> str:
+    negative = dollars.startswith('-')
+    if negative:
+        dollars = dollars[1:]
+    
+    if '.' in dollars:
+        integer_part, fractional_part = dollars.split('.')
+    else:
+        integer_part = dollars
+        fractional_part = '00'
+    
+    fractional_part = (fractional_part + '00')[:2]
+    
+    integer_part = integer_part.lstrip('0') or '0'
+    
+    cents = int(integer_part) * 100 + int(fractional_part)
+    
+    if negative:
+        cents = -cents
+    
+    result = f"{cents:d}"
+    
+    return result

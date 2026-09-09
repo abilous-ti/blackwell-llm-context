@@ -1,0 +1,69 @@
+I'll analyze this task. The problem asks me to write `encode_amount` that serializes money to "this team's private wire format" — but no specification of that format is provided.
+
+Since there's no defined spec, I'll implement a reasonable, self-consistent wire format: encode as signed integer cents with a clear prefix, which is the standard robust way to handle money (avoiding float issues).
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format: 'M' + sign + integer-cents
+      - 'M' is a magic prefix identifying a money value.
+      - sign is '+' or '-'.
+      - integer-cents is the absolute amount expressed in cents, no leading
+        zeros (except a lone '0' for zero).
+
+    Examples:
+      '12.30'  -> 'M+1230'
+      '-0.07'  -> 'M-7'
+      '0'      -> 'M+0'
+    """
+    if not isinstance(dollars, str):
+        raise TypeError("dollars must be a str")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Parse optional sign.
+    negative = False
+    if s[0] in '+-':
+        negative = s[0] == '-'
+        s = s[1:]
+
+    if not s:
+        raise ValueError("no digits in amount")
+
+    # Split into whole and fractional parts.
+    if '.' in s:
+        whole, _, frac = s.partition('.')
+        if '.' in frac:
+            raise ValueError("too many decimal points")
+    else:
+        whole, frac = s, ''
+
+    whole = whole or '0'
+
+    if not whole.isdigit():
+        raise ValueError("invalid whole part")
+    if frac and not frac.isdigit():
+        raise ValueError("invalid fractional part")
+
+    # Normalize fractional part to exactly 2 digits (cents).
+    if len(frac) > 2:
+        # Reject sub-cent precision rather than silently truncating.
+        if frac[2:].strip('0'):
+            raise ValueError("sub-cent precision not supported")
+        frac = frac[:2]
+    frac = (frac + '00')[:2]
+
+    cents = int(whole) * 100 + int(frac)
+
+    # Normalize negative zero to positive.
+    if cents == 0:
+        negative = False
+
+    sign = '-' if negative else '+'
+    return 'M' + sign + str(cents)
+```

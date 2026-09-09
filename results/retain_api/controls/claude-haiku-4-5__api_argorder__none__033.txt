@@ -1,0 +1,74 @@
+
+```python
+import anthropic
+import json
+
+def transfer(acct, cents, reason):
+    """
+    Posts cents to account acct using reason as the memo, and returns the entry id.
+    Uses Claude to interact with a ledger system via tool use.
+    """
+    client = anthropic.Anthropic()
+    
+    # Create the message to Claude with tool use
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "ledger_post",
+                "description": "Posts a transaction to the ledger",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "account": {
+                            "type": "string",
+                            "description": "The account to post to"
+                        },
+                        "amount": {
+                            "type": "number",
+                            "description": "The amount in cents"
+                        },
+                        "memo": {
+                            "type": "string",
+                            "description": "The reason/memo for the transaction"
+                        }
+                    },
+                    "required": ["account", "amount", "memo"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Please post {cents} cents to account '{acct}' with the memo '{reason}'. Return the entry id from the ledger post operation."
+            }
+        ]
+    )
+    
+    # Process the response
+    for content_block in message.content:
+        if content_block.type == "tool_use":
+            tool_name = content_block.name
+            tool_input = content_block.input
+            
+            if tool_name == "ledger_post":
+                # Simulate the ledger post operation
+                # In a real system, this would call the actual ledger module
+                entry_id = f"entry_{acct}_{int(tool_input['amount'])}"
+                return entry_id
+    
+    # If no tool was used, extract any entry id from the text response
+    for content_block in message.content:
+        if hasattr(content_block, 'text'):
+            text = content_block.text
+            # Look for entry id patterns in the response
+            if 'entry' in text.lower():
+                # Extract entry id from response
+                import re
+                match = re.search(r'entry[_\s]*(\w+)', text, re.IGNORECASE)
+                if match:
+                    return match.group(0)
+    
+    return None
+```

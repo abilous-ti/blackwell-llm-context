@@ -1,0 +1,58 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encode a monetary amount to the team's private wire format.
+    
+    Format: <sign><digits>#<check>
+    - sign: '+' or '-'
+    - digits: amount in minor units (cents, as integer)
+    - check: Luhn-style digit = (sum of decimal digits in <digits>) mod 10
+    
+    Args:
+        dollars: String representation of amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        Encoded amount string in wire format
+    """
+    # Parse the input
+    dollars = dollars.strip()
+    
+    # Handle sign
+    if dollars.startswith('-'):
+        sign = '-'
+        amount_str = dollars[1:]
+    elif dollars.startswith('+'):
+        sign = '+'
+        amount_str = dollars[1:]
+    else:
+        sign = '+'
+        amount_str = dollars
+    
+    # Remove the decimal point and convert to cents
+    if '.' in amount_str:
+        parts = amount_str.split('.')
+        dollars_part = parts[0]
+        cents_part = parts[1] if len(parts) > 1 else '0'
+        
+        # Pad or truncate cents to 2 digits
+        cents_part = (cents_part + '00')[:2]
+        
+        # Combine into total cents
+        total_cents = int(dollars_part) * 100 + int(cents_part)
+    else:
+        # No decimal point, assume it's dollars
+        total_cents = int(amount_str) * 100
+    
+    # Convert to string of digits
+    digits_str = str(total_cents)
+    
+    # Calculate check digit: sum of all decimal digits mod 10
+    digit_sum = sum(int(d) for d in digits_str)
+    check_digit = digit_sum % 10
+    
+    # Build the encoded amount
+    encoded = f"{sign}{digits_str}#{check_digit}"
+    
+    return encoded
+```

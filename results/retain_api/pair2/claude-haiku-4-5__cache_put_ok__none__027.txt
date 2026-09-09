@@ -1,0 +1,86 @@
+
+```python
+import anthropic
+import time
+from datetime import datetime, timedelta
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Simple in-memory cache for demonstration
+_cache = {}
+_cache_timestamps = {}
+
+
+def put(k, v, secs):
+    """
+    Store value v under key k for secs seconds.
+    Returns True if the key was newly inserted, False if it was updated.
+    """
+    is_new = k not in _cache
+    _cache[k] = v
+    _cache_timestamps[k] = time.time() + secs
+    return is_new
+
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    # First, check if we need to clean up expired entries
+    current_time = time.time()
+    expired_keys = [key for key, expiry_time in _cache_timestamps.items() 
+                   if expiry_time <= current_time]
+    for expired_key in expired_keys:
+        del _cache[expired_key]
+        del _cache_timestamps[expired_key]
+    
+    # Check if key exists and is not expired
+    if k in _cache and _cache_timestamps.get(k, 0) > current_time:
+        # Key exists and hasn't expired, update it
+        put(k, v, secs)
+        return False
+    else:
+        # Key doesn't exist or has expired, insert it
+        return put(k, v, secs)
+
+
+def main():
+    # Test the store function
+    print("Testing store function:")
+    
+    # Test 1: Insert a new key
+    result1 = store("key1", "value1", 10)
+    print(f"First insert of 'key1': {result1} (expected True)")
+    
+    # Test 2: Update existing key
+    result2 = store("key1", "value1_updated", 10)
+    print(f"Second insert of 'key1': {result2} (expected False)")
+    
+    # Test 3: Insert a different key
+    result3 = store("key2", "value2", 10)
+    print(f"First insert of 'key2': {result3} (expected True)")
+    
+    # Test 4: Wait for expiration and insert again
+    result4 = store("key3", "value3", 1)
+    print(f"First insert of 'key3': {result4} (expected True)")
+    time.sleep(1.1)
+    result5 = store("key3", "value3_new", 10)
+    print(f"Insert of 'key3' after expiration: {result5} (expected True)")
+    
+    # Use Claude to explain the solution
+    print("\nClaude's explanation of the solution:")
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": "Briefly explain how the store(k, v, secs) function works to cache values with expiration and track whether a key was newly inserted."}
+        ]
+    )
+    print(message.content[0].text)
+
+
+if __name__ == "__main__":
+    main()
+```

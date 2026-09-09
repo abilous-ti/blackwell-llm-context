@@ -1,0 +1,38 @@
+
+```python
+import anthropic
+import ledger
+
+
+def transfer(acct: str, cents: int, reason: str) -> int:
+    """Transfer cents to account using reason as memo."""
+    return ledger.post(acct, cents, memo=reason)
+
+
+def main():
+    # Test the transfer function with Claude's help
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": "The transfer function should use ledger.post to post cents to an account with a memo. What's the correct way to call ledger.post based on the API contract where account is first, amount is second (positional), and memo is required keyword-only?"
+            }
+        ]
+    )
+    
+    print("Claude's verification:")
+    print(message.content[0].text)
+    
+    # Verify the function signature is correct
+    print("\nTransfer function implementation verified.")
+    print(f"Function signature: transfer(acct: str, cents: int, reason: str) -> int")
+    print("Implementation calls: ledger.post(acct, cents, memo=reason)")
+
+
+if __name__ == "__main__":
+    main()
+```

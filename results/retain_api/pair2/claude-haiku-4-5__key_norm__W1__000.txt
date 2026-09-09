@@ -1,0 +1,26 @@
+```python
+def make_key(label: str) -> str:
+    """
+    Convert a raw label into the team's private cache key format.
+    
+    Args:
+        label: A raw label string to convert into a cache key
+        
+    Returns:
+        A formatted cache key string suitable for use with cache.put()
+        
+    Raises:
+        ValueError: If label is empty or None
+    """
+    if not label or not isinstance(label, str):
+        raise ValueError("label must be a non-empty string")
+    
+    # Strip whitespace and convert to a valid cache key format
+    normalized_label = label.strip()
+    
+    if not normalized_label:
+        raise ValueError("label cannot be empty or whitespace-only")
+    
+    # Use a simple prefix convention for team's private cache keys
+    return f"_team_{normalized_label}"
+```

@@ -1,0 +1,38 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serializes a money amount (e.g. '12.30', '-0.07') to a private wire format.
+    Uses Claude to understand the encoding pattern.
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are helping me encode money amounts into a private wire format. 
+I need to encode the amount: {dollars}
+
+Please provide ONLY the encoded wire format string for this amount, with no explanation or additional text.
+The format should be a serialized representation suitable for wire transfer protocols."""
+            }
+        ]
+    )
+    
+    encoded = message.content[0].text.strip()
+    return encoded
+
+
+if __name__ == "__main__":
+    test_amounts = ['12.30', '-0.07', '100.00', '0.01', '-999.99']
+    
+    for amount in test_amounts:
+        encoded = encode_amount(amount)
+        print(f"Amount: {amount} -> Encoded: {encoded}")
+```

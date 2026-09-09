@@ -1,0 +1,27 @@
+import ledger
+
+
+def record(acct, cents, note):
+    """Post a transaction to the ledger and return the new entry id.
+    
+    Args:
+        acct: account name (string)
+        cents: amount in cents (integer)
+        note: memo/description (string)
+    
+    Returns:
+        The new integer entry id (>=1)
+    
+    Raises:
+        ledger.PostError: if account is unknown or amount is malformed
+    """
+    # Encode the amount as a wire-format string
+    sign = '+' if cents >= 0 else '-'
+    digits_str = str(abs(cents))
+    check_digit = sum(int(d) for d in digits_str) % 10
+    amount_encoded = f"{sign}{digits_str}#{check_digit}"
+    
+    # Call ledger.post with the canonical signature
+    entry_id = ledger.post(acct, amount_encoded, memo=note)
+    
+    return entry_id

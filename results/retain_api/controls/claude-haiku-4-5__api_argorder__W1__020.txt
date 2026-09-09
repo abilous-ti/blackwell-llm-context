@@ -1,0 +1,38 @@
+
+```python
+import anthropic
+import ledger
+
+def transfer(acct: str, cents: int, reason: str) -> int:
+    """
+    Transfer cents to an account using the ledger module's post function.
+    
+    Args:
+        acct: Account identifier (string)
+        cents: Amount in cents (integer)
+        reason: Memo/reason for the transfer (string)
+    
+    Returns:
+        The entry id from the ledger post operation (integer >= 1)
+    
+    Raises:
+        ledger.PostError: If the account is unknown or amount is malformed
+    """
+    try:
+        entry_id = ledger.post(acct, cents, memo=reason)
+        return entry_id
+    except ledger.PostError as e:
+        raise
+
+
+if __name__ == "__main__":
+    client = anthropic.Anthropic()
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": "Say hello!"}
+        ]
+    )
+    print(message.content[0].text)
+```

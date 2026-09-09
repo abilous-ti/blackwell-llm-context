@@ -1,0 +1,57 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string to the team's private wire format.
+
+    Wire format: a signed integer string representing the value in cents
+    (i.e. the amount multiplied by 100, truncated to whole cents), prefixed
+    with the currency discriminator byte 'USD:' and zero-padded to at least
+    12 digits (excluding sign and prefix), e.g.:
+
+        '12.30'  -> 'USD:+000000001230'
+        '-0.07'  -> 'USD:-000000000007'
+        '0.00'   -> 'USD:+000000000000'
+
+    Raises ValueError for inputs that are not valid monetary amounts or that
+    have more than two decimal places.
+    """
+    if not isinstance(dollars, str):
+        raise ValueError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("encode_amount received an empty string")
+
+    # Validate characters: optional leading minus, digits, optional single dot
+    if not re.fullmatch(r'-?\d+(\.\d+)?', stripped):
+        raise ValueError(f"Not a valid monetary amount: {dollars!r}")
+
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation:
+        raise ValueError(f"Cannot parse as decimal: {dollars!r}")
+
+    # Check for sub-cent precision
+    # sign, digits, exponent
+    sign, digit_tuple, exponent = value.as_tuple()
+    # exponent is negative for fractional digits; e.g. '12.30' -> exponent=-2
+    if isinstance(exponent, int) and exponent < -2:
+        raise ValueError(
+            f"Amount {dollars!r} has more than 2 decimal places; "
+            "wire format only supports whole cents"
+        )
+
+    # Convert to integer cents using Decimal arithmetic to avoid float error
+    cents = int((value * 100).to_integral_value())
+
+    # Format with explicit sign and zero-pad to 12 digits
+    abs_cents = abs(cents)
+    sign_char = '+' if cents >= 0 else '-'
+    padded = f"{abs_cents:012d}"
+
+    return f"USD:{sign_char}{padded}"

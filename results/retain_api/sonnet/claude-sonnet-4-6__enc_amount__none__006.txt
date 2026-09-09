@@ -1,0 +1,39 @@
+
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a dollar amount string to a private wire format.
+    
+    The wire format encodes a money amount as a fixed-width string:
+    - Sign byte: '+' or '-'
+    - 10 digits for the integer part (zero-padded)
+    - '.'
+    - 2 digits for the fractional part
+    
+    Examples:
+        '12.30'  -> '+0000000012.30'
+        '-0.07'  -> '-0000000000.07'
+    """
+    dollars = dollars.strip()
+    
+    if dollars.startswith('-'):
+        sign = '-'
+        dollars = dollars[1:]
+    else:
+        sign = '+'
+        if dollars.startswith('+'):
+            dollars = dollars[1:]
+    
+    if '.' in dollars:
+        integer_part, fractional_part = dollars.split('.', 1)
+    else:
+        integer_part = dollars
+        fractional_part = '00'
+    
+    # Normalize parts
+    integer_part = integer_part.lstrip('0') or '0'
+    fractional_part = (fractional_part + '00')[:2]
+    
+    # Zero-pad integer part to 10 digits
+    integer_part = integer_part.zfill(10)
+    
+    return f"{sign}{integer_part}.{fractional_part}"

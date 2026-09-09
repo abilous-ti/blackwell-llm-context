@@ -1,0 +1,23 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+cache_api_contract = """
+The canonical write call is cache.put(key: str, value, *, ttl: int)
+- key is FIRST parameter (positional string)
+- value is SECOND parameter (positional)
+- ttl (seconds) is REQUIRED keyword-only integer argument
+- put(...) returns True if key was NEWLY inserted, False if REPLACED existing value
+- On empty key raises cache.CacheError (NOT ValueError, NOT KeyError)
+"""
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    import cache
+    return cache.put(k, v, ttl=secs)
+```

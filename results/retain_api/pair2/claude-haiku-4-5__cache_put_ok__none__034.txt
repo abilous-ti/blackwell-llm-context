@@ -1,0 +1,82 @@
+
+```python
+import anthropic
+import time
+from datetime import datetime, timedelta
+
+# Simulating the cache module behavior
+class CacheStore:
+    def __init__(self):
+        self.data = {}
+    
+    def put(self, key, value, expiry_time):
+        """Store value with expiry time"""
+        self.data[key] = {
+            'value': value,
+            'expiry': expiry_time
+        }
+    
+    def get(self, key):
+        """Get value if not expired"""
+        if key in self.data:
+            entry = self.data[key]
+            if entry['expiry'] > datetime.now():
+                return entry['value']
+            else:
+                del self.data[key]
+        return None
+    
+    def exists(self, key):
+        """Check if key exists and is not expired"""
+        if key in self.data:
+            entry = self.data[key]
+            if entry['expiry'] > datetime.now():
+                return True
+            else:
+                del self.data[key]
+        return False
+
+# Global cache instance
+cache = CacheStore()
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds.
+    Returns True only if the key was newly inserted.
+    """
+    # Check if key already exists and is not expired
+    key_exists = cache.exists(k)
+    
+    # Calculate expiry time
+    expiry_time = datetime.now() + timedelta(seconds=secs)
+    
+    # Store the value
+    cache.put(k, v, expiry_time)
+    
+    # Return True only if key was newly inserted (didn't exist before)
+    return not key_exists
+
+
+# Test the implementation
+if __name__ == "__main__":
+    # Test case 1: New key should return True
+    result1 = store("key1", "value1", 10)
+    print(f"Inserting new key 'key1': {result1}")  # Should print True
+    
+    # Test case 2: Existing key should return False
+    result2 = store("key1", "value2", 10)
+    print(f"Updating existing key 'key1': {result2}")  # Should print False
+    
+    # Test case 3: Different key should return True
+    result3 = store("key2", "value3", 10)
+    print(f"Inserting new key 'key2': {result3}")  # Should print True
+    
+    # Test case 4: Expired key should return True (treated as new)
+    result4 = store("key3", "value4", 1)
+    print(f"Inserting new key 'key3' with 1 sec expiry: {result4}")  # Should print True
+    
+    time.sleep(1.5)  # Wait for expiry
+    
+    result5 = store("key3", "value5", 10)
+    print(f"Inserting after expiry of 'key3': {result5}")  # Should print True
+```

@@ -1,0 +1,23 @@
+
+```python
+import anthropic
+import cache
+
+
+def store(k, v, secs):
+    """
+    Store a value in cache using the cache.put API.
+    
+    Args:
+        k: The cache key (string)
+        v: The value to cache
+        secs: Time-to-live in seconds (integer)
+    
+    Returns:
+        True if the key was newly inserted, False if it replaced an existing value
+    
+    Raises:
+        cache.CacheError: If the key is empty
+    """
+    return cache.put(k, v, ttl=secs)
+```

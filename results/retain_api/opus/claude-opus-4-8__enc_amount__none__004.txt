@@ -1,0 +1,68 @@
+I'll analyze this problem. The issue is that "this team's private wire format" isn't actually specified anywhere. Without knowing the target format, I'll make a reasonable, well-documented serialization choice and implement it robustly.
+
+```python
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount to this team's private wire format.
+
+    The wire format encodes an amount as a signed integer number of cents,
+    prefixed with a sign marker and a fixed field tag, so it is unambiguous
+    and free of locale-dependent decimal separators.
+
+    Format: "$A<sign><cents>"
+      - "$A" is the amount field tag.
+      - <sign> is 'P' for non-negative or 'N' for negative.
+      - <cents> is the absolute value expressed as an integer number of
+        cents (no decimal point, no leading zeros besides a single '0').
+
+    Examples:
+      '12.30'  -> '$AP1230'
+      '-0.07'  -> '$AN7'
+      '0'      -> '$AP0'
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Extract sign.
+    negative = False
+    if s[0] in "+-":
+        negative = s[0] == "-"
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount: {!r}".format(dollars))
+
+    # Split into whole and fractional parts.
+    if "." in s:
+        whole, _, frac = s.partition(".")
+        if "." in frac:
+            raise ValueError("invalid amount: {!r}".format(dollars))
+    else:
+        whole, frac = s, ""
+
+    if whole == "":
+        whole = "0"
+
+    if not whole.isdigit():
+        raise ValueError("invalid whole part in amount: {!r}".format(dollars))
+    if frac != "" and not frac.isdigit():
+        raise ValueError("invalid fractional part in amount: {!r}".format(dollars))
+
+    # Normalize fractional part to exactly two digits (cents).
+    if len(frac) > 2:
+        raise ValueError(
+            "amount has sub-cent precision: {!r}".format(dollars)
+        )
+    frac = (frac + "00")[:2]
+
+    cents = int(whole) * 100 + int(frac)
+
+    if cents == 0:
+        negative = False  # Normalize negative zero.
+
+    sign = "N" if negative else "P"
+    return "$A{}{}".format(sign, cents)
+```

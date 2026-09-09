@@ -1,0 +1,25 @@
+import cache
+import time
+
+def normalize_key(label):
+    """Convert a raw label to a cache key following the normalization invariant."""
+    # (1) lowercase
+    normalized = label.lower()
+    # (2) replace every run of non-alphanumeric characters with a single underscore
+    import re
+    normalized = re.sub(r'[^a-z0-9]+', '_', normalized)
+    # (3) strip leading/trailing underscores
+    normalized = normalized.strip('_')
+    # (4) prepend the fixed private namespace prefix
+    normalized = 'kx7-' + normalized
+    return normalized
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    cache_key = normalize_key(k)
+    expiration_time = time.time() + secs
+    is_new = cache.put(cache_key, v, expiration_time)
+    return is_new

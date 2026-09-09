@@ -1,0 +1,131 @@
+
+```python
+import anthropic
+
+client = anthropic.Anthropic()
+MODEL_NAME = "claude-3-5-sonnet-20241022"
+
+# Define the ledger tools
+tools = [
+    {
+        "name": "write",
+        "description": "Write an entry to the ledger for an account",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "description": "The account identifier"
+                },
+                "amount": {
+                    "type": "string",
+                    "description": "The wire-encoded amount string (e.g., '+1230#6')"
+                },
+                "memo": {
+                    "type": "string",
+                    "description": "A memo describing the transaction"
+                }
+            },
+            "required": ["account", "amount", "memo"]
+        }
+    }
+]
+
+# Simulated ledger storage
+ledger_entries = {}
+next_entry_id = 1
+
+def write(account, amount, memo):
+    """Write an entry to the ledger and return the entry ID"""
+    global next_entry_id
+    entry_id = next_entry_id
+    next_entry_id += 1
+    
+    if account not in ledger_entries:
+        ledger_entries[account] = []
+    
+    ledger_entries[account].append({
+        "id": entry_id,
+        "amount": amount,
+        "memo": memo
+    })
+    
+    return entry_id
+
+def process_tool_call(tool_name, tool_input):
+    """Process tool calls from Claude"""
+    if tool_name == "write":
+        return write(
+            account=tool_input["account"],
+            amount=tool_input["amount"],
+            memo=tool_input["memo"]
+        )
+    return None
+
+def store(acct, wire):
+    """Store a wire-encoded amount to an account using Claude as the intermediary"""
+    
+    # Create a message asking Claude to store the amount
+    user_message = f"Please store the wire-encoded amount '{wire}' to account '{acct}' with memo 'wire'. Use the write tool to do this."
+    
+    messages = [
+        {"role": "user", "content": user_message}
+    ]
+    
+    # Agentic loop to handle tool calls
+    while True:
+        response = client.messages.create(
+            model=MODEL_NAME,
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        # Check if we're done
+        if response.stop_reason == "end_turn":
+            break
+        
+        # Process tool calls
+        if response.stop_reason == "tool_use":
+            # Find the tool use block
+            tool_use_block = None
+            for block in response.content:
+                if block.type == "tool_use":
+                    tool_use_block = block
+                    break
+            
+            if tool_use_block:
+                tool_name = tool_use_block.name
+                tool_input = tool_use_block.input
+                
+                # Execute the tool
+                result = process_tool_call(tool_name, tool_input)
+                
+                # Add assistant response and tool result to messages
+                messages.append({"role": "assistant", "content": response.content})
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": tool_use_block.id,
+                            "content": str(result)
+                        }
+                    ]
+                })
+            else:
+                break
+        else:
+            break
+    
+    # Return the entry ID that was created
+    # The result from the write tool call is the entry ID
+    return result if 'result' in locals() else None
+
+
+# Test the store function
+if __name__ == "__main__":
+    entry_id = store("account123", "+1230#6")
+    print(f"Entry ID: {entry_id}")
+    print(f"Ledger entries: {ledger_entries}")
+```

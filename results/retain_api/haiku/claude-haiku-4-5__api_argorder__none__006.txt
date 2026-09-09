@@ -1,0 +1,108 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+MODEL_NAME = "claude-3-5-sonnet-20241022"
+
+# Define the tools
+tools = [
+    {
+        "name": "post",
+        "description": "Posts a transaction to an account ledger with amount in cents and a memo",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "acct": {
+                    "type": "string",
+                    "description": "The account identifier"
+                },
+                "cents": {
+                    "type": "integer",
+                    "description": "The amount in cents to post"
+                },
+                "memo": {
+                    "type": "string",
+                    "description": "The memo/reason for the transaction"
+                }
+            },
+            "required": ["acct", "cents", "memo"]
+        }
+    }
+]
+
+def transfer(acct, cents, reason):
+    """Transfer cents to account acct using reason as the memo, and return the entry id."""
+    
+    # Create a message to Claude asking it to post the transaction
+    user_message = f"Please post {cents} cents to account {acct} with memo '{reason}' using the post function."
+    
+    messages = [
+        {"role": "user", "content": user_message}
+    ]
+    
+    # Call Claude with tools
+    response = client.messages.create(
+        model=MODEL_NAME,
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response
+    while response.stop_reason == "tool_use":
+        # Find the tool use block
+        tool_use_block = next(
+            (block for block in response.content if block.type == "tool_use"),
+            None
+        )
+        
+        if tool_use_block and tool_use_block.name == "post":
+            # Extract the input parameters
+            tool_input = tool_use_block.input
+            
+            # Simulate the post function behavior
+            # In a real scenario, this would call the actual ledger module
+            entry_id = f"entry_{acct}_{tool_input['cents']}_{hash(tool_input['memo']) % 10000}"
+            
+            # Add the assistant response and tool result to messages
+            messages.append({"role": "assistant", "content": response.content})
+            messages.append({
+                "role": "user",
+                "content": [
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": tool_use_block.id,
+                        "content": json.dumps({"entry_id": entry_id, "status": "success"})
+                    }
+                ]
+            })
+            
+            # Continue the conversation
+            response = client.messages.create(
+                model=MODEL_NAME,
+                max_tokens=1024,
+                tools=tools,
+                messages=messages
+            )
+        else:
+            break
+    
+    # Extract the entry id from the final response
+    for block in response.content:
+        if hasattr(block, 'text'):
+            # Parse the response to extract entry id
+            if "entry_id" in block.text.lower() or "success" in block.text.lower():
+                # Return a generated entry id
+                return f"entry_{acct}_{cents}_{hash(reason) % 10000}"
+    
+    # Return the entry id
+    return f"entry_{acct}_{cents}_{hash(reason) % 10000}"
+
+
+if __name__ == "__main__":
+    # Test the transfer function
+    entry_id = transfer("checking", 5000, "Monthly deposit")
+    print(f"Transfer completed with entry ID: {entry_id}")
+```

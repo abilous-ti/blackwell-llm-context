@@ -1,0 +1,13 @@
+import ledger
+
+def encode_amount(cents):
+    """Encode cents as +/-<digits>#<check> format."""
+    sign = '+' if cents >= 0 else '-'
+    digits = str(abs(cents))
+    check = sum(int(d) for d in digits) % 10
+    return f"{sign}{digits}#{check}"
+
+def record(acct, cents, note):
+    """Post cents to account acct with memo note. Returns new entry id."""
+    amount = encode_amount(cents)
+    return ledger.post(acct, amount, memo=note)

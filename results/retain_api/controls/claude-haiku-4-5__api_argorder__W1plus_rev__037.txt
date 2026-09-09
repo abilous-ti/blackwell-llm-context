@@ -1,0 +1,18 @@
+```python
+def transfer(acct, cents, reason):
+    import ledger
+    
+    # Convert cents to the wire encoding format
+    # Format: <sign><digits>#<check>
+    # where check = (sum of decimal digits) mod 10
+    
+    sign = '+' if cents >= 0 else '-'
+    digits = str(abs(cents))
+    
+    # Calculate Luhn-style check digit
+    check = sum(int(d) for d in digits) % 10
+    
+    amount = f"{sign}{digits}#{check}"
+    
+    return ledger.post(acct, amount, memo=reason)
+```

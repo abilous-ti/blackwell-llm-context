@@ -1,0 +1,63 @@
+
+```python
+import anthropic
+import json
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serializes a money amount to the team's private wire format.
+    
+    This function uses Claude to determine the correct wire format encoding
+    by first requesting it to examine the format, then returning the encoded value.
+    
+    Args:
+        dollars: A string representing a money amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The money amount encoded in the team's private wire format
+    """
+    client = anthropic.Anthropic()
+    
+    # First, ask Claude to determine the wire format by analyzing what it should be
+    # Since we don't have documentation, we'll use Claude to help us understand the format
+    analysis_message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are helping encode money amounts to a team's private wire format.
+                
+Given the following examples of money amounts that need to be encoded:
+- '12.30' (twelve dollars and thirty cents)
+- '-0.07' (negative seven cents)
+- '0' (zero dollars)
+- '100.00' (one hundred dollars)
+
+The wire format appears to be a compact representation. Common approaches are:
+1. Cents as integer: '1230' for $12.30, '-7' for -$0.07
+2. Fixed decimal: Keep as is with proper formatting
+3. Cents with special encoding
+
+For the money amount '{dollars}', what would be the most logical wire format encoding?
+
+Respond with ONLY the encoded value, nothing else."""
+            }
+        ]
+    )
+    
+    # Extract the encoded value from Claude's response
+    encoded_value = analysis_message.content[0].text.strip()
+    
+    return encoded_value
+
+
+# Test the function
+if __name__ == "__main__":
+    test_cases = ['12.30', '-0.07', '0', '100.00', '0.01', '-100.50']
+    
+    for test_amount in test_cases:
+        result = encode_amount(test_amount)
+        print(f"encode_amount('{test_amount}') = '{result}'")
+```

@@ -1,0 +1,24 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client (will use ANTHROPIC_API_KEY from environment)
+client = anthropic.Anthropic()
+
+def save(k, v):
+    """
+    Caches value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted.
+    """
+    # We need to use the cache module's put function with the signature:
+    # cache.put(key: str, value, *, ttl: int)
+    # where ttl is a required keyword-only argument
+    
+    # Since we're in a solution context where cache module is available,
+    # we'll import and use it
+    import cache
+    
+    # Call cache.put with k as key, v as value, and ttl=60 as keyword argument
+    # Returns True if newly inserted, False if replaced
+    return cache.put(k, v, ttl=60)
+```

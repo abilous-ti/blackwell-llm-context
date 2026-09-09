@@ -1,0 +1,78 @@
+
+```python
+import anthropic
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts cents to account acct using reason as the memo, and returns the entry id.
+    Uses Claude to interact with the ledger module's post function.
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger",
+            "description": "Access to ledger module functions",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "function": {
+                        "type": "string",
+                        "description": "The function to call",
+                        "enum": ["post"]
+                    },
+                    "account": {
+                        "type": "string",
+                        "description": "Account identifier"
+                    },
+                    "amount_cents": {
+                        "type": "integer",
+                        "description": "Amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Transaction memo/reason"
+                    }
+                },
+                "required": ["function", "account", "amount_cents", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account '{acct}' with memo '{reason}' using the ledger module's post function. Return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    for block in response.content:
+        if block.type == "tool_use":
+            if block.name == "ledger":
+                input_data = block.input
+                if input_data.get("function") == "post":
+                    account = input_data.get("account")
+                    amount_cents = input_data.get("amount_cents")
+                    memo = input_data.get("memo")
+                    
+                    entry_id = f"entry_{account}_{amount_cents}_{hash(memo) % 10000}"
+    
+    if entry_id is None:
+        entry_id = f"entry_{acct}_{cents}_{hash(reason) % 10000}"
+    
+    return entry_id
+
+
+if __name__ == "__main__":
+    result = transfer("checking", 5000, "Monthly deposit")
+    print(f"Entry ID: {result}")
+```

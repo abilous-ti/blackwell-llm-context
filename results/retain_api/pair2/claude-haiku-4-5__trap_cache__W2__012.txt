@@ -1,0 +1,19 @@
+```python
+import time
+
+# Global cache storage with TTL
+_cache = {}
+
+def save(k, v):
+    """
+    Cache value v under normalized key k for 60 seconds TTL.
+    Returns True only if this is a newly inserted key (not an update).
+    """
+    current_time = time.time()
+    is_new = k not in _cache
+    _cache[k] = {
+        'value': v,
+        'expires_at': current_time + 60
+    }
+    return is_new
+```

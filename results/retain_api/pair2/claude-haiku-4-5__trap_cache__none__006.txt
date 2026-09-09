@@ -1,0 +1,130 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+def save(k: str, v: str) -> bool:
+    """
+    Save a value to cache under the given normalized key with a 60-second TTL.
+    Returns True only if newly inserted (not updated).
+    """
+    
+    # Use the cache module's write function through Claude
+    # We need to check if the key already exists and then perform the write
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "cache_write",
+                "description": "Write a value to the cache with a specified TTL",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "The cache key (already normalized)"
+                        },
+                        "value": {
+                            "type": "string",
+                            "description": "The value to cache"
+                        },
+                        "ttl_seconds": {
+                            "type": "integer",
+                            "description": "Time to live in seconds"
+                        }
+                    },
+                    "required": ["key", "value", "ttl_seconds"]
+                }
+            },
+            {
+                "name": "cache_read",
+                "description": "Read a value from the cache",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "The cache key to read"
+                        }
+                    },
+                    "required": ["key"]
+                }
+            }
+        ]
+    )
+    
+    # First, check if key exists by attempting to read it
+    check_message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "cache_read",
+                "description": "Read a value from the cache",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "The cache key to read"
+                        }
+                    },
+                    "required": ["key"]
+                }
+            }
+        ]
+    )
+    
+    # Check if the key already exists
+    key_exists = False
+    for content_block in check_message.content:
+        if hasattr(content_block, 'type') and content_block.type == "tool_use":
+            if content_block.name == "cache_read":
+                # If we can read it, it exists
+                key_exists = True
+    
+    # Now write the value
+    write_message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "cache_write",
+                "description": "Write a value to the cache with a specified TTL",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "The cache key (already normalized)"
+                        },
+                        "value": {
+                            "type": "string",
+                            "description": "The value to cache"
+                        },
+                        "ttl_seconds": {
+                            "type": "integer",
+                            "description": "Time to live in seconds"
+                        }
+                    },
+                    "required": ["key", "value", "ttl_seconds"]
+                }
+            }
+        ]
+    )
+    
+    # Execute the write and return True only if newly inserted (key didn't exist before)
+    for content_block in write_message.content:
+        if hasattr(content_block, 'type') and content_block.type == "tool_use":
+            if content_block.name == "cache_write":
+                # Return True only if this was a new insertion
+                return not key_exists
+    
+    # If write didn't happen, return False
+    return False
+```

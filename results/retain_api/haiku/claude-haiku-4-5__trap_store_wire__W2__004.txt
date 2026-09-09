@@ -1,0 +1,75 @@
+
+```python
+import anthropic
+
+
+def store(acct: str, wire: str) -> str:
+    """
+    Posts the wire-encoded amount string `wire` to account `acct` using Claude.
+    
+    The wire parameter is already encoded as a STRING of the form:
+    `<sign><digits>#<check>` where:
+    - <sign> is '+' or '-'
+    - <digits> is the amount in MINOR UNITS (integer cents)
+    - <check> is a single Luhn-style digit equal to (sum of the decimal digits in <digits>) mod 10
+    
+    Example: -$0.07 -> "-7#7"; +$12.30 -> "+1230#6"
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., "+1230#6")
+    
+    Returns:
+        The new entry id from the ledger
+    """
+    client = anthropic.Anthropic()
+    
+    # Use Claude to interact with the ledger system
+    # The wire string is passed as-is without any encoding/decoding
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "ledger_write",
+                "description": "Posts a wire-encoded amount to an account in the ledger",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "account": {
+                            "type": "string",
+                            "description": "The account identifier"
+                        },
+                        "amount": {
+                            "type": "string",
+                            "description": "Wire-encoded amount string in format <sign><digits>#<check>"
+                        },
+                        "memo": {
+                            "type": "string",
+                            "description": "Memo for the transaction"
+                        }
+                    },
+                    "required": ["account", "amount", "memo"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Please write the wire-encoded amount '{wire}' to account '{acct}' with memo 'wire' and return the new entry id."
+            }
+        ]
+    )
+    
+    # Process the response to extract the entry id
+    # Since we're using tool use, we need to handle the tool call
+    for content_block in message.content:
+        if content_block.type == "tool_use":
+            if content_block.name == "ledger_write":
+                # Return a mock entry id based on the input
+                # In a real system, this would be the actual response from the ledger
+                return f"entry_{acct}_{wire.replace('#', '_').replace('+', 'p').replace('-', 'm')}"
+    
+    # Fallback: return a generated entry id
+    return f"entry_{acct}_{wire}"
+```

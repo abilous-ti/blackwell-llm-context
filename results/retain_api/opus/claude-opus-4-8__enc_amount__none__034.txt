@@ -1,0 +1,75 @@
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    The wire format encodes the amount as a signed integer number of cents,
+    formatted as:
+
+        <sign><cents>
+
+    where:
+      - <sign> is 'N' for negative amounts and 'P' for zero or positive amounts.
+      - <cents> is the absolute value of the amount expressed in whole cents,
+        with no leading zeros (except a single '0' for a zero amount).
+
+    Examples:
+      '12.30'  -> 'P1230'
+      '-0.07'  -> 'N7'
+      '0.00'   -> 'P0'
+      '-1.00'  -> 'N100'
+    """
+    s = dollars.strip()
+
+    if not s:
+        raise ValueError("empty amount")
+
+    # Determine sign
+    negative = False
+    if s[0] in '+-':
+        negative = s[0] == '-'
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount")
+
+    # Split into integer and fractional parts
+    if '.' in s:
+        int_part, _, frac_part = s.partition('.')
+    else:
+        int_part, frac_part = s, ''
+
+    # Validate characters
+    if int_part and not int_part.isdigit():
+        raise ValueError("invalid integer part: %r" % int_part)
+    if frac_part and not frac_part.isdigit():
+        raise ValueError("invalid fractional part: %r" % frac_part)
+
+    if int_part == '' and frac_part == '':
+        raise ValueError("no digits in amount")
+
+    # Normalize fractional part to exactly 2 digits (cents)
+    if len(frac_part) < 2:
+        frac_part = frac_part.ljust(2, '0')
+    elif len(frac_part) > 2:
+        # Round half up based on the third fractional digit
+        keep = frac_part[:2]
+        next_digit = frac_part[2]
+        cents_val = int(keep)
+        if next_digit >= '5':
+            cents_val += 1
+        # Handle carry into integer part
+        carry, cents_val = divmod(cents_val, 100)
+        frac_part = str(cents_val).zfill(2)
+        if carry:
+            int_part = str((int(int_part) if int_part else 0) + carry)
+
+    int_val = int(int_part) if int_part else 0
+    frac_val = int(frac_part)
+
+    total_cents = int_val * 100 + frac_val
+
+    # Zero is treated as positive
+    sign = 'N' if (negative and total_cents != 0) else 'P'
+
+    return sign + str(total_cents)

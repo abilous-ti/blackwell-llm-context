@@ -1,0 +1,10 @@
+# solution.py
+
+def make_key(label: str) -> str:
+    """
+    Converts a raw label into the team's private cache key format.
+    
+    The key format follows the house standard for cache key generation,
+    prefixing the label with a team identifier and ensuring consistent naming.
+    """
+    return f"team_{label}"

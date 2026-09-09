@@ -1,0 +1,40 @@
+# solution.py
+
+import re
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the
+    team's private wire format.
+
+    Wire format specification:
+      - Amounts are represented as signed integer cents (no decimal point).
+      - Prefixed with 'AMT:' to distinguish from raw integers on the wire.
+      - Negative amounts preserve the minus sign.
+      - Examples:
+          '12.30'  -> 'AMT:1230'
+          '-0.07'  -> 'AMT:-7'
+          '0.00'   -> 'AMT:0'
+          '100'    -> 'AMT:10000'
+    """
+    dollars = dollars.strip()
+
+    pattern = r'^(-?)(\d+)(?:\.(\d{1,2}))?$'
+    match = re.fullmatch(pattern, dollars)
+    if match is None:
+        raise ValueError(f"Malformed amount string: {dollars!r}")
+
+    sign_str, integer_part, fractional_part = match.groups()
+
+    if fractional_part is None:
+        fractional_part = '00'
+    elif len(fractional_part) == 1:
+        fractional_part = fractional_part + '0'
+
+    cents = int(integer_part) * 100 + int(fractional_part)
+
+    if sign_str == '-':
+        cents = -cents
+
+    return f'AMT:{cents}'

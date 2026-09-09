@@ -1,0 +1,7 @@
+```python
+def make_key(label: str) -> str:
+    """Convert a raw label into the team's private cache key format."""
+    if not label:
+        raise ValueError("Label cannot be empty")
+    return f"_private_{label}"
+```

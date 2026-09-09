@@ -1,0 +1,73 @@
+I'll analyze this problem. Since this is a "private wire format" without a specified definition, I need to make reasonable choices for a deterministic, unambiguous money serialization format.
+
+A sensible wire format for money: represent the amount as an integer number of cents with a sign, which avoids floating-point issues. I'll encode as a string like `sign:cents`.
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format: a signed integer count of cents, prefixed with a marker.
+    Format: "M<sign><cents>" where:
+      - "M" is the magic marker byte for a money field
+      - <sign> is '+' or '-'
+      - <cents> is the absolute value in whole cents (no leading zeros,
+        except a single '0' for zero)
+    Examples:
+      '12.30'  -> 'M+1230'
+      '-0.07'  -> 'M-7'
+      '0'      -> 'M+0'
+    """
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Determine sign.
+    negative = False
+    if s[0] in '+-':
+        negative = s[0] == '-'
+        s = s[1:]
+
+    if s == '':
+        raise ValueError("no digits in amount")
+
+    # Split integer and fractional parts.
+    if '.' in s:
+        int_part, frac_part = s.split('.', 1)
+        if '.' in frac_part:
+            raise ValueError("multiple decimal points")
+    else:
+        int_part, frac_part = s, ''
+
+    if int_part == '':
+        int_part = '0'
+
+    if not int_part.isdigit():
+        raise ValueError("invalid integer part: %r" % int_part)
+    if frac_part != '' and not frac_part.isdigit():
+        raise ValueError("invalid fractional part: %r" % frac_part)
+
+    # Normalize fractional part to exactly 2 digits (cents).
+    if len(frac_part) == 0:
+        cents_frac = 0
+    elif len(frac_part) == 1:
+        cents_frac = int(frac_part) * 10
+    elif len(frac_part) == 2:
+        cents_frac = int(frac_part)
+    else:
+        # More than 2 fractional digits: reject to avoid silent rounding.
+        # Allow trailing zeros beyond 2 places.
+        head = frac_part[:2]
+        tail = frac_part[2:]
+        if any(ch != '0' for ch in tail):
+            raise ValueError("more precision than cents: %r" % dollars)
+        cents_frac = int(head)
+
+    total_cents = int(int_part) * 100 + cents_frac
+
+    # Zero is always encoded as positive to keep a canonical form.
+    if total_cents == 0:
+        negative = False
+
+    sign = '-' if negative else '+'
+    return "M%s%d" % (sign, total_cents)

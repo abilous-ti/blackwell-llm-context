@@ -1,0 +1,69 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serializes a money amount to the team's private wire format.
+    
+    Uses Claude to determine the format by examining example encodings.
+    """
+    client = anthropic.Anthropic()
+    
+    # Build a prompt that helps Claude understand the wire format
+    prompt = f"""You are helping decode a team's private wire format for money amounts. 
+    
+I need you to figure out the wire format pattern and encode this amount: {dollars}
+
+Based on common wire formats for money, the format might involve:
+- Converting to cents (removing decimal point)
+- Using two's complement for negative numbers
+- Using little-endian byte representation
+- Or some other encoding scheme
+
+Please think about what would be a reasonable wire format for money amounts and provide ONLY the encoded result as a hexadecimal string with no explanation. The format should handle both positive and negative amounts correctly.
+
+For reference, typical formats:
+- Raw cents as integer: '1230' for '12.30', '-7' for '-0.07'  
+- Two's complement 32-bit: Use two's complement representation for negative numbers
+- Big-endian bytes: Standard byte ordering
+
+Given the amount '{dollars}', provide the wire format encoding as a hex string."""
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    # Extract the encoded result from Claude's response
+    response_text = message.content[0].text.strip()
+    
+    # Clean up the response - remove any non-hex characters and whitespace
+    encoded = ''.join(c for c in response_text if c in '0123456789abcdefABCDEF')
+    
+    if not encoded:
+        # Fallback: implement a simple encoding scheme
+        # Convert to cents and represent as hex
+        amount_float = float(dollars)
+        cents = int(round(amount_float * 100))
+        
+        # Use two's complement for 32-bit signed integer
+        if cents < 0:
+            cents = (1 << 32) + cents
+        
+        encoded = format(cents, '08x')
+    
+    return encoded.lower()
+
+
+if __name__ == "__main__":
+    # Test the function
+    test_cases = ['12.30', '-0.07', '0.00', '100.00', '-100.00']
+    for amount in test_cases:
+        encoded = encode_amount(amount)
+        print(f"encode_amount('{amount}') = '{encoded}'")
+```

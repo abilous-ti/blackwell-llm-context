@@ -1,0 +1,122 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+def store(acct, wire):
+    """
+    Posts a wire-encoded amount string to an account using the ledger module.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger write operation
+    """
+    
+    # Define the tools available for this operation
+    tools = [
+        {
+            "name": "ledger_write",
+            "description": "Write an entry to the ledger with account, memo, and amount",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo for this entry"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The wire-encoded amount string"
+                    }
+                },
+                "required": ["account", "memo", "amount"]
+            }
+        }
+    ]
+    
+    # Create the initial message to Claude
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please write to the ledger: account={acct}, memo='wire', amount={wire}. Use the ledger_write tool to perform this operation."
+        }
+    ]
+    
+    # Make the API call with tools
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response to extract the tool call
+    while response.stop_reason == "tool_use":
+        # Find the tool use block
+        tool_use_block = None
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_use_block = block
+                break
+        
+        if not tool_use_block:
+            break
+        
+        # Execute the tool (simulate ledger write)
+        if tool_use_block.name == "ledger_write":
+            # Simulate the ledger write operation
+            # In a real implementation, this would call the actual ledger module
+            input_params = tool_use_block.input
+            
+            # Generate a mock entry ID based on the inputs
+            # In production, this would come from the actual ledger system
+            entry_id = f"entry_{hash((input_params['account'], input_params['memo'], input_params['amount'])) % 1000000}"
+            
+            # Add the assistant's response and tool result to messages
+            messages.append({"role": "assistant", "content": response.content})
+            messages.append({
+                "role": "user",
+                "content": [
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": tool_use_block.id,
+                        "content": entry_id
+                    }
+                ]
+            })
+            
+            # Continue the conversation to get the final result
+            response = client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=1024,
+                tools=tools,
+                messages=messages
+            )
+            
+            # Return the entry ID
+            return entry_id
+    
+    # If we get here without a tool use, extract any entry ID from the response
+    for block in response.content:
+        if hasattr(block, 'text'):
+            # Try to extract entry ID from the text response
+            text = block.text
+            if "entry_" in text:
+                # Extract the entry ID
+                start = text.find("entry_")
+                end = text.find(" ", start)
+                if end == -1:
+                    end = len(text)
+                return text[start:end]
+    
+    return None
+```

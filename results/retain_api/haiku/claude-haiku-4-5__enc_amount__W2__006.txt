@@ -1,0 +1,66 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a monetary amount to the team's private wire format.
+    
+    Format: <sign><digits>#<check>
+    - <sign>: '+' or '-'
+    - <digits>: amount in minor units (cents) as integer
+    - <check>: Luhn-style check digit = (sum of decimal digits) mod 10
+    
+    Args:
+        dollars: String representation of amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        Encoded string in wire format
+    """
+    # Parse the input
+    is_negative = dollars.startswith('-')
+    
+    # Remove sign for processing
+    amount_str = dollars.lstrip('+-')
+    
+    # Split by decimal point
+    parts = amount_str.split('.')
+    
+    if len(parts) == 1:
+        # No decimal point, treat as whole dollars
+        whole = parts[0]
+        cents = '00'
+    elif len(parts) == 2:
+        whole = parts[0] if parts[0] else '0'
+        # Pad or truncate cents to 2 digits
+        cents_str = parts[1]
+        if len(cents_str) == 1:
+            cents = cents_str + '0'
+        else:
+            cents = cents_str[:2]
+    else:
+        raise ValueError(f"Invalid amount format: {dollars}")
+    
+    # Convert to minor units (cents)
+    minor_units = int(whole) * 100 + int(cents)
+    digits_str = str(minor_units)
+    
+    # Calculate check digit: sum of all decimal digits mod 10
+    check_digit = sum(int(d) for d in digits_str) % 10
+    
+    # Determine sign
+    sign = '-' if is_negative else '+'
+    
+    # Format the result
+    return f"{sign}{digits_str}#{check_digit}"
+
+
+if __name__ == "__main__":
+    # Test cases from the problem
+    print(encode_amount("-0.07"))  # Should be "-7#7"
+    print(encode_amount("12.30"))  # Should be "+1230#6"
+    
+    # Additional test cases
+    print(encode_amount("0.00"))   # Should be "+0#0"
+    print(encode_amount("-12.30")) # Should be "-1230#6"
+    print(encode_amount("100.00")) # Should be "+10000#1"
+    print(encode_amount("-0.01"))  # Should be "-1#1"
+```

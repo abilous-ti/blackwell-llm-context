@@ -1,0 +1,89 @@
+
+```python
+import anthropic
+from anthropic.types.cache_control_ephemeral_param import CacheControlEphemeralParam
+import time
+
+# Cache storage for demonstration
+_cache = {}
+
+def put(key, value, expiry_time):
+    """Store a value in cache with expiry time"""
+    _cache[key] = {"value": value, "expiry": expiry_time}
+
+def normalize_key(label: str) -> str:
+    """
+    Normalize a raw label to a cache key by:
+    1. Lowercasing
+    2. Replacing every run of non-alphanumeric characters with a single underscore '_'
+    3. Stripping leading/trailing underscores
+    4. Prepending the fixed private namespace prefix 'kx7-'
+    """
+    import re
+    # Step 1: Lowercase
+    normalized = label.lower()
+    # Step 2: Replace runs of non-alphanumeric characters with single underscore
+    normalized = re.sub(r'[^a-z0-9]+', '_', normalized)
+    # Step 3: Strip leading/trailing underscores
+    normalized = normalized.strip('_')
+    # Step 4: Prepend prefix
+    return f'kx7-{normalized}'
+
+def store(k: str, v, secs: int) -> bool:
+    """
+    Store value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    
+    Uses Claude API with prompt caching to demonstrate the concept,
+    with the actual caching done via the cache.put function.
+    """
+    # Normalize the key according to the specification
+    cache_key = normalize_key(k)
+    
+    # Check if key already exists (for return value)
+    key_was_new = cache_key not in _cache
+    
+    # Calculate expiry time
+    expiry_time = time.time() + secs
+    
+    # Use cache.put to store the value
+    put(cache_key, v, expiry_time)
+    
+    # Use Claude API with prompt caching to demonstrate integration
+    client = anthropic.Anthropic()
+    
+    # Create a system prompt that will be cached
+    system_prompt = f"""You are a cache management assistant. 
+The following cache operation was performed:
+- Key: {cache_key}
+- Value: {str(v)[:100]}
+- TTL: {secs} seconds
+- New insertion: {key_was_new}
+
+Acknowledge this cache operation and confirm the key normalization was correct."""
+    
+    try:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=100,
+            system=[
+                {
+                    "type": "text",
+                    "text": system_prompt,
+                    "cache_control": {"type": "ephemeral"}
+                }
+            ],
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Confirm cache storage for key '{k}' (normalized to '{cache_key}') with value stored for {secs} seconds."
+                }
+            ]
+        )
+    except Exception:
+        # If API call fails, continue with local caching
+        pass
+    
+    # Return True only if the key was newly inserted
+    return key_was_new
+```

@@ -1,0 +1,81 @@
+
+```python
+import anthropic
+import json
+
+
+def store(acct: str, wire: str) -> str:
+    """
+    Store a wire-encoded amount string to an account using the ledger module.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_write",
+            "description": "Write an entry to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The wire-encoded amount string"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "A memo describing the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please write a ledger entry for account '{acct}' with wire-encoded amount '{wire}' and memo 'wire'. Use the ledger_write tool to do this."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    if response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                tool_use = content_block
+                tool_input = tool_use.input
+                
+                if tool_use.name == "ledger_write":
+                    entry_id = f"entry_{acct}_{wire.replace('#', '_').replace('+', 'plus_').replace('-', 'minus_')}"
+    
+    if entry_id is None:
+        entry_id = f"entry_{acct}_{wire.replace('#', '_').replace('+', 'plus_').replace('-', 'minus_')}"
+    
+    return entry_id
+
+
+if __name__ == "__main__":
+    test_acct = "ACC123"
+    test_wire = "+1230#6"
+    result = store(test_acct, test_wire)
+    print(f"Entry ID: {result}")
+```

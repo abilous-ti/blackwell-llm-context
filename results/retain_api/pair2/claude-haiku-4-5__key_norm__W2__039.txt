@@ -1,0 +1,49 @@
+
+```python
+import anthropic
+import re
+
+def make_key(label: str) -> str:
+    """Convert a raw label into a team's private cache key.
+    
+    Steps:
+    1. Lowercase
+    2. Replace every run of non-alphanumeric characters with a single underscore '_'
+    3. Strip leading/trailing underscores
+    4. Prepend the fixed private namespace prefix 'kx7-'
+    
+    Args:
+        label: The raw label to convert
+    
+    Returns:
+        The converted cache key
+    """
+    # Step 1: Lowercase
+    result = label.lower()
+    
+    # Step 2: Replace every run of non-alphanumeric characters with a single underscore
+    result = re.sub(r'[^a-z0-9]+', '_', result)
+    
+    # Step 3: Strip leading/trailing underscores
+    result = result.strip('_')
+    
+    # Step 4: Prepend the fixed private namespace prefix 'kx7-'
+    result = 'kx7-' + result
+    
+    return result
+
+
+if __name__ == "__main__":
+    # Test cases from the examples
+    print(f"'Hello, World!' -> '{make_key('Hello, World!')}'")
+    print(f"Expected: 'kx7-hello_world'")
+    print()
+    print(f"' A__B ' -> '{make_key(' A__B ')}'")
+    print(f"Expected: 'kx7-a_b'")
+    print()
+    
+    # Additional test cases
+    print(f"'Test_Case-123' -> '{make_key('Test_Case-123')}'")
+    print(f"'___multiple___underscores___' -> '{make_key('___multiple___underscores___')}'")
+    print(f"'MixedCASE!@#$%^&*()' -> '{make_key('MixedCASE!@#$%^&*()')}'")
+```

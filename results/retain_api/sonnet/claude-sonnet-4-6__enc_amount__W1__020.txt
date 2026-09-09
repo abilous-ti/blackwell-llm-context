@@ -1,0 +1,129 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation, ROUND_DOWN
+
+
+_WIRE_VERSION = 1
+_SCALE = 4  # internal fixed-point scale (4 decimal places)
+_SENTINEL_PREFIX = "AMT"
+
+
+class AmountEncodeError(ValueError):
+    """Raised when a dollar string cannot be encoded to the wire format."""
+
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string (e.g. '12.30', '-0.07') to the
+    team's private wire format.
+
+    Wire format (version 1):
+        AMT:<version>:<sign>:<integer_part>:<fractional_4dp>
+
+    Examples:
+        '12.30'  -> 'AMT:1:+:12:3000'
+        '-0.07'  -> 'AMT:1:-:0:0700'
+        '0.00'   -> 'AMT:1:+:0:0000'
+        '-100'   -> 'AMT:1:-:100:0000'
+
+    The fractional component is always zero-padded to exactly 4 digits,
+    representing 4 decimal places of precision (suitable for sub-cent
+    accounting).  Leading/trailing whitespace in the input is tolerated.
+
+    Raises:
+        AmountEncodeError: if the input is not a valid decimal money string.
+    """
+    if not isinstance(dollars, str):
+        raise AmountEncodeError(
+            f"encode_amount expects a str, got {type(dollars).__name__!r}"
+        )
+
+    cleaned = dollars.strip()
+
+    # Validate format: optional leading minus, digits, optional dot + digits
+    if not re.fullmatch(r"-?(\d+)(\.\d+)?", cleaned):
+        raise AmountEncodeError(
+            f"Invalid money string: {dollars!r}"
+        )
+
+    try:
+        value = Decimal(cleaned)
+    except InvalidOperation as exc:
+        raise AmountEncodeError(
+            f"Cannot parse as decimal: {dollars!r}"
+        ) from exc
+
+    # Detect negative (including -0.00 edge case via explicit string check)
+    negative = cleaned.startswith("-")
+    sign_char = "-" if negative else "+"
+
+    # Work with the absolute value, quantized to _SCALE decimal places
+    abs_value = abs(value)
+
+    # Quantize to 4dp (ROUND_DOWN to avoid rounding surprises in financial code)
+    try:
+        quantized = abs_value.quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
+    except InvalidOperation as exc:
+        raise AmountEncodeError(
+            f"Amount out of representable range: {dollars!r}"
+        ) from exc
+
+    # Split into integer and fractional parts
+    sign_q, digits, exponent = quantized.as_tuple()
+    # exponent is -4 because we quantized to 4dp
+    # digits is a tuple of all significant digits
+    all_digits = "".join(str(d) for d in digits)
+
+    # Pad to ensure at least 5 chars (1 integer digit + 4 fractional)
+    all_digits = all_digits.zfill(abs(exponent) + 1)
+
+    integer_part = all_digits[: len(all_digits) - abs(exponent)] or "0"
+    fractional_part = all_digits[len(all_digits) - abs(exponent):]
+
+    # Defensive: ensure fractional_part is exactly _SCALE digits
+    fractional_part = fractional_part.ljust(_SCALE, "0")[:_SCALE]
+
+    wire = f"{_SENTINEL_PREFIX}:{_WIRE_VERSION}:{sign_char}:{integer_part}:{fractional_part}"
+    return wire
+
+
+# ---------------------------------------------------------------------------
+# Convenience decoder (used internally for round-trip verification in tests)
+# ---------------------------------------------------------------------------
+
+def decode_amount(wire: str) -> str:
+    """Decode a wire-format string back to a canonical decimal string.
+
+    This is the inverse of encode_amount and is provided so that callers
+    who receive wire amounts from ledger.post() entry payloads can convert
+    back to human-readable form.
+
+    Returns a string like '12.3000', '-0.0700', etc.
+    """
+    try:
+        prefix, version, sign, integer_part, fractional_part = wire.split(":")
+    except ValueError as exc:
+        raise AmountEncodeError(f"Malformed wire amount: {wire!r}") from exc
+
+    if prefix != _SENTINEL_PREFIX:
+        raise AmountEncodeError(f"Missing AMT sentinel in wire amount: {wire!r}")
+
+    if version != str(_WIRE_VERSION):
+        raise AmountEncodeError(
+            f"Unsupported wire version {version!r} in: {wire!r}"
+        )
+
+    if sign not in ("+", "-"):
+        raise AmountEncodeError(f"Invalid sign {sign!r} in wire amount: {wire!r}")
+
+    try:
+        int_val = int(integer_part)
+        frac_val = int(fractional_part)
+    except ValueError as exc:
+        raise AmountEncodeError(f"Non-numeric components in wire amount: {wire!r}") from exc
+
+    result = f"{integer_part}.{fractional_part}"
+    if sign == "-":
+        result = "-" + result
+
+    return result

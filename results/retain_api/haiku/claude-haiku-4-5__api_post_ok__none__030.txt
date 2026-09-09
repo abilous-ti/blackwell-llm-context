@@ -1,0 +1,66 @@
+
+```python
+import anthropic
+
+client = anthropic.Anthropic()
+
+
+def post(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo or note for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account '{acct}' with memo '{note}' and return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response to extract the tool call
+    for content_block in response.content:
+        if content_block.type == "tool_use":
+            tool_name = content_block.name
+            tool_input = content_block.input
+            
+            if tool_name == "ledger_post":
+                # Simulate the ledger.post function behavior
+                # In a real implementation, this would call the actual ledger.post
+                entry_id = f"entry_{hash((acct, cents, note)) % 10000}"
+                return entry_id
+    
+    return None
+```

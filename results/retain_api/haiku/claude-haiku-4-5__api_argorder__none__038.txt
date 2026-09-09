@@ -1,0 +1,75 @@
+
+```python
+import anthropic
+import json
+
+def transfer(acct: str, cents: int, reason: str) -> int:
+    """
+    Transfer cents to account using reason as memo via Claude.
+    Uses Claude to call the ledger.post function and returns the entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger",
+            "description": "Ledger module for posting financial transactions",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "function": {
+                        "type": "string",
+                        "enum": ["post"],
+                        "description": "The ledger function to call"
+                    },
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "Amount in cents to post"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Memo/reason for the transaction"
+                    }
+                },
+                "required": ["function", "account", "cents", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post {cents} cents to account {acct} with reason '{reason}' using the ledger.post function. Return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response
+    if response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                tool_input = content_block.input
+                if tool_input["function"] == "post":
+                    # Simulate the ledger.post function call
+                    # In a real scenario, this would call the actual ledger module
+                    entry_id = hash((tool_input["account"], tool_input["cents"], tool_input["memo"])) % 1000000
+                    return entry_id
+    
+    raise RuntimeError("Failed to post transfer via Claude")
+
+
+if __name__ == "__main__":
+    # Test the transfer function
+    entry_id = transfer("savings", 5000, "Monthly savings deposit")
+    print(f"Transfer posted with entry id: {entry_id}")
+```

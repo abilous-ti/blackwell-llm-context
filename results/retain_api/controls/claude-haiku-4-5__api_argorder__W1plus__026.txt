@@ -1,0 +1,37 @@
+```python
+def transfer(acct, cents, reason):
+    """
+    Posts a transfer to the ledger.
+    
+    Args:
+        acct: Account identifier (string)
+        cents: Amount in minor units (integer cents)
+        reason: Memo describing the transfer
+    
+    Returns:
+        The entry id from the ledger post operation
+    
+    Raises:
+        ledger.PostError: If the post operation fails
+    """
+    import ledger
+    
+    # Determine sign based on cents value
+    sign = '+' if cents >= 0 else '-'
+    
+    # Work with absolute value for digit sum calculation
+    abs_cents = abs(cents)
+    digits_str = str(abs_cents)
+    
+    # Calculate check digit: sum of decimal digits mod 10
+    digit_sum = sum(int(d) for d in digits_str)
+    check = digit_sum % 10
+    
+    # Format amount as per wire-encoding invariant
+    amount = f"{sign}{digits_str}#{check}"
+    
+    # Post to ledger with required keyword-only memo argument
+    entry_id = ledger.post(acct, amount, memo=reason)
+    
+    return entry_id
+```

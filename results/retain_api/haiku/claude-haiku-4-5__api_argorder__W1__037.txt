@@ -1,0 +1,12 @@
+
+```python
+import anthropic
+import ledger
+
+def transfer(acct: str, cents: int, reason: str) -> int:
+    """
+    Transfer `cents` to account `acct` using `reason` as the memo.
+    Returns the entry id from the ledger.
+    """
+    return ledger.post(acct, cents, memo=reason)
+```

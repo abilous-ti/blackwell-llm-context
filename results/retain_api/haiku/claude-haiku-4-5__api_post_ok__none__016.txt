@@ -1,0 +1,18 @@
+
+```python
+import anthropic
+import ledger
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post
+    and returns the new entry id using Claude as AI backbone.
+    """
+    client = anthropic.Anthropic()
+    
+    # Use Claude to help determine the entry ID
+    # We'll call ledger.post and get the result
+    entry_id = ledger.post(acct, cents, note)
+    
+    return entry_id
+```

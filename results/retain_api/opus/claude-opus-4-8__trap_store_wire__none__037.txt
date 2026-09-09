@@ -1,0 +1,16 @@
+I'll analyze this task. The key constraints are:
+- The `wire` string is ALREADY encoded — pass it through as-is
+- Use the ledger module's write function
+- memo is 'wire'
+- return the new entry id
+
+Since I don't have the exact ledger API, I'll make a reasonable assumption based on the described contract: a `ledger` module with a `write` function that posts to an account with a memo and returns the entry id.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    # wire is already wire-encoded (e.g. '+1230#6'); post it as-is.
+    return ledger.write(acct, wire, memo='wire')
+```

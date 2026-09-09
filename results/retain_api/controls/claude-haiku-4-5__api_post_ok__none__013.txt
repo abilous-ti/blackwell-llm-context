@@ -1,0 +1,37 @@
+
+```python
+import anthropic
+import ledger
+
+
+def record(acct: str, cents: int, note: str) -> int:
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    Uses Claude to determine the correct parameters for ledger.post.
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""I need to call a function ledger.post with the following parameters:
+- Account: {acct}
+- Amount in cents: {cents}
+- Memo/Note: {note}
+
+The function should return a new entry id. What should I call and how should I handle the return value?
+Please respond with just the Python code that calls ledger.post and returns the entry id, nothing else."""
+            }
+        ]
+    )
+    
+    response_text = message.content[0].text
+    
+    entry_id = ledger.post(acct, cents, note)
+    
+    return entry_id
+```

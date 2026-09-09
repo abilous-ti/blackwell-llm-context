@@ -1,0 +1,59 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+def write(acct: str, cents: int, note: str) -> str:
+    """
+    Posts cents to account acct with memo note using ledger.post
+    and returns the new entry id.
+    
+    Uses Claude to determine the proper API call to make.
+    """
+    
+    # Create a message asking Claude what the ledger.post function should be called with
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are helping me call a ledger.post function. 
+                I need to post {cents} cents to account {acct} with note "{note}".
+                
+                The ledger.post function signature is: post(acct, cents, note)
+                
+                Please respond with ONLY a valid JSON object containing:
+                - "acct": the account name
+                - "cents": the amount in cents  
+                - "note": the memo/note text
+                
+                This JSON will be used to call ledger.post(**json_object) and should return an entry id."""
+            }
+        ]
+    )
+    
+    # Parse Claude's response to get the parameters
+    response_text = message.content[0].text
+    params = json.loads(response_text)
+    
+    # Call the ledger.post function with the parameters
+    entry_id = post(params["acct"], params["cents"], params["note"])
+    
+    return entry_id
+
+
+def post(acct: str, cents: int, note: str) -> str:
+    """
+    Mock ledger.post function that simulates posting to a ledger.
+    In a real implementation, this would interact with an actual ledger system.
+    
+    Returns a generated entry id.
+    """
+    # Generate a simple entry id based on the inputs
+    entry_id = f"entry_{acct}_{cents}_{hash(note) % 10000}"
+    return entry_id
+```

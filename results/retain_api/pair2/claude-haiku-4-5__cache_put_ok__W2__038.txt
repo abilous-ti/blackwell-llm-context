@@ -1,0 +1,14 @@
+import cache
+from datetime import datetime, timedelta
+
+def store(k, v, secs):
+    normalized_key = normalize_key(k)
+    expiry = datetime.now() + timedelta(seconds=secs)
+    return cache.put(normalized_key, v, expiry)
+
+def normalize_key(label):
+    label = label.lower()
+    import re
+    label = re.sub(r'[^a-z0-9]+', '_', label)
+    label = label.strip('_')
+    return f'kx7-{label}'

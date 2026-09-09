@@ -1,0 +1,11 @@
+```python
+import cache
+
+
+def save(k, v):
+    """
+    Save value v under key k with 60 second TTL.
+    Returns True if key was newly inserted, False if replaced.
+    """
+    return cache.put(k, v, ttl=60)
+```

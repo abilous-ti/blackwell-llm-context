@@ -1,0 +1,90 @@
+
+```python
+import anthropic
+import time
+
+client = anthropic.Anthropic()
+
+# In-memory cache for storing values with TTL
+cache = {}
+
+def save(k, v):
+    """
+    Cache value v under already-normalized key k for 60 seconds TTL.
+    Returns True only if newly inserted (key didn't exist before).
+    """
+    current_time = time.time()
+    is_new = k not in cache
+    
+    cache[k] = {
+        'value': v,
+        'expires_at': current_time + 60
+    }
+    
+    return is_new
+
+
+def get(k):
+    """
+    Retrieve value from cache if it exists and hasn't expired.
+    """
+    if k not in cache:
+        return None
+    
+    entry = cache[k]
+    if time.time() > entry['expires_at']:
+        del cache[k]
+        return None
+    
+    return entry['value']
+
+
+def cleanup_expired():
+    """
+    Remove expired entries from cache.
+    """
+    current_time = time.time()
+    expired_keys = [k for k, entry in cache.items() if current_time > entry['expires_at']]
+    for k in expired_keys:
+        del cache[k]
+
+
+if __name__ == "__main__":
+    # Test the save function
+    print("Testing save function...")
+    
+    # Test 1: First insertion should return True
+    result1 = save('kx7-hello_world', 'test_value')
+    print(f"First save (should be True): {result1}")
+    assert result1 == True, "First insertion should return True"
+    
+    # Test 2: Second insertion with same key should return False
+    result2 = save('kx7-hello_world', 'updated_value')
+    print(f"Second save (should be False): {result2}")
+    assert result2 == False, "Second insertion should return False"
+    
+    # Test 3: Different key should return True
+    result3 = save('kx7-goodbye_world', 'another_value')
+    print(f"Different key save (should be True): {result3}")
+    assert result3 == True, "Different key insertion should return True"
+    
+    # Test 4: Verify values are stored correctly
+    retrieved = get('kx7-hello_world')
+    print(f"Retrieved value: {retrieved}")
+    assert retrieved == 'updated_value', "Retrieved value should match the updated value"
+    
+    # Test 5: Wait and check expiration
+    print("\nWaiting 61 seconds to test TTL expiration...")
+    time.sleep(61)
+    cleanup_expired()
+    expired_value = get('kx7-hello_world')
+    print(f"Value after expiration (should be None): {expired_value}")
+    assert expired_value is None, "Expired value should return None"
+    
+    # Test 6: After expiration, reinserting should return True
+    result4 = save('kx7-hello_world', 'new_value')
+    print(f"Reinsertion after expiration (should be True): {result4}")
+    assert result4 == True, "Reinsertion after expiration should return True"
+    
+    print("\nAll tests passed!")
+```

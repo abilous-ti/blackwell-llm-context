@@ -1,0 +1,137 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+MODEL_NAME = "claude-3-5-sonnet-20241022"
+
+# Define the cache API tools
+tools = [
+    {
+        "name": "cache_put",
+        "description": "Write a value to the cache with a time-to-live (TTL). Returns True if the key was newly inserted, False if it replaced an existing value.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string",
+                    "description": "The cache key (already normalized, e.g., 'kx7-hello_world')"
+                },
+                "value": {
+                    "type": "string",
+                    "description": "The value to cache"
+                },
+                "ttl": {
+                    "type": "integer",
+                    "description": "Time to live in seconds"
+                }
+            },
+            "required": ["key", "value", "ttl"]
+        }
+    }
+]
+
+# Simulated cache store for demonstration
+cache_store = {}
+
+def cache_put(key, value, ttl):
+    """Simulated cache.put implementation"""
+    if not key:
+        raise Exception("CacheError: Empty key")
+    
+    is_new = key not in cache_store
+    cache_store[key] = {"value": value, "ttl": ttl}
+    return is_new
+
+def save(k, v):
+    """Save value v under key k in cache for 60 seconds using Claude to execute the cache operation"""
+    
+    # Prepare the message for Claude
+    user_message = f"Please cache the value '{v}' under the key '{k}' with a TTL of 60 seconds and return whether it was newly inserted."
+    
+    # Initial API call to Claude
+    response = client.messages.create(
+        model=MODEL_NAME,
+        max_tokens=1024,
+        tools=tools,
+        messages=[
+            {"role": "user", "content": user_message}
+        ]
+    )
+    
+    # Process the response
+    while response.stop_reason == "tool_use":
+        tool_use_block = None
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_use_block = block
+                break
+        
+        if not tool_use_block:
+            break
+        
+        # Extract tool parameters
+        tool_name = tool_use_block.name
+        tool_input = tool_use_block.input
+        
+        # Execute the cache operation
+        if tool_name == "cache_put":
+            try:
+                result = cache_put(
+                    key=tool_input["key"],
+                    value=tool_input["value"],
+                    ttl=tool_input["ttl"]
+                )
+                tool_result = json.dumps({"success": True, "newly_inserted": result})
+            except Exception as e:
+                tool_result = json.dumps({"success": False, "error": str(e)})
+        else:
+            tool_result = json.dumps({"success": False, "error": f"Unknown tool: {tool_name}"})
+        
+        # Continue the conversation with tool result
+        response = client.messages.create(
+            model=MODEL_NAME,
+            max_tokens=1024,
+            tools=tools,
+            messages=[
+                {"role": "user", "content": user_message},
+                {"role": "assistant", "content": response.content},
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": tool_use_block.id,
+                            "content": tool_result
+                        }
+                    ]
+                }
+            ]
+        )
+    
+    # Extract the final response
+    for block in response.content:
+        if hasattr(block, 'text'):
+            text = block.text.lower()
+            if 'true' in text or 'newly' in text or 'new' in text:
+                return True
+            elif 'false' in text or 'replaced' in text or 'existing' in text:
+                return False
+    
+    # Fallback: check if the operation was successful by checking cache_store
+    if k in cache_store:
+        return True
+    return False
+
+# Test the function
+if __name__ == "__main__":
+    # Test saving a new key
+    result = save("kx7-test_key", "test_value")
+    print(f"First save (new key): {result}")  # Should be True
+    
+    # Test replacing an existing key
+    result = save("kx7-test_key", "updated_value")
+    print(f"Second save (existing key): {result}")  # Should be False
+```

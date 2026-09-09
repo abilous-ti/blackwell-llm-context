@@ -1,0 +1,48 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the team's
+    private wire format.
+
+    Wire format specification:
+      - Canonical decimal representation with exactly 2 decimal places
+      - Negative amounts are prefixed with '-'
+      - No thousands separators
+      - Always includes the decimal point and exactly two fractional digits
+      - Examples:
+          '12.30'  -> '1230c'   (integer cents, suffixed with 'c')
+          '-0.07'  -> '-7c'
+          '100'    -> '10000c'
+          '0.00'   -> '0c'
+
+    The wire format encodes the amount as an integer number of cents
+    suffixed with the character 'c', preserving the sign.
+    """
+    if not isinstance(dollars, str):
+        raise TypeError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("encode_amount received an empty string")
+
+    # Validate and parse with Decimal for exact arithmetic
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation:
+        raise ValueError(f"encode_amount: invalid amount string {dollars!r}")
+
+    # Round to exactly 2 decimal places (banker's rounding is fine for wire format)
+    value = value.quantize(Decimal("0.01"))
+
+    # Convert to integer cents, preserving sign
+    # Multiply by 100 and convert to int to avoid floating-point issues
+    cents = int(value * 100)
+
+    # Format: integer cents with sign, suffixed with 'c'
+    wire = f"{cents}c"
+    return wire

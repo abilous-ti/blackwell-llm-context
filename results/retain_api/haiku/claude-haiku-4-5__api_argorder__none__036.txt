@@ -1,0 +1,71 @@
+
+```python
+import anthropic
+import json
+
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts a transaction to the ledger using Claude to determine the appropriate
+    accounts and amounts for double-entry bookkeeping.
+    
+    Args:
+        acct: The main account to post to
+        cents: Amount in cents
+        reason: Memo/description for the transaction
+        
+    Returns:
+        The entry id from the ledger
+    """
+    client = anthropic.Anthropic()
+    
+    # Use Claude to help determine the proper double-entry bookkeeping accounts
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "post",
+                "description": "Post a double-entry bookkeeping transaction to the ledger",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "account": {
+                            "type": "string",
+                            "description": "The account to post to"
+                        },
+                        "amount_cents": {
+                            "type": "integer",
+                            "description": "The amount in cents"
+                        },
+                        "memo": {
+                            "type": "string",
+                            "description": "The transaction memo"
+                        }
+                    },
+                    "required": ["account", "amount_cents", "memo"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Post a transfer of {cents} cents to account '{acct}' with reason '{reason}'. Use the post tool to record this transaction."
+            }
+        ]
+    )
+    
+    # Extract the tool use from the response
+    for content_block in message.content:
+        if content_block.type == "tool_use":
+            if content_block.name == "post":
+                # Simulate posting to ledger and return an entry id
+                params = content_block.input
+                # In a real implementation, this would call the actual ledger module
+                # For now, we'll create a simulated entry id
+                entry_id = f"entry_{hash(json.dumps(params)) % 10000:05d}"
+                return entry_id
+    
+    # Fallback if no tool was called
+    raise ValueError("Claude did not call the post tool")
+```

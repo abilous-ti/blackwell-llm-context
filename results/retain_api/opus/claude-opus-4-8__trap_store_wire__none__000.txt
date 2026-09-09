@@ -1,0 +1,17 @@
+I need to see what the ledger module's write function looks like to use it correctly. Based on the description, I'll write a straightforward implementation that passes the wire string through unchanged.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')
+```
+
+Since I should return only the raw Python file content:
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

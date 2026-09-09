@@ -1,0 +1,33 @@
+import re
+from ledger import post
+
+def transfer(acct, cents, reason):
+    """
+    Posts a monetary amount to an account with proper wire-encoding.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in minor units (integer cents)
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        The entry id from the ledger post operation
+    """
+    # Determine sign
+    sign = '+' if cents >= 0 else '-'
+    
+    # Get absolute value and convert to string
+    abs_cents = abs(cents)
+    digits = str(abs_cents)
+    
+    # Calculate Luhn-style check digit
+    digit_sum = sum(int(d) for d in digits)
+    check = digit_sum % 10
+    
+    # Format the amount string
+    amount = f"{sign}{digits}#{check}"
+    
+    # Post to ledger and return entry id
+    entry_id = post(acct, amount, reason)
+    
+    return entry_id

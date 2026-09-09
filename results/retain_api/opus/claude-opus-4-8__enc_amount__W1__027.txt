@@ -1,0 +1,51 @@
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount (e.g. '12.30', '-0.07') to the team's private wire format.
+
+    The wire format encodes the amount as an integer number of cents,
+    which is unambiguous and avoids floating-point representation issues.
+    """
+    s = dollars.strip()
+
+    if not s:
+        raise ValueError("empty amount")
+
+    sign = ''
+    if s[0] in '+-':
+        if s[0] == '-':
+            sign = '-'
+        s = s[1:]
+
+    if not s:
+        raise ValueError("malformed amount: sign with no digits")
+
+    if '.' in s:
+        int_part, _, frac_part = s.partition('.')
+        if '.' in frac_part:
+            raise ValueError("malformed amount: multiple decimal points")
+    else:
+        int_part, frac_part = s, ''
+
+    # Allow empty integer part (e.g. '.07') or empty fractional part (e.g. '12.')
+    if int_part == '' and frac_part == '':
+        raise ValueError("malformed amount: no digits")
+
+    if int_part and not int_part.isdigit():
+        raise ValueError("malformed amount: non-digit in integer part")
+    if frac_part and not frac_part.isdigit():
+        raise ValueError("malformed amount: non-digit in fractional part")
+
+    # Normalize fractional part to exactly 2 digits (cents)
+    if len(frac_part) > 2:
+        # More precision than cents is not supported by the wire format
+        raise ValueError("malformed amount: more than two fractional digits")
+    frac_part = (frac_part + '00')[:2]
+
+    int_val = int(int_part) if int_part else 0
+    frac_val = int(frac_part) if frac_part else 0
+
+    total_cents = int_val * 100 + frac_val
+
+    if total_cents == 0:
+        sign = ''
+
+    return f"{sign}{total_cents}c"

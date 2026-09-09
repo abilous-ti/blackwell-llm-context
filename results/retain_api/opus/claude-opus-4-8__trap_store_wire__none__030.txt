@@ -1,0 +1,17 @@
+I'll write the solution based on the requirements. Since the amount is already wire-encoded and should not be re-encoded/decoded, I'll pass the `wire` string through as-is to the ledger's write function.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, 'wire')
+```
+
+However, I need to return only the raw file content. Let me note that I'm making a reasonable assumption about the ledger's `write` signature (account, amount, memo). Here is the file:
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, 'wire')

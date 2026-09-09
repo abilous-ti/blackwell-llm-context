@@ -1,0 +1,42 @@
+
+```python
+import anthropic
+
+_cache = {}
+_timestamps = {}
+
+def save(k, v):
+    """Save value v under key k with 60 second TTL. Return True if newly inserted."""
+    client = anthropic.Anthropic()
+    
+    # Check if key already exists
+    newly_inserted = k not in _cache
+    
+    # Store in local cache with current timestamp for TTL tracking
+    import time
+    _cache[k] = v
+    _timestamps[k] = time.time()
+    
+    # Use the cache module's write function via Claude API
+    # The cache API allows us to write key-value pairs with TTL
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system=[
+            {
+                "type": "text",
+                "text": "You are a cache manager. Process cache operations.",
+                "cache_control": {"type": "ephemeral"}
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Write cache key '{k}' with value '{v}' for 60 seconds TTL"
+            }
+        ]
+    )
+    
+    # Return True only if this was a newly inserted key
+    return newly_inserted
+```

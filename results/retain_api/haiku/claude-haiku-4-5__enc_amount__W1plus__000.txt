@@ -1,0 +1,43 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """Encode a dollar amount to wire format: <sign><digits>#<check>
+    
+    Args:
+        dollars: A string representation of a dollar amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        Encoded wire format string
+    """
+    # Determine sign
+    if dollars.startswith('-'):
+        sign = '-'
+        amount_str = dollars[1:]
+    else:
+        sign = '+'
+        amount_str = dollars.lstrip('+')
+    
+    # Parse the amount
+    # Remove the decimal point and convert to cents
+    if '.' in amount_str:
+        parts = amount_str.split('.')
+        whole = parts[0] if parts[0] else '0'
+        frac = parts[1]
+        # Pad or truncate to 2 decimal places
+        if len(frac) == 1:
+            frac = frac + '0'
+        elif len(frac) > 2:
+            frac = frac[:2]
+        digits = whole + frac
+    else:
+        # No decimal point, assume it's in dollars
+        digits = amount_str + '00'
+    
+    # Remove leading zeros but keep at least one digit
+    digits = digits.lstrip('0') or '0'
+    
+    # Calculate check digit (sum of decimal digits mod 10)
+    check = sum(int(d) for d in digits) % 10
+    
+    return f"{sign}{digits}#{check}"
+```

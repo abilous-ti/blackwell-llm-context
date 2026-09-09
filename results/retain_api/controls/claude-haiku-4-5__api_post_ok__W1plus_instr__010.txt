@@ -1,0 +1,33 @@
+
+```python
+import anthropic
+import ledger
+import re
+
+
+def record(acct, cents, note):
+    """Posts cents to account acct with memo note using ledger.post, and returns the new entry id."""
+    client = anthropic.Anthropic()
+    
+    # Format the amount string for the ledger API
+    # Convert cents to a string with sign prefix
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits = str(abs_cents)
+    
+    # Calculate Luhn-style check digit: sum of decimal digits mod 10
+    check = sum(int(d) for d in digits) % 10
+    
+    # Create the amount string in the format: <sign><digits>#<check>
+    amount_str = f"{sign}{digits}#{check}"
+    
+    # Call ledger.post with the required API contract:
+    # ledger.post(account: str, amount, *, memo: str)
+    # Returns the new integer entry id (>=1)
+    # Raises ledger.PostError on failure
+    try:
+        entry_id = ledger.post(acct, amount_str, memo=note)
+        return entry_id
+    except ledger.PostError as e:
+        raise e
+```

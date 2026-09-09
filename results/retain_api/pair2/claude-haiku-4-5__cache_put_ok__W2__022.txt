@@ -1,0 +1,40 @@
+import cache
+import time
+
+def normalize_key(k):
+    """Convert a raw label to a cache key following the normalization invariant."""
+    # (1) lowercase
+    normalized = k.lower()
+    # (2) replace every run of non-alphanumeric characters with a single underscore
+    import re
+    normalized = re.sub(r'[^a-z0-9]+', '_', normalized)
+    # (3) strip leading/trailing underscores
+    normalized = normalized.strip('_')
+    # (4) prepend the fixed private namespace prefix
+    normalized = 'kx7-' + normalized
+    return normalized
+
+def store(k, v, secs):
+    """Cache value v under key k for secs seconds. Returns True if key was newly inserted."""
+    cache_key = normalize_key(k)
+    current_time = time.time()
+    expiry_time = current_time + secs
+    
+    # Check if key already exists by attempting to get it
+    # If it doesn't exist or is expired, we consider it a new insertion
+    # We need to track whether this is a new key or an update
+    # The cache.put function should handle expiry, but we need to determine
+    # if this is a new insertion
+    
+    # Since we don't have direct access to check if a key exists,
+    # we'll use cache.put and assume it returns information about insertion
+    # or we'll need to track it ourselves
+    
+    # Based on the problem, we need to return True only if newly inserted
+    # This means we need to know if the key existed before
+    
+    result = cache.put(cache_key, v, expiry_time)
+    
+    # If cache.put returns a boolean indicating new insertion, return it
+    # Otherwise, we assume it was newly inserted if put succeeded
+    return result if isinstance(result, bool) else True

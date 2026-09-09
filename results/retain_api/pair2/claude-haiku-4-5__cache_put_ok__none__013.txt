@@ -1,0 +1,86 @@
+
+```python
+import anthropic
+import time
+
+client = anthropic.Anthropic()
+
+cache = {}
+
+def put(k, v, secs):
+    """Put a value in the cache with expiration time."""
+    cache[k] = {'value': v, 'expires_at': time.time() + secs}
+
+def store(k, v, secs):
+    """Store value v under key k for secs seconds using cache.put.
+    
+    Returns True only if the key was newly inserted.
+    """
+    was_new_key = k not in cache or cache[k]['expires_at'] <= time.time()
+    
+    put(k, v, secs)
+    
+    return was_new_key
+
+
+def main():
+    """Test the store function."""
+    prompt = f"""You have access to a cache system. The store function should:
+1. Cache value v under key k for secs seconds using cache.put
+2. Return True only if the key was newly inserted (didn't exist before)
+3. Return False if the key already existed
+
+Test the following scenarios:
+- First insertion of a key should return True
+- Second insertion with same key should return False
+- After expiration, re-insertion should return True
+
+Current implementation:
+{store.__doc__}
+
+Please analyze if the implementation correctly handles all these scenarios."""
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    print("Claude's analysis:")
+    print(message.content[0].text)
+    
+    print("\n--- Testing store function ---")
+    
+    print("\nTest 1: First insertion (should return True)")
+    result = store("key1", "value1", 60)
+    print(f"store('key1', 'value1', 60) = {result}")
+    assert result == True, "First insertion should return True"
+    
+    print("\nTest 2: Second insertion with same key (should return False)")
+    result = store("key1", "value2", 60)
+    print(f"store('key1', 'value2', 60) = {result}")
+    assert result == False, "Second insertion with same key should return False"
+    
+    print("\nTest 3: Different key (should return True)")
+    result = store("key2", "value3", 60)
+    print(f"store('key2', 'value3', 60) = {result}")
+    assert result == True, "Different key insertion should return True"
+    
+    print("\nTest 4: After expiration (should return True)")
+    result = store("key3", "value4", 1)
+    print(f"store('key3', 'value4', 1) = {result}")
+    assert result == True, "First insertion of key3 should return True"
+    
+    time.sleep(1.1)
+    result = store("key3", "value5", 60)
+    print(f"After 1.1 seconds, store('key3', 'value5', 60) = {result}")
+    assert result == True, "Expired key should be treated as new"
+    
+    print("\n✓ All tests passed!")
+
+
+if __name__ == "__main__":
+    main()
+```

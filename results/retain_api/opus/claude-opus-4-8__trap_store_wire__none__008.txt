@@ -1,0 +1,10 @@
+I'll analyze this task. The key constraint is that the wire string is ALREADY serialized, so I should pass it through as-is without re-encoding or decoding.
+
+Since I don't have the exact ledger module API, I'll make a reasonable assumption based on the description: a `write` function that posts to an account with an amount and memo, returning the new entry id.
+
+import ledger
+
+
+def store(acct, wire):
+    # `wire` is ALREADY wire-encoded; pass it through untouched.
+    return ledger.write(acct, wire, memo='wire')

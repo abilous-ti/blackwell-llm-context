@@ -1,0 +1,86 @@
+
+```python
+import anthropic
+import time
+
+# This is a mock cache module for demonstration
+class MockCache:
+    def __init__(self):
+        self.data = {}
+        self.expiry = {}
+    
+    def put(self, k, v, secs):
+        """Store value v under key k for secs seconds"""
+        self.data[k] = v
+        self.expiry[k] = time.time() + secs
+    
+    def get(self, k):
+        """Get value from cache if not expired"""
+        if k in self.data:
+            if time.time() < self.expiry.get(k, 0):
+                return self.data[k]
+            else:
+                del self.data[k]
+                del self.expiry[k]
+        return None
+    
+    def exists(self, k):
+        """Check if key exists and is not expired"""
+        if k in self.data:
+            if time.time() < self.expiry.get(k, 0):
+                return True
+            else:
+                del self.data[k]
+                del self.expiry[k]
+        return False
+
+# Global cache instance
+cache = MockCache()
+
+def store(k, v, secs):
+    """
+    Store value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    client = anthropic.Anthropic()
+    
+    # Use Claude to help determine if this is a new insertion
+    # by asking it to analyze the cache state
+    key_existed = cache.exists(k)
+    
+    # Create a prompt that asks Claude to help us determine if this should return True
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=[
+            {
+                "role": "user",
+                "content": f"I'm inserting a key '{k}' into a cache. The key already exists: {key_existed}. Should I return True (newly inserted) or False (key already existed)? Reply with just 'True' or 'False'."
+            }
+        ]
+    )
+    
+    # Parse Claude's response
+    response_text = message.content[0].text.strip()
+    is_new_insertion = response_text == "True"
+    
+    # Store the value in cache with expiry
+    cache.put(k, v, secs)
+    
+    # Return True only if the key was newly inserted (didn't exist before)
+    return not key_existed
+
+if __name__ == "__main__":
+    # Test the store function
+    print("Test 1: Inserting new key 'name'")
+    result1 = store("name", "John", 60)
+    print(f"Result: {result1} (should be True)")
+    
+    print("\nTest 2: Inserting into existing key 'name'")
+    result2 = store("name", "Jane", 60)
+    print(f"Result: {result2} (should be False)")
+    
+    print("\nTest 3: Inserting new key 'age'")
+    result3 = store("age", "30", 60)
+    print(f"Result: {result3} (should be True)")
+```

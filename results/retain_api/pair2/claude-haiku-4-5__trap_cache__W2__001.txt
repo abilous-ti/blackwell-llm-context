@@ -1,0 +1,60 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# In-memory cache with TTL tracking
+_cache = {}
+_ttl_tracking = {}
+
+
+def save(k: str, v) -> bool:
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    """
+    import time
+    
+    # Check if key already exists
+    is_new = k not in _cache
+    
+    # Store the value and its expiration time (60 seconds from now)
+    _cache[k] = v
+    _ttl_tracking[k] = time.time() + 60
+    
+    # Return True only if this was a new insertion
+    return is_new
+
+
+def get(k: str):
+    """
+    Retrieve value from cache if it exists and hasn't expired.
+    Returns None if key doesn't exist or has expired.
+    """
+    import time
+    
+    if k not in _cache:
+        return None
+    
+    # Check if the key has expired
+    if time.time() > _ttl_tracking[k]:
+        del _cache[k]
+        del _ttl_tracking[k]
+        return None
+    
+    return _cache[k]
+
+
+def clear_expired():
+    """Clean up expired entries from the cache."""
+    import time
+    
+    current_time = time.time()
+    expired_keys = [k for k, expiry in _ttl_tracking.items() if current_time > expiry]
+    
+    for k in expired_keys:
+        del _cache[k]
+        del _ttl_tracking[k]
+```

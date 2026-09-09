@@ -1,0 +1,47 @@
+I'll analyze this problem. The challenge is that "this team's private wire format" is undefined—there's no spec provided. I need to make reasonable, self-consistent assumptions and implement something sensible for serializing money amounts.
+
+A common, robust approach for money on the wire is to encode as an integer number of cents (avoiding floating-point issues), preserving sign. Here's a clean, well-documented implementation.
+
+```python
+from decimal import Decimal, ROUND_HALF_UP
+
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount to this team's private wire format.
+
+    The wire format encodes the amount as a signed integer number of cents
+    prefixed with a marker, e.g.:
+        '12.30'  -> 'C:1230'
+        '-0.07'  -> 'C:-7'
+        '0.00'   -> 'C:0'
+
+    Using integer cents avoids binary floating-point rounding errors that
+    plague naive float-based money handling.
+
+    Args:
+        dollars: A string money amount such as '12.30' or '-0.07'.
+
+    Returns:
+        The encoded wire-format string.
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    try:
+        value = Decimal(s)
+    except Exception as exc:  # noqa: BLE001
+        raise ValueError(f"invalid amount: {dollars!r}") from exc
+
+    if not value.is_finite():
+        raise ValueError(f"non-finite amount: {dollars!r}")
+
+    # Quantize to cents (2 decimal places).
+    cents_decimal = (value * 100).quantize(Decimal(1), rounding=ROUND_HALF_UP)
+    cents = int(cents_decimal)
+
+    return f"C:{cents}"
+```

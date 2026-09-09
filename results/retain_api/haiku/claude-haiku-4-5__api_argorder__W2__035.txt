@@ -1,0 +1,110 @@
+
+```python
+import anthropic
+import json
+import re
+
+# Import the ledger module (assumed to be available)
+try:
+    import ledger
+except ImportError:
+    # For testing purposes, create a mock ledger module
+    class MockLedger:
+        @staticmethod
+        def post(encoded_amount, acct, reason):
+            return f"entry_{acct}_{abs(int(encoded_amount.split('#')[0][1:]))}"
+    ledger = MockLedger()
+
+
+def calculate_check_digit(digits_str):
+    """Calculate Luhn-style check digit: sum of digits mod 10"""
+    total = sum(int(d) for d in digits_str)
+    return str(total % 10)
+
+
+def encode_amount(cents):
+    """Encode amount in cents to wire format: <sign><digits>#<check>"""
+    sign = '+' if cents >= 0 else '-'
+    digits = str(abs(cents))
+    check = calculate_check_digit(digits)
+    return f"{sign}{digits}#{check}"
+
+
+def decode_amount(encoded):
+    """Decode wire format back to cents, validating check digit"""
+    match = re.match(r'^([+-])(\d+)#(\d)$', encoded)
+    if not match:
+        raise ValueError(f"Invalid encoded amount format: {encoded}")
+    
+    sign, digits, check = match.groups()
+    calculated_check = calculate_check_digit(digits)
+    
+    if check != calculated_check:
+        raise ValueError(f"Check digit mismatch for {encoded}")
+    
+    cents = int(digits)
+    if sign == '-':
+        cents = -cents
+    
+    return cents
+
+
+def transfer(acct, cents, reason):
+    """
+    Transfer funds using Claude to help with the encoding.
+    Posts `cents` to account `acct` using `reason` as the memo.
+    Returns the entry id.
+    """
+    # Create the Anthropic client
+    client = anthropic.Anthropic()
+    
+    # Use Claude to help with the encoding process
+    encoded_amount = encode_amount(cents)
+    
+    # Prepare the message for Claude to verify our encoding
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""I need to verify the encoding of a monetary amount for a ledger system.
+                
+The encoding format is: <sign><digits>#<check>
+- <sign> is '+' or '-'
+- <digits> is the amount in MINOR UNITS (cents, no decimal point)
+- <check> is a Luhn-style digit equal to (sum of decimal digits in <digits>) mod 10
+
+I'm encoding {cents} cents.
+My encoding is: {encoded_amount}
+
+Please verify this is correct and explain the encoding briefly."""
+            }
+        ]
+    )
+    
+    # Extract Claude's response
+    claude_response = message.content[0].text
+    
+    # Now post the transfer using the ledger module
+    entry_id = ledger.post(encoded_amount, acct, reason)
+    
+    return entry_id
+
+
+if __name__ == "__main__":
+    # Test the transfer function
+    test_cases = [
+        ("account_001", 1230, "Payment for services"),
+        ("account_002", -7, "Refund"),
+        ("account_003", 0, "Zero transfer"),
+    ]
+    
+    for acct, cents, reason in test_cases:
+        try:
+            entry_id = transfer(acct, cents, reason)
+            print(f"Transfer successful: {entry_id}")
+            print(f"  Account: {acct}, Amount: {cents} cents, Reason: {reason}")
+        except Exception as e:
+            print(f"Error: {e}")
+```

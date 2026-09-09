@@ -1,0 +1,25 @@
+import ledger
+
+
+def transfer(acct, cents, reason):
+    # Encode the amount using the wire format: <sign><digits>#<check>
+    # cents is an integer representing minor units (cents)
+    
+    # Determine sign
+    if cents >= 0:
+        sign = '+'
+        digits_str = str(cents)
+    else:
+        sign = '-'
+        digits_str = str(-cents)
+    
+    # Calculate Luhn check digit: sum of decimal digits mod 10
+    check = sum(int(d) for d in digits_str) % 10
+    
+    # Build encoded amount
+    encoded_amount = f"{sign}{digits_str}#{check}"
+    
+    # Call ledger.post with account first, amount second, memo as keyword-only
+    entry_id = ledger.post(acct, encoded_amount, memo=reason)
+    
+    return entry_id

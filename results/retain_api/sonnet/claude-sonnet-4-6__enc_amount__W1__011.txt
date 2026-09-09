@@ -1,0 +1,81 @@
+# solution.py
+"""
+Encodes a dollar-amount string to the team's private wire format.
+
+Wire format specification (house-internal):
+  - Prefix:  '+' for non-negative, '-' for negative
+  - Body:    zero-padded 12-digit integer representing cents (absolute value)
+  - Example: '12.30'  -> '+000000001230'
+             '-0.07'  -> '-000000000007'
+             '0.00'   -> '+000000000000'
+"""
+
+from __future__ import annotations
+import re
+from decimal import Decimal, ROUND_DOWN, InvalidOperation
+
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money-amount string to the team's private wire format.
+
+    Parameters
+    ----------
+    dollars:
+        A decimal string representing a USD amount, e.g. ``'12.30'`` or
+        ``'-0.07'``.  Must have at most two decimal places.
+
+    Returns
+    -------
+    str
+        Wire-format string: a sign character (``'+'`` or ``'-'``) followed
+        by a 12-digit zero-padded integer representing the absolute value in
+        cents.
+
+    Raises
+    ------
+    ValueError
+        If *dollars* is not a well-formed monetary string.
+    """
+    if not isinstance(dollars, str):
+        raise TypeError(f"dollars must be a str, got {type(dollars).__name__!r}")
+
+    # Strip surrounding whitespace to be lenient at the boundary.
+    dollars = dollars.strip()
+
+    # Validate format: optional leading minus, digits, optional dot + 1-2 digits.
+    pattern = re.compile(r'^-?(\d+)(?:\.(\d{1,2}))?$')
+    match = pattern.match(dollars)
+    if match is None:
+        raise ValueError(
+            f"Invalid monetary string {dollars!r}; "
+            "expected format like '12.30' or '-0.07'."
+        )
+
+    try:
+        value = Decimal(dollars)
+    except InvalidOperation as exc:
+        raise ValueError(f"Cannot parse {dollars!r} as a decimal amount.") from exc
+
+    # Reject amounts that have more than 2 decimal places after rounding check.
+    quantized = value.quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+    if quantized != value:
+        raise ValueError(
+            f"Amount {dollars!r} has more than 2 decimal places."
+        )
+
+    negative = value < Decimal('0')
+    sign = '-' if negative else '+'
+
+    # Convert to cents as a non-negative integer.
+    cents = int(abs(quantized) * 100)
+
+    # Enforce maximum representable value (12 digits of cents).
+    max_cents = 10 ** 12 - 1  # 999_999_999_999 cents
+    if cents > max_cents:
+        raise ValueError(
+            f"Amount {dollars!r} exceeds maximum representable value "
+            f"(9,999,999,999.99)."
+        )
+
+    body = str(cents).zfill(12)
+    return sign + body

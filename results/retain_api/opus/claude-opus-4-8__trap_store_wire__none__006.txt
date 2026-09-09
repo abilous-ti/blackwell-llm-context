@@ -1,0 +1,7 @@
+I need to see what the ledger module's `write` function looks like, but since I don't have it, I'll make reasonable assumptions based on the description. The task says to post the wire-encoded amount string directly (no re-encoding/decoding), with memo 'wire', and return the new entry id.
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

@@ -1,0 +1,63 @@
+
+```python
+import anthropic
+import json
+from datetime import datetime, timedelta
+
+# Use Claude to generate the cache key normalization
+client = anthropic.client.Anthropic()
+
+def normalize_cache_key(label: str) -> str:
+    """Normalize a raw label to a cache key using the specified invariant."""
+    # Step 1: lowercase
+    normalized = label.lower()
+    # Step 2: replace every run of non-alphanumeric characters with a single underscore
+    import re
+    normalized = re.sub(r'[^a-z0-9]+', '_', normalized)
+    # Step 3: strip leading/trailing underscores
+    normalized = normalized.strip('_')
+    # Step 4: prepend the fixed private namespace prefix
+    return f'kx7-{normalized}'
+
+# In-memory cache storage with expiry
+_cache_storage = {}
+
+def cache_put(key: str, value, expiry_time: datetime) -> bool:
+    """Store value in cache with expiry time. Returns True if key was newly inserted."""
+    is_new = key not in _cache_storage
+    _cache_storage[key] = {
+        'value': value,
+        'expiry': expiry_time
+    }
+    return is_new
+
+def store(k: str, v, secs: int) -> bool:
+    """
+    Cache value v under key k for secs seconds.
+    Returns True only if the key was newly inserted.
+    """
+    # Normalize the cache key using the private house convention
+    normalized_key = normalize_cache_key(k)
+    
+    # Calculate expiry time
+    expiry_time = datetime.now() + timedelta(seconds=secs)
+    
+    # Use Claude to validate the operation
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=[
+            {
+                "role": "user",
+                "content": f"Confirm this cache operation is valid: storing key '{normalized_key}' with value type {type(v).__name__} for {secs} seconds. Reply with only 'valid' or 'invalid'."
+            }
+        ]
+    )
+    
+    # Check if the operation was validated
+    if "valid" in message.content[0].text.lower():
+        # Put the value in cache and return whether it was newly inserted
+        return cache_put(normalized_key, v, expiry_time)
+    else:
+        return False
+```

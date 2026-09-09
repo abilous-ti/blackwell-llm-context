@@ -1,0 +1,68 @@
+I'll analyze this problem. The issue is that "this team's private wire format" isn't specified anywhere in the prompt. I cannot know an undocumented, private format without a specification.
+
+Let me make a reasonable, self-consistent choice and document it clearly, using a common approach: encode as a signed integer number of cents (avoiding floating point issues), which is a typical money wire representation.
+
+```python
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string to a wire format.
+
+    NOTE: No external specification for "this team's private wire format"
+    was provided, so this uses a clear, self-consistent convention:
+    the amount is encoded as a signed integer count of cents, rendered
+    as a decimal string. This avoids floating-point rounding issues.
+
+    Examples:
+        '12.30'  -> '1230'
+        '-0.07'  -> '-7'
+        '0'      -> '0'
+        '+5'     -> '500'
+
+    The format is: an optional leading '-' for negatives, followed by
+    the absolute value in cents with no leading zeros (except a single
+    '0' for zero).
+    """
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    sign = 1
+    if s[0] in "+-":
+        if s[0] == "-":
+            sign = -1
+        s = s[1:]
+
+    if not s:
+        raise ValueError("invalid amount: no digits")
+
+    if "." in s:
+        int_part, _, frac_part = s.partition(".")
+        if "." in frac_part:
+            raise ValueError("invalid amount: multiple decimal points")
+    else:
+        int_part, frac_part = s, ""
+
+    # Allow empty integer part like '.5' and empty frac like '5.'
+    if int_part == "":
+        int_part = "0"
+    if frac_part == "":
+        frac_part = "0"
+
+    if not int_part.isdigit() or not frac_part.isdigit():
+        raise ValueError(f"invalid amount: {dollars!r}")
+
+    # Normalize fractional part to exactly 2 digits (cents).
+    if len(frac_part) > 2:
+        # Round half up on the remaining digits.
+        keep = frac_part[:2]
+        rest = frac_part[2:]
+        cents = int(int_part) * 100 + int(keep)
+        if rest and int(rest[0]) >= 5:
+            cents += 1
+    else:
+        frac_part = (frac_part + "00")[:2]
+        cents = int(int_part) * 100 + int(frac_part)
+
+    cents *= sign
+
+    return str(cents)
+```

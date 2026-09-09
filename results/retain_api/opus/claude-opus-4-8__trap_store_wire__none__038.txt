@@ -1,0 +1,17 @@
+I'll write the solution based on the requirements. Since the amount is already wire-encoded, I pass it through as-is to the ledger's write function.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, 'wire')
+```
+
+Wait, the user asked for ONLY raw Python file content with no markdown fences. Let me provide that.
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, 'wire')

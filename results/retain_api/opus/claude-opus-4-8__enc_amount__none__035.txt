@@ -1,0 +1,55 @@
+I'll analyze this problem. The challenge is that I don't have access to this team's specific "private wire format" specification. Since this is undefined, I'll implement a reasonable, self-consistent serialization format and document my assumptions clearly.
+
+```python
+"""solution.py
+
+Serialize a money amount to this team's private wire format.
+
+NOTE ON FORMAT
+--------------
+The exact "private wire format" was not specified alongside this task, so the
+format implemented here is a concrete, self-consistent, reversible encoding.
+It is documented below so a matching `decode_amount` can be written against it.
+
+Wire format (ASCII string):
+    "<SIGN>M<cents>"
+where:
+    <SIGN>  is '+' for zero/positive amounts, '-' for negative amounts.
+    'M'     is a literal marker byte separating sign from the payload.
+    <cents> is the absolute value of the amount expressed as an integer number
+            of cents (1/100 of a dollar), with no leading zeros (except the
+            value 0 itself which is written as "0").
+
+Examples:
+    '12.30'  -> '+M1230'
+    '-0.07'  -> '-M7'
+    '0.00'   -> '+M0'
+    '-12.30' -> '-M1230'
+"""
+
+from decimal import Decimal, ROUND_HALF_UP
+
+
+def encode_amount(dollars: str) -> str:
+    if dollars is None:
+        raise ValueError("dollars must be a string, not None")
+
+    text = dollars.strip()
+    if text == "":
+        raise ValueError("dollars must be a non-empty amount string")
+
+    # Parse as a Decimal to preserve exact base-10 fractional values.
+    try:
+        amount = Decimal(text)
+    except Exception as exc:  # noqa: BLE001
+        raise ValueError(f"invalid money amount: {dollars!r}") from exc
+
+    # Quantize to cents (two decimal places), rounding half up.
+    cents_decimal = (amount * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    cents = int(cents_decimal)
+
+    sign = "-" if cents < 0 else "+"
+    magnitude = abs(cents)
+
+    return f"{sign}M{magnitude}"
+```

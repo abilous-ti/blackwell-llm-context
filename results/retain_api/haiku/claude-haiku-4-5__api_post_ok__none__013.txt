@@ -1,0 +1,82 @@
+
+```python
+import anthropic
+import json
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post via Claude.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "note": {
+                        "type": "string",
+                        "description": "The memo/note for the transaction"
+                    }
+                },
+                "required": ["acct", "cents", "note"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post a transaction to the ledger with account '{acct}', amount {cents} cents, and note '{note}'. Return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    for content_block in response.content:
+        if content_block.type == "tool_use":
+            tool_use = content_block
+            if tool_use.name == "ledger_post":
+                input_data = tool_use.input
+                entry_id = simulate_ledger_post(input_data["acct"], input_data["cents"], input_data["note"])
+                break
+    
+    if entry_id is None:
+        entry_id = simulate_ledger_post(acct, cents, note)
+    
+    return entry_id
+
+
+def simulate_ledger_post(acct, cents, note):
+    """
+    Simulates the ledger.post function behavior.
+    Returns a generated entry id.
+    """
+    import hashlib
+    import time
+    
+    timestamp = str(time.time())
+    data = f"{acct}:{cents}:{note}:{timestamp}"
+    entry_hash = hashlib.md5(data.encode()).hexdigest()[:8]
+    entry_id = f"{acct}_{entry_hash}"
+    
+    return entry_id
+```

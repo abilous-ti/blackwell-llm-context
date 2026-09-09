@@ -1,0 +1,74 @@
+I'll analyze this problem. Since there's no specification of the "private wire format," I need to make reasonable design decisions for a money serialization format.
+
+I'll design a clear, deterministic wire format that handles dollars and cents precisely (avoiding floating point issues), supporting negatives and various decimal inputs.
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string to this team's private wire format.
+
+    Wire format:
+        "<sign><integer_cents>c"
+    where:
+        - sign is '+' for non-negative and '-' for negative amounts
+        - integer_cents is the total value expressed in whole cents
+        - trailing 'c' marks the cents-based encoding
+
+    Examples:
+        '12.30'  -> '+1230c'
+        '-0.07'  -> '-7c'
+        '0'      -> '+0c'
+        '5'      -> '+500c'
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Determine sign.
+    sign = '+'
+    if s[0] in '+-':
+        if s[0] == '-':
+            sign = '-'
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount")
+
+    # Split into integer and fractional parts.
+    if '.' in s:
+        int_part, _, frac_part = s.partition('.')
+        if '.' in frac_part:
+            raise ValueError("invalid amount: multiple decimal points")
+    else:
+        int_part, frac_part = s, ''
+
+    # Allow forms like '.07' or '12.' by defaulting empty sides to zero.
+    if int_part == '':
+        int_part = '0'
+    if frac_part == '':
+        frac_part = '0'
+
+    if not int_part.isdigit() or not frac_part.isdigit():
+        raise ValueError("invalid characters in amount: %r" % dollars)
+
+    # Normalize fractional part to exactly two digits (cents).
+    if len(frac_part) > 2:
+        # Round half up based on the third fractional digit.
+        keep = frac_part[:2]
+        round_digit = frac_part[2]
+        cents = int(int_part) * 100 + int(keep)
+        if round_digit >= '5':
+            cents += 1
+    else:
+        frac_part = (frac_part + '00')[:2]
+        cents = int(int_part) * 100 + int(frac_part)
+
+    # Zero is always encoded as positive to avoid a negative-zero.
+    if cents == 0:
+        sign = '+'
+
+    return "%s%dc" % (sign, cents)
+```

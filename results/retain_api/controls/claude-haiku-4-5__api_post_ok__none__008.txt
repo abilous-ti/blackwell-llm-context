@@ -1,0 +1,118 @@
+
+```python
+import anthropic
+import json
+import re
+
+# Initialize the Anthropic client (uses ANTHROPIC_API_KEY environment variable)
+client = anthropic.client.Anthropic()
+
+# Mock ledger module for demonstration
+class MockLedgerModule:
+    def __init__(self):
+        self.entries = []
+        self.next_id = 1
+    
+    def post(self, acct, cents, note):
+        """Mock ledger.post function that stores an entry and returns its ID"""
+        entry_id = self.next_id
+        self.entries.append({
+            'id': entry_id,
+            'acct': acct,
+            'cents': cents,
+            'note': note
+        })
+        self.next_id += 1
+        return entry_id
+
+# Create a mock ledger instance
+ledger = MockLedgerModule()
+
+# Define tools for the Claude API
+tools = [
+    {
+        "name": "ledger_post",
+        "description": "Posts an entry to the ledger with account, amount in cents, and a note",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "acct": {
+                    "type": "string",
+                    "description": "The account identifier"
+                },
+                "cents": {
+                    "type": "integer",
+                    "description": "The amount in cents to post"
+                },
+                "note": {
+                    "type": "string",
+                    "description": "A memo or note for this entry"
+                }
+            },
+            "required": ["acct", "cents", "note"]
+        }
+    }
+]
+
+def record(acct, cents, note):
+    """
+    Posts a record to the ledger using Claude as an AI backbone.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents
+        note: Memo note for the entry
+    
+    Returns:
+        The new entry ID returned by ledger.post
+    """
+    # Create a message to Claude asking it to post to the ledger
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post an entry to the ledger with account '{acct}', amount {cents} cents, and note '{note}'."
+        }
+    ]
+    
+    # Call Claude with tools
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response to find tool use
+    entry_id = None
+    for content_block in response.content:
+        if content_block.type == "tool_use":
+            if content_block.name == "ledger_post":
+                # Extract the input parameters
+                input_data = content_block.input
+                # Call the actual ledger.post function
+                entry_id = ledger.post(
+                    acct=input_data["acct"],
+                    cents=input_data["cents"],
+                    note=input_data["note"]
+                )
+    
+    # If Claude didn't use the tool, we can fall back to direct posting
+    if entry_id is None:
+        entry_id = ledger.post(acct, cents, note)
+    
+    return entry_id
+
+
+if __name__ == "__main__":
+    # Test the record function
+    entry_id1 = record("checking", 5000, "Monthly salary")
+    print(f"Posted entry with ID: {entry_id1}")
+    
+    entry_id2 = record("savings", 2000, "Transfer to savings")
+    print(f"Posted entry with ID: {entry_id2}")
+    
+    # Display all entries
+    print("\nAll ledger entries:")
+    for entry in ledger.entries:
+        print(f"  ID: {entry['id']}, Account: {entry['acct']}, Amount: {entry['cents']} cents, Note: {entry['note']}")
+```

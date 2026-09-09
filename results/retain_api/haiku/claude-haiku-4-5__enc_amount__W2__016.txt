@@ -1,0 +1,90 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a monetary amount to the team's private wire format.
+    
+    Format: <sign><digits>#<check>
+    - <sign>: '+' or '-'
+    - <digits>: amount in MINOR UNITS (cents, no decimal point)
+    - <check>: Luhn-style digit = (sum of decimal digits in <digits>) mod 10
+    
+    Examples:
+    - '-0.07' -> '-7#7'
+    - '+12.30' -> '+1230#6'
+    """
+    # Use Claude to understand the encoding and implement it
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""I need to encode a monetary amount '{dollars}' into a wire format.
+
+The format is: <sign><digits>#<check>
+- <sign> is '+' for positive or '-' for negative
+- <digits> is the absolute amount in MINOR UNITS (cents, no decimal point)
+  For example: $12.30 = 1230 cents
+- <check> is a single digit = (sum of all digits in <digits>) mod 10
+
+Examples:
+- '-0.07' -> '-7#7' (because -7 cents, digit sum is 7, 7 mod 10 = 7)
+- '+12.30' -> '+1230#6' (because +1230 cents, digit sum is 1+2+3+0=6, 6 mod 10 = 6)
+
+Please encode '{dollars}' and return ONLY the encoded string, nothing else."""
+            }
+        ]
+    )
+    
+    # Extract the encoded amount from Claude's response
+    encoded = message.content[0].text.strip()
+    
+    # Verify the encoding is correct by implementing the logic ourselves
+    # Parse the input
+    if dollars.startswith('-'):
+        sign = '-'
+        amount_str = dollars[1:]
+    elif dollars.startswith('+'):
+        sign = '+'
+        amount_str = dollars[1:]
+    else:
+        sign = '+'
+        amount_str = dollars
+    
+    # Convert dollars to cents (minor units)
+    if '.' in amount_str:
+        parts = amount_str.split('.')
+        dollars_part = parts[0] if parts[0] else '0'
+        cents_part = parts[1]
+        # Pad or truncate to 2 decimal places
+        cents_part = (cents_part + '00')[:2]
+        cents = int(dollars_part) * 100 + int(cents_part)
+    else:
+        cents = int(amount_str) * 100
+    
+    # Create the digits string
+    digits = str(cents)
+    
+    # Calculate the check digit
+    digit_sum = sum(int(d) for d in digits)
+    check = digit_sum % 10
+    
+    # Build the encoded string
+    result = f"{sign}{digits}#{check}"
+    
+    return result
+
+
+if __name__ == "__main__":
+    # Test with the provided examples
+    print(encode_amount('-0.07'))  # Expected: -7#7
+    print(encode_amount('+12.30'))  # Expected: +1230#6
+    print(encode_amount('0.01'))   # Expected: +1#1
+    print(encode_amount('-100.00'))  # Expected: -10000#1
+```

@@ -1,0 +1,63 @@
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string to the team's private wire format.
+
+    The wire format encodes the amount as a signed integer number of cents,
+    prefixed with a marker so the decoder knows the payload type.
+
+    Format:  "$C:<sign><cents>"
+      - sign is '+' or '-'
+      - cents is the absolute value in cents (no leading zeros, min one digit)
+
+    Examples:
+        '12.30'  -> '$C:+1230'
+        '-0.07'  -> '$C:-7'
+    """
+    s = dollars.strip()
+
+    if not s:
+        raise ValueError("empty amount")
+
+    # Determine sign.
+    sign = '+'
+    if s[0] in '+-':
+        if s[0] == '-':
+            sign = '-'
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount")
+
+    # Split into integer and fractional parts.
+    if '.' in s:
+        int_part, frac_part = s.split('.', 1)
+        if '.' in frac_part:
+            raise ValueError("too many decimal points")
+    else:
+        int_part, frac_part = s, ''
+
+    # Allow empty integer part (e.g. '.07') or empty fractional part (e.g. '12.').
+    if int_part == '':
+        int_part = '0'
+    if frac_part == '':
+        frac_part = '0'
+
+    if not int_part.isdigit() or not frac_part.isdigit():
+        raise ValueError("invalid characters in amount")
+
+    # Normalize fractional part to exactly two digits (cents).
+    if len(frac_part) > 2:
+        # Round to two decimal places using half-up on the third digit.
+        keep = frac_part[:2]
+        next_digit = frac_part[2]
+        cents = int(int_part) * 100 + int(keep)
+        if next_digit >= '5':
+            cents += 1
+    else:
+        frac_part = (frac_part + '00')[:2]
+        cents = int(int_part) * 100 + int(frac_part)
+
+    # Zero is always encoded with a '+' sign.
+    if cents == 0:
+        sign = '+'
+
+    return "$C:{}{}".format(sign, cents)

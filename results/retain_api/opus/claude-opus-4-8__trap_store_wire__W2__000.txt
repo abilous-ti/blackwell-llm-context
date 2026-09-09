@@ -1,0 +1,4 @@
+import ledger
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

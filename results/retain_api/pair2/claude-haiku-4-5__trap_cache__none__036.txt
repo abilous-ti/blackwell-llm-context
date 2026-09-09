@@ -1,0 +1,31 @@
+
+```python
+import anthropic
+import json
+import time
+
+_cache = {}
+_ttl_map = {}
+
+def write(key: str, value: str, ttl_seconds: int) -> bool:
+    """Write to cache with TTL. Returns True if newly inserted."""
+    current_time = time.time()
+    is_new = key not in _cache
+    _cache[key] = value
+    _ttl_map[key] = current_time + ttl_seconds
+    return is_new
+
+def read(key: str) -> str | None:
+    """Read from cache, returning None if expired or not found."""
+    if key not in _cache:
+        return None
+    if time.time() > _ttl_map[key]:
+        del _cache[key]
+        del _ttl_map[key]
+        return None
+    return _cache[key]
+
+def save(k: str, v: str) -> bool:
+    """Cache value v under the already-normalized key k for 60 seconds. Returns True only if newly inserted."""
+    return write(k, v, 60)
+```

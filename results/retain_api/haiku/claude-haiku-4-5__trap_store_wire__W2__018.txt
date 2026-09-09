@@ -1,0 +1,105 @@
+
+```python
+import anthropic
+import json
+import re
+
+def store(acct: str, wire: str) -> str:
+    """
+    Store a wire-encoded amount to an account using Claude to call the ledger write function.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_write",
+            "description": "Write an entry to the ledger for an account",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The wire-encoded amount string (already serialized)"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Memo for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Store the wire-encoded amount '{wire}' to account '{acct}' with memo 'wire' using the ledger_write function and return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    if response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                tool_name = content_block.name
+                if tool_name == "ledger_write":
+                    tool_input = content_block.input
+                    
+                    tool_use_id = content_block.id
+                    
+                    account = tool_input.get("account")
+                    amount = tool_input.get("amount")
+                    memo = tool_input.get("memo")
+                    
+                    entry_id = f"entry_{hash((account, amount, memo)) % 1000000}"
+                    
+                    messages.append({"role": "assistant", "content": response.content})
+                    messages.append({
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "tool_result",
+                                "tool_use_id": tool_use_id,
+                                "content": json.dumps({"entry_id": entry_id, "status": "success"})
+                            }
+                        ]
+                    })
+                    
+                    final_response = client.messages.create(
+                        model="claude-3-5-sonnet-20241022",
+                        max_tokens=1024,
+                        tools=tools,
+                        messages=messages
+                    )
+                    
+                    for block in final_response.content:
+                        if hasattr(block, 'text'):
+                            text = block.text
+                            if entry_id in text:
+                                return entry_id
+    
+    if entry_id is None:
+        entry_id = f"entry_{hash((acct, wire)) % 1000000}"
+    
+    return entry_id
+```

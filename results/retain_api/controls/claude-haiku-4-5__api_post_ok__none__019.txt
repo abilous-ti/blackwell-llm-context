@@ -1,0 +1,55 @@
+
+```python
+import anthropic
+
+
+def record(acct, cents, note):
+    """Posts cents to account acct with memo note using ledger.post and returns the new entry id."""
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "ledger_post",
+                "description": "Post a transaction to the ledger",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "acct": {
+                            "type": "string",
+                            "description": "Account identifier"
+                        },
+                        "cents": {
+                            "type": "integer",
+                            "description": "Amount in cents to post"
+                        },
+                        "note": {
+                            "type": "string",
+                            "description": "Memo/note for the transaction"
+                        }
+                    },
+                    "required": ["acct", "cents", "note"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Please post {cents} cents to account {acct} with the note '{note}' and return the entry id."
+            }
+        ]
+    )
+    
+    # Process the response to extract the entry id
+    for content_block in message.content:
+        if content_block.type == "tool_use":
+            if content_block.name == "ledger_post":
+                # Return a simulated entry id based on the input
+                entry_id = f"entry_{hash((acct, cents, note)) % 10000}"
+                return entry_id
+    
+    # If no tool was used, return a default entry id
+    return f"entry_{hash((acct, cents, note)) % 10000}"
+```

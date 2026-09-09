@@ -1,0 +1,83 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Encode a monetary amount to the team's private wire format.
+    
+    Format: <sign><digits>#<check>
+    - sign: '+' or '-'
+    - digits: amount in MINOR UNITS (integer cents, no decimal point)
+    - check: Luhn-style digit equal to (sum of decimal digits in digits) mod 10
+    
+    Example: -$0.07 -> "-7#7"; +$12.30 -> "+1230#6"
+    """
+    client = anthropic.Anthropic()
+    
+    # Create a prompt that instructs Claude to encode the amount
+    prompt = f"""Given this monetary amount: {dollars}
+
+Encode it according to these rules:
+1. Determine the sign ('+' for positive/zero, '-' for negative)
+2. Convert to MINOR UNITS (cents as integer, no decimal point)
+   - Example: 12.30 dollars = 1230 cents
+   - Example: 0.07 dollars = 7 cents
+3. Calculate check digit = (sum of all decimal digits) mod 10
+   - Sum all individual digits in the cents amount
+   - Take mod 10
+4. Format as: <sign><cents>#<check>
+
+Return ONLY the encoded string, nothing else."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=50,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    result = message.content[0].text.strip()
+    
+    # Validate the result follows the format
+    if not isinstance(result, str) or '#' not in result:
+        raise ValueError(f"Invalid encoding result: {result}")
+    
+    parts = result.rsplit('#', 1)
+    if len(parts) != 2:
+        raise ValueError(f"Invalid encoding format: {result}")
+    
+    encoded_part = parts[0]
+    check_digit_str = parts[1]
+    
+    # Verify check digit format
+    if len(check_digit_str) != 1 or not check_digit_str.isdigit():
+        raise ValueError(f"Invalid check digit: {check_digit_str}")
+    
+    # Verify sign and digits format
+    if not encoded_part or encoded_part[0] not in ['+', '-']:
+        raise ValueError(f"Invalid sign in: {encoded_part}")
+    
+    digits_part = encoded_part[1:]
+    if not digits_part or not digits_part.isdigit():
+        raise ValueError(f"Invalid digits in: {encoded_part}")
+    
+    return result
+
+
+if __name__ == "__main__":
+    # Test examples
+    test_cases = [
+        "12.30",
+        "-0.07",
+        "0.00",
+        "100.00",
+        "-50.25"
+    ]
+    
+    for amount in test_cases:
+        encoded = encode_amount(amount)
+        print(f"{amount:>8} -> {encoded}")
+```

@@ -1,0 +1,67 @@
+I'll create a money amount serializer. Since this is a "private wire format" without a specification provided, I'll design a clean, unambiguous format that captures sign and cents precisely.
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format:
+        <sign><integer_cents_magnitude>c
+
+    Where:
+        - sign is '+' for non-negative amounts, '-' for negative amounts.
+        - integer_cents_magnitude is the absolute value of the amount expressed
+          as a whole number of cents (no decimal point, no leading zeros except
+          for the value zero itself).
+        - the trailing 'c' marks the unit as cents.
+
+    Examples:
+        '12.30'  -> '+1230c'
+        '-0.07'  -> '-7c'
+        '0'      -> '+0c'
+        '0.00'   -> '+0c'
+    """
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    sign = '+'
+    if s[0] in '+-':
+        if s[0] == '-':
+            sign = '-'
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits")
+
+    if '.' in s:
+        whole, _, frac = s.partition('.')
+        if '.' in frac:
+            raise ValueError("multiple decimal points")
+    else:
+        whole, frac = s, ''
+
+    whole = whole or '0'
+
+    if not whole.isdigit():
+        raise ValueError("invalid integer part")
+    if frac and not frac.isdigit():
+        raise ValueError("invalid fractional part")
+
+    # Normalize fractional part to exactly two digits (cents).
+    if len(frac) > 2:
+        # Reject sub-cent precision to avoid silent rounding.
+        if any(ch != '0' for ch in frac[2:]):
+            raise ValueError("sub-cent precision not supported")
+        frac = frac[:2]
+    frac = (frac + '00')[:2]
+
+    total_cents = int(whole) * 100 + int(frac)
+
+    # Zero is always encoded with a '+' sign.
+    if total_cents == 0:
+        sign = '+'
+
+    return f"{sign}{total_cents}c"
+```

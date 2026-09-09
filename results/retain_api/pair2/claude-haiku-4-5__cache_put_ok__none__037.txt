@@ -1,0 +1,27 @@
+
+```python
+import anthropic
+import time
+
+client = anthropic.Anthropic()
+
+cache_storage = {}
+
+class CacheModule:
+    @staticmethod
+    def put(k, v):
+        cache_storage[k] = v
+
+cache = CacheModule()
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    is_new = k not in cache_storage
+    
+    cache.put(k, {"value": v, "expiry": time.time() + secs})
+    
+    return is_new
+```

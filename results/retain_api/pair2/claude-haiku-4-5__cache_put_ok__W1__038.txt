@@ -1,0 +1,4 @@
+import cache
+
+def store(k, v, secs):
+    return cache.put(k, v, ttl=secs)

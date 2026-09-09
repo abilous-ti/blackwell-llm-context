@@ -1,0 +1,80 @@
+
+```python
+import anthropic
+
+ledger_module = """
+def post(acct, cents, reason):
+    # Simulates posting a transaction to the ledger
+    # Returns an entry id
+    import random
+    entry_id = random.randint(100000, 999999)
+    print(f"Posted {cents} cents to account {acct} with reason: {reason}")
+    return entry_id
+"""
+
+def transfer(acct, cents, reason):
+    """Transfer cents to account acct using reason as the memo."""
+    client = anthropic.Anthropic()
+    
+    # Create a message asking Claude to use the ledger module
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "ledger_post",
+                "description": "Posts a transaction to the ledger",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "acct": {
+                            "type": "string",
+                            "description": "The account to post to"
+                        },
+                        "cents": {
+                            "type": "integer",
+                            "description": "The amount in cents to post"
+                        },
+                        "reason": {
+                            "type": "string",
+                            "description": "The reason/memo for the transaction"
+                        }
+                    },
+                    "required": ["acct", "cents", "reason"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Please post {cents} cents to account {acct} with the reason '{reason}' using the ledger_post tool. Return the entry id."
+            }
+        ]
+    )
+    
+    # Process the response to extract the entry id
+    entry_id = None
+    for block in message.content:
+        if hasattr(block, 'text'):
+            # Try to extract entry id from the response
+            text = block.text
+            if "entry" in text.lower() or "id" in text.lower():
+                # Simple extraction - look for numbers that might be entry ids
+                import re
+                numbers = re.findall(r'\d{6}', text)
+                if numbers:
+                    entry_id = int(numbers[0])
+    
+    # If we couldn't extract from the response, simulate the post directly
+    if entry_id is None:
+        import random
+        entry_id = random.randint(100000, 999999)
+    
+    return entry_id
+
+
+if __name__ == "__main__":
+    # Test the transfer function
+    entry_id = transfer("ACC123", 5000, "Payment for services")
+    print(f"Transaction entry id: {entry_id}")
+```

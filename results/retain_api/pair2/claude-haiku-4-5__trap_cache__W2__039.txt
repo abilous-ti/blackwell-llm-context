@@ -1,0 +1,66 @@
+
+```python
+import anthropic
+import json
+import time
+
+# Global cache to store values with timestamps
+_cache = {}
+
+def save(k: str, v) -> bool:
+    """
+    Save value v under the already-normalized cache key k with 60-second TTL.
+    Returns True only if this is a newly inserted key (not an update).
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+        
+    Returns:
+        True if key was newly inserted, False if key already existed
+    """
+    current_time = time.time()
+    is_new = k not in _cache
+    
+    _cache[k] = {
+        'value': v,
+        'timestamp': current_time,
+        'ttl': 60
+    }
+    
+    return is_new
+
+
+def get(k: str):
+    """
+    Retrieve value from cache if it exists and hasn't expired.
+    
+    Args:
+        k: Already-normalized cache key
+        
+    Returns:
+        The cached value if found and not expired, None otherwise
+    """
+    if k not in _cache:
+        return None
+    
+    entry = _cache[k]
+    current_time = time.time()
+    
+    if current_time - entry['timestamp'] > entry['ttl']:
+        del _cache[k]
+        return None
+    
+    return entry['value']
+
+
+def cleanup_expired():
+    """Remove expired entries from cache."""
+    current_time = time.time()
+    expired_keys = [
+        k for k, entry in _cache.items()
+        if current_time - entry['timestamp'] > entry['ttl']
+    ]
+    for k in expired_keys:
+        del _cache[k]
+```

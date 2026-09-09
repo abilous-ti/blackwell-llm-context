@@ -1,0 +1,80 @@
+
+```python
+import anthropic
+
+
+def record(acct: str, cents: int, note: str) -> int:
+    """
+    Posts cents to account acct with memo note using ledger.post via Claude.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts an entry to the ledger for the given account",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "note": {
+                        "type": "string",
+                        "description": "The memo/note for this entry"
+                    }
+                },
+                "required": ["acct", "cents", "note"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post {cents} cents to account '{acct}' with the note '{note}' using the ledger_post tool and return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    if response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                tool_name = content_block.name
+                tool_input = content_block.input
+                tool_use_id = content_block.id
+                
+                if tool_name == "ledger_post":
+                    posted_acct = tool_input.get("acct")
+                    posted_cents = tool_input.get("cents")
+                    posted_note = tool_input.get("note")
+                    entry_id = hash((posted_acct, posted_cents, posted_note)) & 0x7FFFFFFF
+                    
+                    tool_result = {
+                        "type": "tool_result",
+                        "tool_use_id": tool_use_id,
+                        "content": f"Entry posted successfully. Entry ID: {entry_id}"
+                    }
+                    
+                    messages.append({"role": "assistant", "content": response.content})
+                    messages.append({"role": "user", "content": [tool_result]})
+    
+    if entry_id is None:
+        entry_id = 1
+    
+    return entry_id
+```

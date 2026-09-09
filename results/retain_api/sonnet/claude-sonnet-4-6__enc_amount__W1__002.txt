@@ -1,0 +1,42 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string to the team's private wire format.
+
+    Wire format: signed integer cents as a decimal string, prefixed with 'AMT:'.
+    Examples:
+        '12.30'  -> 'AMT:1230'
+        '-0.07'  -> 'AMT:-7'
+        '0.00'   -> 'AMT:0'
+        '1.00'   -> 'AMT:100'
+
+    Raises ValueError if the input is not a valid money amount.
+    """
+    if not isinstance(dollars, str):
+        raise ValueError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("encode_amount received an empty string")
+
+    # Validate general shape before Decimal parsing
+    if not re.fullmatch(r'-?\d+(\.\d+)?', stripped):
+        raise ValueError(f"Invalid money amount: {dollars!r}")
+
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation:
+        raise ValueError(f"Cannot parse as decimal: {dollars!r}")
+
+    # Round to exactly 2 decimal places and convert to cents
+    try:
+        cents = int((value * 100).to_integral_value())
+    except Exception as exc:
+        raise ValueError(f"Failed to convert {dollars!r} to cents: {exc}") from exc
+
+    return f"AMT:{cents}"

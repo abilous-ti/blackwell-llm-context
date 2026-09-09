@@ -1,0 +1,34 @@
+def encode_amount(dollars: str) -> str:
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    sign = ''
+    if s[0] in '+-':
+        sign = '-' if s[0] == '-' else ''
+        s = s[1:]
+
+    if '.' in s:
+        whole, _, frac = s.partition('.')
+        if '.' in frac:
+            raise ValueError("malformed amount")
+    else:
+        whole, frac = s, ''
+
+    if whole == '' and frac == '':
+        raise ValueError("malformed amount")
+
+    if not whole:
+        whole = '0'
+
+    if not whole.isdigit() or (frac and not frac.isdigit()):
+        raise ValueError("malformed amount")
+
+    frac = (frac + '00')[:2]
+
+    cents = int(whole) * 100 + int(frac)
+
+    if cents == 0:
+        sign = ''
+
+    return f"{sign}{cents}"

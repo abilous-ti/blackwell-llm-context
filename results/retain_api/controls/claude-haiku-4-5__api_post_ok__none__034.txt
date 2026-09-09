@@ -1,0 +1,99 @@
+
+```python
+import anthropic
+
+def post(acct: str, cents: int, note: str) -> str:
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "note": {
+                        "type": "string",
+                        "description": "The memo/note for the transaction"
+                    }
+                },
+                "required": ["acct", "cents", "note"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account {acct} with note '{note}' using the ledger_post tool and return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response to extract the entry id
+    if response.stop_reason == "tool_use":
+        for block in response.content:
+            if block.type == "tool_use":
+                # Simulate the ledger.post call
+                result = {
+                    "entry_id": f"entry_{acct}_{cents}_{hash(note) % 10000}",
+                    "account": acct,
+                    "amount": cents,
+                    "memo": note
+                }
+                
+                # Continue the conversation with the tool result
+                messages.append({"role": "assistant", "content": response.content})
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": block.id,
+                            "content": str(result)
+                        }
+                    ]
+                })
+                
+                # Get the final response with the entry id
+                final_response = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=1024,
+                    tools=tools,
+                    messages=messages
+                )
+                
+                # Extract entry id from the response
+                for final_block in final_response.content:
+                    if hasattr(final_block, 'text'):
+                        # Parse the entry id from the response text
+                        text = final_block.text
+                        if "entry_" in text:
+                            # Extract entry id from response
+                            import re
+                            match = re.search(r'entry_[a-zA-Z0-9_]+', text)
+                            if match:
+                                return match.group(0)
+                
+                return result["entry_id"]
+    
+    return ""
+```

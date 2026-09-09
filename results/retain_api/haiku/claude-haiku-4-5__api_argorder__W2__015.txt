@@ -1,0 +1,99 @@
+
+```python
+import anthropic
+import re
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer funds to an account using Claude as an AI backbone.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (can be negative)
+        reason: Transaction reason/memo
+    
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    
+    def encode_amount(cents: int) -> str:
+        """Encode amount in wire format: <sign><digits>#<check>"""
+        sign = '+' if cents >= 0 else '-'
+        digits_str = str(abs(cents))
+        digit_sum = sum(int(d) for d in digits_str)
+        check = digit_sum % 10
+        return f"{sign}{digits_str}#{check}"
+    
+    def decode_and_validate(encoded: str) -> int:
+        """Decode and validate wire format, returning cents value"""
+        match = re.match(r'^([+-])(\d+)#(\d)$', encoded)
+        if not match:
+            raise ValueError(f"Invalid encoded format: {encoded}")
+        
+        sign, digits_str, check_str = match.groups()
+        check = int(check_str)
+        
+        digit_sum = sum(int(d) for d in digits_str)
+        expected_check = digit_sum % 10
+        
+        if check != expected_check:
+            raise ValueError(f"Check digit mismatch in {encoded}")
+        
+        value = int(digits_str)
+        if sign == '-':
+            value = -value
+        
+        return value
+    
+    encoded_amount = encode_amount(cents)
+    
+    client = anthropic.Anthropic()
+    
+    system_prompt = """You are a banking ledger system assistant. You have access to a ledger module with a `post` function.
+    
+When asked to post a transaction, you must:
+1. Call the ledger.post() function with the properly formatted parameters
+2. Return the entry ID from the response
+
+The wire encoding format for amounts is: <sign><digits>#<check>
+- <sign> is '+' or '-'
+- <digits> is the amount in MINOR UNITS (cents), no decimal point
+- <check> is a single digit equal to (sum of decimal digits in <digits>) mod 10
+
+Examples:
+- -$0.07 encodes as "-7#7" (7 cents negative, check = 7 mod 10 = 7)
+- +$12.30 encodes as "+1230#6" (1230 cents positive, check = (1+2+3+0) mod 10 = 6)
+
+You must use the encoded format when calling ledger.post()."""
+    
+    user_message = f"""Post a transfer to the ledger with these details:
+- Account: {acct}
+- Amount (encoded): {encoded_amount}
+- Reason: {reason}
+
+Call ledger.post(account="{acct}", amount="{encoded_amount}", memo="{reason}") and return the entry ID."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system=system_prompt,
+        messages=[
+            {"role": "user", "content": user_message}
+        ]
+    )
+    
+    response_text = message.content[0].text
+    
+    entry_id_match = re.search(r'entry[_\s]?id[:\s]+([A-Za-z0-9_\-]+)', response_text, re.IGNORECASE)
+    if entry_id_match:
+        return entry_id_match.group(1)
+    
+    lines = response_text.split('\n')
+    for line in lines:
+        if 'entry' in line.lower() and 'id' in line.lower():
+            match = re.search(r'([A-Za-z0-9_\-]+)', line)
+            if match:
+                return match.group(1)
+    
+    return response_text.strip()
+```

@@ -1,0 +1,71 @@
+I'll create a money amount serializer. Since this is a "private wire format" without a specified spec, I'll design a reasonable, well-defined binary-ish text format that encodes sign and integer cents unambiguously.
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format specification:
+      - Amounts are represented in integer cents (2 decimal places).
+      - The wire string has the form:  "M<sign><cents>E"
+          * 'M' is a leading sentinel marking the start of the payload.
+          * <sign> is '+' for non-negative amounts, '-' for negative.
+          * <cents> is the absolute value expressed in cents, as a
+            decimal integer with no leading zeros (zero is "0").
+          * 'E' is a trailing sentinel marking the end of the payload.
+
+    Examples:
+      '12.30'  -> 'M+1230E'
+      '-0.07'  -> 'M-7E'
+      '0'      -> 'M+0E'
+      '0.00'   -> 'M+0E'
+    """
+    if dollars is None:
+        raise ValueError("dollars must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Handle sign.
+    negative = False
+    if s[0] in "+-":
+        negative = s[0] == "-"
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits after sign")
+
+    # Split into integer and fractional parts.
+    if "." in s:
+        int_part, frac_part = s.split(".", 1)
+        if "." in frac_part:
+            raise ValueError("too many decimal points")
+    else:
+        int_part, frac_part = s, ""
+
+    if int_part == "":
+        int_part = "0"
+
+    if not int_part.isdigit():
+        raise ValueError("invalid integer part: {!r}".format(int_part))
+    if frac_part != "" and not frac_part.isdigit():
+        raise ValueError("invalid fractional part: {!r}".format(frac_part))
+
+    # Normalize fractional part to exactly 2 digits (cents), with rounding
+    # for anything beyond 2 decimal places using half-up rounding.
+    if len(frac_part) <= 2:
+        cents_frac = frac_part.ljust(2, "0")
+        round_up = False
+    else:
+        cents_frac = frac_part[:2]
+        # Look at the next digit to decide half-up rounding.
+        round_up = frac_part[2] >= "5"
+
+    total_cents = int(int_part) * 100 + int(cents_frac)
+    if round_up:
+        total_cents += 1
+
+    sign_char = "-" if (negative and total_cents != 0) else "+"
+
+    return "M{}{}E".format(sign_char, total_cents)

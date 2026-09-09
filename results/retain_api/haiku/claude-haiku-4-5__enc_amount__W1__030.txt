@@ -1,0 +1,18 @@
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a money amount string to the team's private wire format.
+    
+    Converts dollar strings like '12.30' or '-0.07' to the canonical format
+    used by the ledger module's post() method.
+    
+    Args:
+        dollars: A string representation of a dollar amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The encoded amount as a string in the team's wire format
+    """
+    try:
+        amount = float(dollars)
+        return str(int(amount * 100))
+    except (ValueError, TypeError):
+        raise ValueError(f"Invalid dollar amount: {dollars}")

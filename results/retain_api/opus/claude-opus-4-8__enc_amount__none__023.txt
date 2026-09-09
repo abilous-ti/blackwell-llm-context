@@ -1,0 +1,60 @@
+I need to make some reasonable decisions here since the "private wire format" isn't specified. I'll design a sensible, well-documented serialization format for money amounts.
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string to this team's private wire format.
+
+    Wire format: "<sign>C<cents>"
+      - <sign> is 'P' for positive/zero or 'N' for negative
+      - <cents> is the absolute value expressed as an integer number of cents,
+        zero-padded to at least 3 digits.
+
+    Examples:
+        encode_amount('12.30')  -> 'PC1230'
+        encode_amount('-0.07')  -> 'NC007'
+        encode_amount('0')      -> 'PC000'
+    """
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Determine sign.
+    negative = False
+    if s[0] in '+-':
+        negative = s[0] == '-'
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits")
+
+    # Split into whole and fractional parts.
+    if '.' in s:
+        whole, frac = s.split('.', 1)
+        if '.' in frac:
+            raise ValueError("too many decimal points")
+    else:
+        whole, frac = s, ''
+
+    whole = whole or '0'
+
+    if not whole.isdigit():
+        raise ValueError("invalid whole part: %r" % whole)
+    if frac and not frac.isdigit():
+        raise ValueError("invalid fractional part: %r" % frac)
+
+    # Normalize fractional part to exactly 2 digits (cents), rounding half-up.
+    if len(frac) < 2:
+        frac = frac.ljust(2, '0')
+        round_up = False
+    else:
+        cents_frac = frac[:2]
+        remainder = frac[2:]
+        # Round half up based on the first dropped digit.
+        round_up = len(remainder) > 0 and remainder[0] >= '5'
+        frac = cents_frac
+
+    total_cents = int(whole) * 100 + int(frac)
+    if round_up:
+        total_cents += 1
+
+    sign = 'N' if (negative and total_cents != 0) else 'P'
+    return "%sC%03d" % (sign, total_cents)

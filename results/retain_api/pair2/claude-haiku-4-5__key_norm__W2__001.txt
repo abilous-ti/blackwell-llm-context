@@ -1,0 +1,122 @@
+
+```python
+import anthropic
+import re
+
+
+def make_key(label: str) -> str:
+    """Convert a raw label into a team's private cache key.
+    
+    Transformation steps:
+    1. Lowercase the label
+    2. Replace every run of non-alphanumeric characters with a single underscore '_'
+    3. Strip leading/trailing underscores
+    4. Prepend the fixed private namespace prefix 'kx7-'
+    """
+    # Step 1: Lowercase
+    lowercased = label.lower()
+    
+    # Step 2: Replace runs of non-alphanumeric characters with single underscore
+    normalized = re.sub(r'[^a-z0-9]+', '_', lowercased)
+    
+    # Step 3: Strip leading/trailing underscores
+    stripped = normalized.strip('_')
+    
+    # Step 4: Prepend the fixed prefix
+    cache_key = 'kx7-' + stripped
+    
+    return cache_key
+
+
+def demonstrate_cache_key():
+    """Demonstrate the make_key function with example transformations."""
+    examples = [
+        'Hello, World!',
+        ' A__B ',
+        'Test-Case_123',
+        '!!!Multiple###Symbols!!!',
+        'CamelCaseExample',
+        '   Leading and trailing spaces   ',
+    ]
+    
+    print("Cache Key Examples:")
+    print("-" * 50)
+    for example in examples:
+        key = make_key(example)
+        print(f"'{example}' -> '{key}'")
+
+
+def verify_with_claude():
+    """Verify the cache key generation logic with Claude using extended thinking."""
+    client = anthropic.Anthropic()
+    
+    # Test cases to verify
+    test_cases = [
+        ("Hello, World!", "kx7-hello_world"),
+        (" A__B ", "kx7-a_b"),
+        ("Test-Case_123", "kx7-test_case_123"),
+        ("!!!Multiple###Symbols!!!", "kx7-multiple_symbols"),
+    ]
+    
+    print("\nVerifying with Claude:")
+    print("-" * 50)
+    
+    for input_label, expected_output in test_cases:
+        actual_output = make_key(input_label)
+        is_correct = actual_output == expected_output
+        status = "✓" if is_correct else "✗"
+        print(f"{status} Input: '{input_label}'")
+        print(f"  Expected: {expected_output}")
+        print(f"  Got:      {actual_output}")
+        if not is_correct:
+            print(f"  MISMATCH!")
+        print()
+    
+    # Use Claude to verify the transformation logic
+    prompt = """
+    A team uses the following cache key normalization rules:
+    1. Lowercase the label
+    2. Replace every run of non-alphanumeric characters with a single underscore '_'
+    3. Strip leading/trailing underscores
+    4. Prepend the fixed private namespace prefix 'kx7-'
+    
+    Examples given:
+    - 'Hello, World!' -> 'kx7-hello_world'
+    - ' A__B ' -> 'kx7-a_b'
+    
+    Verify that this Python implementation is correct:
+    
+    ```python
+    import re
+    
+    def make_key(label: str) -> str:
+        lowercased = label.lower()
+        normalized = re.sub(r'[^a-z0-9]+', '_', lowercased)
+        stripped = normalized.strip('_')
+        cache_key = 'kx7-' + stripped
+        return cache_key
+    ```
+    
+    Is this implementation correct? Explain your reasoning.
+    """
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    print("Claude's Verification:")
+    print("-" * 50)
+    print(response.content[0].text)
+
+
+if __name__ == "__main__":
+    # Demonstrate the function
+    demonstrate_cache_key()
+    
+    # Verify with Claude
+    verify_with_claude()
+```

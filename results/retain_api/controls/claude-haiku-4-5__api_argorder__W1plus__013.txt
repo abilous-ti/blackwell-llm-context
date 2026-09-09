@@ -1,0 +1,19 @@
+```python
+def transfer(acct, cents, reason):
+    import ledger
+    
+    # Calculate check digit using Luhn-style: sum of digits mod 10
+    digits_str = str(abs(cents))
+    check_digit = sum(int(d) for d in digits_str) % 10
+    
+    # Determine sign
+    sign = '+' if cents >= 0 else '-'
+    
+    # Format amount as per wire-encoding: <sign><digits>#<check>
+    amount = f"{sign}{digits_str}#{check_digit}"
+    
+    # Call ledger.post with required keyword argument memo=
+    entry_id = ledger.post(acct, amount, memo=reason)
+    
+    return entry_id
+```

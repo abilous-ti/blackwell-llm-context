@@ -1,0 +1,51 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount to the team's private wire format.
+    
+    Args:
+        dollars: A string representing a dollar amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The serialized amount in the team's private wire format
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are part of a team that uses a private wire format for serializing money amounts. 
+                
+The ledger module API uses this private format internally. Given a dollar amount as a string (e.g., '12.30', '-0.07'), 
+you need to determine what the wire format transformation is.
+
+Common wire formats for financial data include:
+1. Cents as integer (12.30 -> 1230, -0.07 -> -7)
+2. Fixed-point with specific decimal places
+3. Scientific notation
+4. Custom encoding
+
+Given the dollar amount: {dollars}
+
+What is the most likely private wire format encoding for this amount? 
+Respond with ONLY the encoded value, nothing else."""
+            }
+        ]
+    )
+    
+    encoded = message.content[0].text.strip()
+    
+    try:
+        dollars_float = float(dollars)
+        cents = round(dollars_float * 100)
+        return str(cents)
+    except (ValueError, OverflowError):
+        return encoded
+```

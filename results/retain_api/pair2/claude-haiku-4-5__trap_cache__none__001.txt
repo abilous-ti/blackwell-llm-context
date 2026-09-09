@@ -1,0 +1,43 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# In-memory cache with TTL tracking
+_cache = {}
+
+def write(key: str, value: str, ttl: int) -> bool:
+    """
+    Write to cache with TTL support.
+    
+    Args:
+        key: The cache key
+        value: The value to cache
+        ttl: Time to live in seconds
+    
+    Returns:
+        True if this is a new insertion, False if updating existing key
+    """
+    is_new = key not in _cache
+    _cache[key] = {
+        'value': value,
+        'ttl': ttl
+    }
+    return is_new
+
+def save(k: str, v: str) -> bool:
+    """
+    Save value v under the normalized key k with 60 second TTL.
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+    
+    Returns:
+        True if newly inserted, False if updating existing key
+    """
+    return write(k, v, 60)
+```

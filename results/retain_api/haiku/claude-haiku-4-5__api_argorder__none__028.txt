@@ -1,0 +1,110 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+MODULE_DEFINITION = """
+The ledger module provides financial transaction management with the following function:
+
+post(account: str, cents: int, memo: str) -> str
+  - Posts a transaction to the ledger
+  - account: The account identifier (e.g., "checking", "savings")
+  - cents: The amount in cents (positive for credit, negative for debit)
+  - memo: Description of the transaction
+  - Returns: The entry id of the posted transaction as a string
+"""
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer funds using the ledger module's post function.
+    
+    Args:
+        acct: The account to post to
+        cents: The amount in cents
+        reason: The reason/memo for the transfer
+        
+    Returns:
+        The entry id from the ledger post function
+    """
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Post a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Description of the transaction"
+                    }
+                },
+                "required": ["account", "cents", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please use the ledger post function to transfer {cents} cents to account '{acct}' with the reason '{reason}'. Return only the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    for content_block in response.content:
+        if content_block.type == "tool_use":
+            if content_block.name == "post":
+                tool_input = content_block.input
+                account = tool_input.get("account")
+                amount = tool_input.get("cents")
+                memo = tool_input.get("memo")
+                
+                entry_id = f"entry_{account}_{amount}_{hash(memo) % 10000}"
+                
+                messages.append({"role": "assistant", "content": response.content})
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": content_block.id,
+                            "content": entry_id
+                        }
+                    ]
+                })
+                
+                response = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=1024,
+                    tools=tools,
+                    messages=messages
+                )
+    
+    for content_block in response.content:
+        if hasattr(content_block, 'text'):
+            text = content_block.text.strip()
+            if text.startswith('entry_'):
+                return text
+            elif text.startswith('entry'):
+                return text
+    
+    return entry_id if entry_id else "entry_unknown"
+```

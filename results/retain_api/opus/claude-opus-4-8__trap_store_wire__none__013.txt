@@ -1,0 +1,17 @@
+I need to make some reasonable assumptions about the ledger module's API since it isn't specified. I'll write a clean implementation that posts the already-encoded wire string as-is.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, 'wire')
+```
+
+Wait, I should not include prose. Let me return only the file content.
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, 'wire')

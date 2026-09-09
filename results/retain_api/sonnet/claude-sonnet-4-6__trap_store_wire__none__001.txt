@@ -1,0 +1,4 @@
+from ledger import write
+
+def store(acct, wire):
+    return write(acct, wire, 'wire')

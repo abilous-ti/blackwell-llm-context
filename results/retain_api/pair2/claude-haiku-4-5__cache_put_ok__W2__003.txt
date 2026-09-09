@@ -1,0 +1,92 @@
+
+```python
+import anthropic
+import hashlib
+import time
+
+# This is a simple in-memory cache for demonstration
+_cache_storage = {}
+_cache_timestamps = {}
+
+def put(k, v):
+    """Simple cache put function that returns True if key was newly inserted."""
+    is_new = k not in _cache_storage
+    _cache_storage[k] = v
+    _cache_timestamps[k] = time.time()
+    return is_new
+
+def normalize_cache_key(label):
+    """Normalize a label to a cache key following the house convention."""
+    # Step 1: lowercase
+    normalized = label.lower()
+    
+    # Step 2: replace every run of non-alphanumeric characters with a single underscore
+    result = []
+    in_non_alnum = False
+    for char in normalized:
+        if char.isalnum():
+            result.append(char)
+            in_non_alnum = False
+        else:
+            if not in_non_alnum:
+                result.append('_')
+                in_non_alnum = True
+    
+    normalized = ''.join(result)
+    
+    # Step 3: strip leading/trailing underscores
+    normalized = normalized.strip('_')
+    
+    # Step 4: prepend the fixed private namespace prefix 'kx7-'
+    return 'kx7-' + normalized
+
+def store(k, v, secs):
+    """
+    Cache value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    # Normalize the key according to house convention
+    normalized_key = normalize_cache_key(k)
+    
+    # Check if key is new before insertion
+    is_new = put(normalized_key, v)
+    
+    # Set expiration time
+    _cache_timestamps[normalized_key] = time.time() + secs
+    
+    return is_new
+
+# Demonstration with Claude
+if __name__ == "__main__":
+    client = anthropic.Anthropic()
+    
+    # Create a message to demonstrate the caching functionality
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": "Explain how a cache key normalization system works in one sentence."
+            }
+        ]
+    )
+    
+    print("Claude's response:", message.content[0].text)
+    
+    # Test the store function with various keys
+    test_cases = [
+        ("Hello, World!", "test_value_1"),
+        (" A__B ", "test_value_2"),
+        ("CacheKey123!", "test_value_3"),
+    ]
+    
+    print("\nCache storage test results:")
+    for raw_key, value in test_cases:
+        result = store(raw_key, value, 3600)
+        normalized = normalize_cache_key(raw_key)
+        print(f"Raw key: '{raw_key}' -> Normalized: '{normalized}' -> First insert: {result}")
+        # Try storing the same key again
+        result_again = store(raw_key, value, 3600)
+        print(f"  Storing same key again -> First insert: {result_again}")
+```

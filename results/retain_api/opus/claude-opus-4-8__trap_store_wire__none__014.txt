@@ -1,0 +1,19 @@
+I need to make some reasonable assumptions about the `ledger` module's `write` function API since it's not fully specified. The key constraint is clear: the wire string is already serialized, so I pass it through as-is.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')
+```
+
+Let me reconsider the `write` signature—the problem doesn't specify it exactly, but the requirements are: post amount `wire` to account `acct` with memo `'wire'`, and return the new entry id.
+
+solution.py content:
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

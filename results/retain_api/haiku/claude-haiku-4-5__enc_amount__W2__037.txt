@@ -1,0 +1,169 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Encode a money amount to the team's private wire format.
+    
+    Wire format: <sign><digits>#<check>
+    - sign: '+' or '-'
+    - digits: amount in MINOR UNITS (cents, no decimal point)
+    - check: Luhn-style digit = (sum of decimal digits) mod 10
+    
+    Examples:
+    - '-0.07' -> '-7#7'
+    - '12.30' -> '+1230#6'
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are a Python code generator. Generate ONLY the Python code (no markdown, no explanation) that implements the encode_amount function.
+
+The function should:
+1. Take a dollars string like '12.30' or '-0.07'
+2. Convert to cents (minor units) as an integer
+3. Create a sign ('+' for positive, '-' for negative/zero)
+4. Calculate check digit as sum of all digits in the cents amount mod 10
+5. Return formatted string: '<sign><cents>#<check>'
+
+Examples:
+- '-0.07' -> '-7#7' (7 cents, check = 7 mod 10 = 7)
+- '12.30' -> '+1230#6' (1230 cents, check = (1+2+3+0) mod 10 = 6)
+- '0' -> '+0#0' (0 cents, check = 0 mod 10 = 0)
+
+def encode_amount(dollars: str) -> str:"""
+            }
+        ]
+    )
+    
+    generated_code = message.content[0].text.strip()
+    
+    # Clean up the generated code if needed
+    if generated_code.startswith("```"):
+        lines = generated_code.split('\n')
+        generated_code = '\n'.join(lines[1:] if lines[0].startswith("```") else lines)
+        if generated_code.endswith("```"):
+            generated_code = generated_code[:-3]
+    
+    # Define the function from generated code
+    exec_globals = {}
+    exec(f"def encode_amount(dollars: str) -> str:\n{generated_code}", exec_globals)
+    encode_amount_fn = exec_globals['encode_amount']
+    
+    # Test the function
+    test_cases = [
+        ('-0.07', '-7#7'),
+        ('12.30', '+1230#6'),
+        ('0', '+0#0'),
+        ('100.00', '+10000#1'),
+    ]
+    
+    for input_val, expected in test_cases:
+        result = encode_amount_fn(input_val)
+        if result != expected:
+            raise AssertionError(f"Failed for {input_val}: got {result}, expected {expected}")
+    
+    # Return the actual implementation
+    return """def encode_amount(dollars: str) -> str:
+    \"\"\"
+    Encode a money amount to the team's private wire format.
+    
+    Wire format: <sign><digits>#<check>
+    - sign: '+' or '-'
+    - digits: amount in MINOR UNITS (cents, no decimal point)
+    - check: Luhn-style digit = (sum of decimal digits) mod 10
+    \"\"\"
+    # Parse the input
+    amount_str = dollars.strip()
+    
+    # Determine sign
+    if amount_str.startswith('-'):
+        sign = '-'
+        amount_str = amount_str[1:]
+    else:
+        sign = '+'
+        if amount_str.startswith('+'):
+            amount_str = amount_str[1:]
+    
+    # Convert to cents (minor units)
+    if '.' in amount_str:
+        parts = amount_str.split('.')
+        dollars_part = parts[0] if parts[0] else '0'
+        cents_part = parts[1].ljust(2, '0')[:2]  # Pad or truncate to 2 digits
+        cents = int(dollars_part) * 100 + int(cents_part)
+    else:
+        cents = int(amount_str) * 100
+    
+    # Ensure we use '+' for zero and positive
+    if cents == 0:
+        sign = '+'
+    
+    # Convert cents to string for digit sum
+    cents_str = str(cents)
+    
+    # Calculate check digit as sum of all digits mod 10
+    digit_sum = sum(int(d) for d in cents_str)
+    check = digit_sum % 10
+    
+    # Format and return
+    return f"{sign}{cents_str}#{check}\""""
+```
+
+Wait, I need to reconsider. The problem asks me to write the function directly, not use Claude to generate it. Let me write the correct implementation:
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encode a money amount to the team's private wire format.
+    
+    Wire format: <sign><digits>#<check>
+    - sign: '+' or '-'
+    - digits: amount in MINOR UNITS (cents, no decimal point)
+    - check: Luhn-style digit = (sum of decimal digits) mod 10
+    
+    Examples:
+    - '-0.07' -> '-7#7'
+    - '12.30' -> '+1230#6'
+    """
+    # Parse the input
+    amount_str = dollars.strip()
+    
+    # Determine sign and remove it from the string
+    if amount_str.startswith('-'):
+        sign = '-'
+        amount_str = amount_str[1:]
+    else:
+        sign = '+'
+        if amount_str.startswith('+'):
+            amount_str = amount_str[1:]
+    
+    # Convert dollars to cents (minor units)
+    if '.' in amount_str:
+        parts = amount_str.split('.')
+        dollars_part = parts[0] if parts[0] else '0'
+        cents_part = parts[1].ljust(2, '0')[:2]  # Pad or truncate to 2 digits
+        cents = int(dollars_part) * 100 + int(cents_part)
+    else:
+        cents = int(amount_str) * 100
+    
+    # For zero, always use positive sign
+    if cents == 0:
+        sign = '+'
+    
+    # Convert cents to string
+    cents_str = str(cents)
+    
+    # Calculate check digit as sum of all digits mod 10
+    digit_sum = sum(int(d) for d in cents_str)
+    check = digit_sum % 10
+    
+    # Format and return
+    return f"{sign}{cents_str}#{check}"
+```

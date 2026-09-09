@@ -1,0 +1,5 @@
+```python
+def store(acct, wire):
+    from ledger import write
+    return write(acct, wire, 'wire')
+```

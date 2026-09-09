@@ -303,7 +303,8 @@ def verify_in(wd: Path, snippet: str) -> bool:
         return False
 
 
-def run_one(task, arm, mock, i, model="claude-haiku-4-5-20251001", singleshot=False):
+def run_one(task, arm, mock, i, model="claude-haiku-4-5-20251001", singleshot=False,
+             http=False, retain=None):
     """One real claude -p run for (task, arm). Returns {'solved':bool,'cost':float}.
     singleshot=True forces a Claude model into single-shot COMPLETION mode (max-turns 1, no tools;
     we extract the code from the returned text) — the SAME regime as the non-Anthropic models. This
@@ -341,11 +342,18 @@ def run_one(task, arm, mock, i, model="claude-haiku-4-5-20251001", singleshot=Fa
     try:
         ctx = ARMS[arm]
         prompt = ((ctx + "\n\n") if ctx else "") + task["prompt"]
-        if not model.startswith("claude"):
-            # Non-Anthropic (Azure Responses API): single-shot completion + code extraction.
+        if http or not model.startswith("claude"):
+            # One HTTP request, one turn, no tools. `http` forces this path for Anthropic
+            # models too; without it a claude* model would fall through to the command line.
             text, toks = _azure_complete(
                 " ".join((prompt + " Return ONLY the raw Python file content, no markdown "
                           "fences, no prose.").split()), model)
+            if retain:
+                import pathlib
+                d = pathlib.Path(retain)
+                d.mkdir(parents=True, exist_ok=True)
+                (d / ("%s__%s__%s__%03d.txt" % (model, task["id"], arm, i))).write_text(
+                    text or "", encoding="utf-8")
             (wd / "solution.py").write_text(_extract_code(text), encoding="utf-8")
             return {"solved": verify_in(wd, task["verify"]), "cost": 0.0, "out_tokens": toks}
         if singleshot:
@@ -688,7 +696,7 @@ def certify_interference(counts, by_task, eta=0.10, tau=0.30):
 # Driver: measure all arms x tasks, compute estimator + run all three certificates.
 # ============================================================================================
 def measure(arms, mock, runs, tasks=None, workers=1, model="claude-haiku-4-5-20251001",
-            singleshot=False):
+            singleshot=False, http=False, retain=None):
     """Returns counts[arm][tid]=(k,n), cost[arm][tid]=mean cost, toks[arm][tid]=mean out_tokens,
     draws[arm][tid]=ordered list of 0/1 PASS outcomes (draw i = index i; needed for sequential replay).
     workers>1 runs the n calls of each cell concurrently (calls are subprocess+network bound and
@@ -704,9 +712,11 @@ def measure(arms, mock, runs, tasks=None, workers=1, model="claude-haiku-4-5-202
         for t in tasks:
             if workers > 1 and not mock:
                 with ThreadPoolExecutor(max_workers=workers) as ex:
-                    rows = list(ex.map(lambda i, _t=t, _a=a: run_one(_t, _a, mock, i, model, singleshot), range(runs)))
+                    rows = list(ex.map(lambda i, _t=t, _a=a: run_one(_t, _a, mock, i, model, singleshot,
+                                                             http, retain), range(runs)))
             else:
-                rows = [run_one(t, a, mock, i, model, singleshot) for i in range(runs)]
+                rows = [run_one(t, a, mock, i, model, singleshot, http, retain)
+                    for i in range(runs)]
             k = sum(1 for r in rows if r["solved"])
             counts[a][t["id"]] = (k, runs)
             draws[a][t["id"]] = [1 if r["solved"] else 0 for r in rows]
@@ -760,6 +770,9 @@ def main():
     ap.add_argument("--out", default="blackwell_results.json", help="results filename")
     ap.add_argument("--workers", type=int, default=1, help="concurrent claude calls per cell")
     ap.add_argument("--model", default="claude-haiku-4-5-20251001", help="model id for claude -p")
+    ap.add_argument("--http", action="store_true",
+                    help="force one HTTP request per draw for ANY model, including claude*; without this a claude* model is driven through the command line")
+    ap.add_argument("--retain", default="", help="directory to write every raw completion to")
     ap.add_argument("--singleshot", action="store_true",
                     help="run a Claude model in single-shot completion mode (breaks the agentic/"
                          "single-shot vendor confound)")
@@ -783,9 +796,10 @@ def main():
     print(f"BLACKWELL S6 anchor {'MOCK' if a.mock else 'REAL'} | n={a.runs}/cell | "
           f"arms={arms} tasks={by_task} | {total_n_runs} claude runs | eta={a.eta}\n")
 
-    print(f"  model = {a.model}{'  [SINGLE-SHOT]' if a.singleshot else ''}")
+    print(f"  model = {a.model}{'  [SINGLE-SHOT]' if a.singleshot else ''}{'  [HTTP-API]' if a.http else ''}{'  [RETAIN]' if a.retain else ''}")
     counts, cost, toks, draws, errs = measure(arms, a.mock, a.runs, tasks=sel_tasks, workers=a.workers,
-                                 model=a.model, singleshot=a.singleshot)
+                                 model=a.model, singleshot=a.singleshot,
+                                 http=a.http, retain=(a.retain or None))
     total_cost = sum(cost[a_][t] for a_ in arms for t in by_task) * a.runs
     print(f"\ntotal measured spend = ${total_cost:.4f}  (n={a.runs}/cell, "
           f"{total_n_runs} runs)\n" + "=" * 78)

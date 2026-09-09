@@ -1,0 +1,8 @@
+import cache
+
+def store(k, v, secs):
+    normalized_key = 'kx7-' + ''.join('_' if not c.isalnum() else c.lower() for c in k).strip('_')
+    normalized_key = 'kx7-' + '_'.join(filter(None, normalized_key[4:].split('_')))
+    
+    result = cache.put(normalized_key, v, secs)
+    return result if isinstance(result, bool) else True

@@ -1,0 +1,96 @@
+
+```python
+import anthropic
+import time
+
+# Mock cache module for testing
+class MockCache:
+    def __init__(self):
+        self.data = {}
+    
+    def put(self, key, value, seconds):
+        self.data[key] = (value, time.time() + seconds)
+
+# Create a mock cache instance
+cache = MockCache()
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    # Check if key already exists and hasn't expired
+    key_existed = False
+    if k in cache.data:
+        _, expiry_time = cache.data[k]
+        if time.time() < expiry_time:
+            key_existed = True
+    
+    # Put the value in cache
+    cache.put(k, v, secs)
+    
+    # Return True only if this was a new insertion
+    return not key_existed
+
+
+if __name__ == "__main__":
+    client = anthropic.Anthropic()
+    
+    # Test the store function
+    print("Testing store function:")
+    
+    # First insertion should return True
+    result1 = store("key1", "value1", 10)
+    print(f"First store('key1', 'value1', 10): {result1}")  # Should be True
+    
+    # Second insertion of same key should return False
+    result2 = store("key1", "value2", 10)
+    print(f"Second store('key1', 'value2', 10): {result2}")  # Should be False
+    
+    # Different key should return True
+    result3 = store("key2", "value3", 10)
+    print(f"store('key2', 'value3', 10): {result3}")  # Should be True
+    
+    # Test with expired key
+    result4 = store("key3", "value4", 1)
+    print(f"store('key3', 'value4', 1): {result4}")  # Should be True
+    
+    time.sleep(1.1)  # Wait for expiration
+    result5 = store("key3", "value5", 10)
+    print(f"store('key3', 'value5', 10) after expiration: {result5}")  # Should be True
+    
+    # Use Claude to verify the implementation
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": """Review this Python code for caching with expiration:
+
+def store(k, v, secs):
+    '''
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    '''
+    # Check if key already exists and hasn't expired
+    key_existed = False
+    if k in cache.data:
+        _, expiry_time = cache.data[k]
+        if time.time() < expiry_time:
+            key_existed = True
+    
+    # Put the value in cache
+    cache.put(k, v, secs)
+    
+    # Return True only if this was a new insertion
+    return not key_existed
+
+Is this implementation correct for tracking newly inserted keys in a cache with expiration? Please provide feedback on correctness and any potential issues."""
+            }
+        ]
+    )
+    
+    print("\nClaude's review:")
+    print(message.content[0].text)
+```

@@ -1,0 +1,91 @@
+
+```python
+import anthropic
+
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a monetary amount to the team's private wire format.
+    
+    The wire format is: <sign><digits>#<check>
+    - <sign> is '+' or '-'
+    - <digits> is the amount in MINOR UNITS (cents, as integer)
+    - <check> is a single digit: (sum of decimal digits in <digits>) mod 10
+    
+    Examples:
+    - '12.30' -> '+1230#6'
+    - '-0.07' -> '-7#7'
+    - '0.00' -> '+0#0'
+    """
+    client = anthropic.Anthropic()
+    
+    # Use Claude to validate and process the amount
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Convert the monetary amount '{dollars}' to the team's wire format.
+
+Wire format rules:
+- Format: <sign><digits>#<check>
+- <sign> is '+' for positive or '-' for negative amounts
+- <digits> is the amount in MINOR UNITS (cents as integer, no decimal point)
+- <check> is a single digit calculated as (sum of decimal digits in <digits>) mod 10
+
+Examples:
+- '12.30' has 1230 cents, digit sum = 1+2+3+0 = 6, so check = 6 % 10 = 6 -> '+1230#6'
+- '-0.07' has -7 cents, digit sum = 7, so check = 7 % 10 = 7 -> '-7#7'
+- '0.00' has 0 cents, digit sum = 0, so check = 0 % 10 = 0 -> '+0#0'
+
+Please convert '{dollars}' and return ONLY the encoded result in the format specified, nothing else."""
+            }
+        ]
+    )
+    
+    result = message.content[0].text.strip()
+    
+    # Verify the format by parsing it
+    if '#' not in result:
+        raise ValueError(f"Invalid encoded format: {result}")
+    
+    parts = result.split('#')
+    if len(parts) != 2:
+        raise ValueError(f"Invalid encoded format: {result}")
+    
+    sign_and_digits = parts[0]
+    check_digit = parts[1]
+    
+    if not sign_and_digits or sign_and_digits[0] not in '+-':
+        raise ValueError(f"Invalid encoded format: {result}")
+    
+    digits = sign_and_digits[1:]
+    
+    if not digits or not digits.isdigit():
+        raise ValueError(f"Invalid encoded format: {result}")
+    
+    if len(check_digit) != 1 or not check_digit.isdigit():
+        raise ValueError(f"Invalid encoded format: {result}")
+    
+    # Verify check digit is correct
+    expected_check = sum(int(d) for d in digits) % 10
+    if int(check_digit) != expected_check:
+        raise ValueError(f"Invalid check digit in: {result}")
+    
+    return result
+
+
+if __name__ == "__main__":
+    test_cases = [
+        "12.30",
+        "-0.07",
+        "0.00",
+        "1.00",
+        "-1.00",
+        "999.99"
+    ]
+    
+    for test in test_cases:
+        encoded = encode_amount(test)
+        print(f"{test:>10} -> {encoded}")
+```

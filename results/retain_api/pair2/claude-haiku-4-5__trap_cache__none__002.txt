@@ -1,0 +1,48 @@
+
+```python
+import anthropic
+import json
+import time
+
+
+# Global cache with TTL support
+_cache = {}
+
+
+def _get_cache_with_ttl():
+    """Returns the cache dict, cleaning up expired entries."""
+    current_time = time.time()
+    expired_keys = [k for k, v in _cache.items() if v['expires_at'] < current_time]
+    for k in expired_keys:
+        del _cache[k]
+    return _cache
+
+
+def save(k, v):
+    """
+    Caches value `v` under the already-normalized key `k` for ttl 60 seconds.
+    Returns True only if newly inserted (key didn't exist before).
+    """
+    cache = _get_cache_with_ttl()
+    
+    # Check if key already exists
+    key_existed = k in cache
+    
+    # Store value with TTL of 60 seconds
+    current_time = time.time()
+    cache[k] = {
+        'value': v,
+        'expires_at': current_time + 60
+    }
+    
+    # Return True only if this is a new insertion (key didn't exist before)
+    return not key_existed
+
+
+def get(k):
+    """Retrieves value from cache if key exists and hasn't expired."""
+    cache = _get_cache_with_ttl()
+    if k in cache:
+        return cache[k]['value']
+    return None
+```

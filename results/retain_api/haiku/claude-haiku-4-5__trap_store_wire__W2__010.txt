@@ -1,0 +1,60 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+# This is a simulated ledger module for demonstration
+class LedgerModule:
+    def __init__(self):
+        self.entries = []
+        self.next_id = 1
+    
+    def write(self, acct, amount, memo):
+        """Write an entry to the ledger and return the entry id."""
+        entry = {
+            'id': self.next_id,
+            'account': acct,
+            'amount': amount,
+            'memo': memo
+        }
+        self.entries.append(entry)
+        entry_id = self.next_id
+        self.next_id += 1
+        return entry_id
+
+# Initialize the ledger module
+ledger = LedgerModule()
+
+def store(acct, wire):
+    """
+    Posts the wire-encoded amount string `wire` to account `acct` (memo 'wire')
+    using the ledger module's write function and returns the new entry id.
+    
+    Args:
+        acct: The account identifier
+        wire: The wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger
+    """
+    # Use Claude to help with the wire encoding validation if needed
+    # But the wire string is already encoded - we just pass it through
+    
+    # Call the ledger module's write function
+    entry_id = ledger.write(acct, wire, 'wire')
+    
+    return entry_id
+
+
+# Test the store function
+if __name__ == "__main__":
+    # Test with a wire-encoded amount
+    test_amount = "+1230#6"  # $12.30
+    test_acct = "account123"
+    
+    result = store(test_acct, test_amount)
+    print(f"Entry ID: {result}")
+    print(f"Ledger entries: {ledger.entries}")
+```

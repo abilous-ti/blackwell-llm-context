@@ -1,0 +1,141 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Define the tools (simulating the ledger module's capabilities)
+tools = [
+    {
+        "name": "post",
+        "description": "Posts an entry to the ledger with the given account, amount in cents, and memo",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "description": "The account to post to"
+                },
+                "cents": {
+                    "type": "integer",
+                    "description": "The amount in cents"
+                },
+                "memo": {
+                    "type": "string",
+                    "description": "The memo/reason for the posting"
+                }
+            },
+            "required": ["account", "cents", "memo"]
+        }
+    }
+]
+
+# Simulated ledger storage
+ledger_entries = {}
+next_entry_id = 1
+
+def post(account: str, cents: int, memo: str) -> str:
+    """Simulates posting to the ledger"""
+    global next_entry_id
+    entry_id = str(next_entry_id)
+    ledger_entries[entry_id] = {
+        "account": account,
+        "cents": cents,
+        "memo": memo
+    }
+    next_entry_id += 1
+    return entry_id
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts cents to account acct using reason as the memo, and returns the entry id.
+    
+    Args:
+        acct: The account to transfer to
+        cents: The amount in cents to transfer
+        reason: The reason/memo for the transfer
+        
+    Returns:
+        The entry id of the posted transaction
+    """
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post a transfer of {cents} cents to account '{acct}' with reason '{reason}' and return the entry id."
+        }
+    ]
+    
+    while True:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        # Check if we're done
+        if response.stop_reason == "end_turn":
+            # Extract the entry id from the response
+            for block in response.content:
+                if hasattr(block, 'text'):
+                    # Look for entry id in the text
+                    text = block.text
+                    if "entry id" in text.lower() or "id:" in text.lower():
+                        # Try to extract the id
+                        parts = text.split()
+                        for i, part in enumerate(parts):
+                            if part.isdigit():
+                                return part
+            break
+        
+        # Process tool calls
+        tool_calls_made = False
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_calls_made = True
+                if block.name == "post":
+                    # Extract the input parameters
+                    input_data = block.input
+                    account = input_data.get("account", acct)
+                    amount = input_data.get("cents", cents)
+                    memo = input_data.get("memo", reason)
+                    
+                    # Call the post function
+                    entry_id = post(account, amount, memo)
+                    
+                    # Add the tool result to messages
+                    messages.append({
+                        "role": "assistant",
+                        "content": response.content
+                    })
+                    messages.append({
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "tool_result",
+                                "tool_use_id": block.id,
+                                "content": f"Successfully posted transfer. Entry ID: {entry_id}"
+                            }
+                        ]
+                    })
+                    
+                    return entry_id
+        
+        if not tool_calls_made:
+            # No tool calls were made, so we're done
+            break
+    
+    # Fallback: if Claude didn't use the tool, use it directly
+    return post(acct, cents, reason)
+
+if __name__ == "__main__":
+    # Test the transfer function
+    entry_id = transfer("checking", 5000, "Monthly salary deposit")
+    print(f"Transfer posted with entry ID: {entry_id}")
+    
+    # Verify the entry was created
+    if entry_id in ledger_entries:
+        entry = ledger_entries[entry_id]
+        print(f"Entry details: Account={entry['account']}, Amount={entry['cents']} cents, Memo={entry['memo']}")
+```

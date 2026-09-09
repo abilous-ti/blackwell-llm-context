@@ -1,0 +1,16 @@
+```python
+def transfer(acct, cents, reason):
+    import ledger
+    
+    # Convert cents to the wire-encoding format
+    sign = '+' if cents >= 0 else '-'
+    digits_str = str(abs(cents))
+    digit_sum = sum(int(d) for d in digits_str)
+    check = digit_sum % 10
+    amount = f"{sign}{digits_str}#{check}"
+    
+    # Post to ledger with required keyword-only memo argument
+    entry_id = ledger.post(acct, amount, memo=reason)
+    
+    return entry_id
+```

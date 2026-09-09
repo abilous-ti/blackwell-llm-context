@@ -1,0 +1,52 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a monetary amount in the format '<sign><digits>#<check>'
+    where <digits> is the amount in MINOR UNITS (cents) and <check> is a Luhn-style check digit.
+    
+    Args:
+        dollars: A string representation of money, e.g., '12.30', '-0.07'
+    
+    Returns:
+        Encoded string in the format '<sign><digits>#<check>'
+    """
+    # Remove any whitespace
+    dollars = dollars.strip()
+    
+    # Determine the sign
+    if dollars.startswith('-'):
+        sign = '-'
+        amount_str = dollars[1:]
+    elif dollars.startswith('+'):
+        sign = '+'
+        amount_str = dollars[1:]
+    else:
+        sign = '+'
+        amount_str = dollars
+    
+    # Parse the dollar amount
+    if '.' in amount_str:
+        parts = amount_str.split('.')
+        dollar_part = parts[0] if parts[0] else '0'
+        cent_part = parts[1] if len(parts) > 1 else '0'
+        
+        # Pad or truncate cent_part to exactly 2 digits
+        cent_part = (cent_part + '00')[:2]
+    else:
+        dollar_part = amount_str if amount_str else '0'
+        cent_part = '00'
+    
+    # Convert to cents (minor units)
+    cents = int(dollar_part) * 100 + int(cent_part)
+    
+    # Create the digits string
+    digits = str(cents)
+    
+    # Calculate the Luhn-style check digit
+    digit_sum = sum(int(d) for d in digits)
+    check = digit_sum % 10
+    
+    # Format the final string
+    return f"{sign}{digits}#{check}"
+```

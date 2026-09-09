@@ -1,0 +1,37 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Serializes a money amount string (e.g. '12.30', '-0.07') to a wire format.
+    
+    The wire format encodes the amount as an integer number of cents,
+    represented as a string with a leading sign indicator.
+    
+    Format: <sign><absolute_cents>
+    where sign is '+' for non-negative, '-' for negative
+    """
+    dollars = dollars.strip()
+    
+    negative = dollars.startswith('-')
+    if negative:
+        dollars = dollars[1:]
+    
+    if '.' in dollars:
+        integer_part, fractional_part = dollars.split('.')
+        # Ensure exactly 2 decimal places
+        fractional_part = fractional_part.ljust(2, '0')[:2]
+    else:
+        integer_part = dollars
+        fractional_part = '00'
+    
+    integer_part = integer_part or '0'
+    
+    cents = int(integer_part) * 100 + int(fractional_part)
+    
+    if negative and cents != 0:
+        sign = '-'
+    else:
+        sign = '+'
+    
+    return f"{sign}{cents:08d}"
+```

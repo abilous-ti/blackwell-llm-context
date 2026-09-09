@@ -1,0 +1,37 @@
+```python
+def encode_amount(dollars: str) -> str:
+    # Parse the input string to extract sign and numeric value
+    dollars = dollars.strip()
+    
+    if dollars.startswith('-'):
+        sign = '-'
+        numeric_part = dollars[1:]
+    elif dollars.startswith('+'):
+        sign = '+'
+        numeric_part = dollars[1:]
+    else:
+        sign = '+'
+        numeric_part = dollars
+    
+    # Remove the decimal point and convert to cents (minor units)
+    if '.' in numeric_part:
+        parts = numeric_part.split('.')
+        dollars_part = parts[0] if parts[0] else '0'
+        cents_part = parts[1] if len(parts) > 1 else '0'
+        
+        # Pad or truncate cents to exactly 2 digits
+        cents_part = cents_part.ljust(2, '0')[:2]
+        
+        cents = int(dollars_part) * 100 + int(cents_part)
+    else:
+        cents = int(numeric_part) * 100
+    
+    # Convert cents to string of digits
+    digits_str = str(cents)
+    
+    # Calculate check digit: sum of all decimal digits mod 10
+    check_digit = sum(int(d) for d in digits_str) % 10
+    
+    # Format the wire encoding
+    return f"{sign}{digits_str}#{check_digit}"
+```

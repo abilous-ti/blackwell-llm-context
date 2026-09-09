@@ -1,0 +1,64 @@
+
+```python
+import anthropic
+import json
+import ledger
+
+def record(acct: str, cents: int, note: str) -> int:
+    """Posts a monetary amount to an account using the ledger module.
+    
+    Args:
+        acct: The account name
+        cents: The amount in cents (integer)
+        note: The memo/note for the transaction
+        
+    Returns:
+        The new entry id from ledger.post
+        
+    Raises:
+        ledger.PostError: If the account is unknown or amount is malformed
+    """
+    # Calculate the Luhn-style check digit
+    digits_str = str(abs(cents))
+    digit_sum = sum(int(d) for d in digits_str)
+    check_digit = digit_sum % 10
+    
+    # Format the amount string according to the wire-encoding invariant
+    sign = '+' if cents >= 0 else '-'
+    amount_encoded = f"{sign}{digits_str}#{check_digit}"
+    
+    # Call ledger.post with the correct signature
+    # account is first positional, amount is second positional, memo is keyword-only
+    entry_id = ledger.post(acct, amount_encoded, memo=note)
+    
+    return entry_id
+
+
+def main():
+    """Test the record function with Claude API interaction."""
+    client = anthropic.Anthropic()
+    
+    # Create a message to Claude to test the encoding
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": "What is the wire-encoding for $12.30 and -$0.07?"
+            }
+        ]
+    )
+    
+    print("Claude's response about wire-encoding:")
+    print(message.content[0].text)
+    
+    # Test our encoding logic
+    print("\nTesting our encoding logic:")
+    print(f"$12.30 (1230 cents): +1230#{sum(int(d) for d in '1230') % 10}")
+    print(f"-$0.07 (-7 cents): -7#{sum(int(d) for d in '7') % 10}")
+
+
+if __name__ == "__main__":
+    main()
+```

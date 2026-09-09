@@ -1,0 +1,39 @@
+```python
+import time
+
+_cache = {}
+
+def save(k, v):
+    """
+    Cache value v under already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    """
+    is_new = k not in _cache
+    _cache[k] = {
+        'value': v,
+        'expiry': time.time() + 60
+    }
+    return is_new
+
+def get(k):
+    """
+    Retrieve value from cache if key exists and not expired.
+    Returns None if key doesn't exist or is expired.
+    """
+    if k not in _cache:
+        return None
+    
+    entry = _cache[k]
+    if time.time() > entry['expiry']:
+        del _cache[k]
+        return None
+    
+    return entry['value']
+
+def _cleanup_expired():
+    """Helper to remove expired entries."""
+    current_time = time.time()
+    expired_keys = [k for k, v in _cache.items() if current_time > v['expiry']]
+    for k in expired_keys:
+        del _cache[k]
+```

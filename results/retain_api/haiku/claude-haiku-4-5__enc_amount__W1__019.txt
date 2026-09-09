@@ -1,0 +1,24 @@
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a money amount from dollars string format to wire format.
+    
+    Args:
+        dollars: A string representing a dollar amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        A string in the team's private wire format for money amounts
+    """
+    try:
+        # Parse the input as a float to validate and normalize
+        amount = float(dollars)
+        
+        # Convert to cents (multiply by 100) and round to nearest integer
+        cents = round(amount * 100)
+        
+        # Return as string representation of cents
+        return str(cents)
+    except (ValueError, TypeError):
+        # If input cannot be converted to float, raise an error
+        raise ValueError(f"Invalid amount format: {dollars}")
+```

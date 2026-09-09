@@ -1,0 +1,25 @@
+def encode_amount(dollars: str) -> str:
+    """
+    Serializes a money amount to the team's private wire format.
+    
+    Args:
+        dollars: A string representation of a money amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The encoded amount as a string in the team's private wire format.
+    """
+    # Parse the dollars string to handle it as a decimal value
+    # Remove any whitespace
+    amount_str = dollars.strip()
+    
+    # Convert to float to validate and normalize
+    try:
+        amount_float = float(amount_str)
+    except ValueError:
+        raise ValueError(f"Invalid amount format: {dollars}")
+    
+    # Convert to cents (integer) to avoid floating point precision issues
+    cents = int(round(amount_float * 100))
+    
+    # Return the wire format: cents as integer string
+    return str(cents)

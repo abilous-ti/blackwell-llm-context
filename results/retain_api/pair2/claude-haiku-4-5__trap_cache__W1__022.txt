@@ -1,0 +1,17 @@
+
+```python
+import anthropic
+from cache import put, CacheError
+
+client = anthropic.Anthropic()
+
+def save(k: str, v) -> bool:
+    """
+    Caches value v under the already-normalized key k for ttl 60 seconds.
+    Returns True if newly inserted, False if replaced existing value.
+    """
+    try:
+        return put(k, v, ttl=60)
+    except CacheError as e:
+        raise CacheError(f"Failed to cache key '{k}': {e}")
+```

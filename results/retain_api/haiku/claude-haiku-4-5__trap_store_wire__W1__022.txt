@@ -1,0 +1,73 @@
+
+```python
+import anthropic
+import ledger
+
+
+def store(acct: str, wire: str) -> int:
+    """
+    Posts a wire-encoded amount to an account using the ledger module.
+    
+    Args:
+        acct: The account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger
+    
+    Raises:
+        ledger.PostError: If posting fails
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "post_to_ledger",
+            "description": "Posts an amount to an account in the ledger system",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The wire-encoded amount string"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post the wire-encoded amount '{wire}' to account '{acct}' with memo 'wire' using the ledger system."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    for content_block in response.content:
+        if content_block.type == "tool_use":
+            if content_block.name == "post_to_ledger":
+                entry_id = ledger.post(
+                    acct,
+                    wire,
+                    memo="wire"
+                )
+                return entry_id
+    
+    raise RuntimeError("Failed to post to ledger")
+```

@@ -1,0 +1,76 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation, ROUND_DOWN
+
+
+_WIRE_VERSION = 1
+_SCALE = 100  # cents
+
+
+class AmountEncodeError(ValueError):
+    """Raised when a dollar string cannot be encoded to the wire format."""
+
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string (e.g. '12.30', '-0.07') to the
+    team-private wire format.
+
+    Wire format (v1):
+        "AMTv1:<sign>:<abs_cents>"
+
+    where
+        <sign>     is either '+' or '-'
+        <abs_cents> is the absolute value of the amount expressed as an
+                    integer number of cents (no decimal point), zero-padded
+                    to at least one digit.
+
+    Examples
+    --------
+    >>> encode_amount('12.30')
+    'AMTv1:+:1230'
+    >>> encode_amount('-0.07')
+    'AMTv1:-:7'
+    >>> encode_amount('0.00')
+    'AMTv1:+:0'
+    """
+    if not isinstance(dollars, str):
+        raise AmountEncodeError(
+            f"encode_amount expects a str, got {type(dollars).__name__!r}"
+        )
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise AmountEncodeError("encode_amount received an empty string")
+
+    # Validate general shape: optional leading '-' or '+', digits, optional
+    # single '.', digits.
+    if not re.fullmatch(r"[+-]?\d+(\.\d+)?", stripped):
+        raise AmountEncodeError(
+            f"Not a valid decimal money string: {dollars!r}"
+        )
+
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation as exc:
+        raise AmountEncodeError(
+            f"Cannot parse {dollars!r} as a decimal: {exc}"
+        ) from exc
+
+    # Quantise to cents (2 decimal places); reject strings that imply
+    # sub-cent precision (e.g. '1.234').
+    quantised = value.quantize(Decimal("0.01"), rounding=ROUND_DOWN)
+    if quantised != value:
+        raise AmountEncodeError(
+            f"Amount {dollars!r} has sub-cent precision and cannot be "
+            "losslessly encoded"
+        )
+
+    negative = quantised < 0
+    sign_char = "-" if negative else "+"
+
+    # Work in integer cents to avoid any floating-point artefacts.
+    # Decimal * 100 is exact for two-decimal-place values.
+    abs_cents = int(abs(quantised) * _SCALE)
+
+    return f"AMTv1:{sign_char}:{abs_cents}"

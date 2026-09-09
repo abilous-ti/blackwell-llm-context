@@ -1,0 +1,67 @@
+
+```python
+import anthropic
+import json
+import time
+
+# Mock cache module for testing
+class MockCache:
+    def __init__(self):
+        self.data = {}
+    
+    def put(self, key, value):
+        """Put a value in the cache. Returns True if key was newly inserted."""
+        is_new = key not in self.data
+        self.data[key] = {
+            'value': value,
+            'timestamp': time.time()
+        }
+        return is_new
+
+# Create a mock cache instance
+cache = MockCache()
+
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    # Call cache.put to store the value
+    is_new = cache.put(k, v)
+    
+    # Set up expiration by scheduling removal after secs seconds
+    if is_new:
+        def remove_after_expiry():
+            time.sleep(secs)
+            if k in cache.data:
+                # Check if enough time has passed
+                stored_time = cache.data[k]['timestamp']
+                if time.time() - stored_time >= secs:
+                    del cache.data[k]
+        
+        # Start expiration in background (in production, use proper scheduling)
+        import threading
+        threading.Thread(target=remove_after_expiry, daemon=True).start()
+    
+    return is_new
+
+
+def main():
+    # Test the store function
+    print("Testing store function:")
+    
+    # Test 1: New key insertion
+    result1 = store("key1", "value1", 10)
+    print(f"First insert of 'key1': {result1}")  # Should be True
+    
+    # Test 2: Key already exists
+    result2 = store("key1", "value2", 10)
+    print(f"Second insert of 'key1': {result2}")  # Should be False
+    
+    # Test 3: Different key
+    result3 = store("key2", "value3", 10)
+    print(f"First insert of 'key2': {result3}")  # Should be True
+    
+    print(f"\nCache contents: {cache.data}")
+```

@@ -1,0 +1,39 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    # Parse the input string to extract sign and numeric parts
+    sign = '+'
+    amount_str = dollars.strip()
+    
+    # Handle negative sign
+    if amount_str.startswith('-'):
+        sign = '-'
+        amount_str = amount_str[1:]
+    elif amount_str.startswith('+'):
+        amount_str = amount_str[1:]
+    
+    # Remove the decimal point and convert to cents (minor units)
+    if '.' in amount_str:
+        parts = amount_str.split('.')
+        dollars_part = parts[0]
+        cents_part = parts[1] if len(parts) > 1 else '0'
+        
+        # Pad cents to 2 digits
+        cents_part = cents_part.ljust(2, '0')[:2]
+        
+        # Combine to get total cents
+        minor_units = int(dollars_part + cents_part)
+    else:
+        # No decimal point, treat as dollars
+        minor_units = int(amount_str) * 100
+    
+    # Convert minor units to string
+    digits = str(minor_units)
+    
+    # Calculate Luhn check digit
+    digit_sum = sum(int(d) for d in digits)
+    check = digit_sum % 10
+    
+    # Format the result
+    return f"{sign}{digits}#{check}"
+```

@@ -1,0 +1,52 @@
+import cache
+import time
+
+def store(k, v, secs):
+    normalized_key = 'kx7-' + ''.join(
+        '_' if not c.isalnum() else c.lower() 
+        for c in k
+    ).replace('_' * 2, '_').strip('_')
+    
+    normalized_key = normalized_key.rstrip('_')
+    
+    run = []
+    for c in k:
+        if c.isalnum():
+            run.append(c.lower())
+        else:
+            if run:
+                normalized_key_part = ''.join(run)
+                run = []
+    
+    normalized_key = 'kx7-' + ''.join(
+        c.lower() if c.isalnum() else '_' 
+        for c in k
+    )
+    
+    i = 0
+    while i < len(normalized_key):
+        if normalized_key[i] == '_' and i + 1 < len(normalized_key) and normalized_key[i + 1] == '_':
+            normalized_key = normalized_key[:i] + normalized_key[i+1:]
+        else:
+            i += 1
+    
+    normalized_key = normalized_key.strip('_')
+    normalized_key = 'kx7-' + normalized_key[4:] if normalized_key.startswith('kx7-') else 'kx7-' + normalized_key
+    
+    result = []
+    in_run = False
+    for c in k:
+        if c.isalnum():
+            result.append(c.lower())
+            in_run = True
+        else:
+            if in_run:
+                result.append('_')
+                in_run = False
+    
+    normalized_key = ''.join(result).strip('_')
+    normalized_key = 'kx7-' + normalized_key
+    
+    expiration_time = time.time() + secs
+    
+    return cache.put(normalized_key, v, expiration_time)

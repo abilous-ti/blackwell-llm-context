@@ -1,0 +1,149 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+MODEL_NAME = "claude-3-5-sonnet-20241022"
+
+# Define the tools
+tools = [
+    {
+        "name": "ledger_write",
+        "description": "Posts a transaction to the ledger with account, amount, and memo. Returns the new entry id.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "description": "The account identifier"
+                },
+                "amount": {
+                    "type": "string",
+                    "description": "The wire-encoded amount string (already formatted)"
+                },
+                "memo": {
+                    "type": "string",
+                    "description": "The memo/description for the transaction"
+                }
+            },
+            "required": ["account", "amount", "memo"]
+        }
+    }
+]
+
+# Simulated ledger database
+ledger_entries = {}
+next_entry_id = 1000
+
+def ledger_write(account, amount, memo):
+    """Posts a transaction to the ledger and returns the new entry id."""
+    global next_entry_id
+    entry_id = next_entry_id
+    next_entry_id += 1
+    
+    ledger_entries[entry_id] = {
+        "account": account,
+        "amount": amount,
+        "memo": memo,
+        "entry_id": entry_id
+    }
+    
+    return entry_id
+
+def process_tool_call(tool_name, tool_input):
+    """Process tool calls and return results."""
+    if tool_name == "ledger_write":
+        entry_id = ledger_write(
+            tool_input["account"],
+            tool_input["amount"],
+            tool_input["memo"]
+        )
+        return entry_id
+    return None
+
+def store(acct, wire):
+    """
+    Posts the wire-encoded amount string to account using the ledger module's write function.
+    Returns the new entry id.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id
+    """
+    # Create the prompt for Claude
+    prompt = f"""You need to post a wire-encoded transaction to the ledger.
+    
+Account: {acct}
+Wire-encoded amount: {wire}
+Memo: wire
+
+Use the ledger_write tool to post this transaction. The amount should be passed exactly as provided ('{wire}'), without any modification or decoding."""
+    
+    messages = [
+        {"role": "user", "content": prompt}
+    ]
+    
+    # Agentic loop
+    while True:
+        response = client.messages.create(
+            model=MODEL_NAME,
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        # Check if we're done
+        if response.stop_reason == "end_turn":
+            break
+        
+        # Process tool uses
+        if response.stop_reason == "tool_use":
+            # Find the tool use block
+            tool_use_block = None
+            for block in response.content:
+                if block.type == "tool_use":
+                    tool_use_block = block
+                    break
+            
+            if tool_use_block:
+                tool_name = tool_use_block.name
+                tool_input = tool_use_block.input
+                tool_use_id = tool_use_block.id
+                
+                # Process the tool call
+                result = process_tool_call(tool_name, tool_input)
+                
+                # Add assistant's response and tool result to messages
+                messages.append({"role": "assistant", "content": response.content})
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": tool_use_id,
+                            "content": str(result)
+                        }
+                    ]
+                })
+            else:
+                break
+        else:
+            break
+    
+    # Extract and return the entry id from the last response
+    # Find the tool result in the messages
+    for message in reversed(messages):
+        if message.get("role") == "user":
+            content = message.get("content", [])
+            if isinstance(content, list):
+                for item in content:
+                    if isinstance(item, dict) and item.get("type") == "tool_result":
+                        return int(item.get("content", ""))
+    
+    # Fallback: return the last entry id
+    return next_entry_id - 1
+```

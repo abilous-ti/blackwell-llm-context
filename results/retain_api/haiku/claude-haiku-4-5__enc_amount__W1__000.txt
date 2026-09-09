@@ -1,0 +1,24 @@
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a dollar amount string to the team's private wire format.
+    
+    Converts decimal dollar amounts (e.g., '12.30', '-0.07') to a
+    wire format suitable for ledger.post() consumption.
+    
+    Args:
+        dollars: A string representation of a dollar amount
+                (e.g., '12.30', '-0.07', '100')
+    
+    Returns:
+        The encoded wire format string for the amount
+    """
+    # Parse the input as a float to normalize the representation
+    amount_float = float(dollars)
+    
+    # Convert to cents (integer) to preserve precision
+    cents = int(round(amount_float * 100))
+    
+    # Return as string representation of cents
+    return str(cents)
+```

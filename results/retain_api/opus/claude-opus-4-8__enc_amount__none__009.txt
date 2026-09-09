@@ -1,0 +1,68 @@
+I'll analyze this problem. Since there's no specification of the "private wire format," I'll design a reasonable, self-consistent serialization format for money amounts.
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format (self-consistent, round-trippable):
+      <sign><whole>|<cents2>
+    where:
+      - sign is 'N' for negative, 'P' for positive/zero
+      - whole is the integer dollar portion (unsigned)
+      - cents2 is exactly two digits of cents
+
+    Examples:
+      '12.30'  -> 'P12|30'
+      '-0.07'  -> 'N0|07'
+    """
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    negative = False
+    if s[0] in '+-':
+        negative = s[0] == '-'
+        s = s[1:]
+
+    if s == '':
+        raise ValueError("missing digits")
+
+    if '.' in s:
+        whole_part, frac_part = s.split('.', 1)
+        if '.' in frac_part:
+            raise ValueError("too many decimal points")
+    else:
+        whole_part, frac_part = s, ''
+
+    if whole_part == '':
+        whole_part = '0'
+
+    if not whole_part.isdigit():
+        raise ValueError("invalid whole part")
+    if frac_part != '' and not frac_part.isdigit():
+        raise ValueError("invalid fractional part")
+
+    # Normalize cents to exactly two digits (round half up).
+    if len(frac_part) <= 2:
+        cents = (frac_part + '00')[:2]
+    else:
+        # Round to two decimal places.
+        keep = frac_part[:2]
+        rest = frac_part[2:]
+        cents_val = int(keep)
+        if rest[0] >= '5':
+            cents_val += 1
+        if cents_val >= 100:
+            cents_val -= 100
+            whole_part = str(int(whole_part) + 1)
+        cents = f"{cents_val:02d}"
+
+    whole_norm = str(int(whole_part))
+
+    # Treat negative zero as positive zero.
+    if negative and whole_norm == '0' and cents == '00':
+        negative = False
+
+    sign = 'N' if negative else 'P'
+    return f"{sign}{whole_norm}|{cents}"

@@ -1,0 +1,36 @@
+# solution.py
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the
+    team's private wire format.
+
+    Wire format: "AMT:<sign><integer_part>:<fractional_part_2digits>"
+    Examples:
+        '12.30'  -> 'AMT:+12:30'
+        '-0.07'  -> 'AMT:-0:07'
+        '5'      -> 'AMT:+5:00'
+        '-100.5' -> 'AMT:-100:50'
+    """
+    stripped = dollars.strip()
+
+    if stripped.startswith('-'):
+        sign = '-'
+        numeric = stripped[1:]
+    else:
+        sign = '+'
+        numeric = stripped.lstrip('+')
+
+    if '.' in numeric:
+        integer_part, frac_part = numeric.split('.', 1)
+    else:
+        integer_part = numeric
+        frac_part = ''
+
+    # Normalise integer part (remove leading zeros but keep at least one digit)
+    integer_part = integer_part.lstrip('0') or '0'
+
+    # Normalise fractional part to exactly 2 digits
+    frac_part = (frac_part + '00')[:2]
+
+    return f"AMT:{sign}{integer_part}:{frac_part}"

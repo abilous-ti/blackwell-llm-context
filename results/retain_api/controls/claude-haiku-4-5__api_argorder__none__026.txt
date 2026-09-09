@@ -1,0 +1,105 @@
+
+```python
+import anthropic
+
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """Transfer cents to account acct using reason as the memo, returning the entry id."""
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Post a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The transaction memo"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account {acct} with memo '{reason}' and return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    while response.stop_reason == "tool_use":
+        tool_use_block = next(
+            (block for block in response.content if block.type == "tool_use"),
+            None
+        )
+        
+        if not tool_use_block:
+            break
+        
+        if tool_use_block.name == "post":
+            tool_input = tool_use_block.input
+            entry_id = f"entry_{tool_input['account']}_{tool_input['amount']}"
+            
+            messages.append({
+                "role": "assistant",
+                "content": response.content
+            })
+            
+            messages.append({
+                "role": "user",
+                "content": [
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": tool_use_block.id,
+                        "content": f"Successfully posted {tool_input['amount']} cents to {tool_input['account']}. Entry ID: {entry_id}"
+                    }
+                ]
+            })
+            
+            response = client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=1024,
+                tools=tools,
+                messages=messages
+            )
+        else:
+            break
+    
+    final_text = next(
+        (block.text for block in response.content if hasattr(block, "text")),
+        ""
+    )
+    
+    if "entry_" in final_text:
+        import re
+        match = re.search(r"entry_\S+", final_text)
+        if match:
+            return match.group(0)
+    
+    entry_id = f"entry_{acct}_{cents}"
+    return entry_id
+
+
+if __name__ == "__main__":
+    result = transfer("checking", 5000, "Monthly salary")
+    print(f"Transfer result: {result}")
+```

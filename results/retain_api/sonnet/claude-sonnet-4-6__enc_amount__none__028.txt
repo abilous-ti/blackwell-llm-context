@@ -1,0 +1,38 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string to the team's private wire format.
+    
+    The wire format encodes a dollar amount (e.g. '12.30', '-0.07') as a
+    string representation of the amount in cents (smallest unit), preserving
+    the sign.
+    
+    Examples:
+        '12.30'  -> '1230'
+        '-0.07'  -> '-7'
+        '0.00'   -> '0'
+        '1.00'   -> '100'
+    """
+    # Handle negative amounts
+    negative = dollars.startswith('-')
+    if negative:
+        dollars = dollars[1:]
+    
+    # Split into dollars and cents parts
+    if '.' in dollars:
+        dollar_part, cent_part = dollars.split('.')
+        # Pad or truncate cent_part to 2 digits
+        cent_part = cent_part.ljust(2, '0')[:2]
+    else:
+        dollar_part = dollars
+        cent_part = '00'
+    
+    # Convert to total cents
+    total_cents = int(dollar_part) * 100 + int(cent_part)
+    
+    if negative and total_cents != 0:
+        return f'-{total_cents}'
+    else:
+        return str(total_cents)
+```

@@ -1,0 +1,49 @@
+
+```python
+import anthropic
+import ledger
+
+def post(acct, cents, note):
+    """Post cents to account acct with memo note using ledger.post, and return the new entry id."""
+    # Use Claude to determine the correct way to call ledger.post
+    client = anthropic.Anthropic()
+    
+    # Call Claude to generate the appropriate ledger.post call
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Given the following context, write Python code that posts {cents} cents to account '{acct}' with memo '{note}' using ledger.post() and returns the new entry id.
+
+The ledger.post function signature is: ledger.post(acct, cents, note)
+
+Write ONLY the Python code to make this call and return the entry id. Do not include any explanation, just the code.
+Return the result of calling ledger.post with the appropriate parameters."""
+            }
+        ]
+    )
+    
+    # Execute the suggested code
+    code = message.content[0].text
+    
+    # Execute the code in a controlled environment
+    local_vars = {'ledger': ledger, 'acct': acct, 'cents': cents, 'note': note}
+    try:
+        exec_globals = local_vars.copy()
+        exec(code, exec_globals)
+        
+        # The code should have stored the result, let's try to get it
+        if 'result' in exec_globals:
+            return exec_globals['result']
+        elif 'entry_id' in exec_globals:
+            return exec_globals['entry_id']
+        else:
+            # If no explicit variable, the last expression should be the return value
+            # For now, let's just call ledger.post directly
+            return ledger.post(acct, cents, note)
+    except Exception:
+        # Fallback: just call ledger.post directly
+        return ledger.post(acct, cents, note)
+```

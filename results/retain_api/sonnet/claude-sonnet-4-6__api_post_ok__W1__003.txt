@@ -1,0 +1,6 @@
+import ledger
+
+
+def record(acct, cents, note):
+    entry_id = ledger.post(acct, cents, memo=note)
+    return entry_id

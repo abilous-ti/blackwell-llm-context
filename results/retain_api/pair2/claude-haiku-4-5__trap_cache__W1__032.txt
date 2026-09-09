@@ -1,0 +1,65 @@
+
+```python
+import anthropic
+from cache import put, CacheError
+
+def save(k: str, v) -> bool:
+    """
+    Save value v under the already-normalized key k with TTL of 60 seconds.
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+        
+    Returns:
+        True if the key was newly inserted, False if it replaced an existing value
+        
+    Raises:
+        CacheError: If the key is empty
+    """
+    return put(k, v, ttl=60)
+
+
+def main():
+    """Test the save function with Claude's help."""
+    client = anthropic.Anthropic()
+    
+    # Test basic save operation
+    print("Testing save function...")
+    
+    # First save should return True (new key)
+    result1 = save("kx7-test_key", {"data": "value1"})
+    print(f"First save (new key): {result1}")  # Should be True
+    
+    # Second save with same key should return False (replacement)
+    result2 = save("kx7-test_key", {"data": "value2"})
+    print(f"Second save (replacement): {result2}")  # Should be False
+    
+    # Test with different key
+    result3 = save("kx7-another_key", "test_value")
+    print(f"Save with different key: {result3}")  # Should be True
+    
+    # Test with empty key should raise CacheError
+    try:
+        save("", "value")
+        print("ERROR: Empty key should raise CacheError")
+    except CacheError:
+        print("Empty key correctly raises CacheError")
+    
+    # Use Claude to verify the implementation
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": "I've implemented a cache save function. Can you verify it correctly uses the cache API with the signature cache.put(key, value, *, ttl=int) where the key is first, value is second positional, and ttl is keyword-only? The function should return True for new inserts and False for replacements."
+            }
+        ]
+    )
+    print("\nClaude's verification:", response.content[0].text)
+
+
+if __name__ == "__main__":
+    main()
+```

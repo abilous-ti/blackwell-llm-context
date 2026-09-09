@@ -1,0 +1,73 @@
+I'll analyze this problem. Since there's no existing specification for a "private wire format," I need to design a reasonable, self-consistent serialization format for money amounts that handles the given examples ('12.30', '-0.07').
+
+I'll create a format that encodes the amount as an integer number of cents with a clear structure.
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format: "<sign><cents>c" where:
+      - <sign> is '+' for non-negative amounts, '-' for negative amounts
+      - <cents> is the absolute value of the amount expressed as an integer
+        number of cents (always at least one digit)
+      - trailing 'c' marks the unit (cents)
+
+    Examples:
+        '12.30'  -> '+1230c'
+        '-0.07'  -> '-7c'
+        '0'      -> '+0c'
+        '-0.00'  -> '+0c'
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    negative = False
+    if s[0] in '+-':
+        negative = s[0] == '-'
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount")
+
+    if '.' in s:
+        int_part, _, frac_part = s.partition('.')
+        if '.' in frac_part:
+            raise ValueError("invalid amount: multiple decimal points")
+    else:
+        int_part, frac_part = s, ''
+
+    if int_part == '':
+        int_part = '0'
+
+    if not int_part.isdigit():
+        raise ValueError("invalid integer part: %r" % int_part)
+    if frac_part != '' and not frac_part.isdigit():
+        raise ValueError("invalid fractional part: %r" % frac_part)
+
+    # Normalize fractional part to exactly 2 digits (cents).
+    if len(frac_part) < 2:
+        frac_part = frac_part.ljust(2, '0')
+    elif len(frac_part) > 2:
+        # Round half up based on the digit after cents.
+        keep = frac_part[:2]
+        next_digit = frac_part[2]
+        cents_extra = int(keep)
+        if next_digit >= '5':
+            cents_extra += 1
+        # Handle carry into the integer part.
+        carry, cents_extra = divmod(cents_extra, 100)
+        int_part = str(int(int_part) + carry)
+        frac_part = str(cents_extra).rjust(2, '0')
+
+    total_cents = int(int_part) * 100 + int(frac_part)
+
+    if total_cents == 0:
+        negative = False  # normalize -0 to +0
+
+    sign = '-' if negative else '+'
+    return "%s%dc" % (sign, total_cents)

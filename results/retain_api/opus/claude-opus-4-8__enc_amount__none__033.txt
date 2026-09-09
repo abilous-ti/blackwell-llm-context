@@ -1,0 +1,56 @@
+I'll analyze this problem. There's a "private wire format" mentioned but no specification given. I need to make reasonable assumptions for serializing a money amount.
+
+Since no format spec is provided, I'll create a sensible, self-consistent wire format that encodes the sign and value precisely (as cents/integer minor units) to avoid floating point issues.
+
+```python
+from decimal import Decimal, ROUND_HALF_UP
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format specification:
+      <SIGN><MINOR_UNITS>
+
+    where:
+      - SIGN is '+' for zero or positive amounts and '-' for negative
+        amounts.
+      - MINOR_UNITS is the absolute value of the amount expressed as an
+        integer number of cents (dollars * 100), rounded half-up to the
+        nearest cent, rendered in decimal with no leading zeros (except a
+        single '0' for a zero amount).
+
+    Examples:
+      '12.30'  -> '+1230'
+      '-0.07'  -> '-7'
+      '0'      -> '+0'
+      '0.00'   -> '+0'
+      '-1234.5'-> '-123450'
+    """
+    if dollars is None:
+        raise ValueError("amount is required")
+
+    text = dollars.strip()
+    if text == "":
+        raise ValueError("empty amount")
+
+    try:
+        value = Decimal(text)
+    except Exception as exc:  # noqa: BLE001
+        raise ValueError(f"invalid amount: {dollars!r}") from exc
+
+    if not value.is_finite():
+        raise ValueError(f"non-finite amount: {dollars!r}")
+
+    # Convert to minor units (cents), rounding half-up to whole cents.
+    cents = (value * 100).quantize(Decimal(1), rounding=ROUND_HALF_UP)
+
+    negative = cents < 0
+    magnitude = -cents if negative else cents
+
+    sign = "-" if negative else "+"
+
+    return f"{sign}{int(magnitude)}"
+```

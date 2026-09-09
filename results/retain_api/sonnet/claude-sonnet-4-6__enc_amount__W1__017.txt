@@ -1,0 +1,73 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
+
+_WIRE_VERSION = 1
+_CENT_MULTIPLIER = 100
+
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string to the team's private wire format.
+
+    Wire format: ``v{version}:{sign}{abs_cents}c``
+    Examples:
+        '12.30'  -> 'v1:+1230c'
+        '-0.07'  -> 'v1:-7c'
+        '0.00'   -> 'v1:+0c'
+
+    Parameters
+    ----------
+    dollars:
+        A string representing a decimal dollar amount, e.g. ``'12.30'`` or
+        ``'-0.07'``.  Must be a valid decimal number with at most two
+        fractional digits.
+
+    Returns
+    -------
+    str
+        The wire-encoded amount string.
+
+    Raises
+    ------
+    ValueError
+        If *dollars* is not a well-formed money string or has more than two
+        decimal places.
+    """
+    if not isinstance(dollars, str):
+        raise ValueError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("encode_amount received an empty string")
+
+    # Validate shape before Decimal conversion to give a clear error.
+    _MONEY_RE = re.compile(r'^-?(?:0|[1-9]\d*)(?:\.\d{1,2})?$')
+    if not _MONEY_RE.match(stripped):
+        raise ValueError(
+            f"encode_amount: {dollars!r} is not a valid money string "
+            "(expected optional leading '-', digits, optional '.' with 1-2 decimal places)"
+        )
+
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation as exc:
+        raise ValueError(f"encode_amount: cannot parse {dollars!r} as Decimal") from exc
+
+    # Quantize to exactly two decimal places (validates no sub-cent precision
+    # slipped through the regex edge cases).
+    try:
+        value = value.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    except InvalidOperation as exc:
+        raise ValueError(f"encode_amount: {dollars!r} out of range for wire format") from exc
+
+    # Convert to integer cents (avoid floating-point: multiply by 100 via Decimal).
+    cents_decimal = (value * _CENT_MULTIPLIER).to_integral_value(rounding=ROUND_HALF_UP)
+    cents = int(cents_decimal)
+
+    sign_char = '-' if cents < 0 else '+'
+    abs_cents = abs(cents)
+
+    wire = f"v{_WIRE_VERSION}:{sign_char}{abs_cents}c"
+    return wire

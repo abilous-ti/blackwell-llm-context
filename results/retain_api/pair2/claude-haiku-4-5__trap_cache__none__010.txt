@@ -1,0 +1,69 @@
+
+```python
+import anthropic
+import json
+import time
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# In-memory cache for demonstration
+_cache = {}
+_cache_timestamps = {}
+
+CACHE_TTL = 60
+
+
+def write(key: str, value: str, ttl: int) -> bool:
+    """
+    Write a value to the cache with the given key and TTL.
+    Returns True if newly inserted, False if updated.
+    """
+    is_new = key not in _cache
+    _cache[key] = value
+    _cache_timestamps[key] = time.time()
+    return is_new
+
+
+def read(key: str) -> str | None:
+    """
+    Read a value from the cache if it exists and hasn't expired.
+    """
+    if key not in _cache:
+        return None
+    
+    if time.time() - _cache_timestamps[key] > CACHE_TTL:
+        del _cache[key]
+        del _cache_timestamps[key]
+        return None
+    
+    return _cache[key]
+
+
+def save(k: str, v: str) -> bool:
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted.
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+        
+    Returns:
+        True if this is a new insertion, False if updating existing key
+    """
+    return write(k, v, CACHE_TTL)
+
+
+if __name__ == "__main__":
+    # Test the save function
+    result1 = save("kx7-hello_world", "test_value")
+    print(f"First save (new): {result1}")  # Should be True
+    
+    result2 = save("kx7-hello_world", "updated_value")
+    print(f"Second save (update): {result2}")  # Should be False
+    
+    # Verify the value was cached
+    cached = read("kx7-hello_world")
+    print(f"Cached value: {cached}")  # Should be 'updated_value'
+```

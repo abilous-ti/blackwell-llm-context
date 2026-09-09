@@ -1,0 +1,24 @@
+
+```python
+import anthropic
+import ledger
+
+
+def transfer(acct, cents, reason):
+    """
+    Transfer cents to an account using the ledger API.
+    
+    Args:
+        acct: Account identifier (string)
+        cents: Amount in cents (numeric)
+        reason: Memo/reason for the transfer (string)
+    
+    Returns:
+        The entry id from the ledger post operation (integer >= 1)
+    
+    Raises:
+        ledger.PostError: If account is unknown or amount is malformed
+    """
+    entry_id = ledger.post(acct, cents, memo=reason)
+    return entry_id
+```

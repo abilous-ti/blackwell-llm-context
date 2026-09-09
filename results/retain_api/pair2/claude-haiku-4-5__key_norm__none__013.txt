@@ -1,0 +1,65 @@
+
+```python
+import anthropic
+import hashlib
+
+
+def make_key(label: str) -> str:
+    """
+    Converts a raw label into a team's private cache key.
+    
+    Uses Claude API with prompt caching to generate a consistent cache key
+    from the label by asking Claude to create a deterministic hash.
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        system=[
+            {
+                "type": "text",
+                "text": "You are a key generation system. When given a label, generate a deterministic cache key by taking the SHA256 hash of the label and returning the first 16 characters in hexadecimal format. Return ONLY the key, nothing else.",
+                "cache_control": {"type": "ephemeral"}
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Generate cache key for label: {label}"
+            }
+        ]
+    )
+    
+    cache_key = message.content[0].text.strip()
+    return cache_key
+
+
+def make_key_deterministic(label: str) -> str:
+    """
+    Alternative implementation that generates a deterministic cache key
+    without relying on Claude API response consistency.
+    """
+    hash_object = hashlib.sha256(label.encode())
+    hex_dig = hash_object.hexdigest()
+    cache_key = f"cache_{hex_dig[:16]}"
+    return cache_key
+
+
+if __name__ == "__main__":
+    test_labels = [
+        "user_profile",
+        "api_response",
+        "database_query",
+    ]
+    
+    print("Testing make_key function:")
+    for label in test_labels:
+        key = make_key(label)
+        print(f"Label: '{label}' -> Key: '{key}'")
+    
+    print("\nTesting deterministic version:")
+    for label in test_labels:
+        key = make_key_deterministic(label)
+        print(f"Label: '{label}' -> Key: '{key}'")
+```

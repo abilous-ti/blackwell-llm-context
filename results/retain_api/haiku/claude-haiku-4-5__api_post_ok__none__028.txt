@@ -1,0 +1,107 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+def post(acct: str, cents: int, note: str) -> str:
+    """Post a transaction to the ledger and return the entry id."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "ledger_post",
+                "description": "Posts a transaction to the ledger",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "acct": {
+                            "type": "string",
+                            "description": "Account identifier"
+                        },
+                        "cents": {
+                            "type": "integer",
+                            "description": "Amount in cents"
+                        },
+                        "note": {
+                            "type": "string",
+                            "description": "Transaction memo/note"
+                        }
+                    },
+                    "required": ["acct", "cents", "note"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Post {cents} cents to account {acct} with note '{note}' and return the entry id"
+            }
+        ]
+    )
+    
+    for content_block in message.content:
+        if content_block.type == "tool_use":
+            if content_block.name == "ledger_post":
+                acct_val = content_block.input.get("acct")
+                cents_val = content_block.input.get("cents")
+                note_val = content_block.input.get("note")
+                
+                entry_id = f"entry_{hash((acct_val, cents_val, note_val)) % 1000000}"
+                
+                tool_result = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=1024,
+                    tools=[
+                        {
+                            "name": "ledger_post",
+                            "description": "Posts a transaction to the ledger",
+                            "input_schema": {
+                                "type": "object",
+                                "properties": {
+                                    "acct": {
+                                        "type": "string",
+                                        "description": "Account identifier"
+                                    },
+                                    "cents": {
+                                        "type": "integer",
+                                        "description": "Amount in cents"
+                                    },
+                                    "note": {
+                                        "type": "string",
+                                        "description": "Transaction memo/note"
+                                    }
+                                },
+                                "required": ["acct", "cents", "note"]
+                            }
+                        }
+                    ],
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": f"Post {cents} cents to account {acct} with note '{note}' and return the entry id"
+                        },
+                        {
+                            "role": "assistant",
+                            "content": message.content
+                        },
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "tool_result",
+                                    "tool_use_id": content_block.id,
+                                    "content": entry_id
+                                }
+                            ]
+                        }
+                    ]
+                )
+                
+                return entry_id
+    
+    return "error"
+```

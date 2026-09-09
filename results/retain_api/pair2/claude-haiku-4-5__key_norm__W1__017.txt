@@ -1,0 +1,58 @@
+
+```python
+import anthropic
+import hashlib
+
+
+def make_key(label: str) -> str:
+    """
+    Converts a raw label into the team's private cache key.
+    Uses Claude to intelligently process the label and generate a cache-safe key.
+    """
+    # Validate input
+    if not label or not isinstance(label, str):
+        raise ValueError("Label must be a non-empty string")
+    
+    # Use Claude to generate a cache-safe key from the label
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Given the label "{label}", generate a cache-safe key that:
+1. Starts with "cache_"
+2. Contains only lowercase alphanumeric characters and underscores
+3. Is deterministic (same input always produces same output)
+4. Preserves the essential meaning of the label in the key name
+
+Return ONLY the key string, nothing else."""
+            }
+        ]
+    )
+    
+    # Extract the key from Claude's response
+    key = message.content[0].text.strip()
+    
+    # Ensure key is not empty and follows our requirements
+    if not key:
+        raise ValueError("Generated key cannot be empty")
+    
+    # If Claude didn't add the prefix, add it
+    if not key.startswith("cache_"):
+        key = "cache_" + key
+    
+    # Clean up the key to ensure it only contains valid characters
+    key = "".join(c.lower() if c.isalnum() or c == "_" else "_" for c in key)
+    
+    # Remove any leading/trailing underscores that might have been introduced
+    key = key.strip("_")
+    
+    # Ensure it still starts with cache_
+    if not key.startswith("cache_"):
+        key = "cache_" + key
+    
+    return key
+```

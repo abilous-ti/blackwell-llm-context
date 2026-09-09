@@ -1,0 +1,27 @@
+
+```python
+import anthropic
+
+client = anthropic.Anthropic()
+
+cache_data = {}
+cache_timestamps = {}
+
+def save(k, v):
+    """
+    Saves a value to cache with TTL of 60 seconds.
+    Returns True only if newly inserted (key didn't exist before).
+    
+    Args:
+        k: Already normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+    
+    Returns:
+        bool: True if newly inserted, False if updated existing key
+    """
+    is_new = k not in cache_data
+    cache_data[k] = v
+    cache_timestamps[k] = 60  # TTL in seconds
+    
+    return is_new
+```

@@ -1,0 +1,73 @@
+
+```python
+import anthropic
+import hashlib
+import os
+
+def make_key(label: str) -> str:
+    """
+    Convert a raw label into a team's private cache key.
+    Uses Claude API with prompt caching to efficiently generate consistent cache keys.
+    """
+    client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+    
+    system_prompt = """You are a cache key generator for a development team. 
+Your job is to convert raw labels into consistent, private cache keys.
+The cache keys should be:
+- Deterministic (same input always produces same output)
+- URL-safe (only alphanumeric, hyphens, underscores)
+- Lowercase
+- Between 8-32 characters long
+- Derived from the input label but not directly revealing sensitive information
+
+Rules for conversion:
+1. Convert to lowercase
+2. Replace spaces and special characters with hyphens
+3. Remove any leading/trailing hyphens
+4. If the result is shorter than 8 chars, pad with a hash suffix
+5. If longer than 32 chars, truncate and add a hash suffix
+6. Ensure the key is deterministic"""
+
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        system=[
+            {
+                "type": "text",
+                "text": system_prompt,
+                "cache_control": {"type": "ephemeral"}
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Convert this label to a cache key: '{label}'\n\nRespond with only the cache key, nothing else."
+            }
+        ]
+    )
+    
+    cache_key = response.content[0].text.strip()
+    
+    if not cache_key or not all(c.isalnum() or c in '-_' for c in cache_key):
+        hash_suffix = hashlib.sha256(label.encode()).hexdigest()[:8]
+        clean_label = ''.join(c.lower() if c.isalnum() else '-' for c in label)
+        clean_label = clean_label.strip('-')
+        cache_key = f"{clean_label}-{hash_suffix}"[:32]
+        cache_key = cache_key.rstrip('-')
+    
+    return cache_key
+
+
+if __name__ == "__main__":
+    test_labels = [
+        "my-api-endpoint",
+        "User Authentication Service",
+        "cache_data_2024",
+        "Special@Characters!Here",
+        "a"
+    ]
+    
+    for label in test_labels:
+        key = make_key(label)
+        print(f"Label: '{label}' -> Cache Key: '{key}'")
+```

@@ -1,0 +1,11 @@
+I'll write the solution based on the requirements. Let me note the ambiguity: the task says "already serialized -- do NOT re-encode or decode it," so I'll pass the wire string through as-is to the ledger's write function.
+
+Since I don't have the ledger module's exact signature, I'll make a reasonable assumption based on the described behavior: `write(acct, amount, memo)` returning an entry id.
+
+import ledger
+
+
+def store(acct, wire):
+    # `wire` is already wire-encoded (sign, cents, '#', check digit).
+    # Do NOT re-encode or decode it -- post it through verbatim.
+    return ledger.write(acct, wire, 'wire')

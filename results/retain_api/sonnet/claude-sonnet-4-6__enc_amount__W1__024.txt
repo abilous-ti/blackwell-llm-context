@@ -1,0 +1,50 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation, ROUND_DOWN
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the
+    team's private wire format.
+
+    Wire format: a signed integer string representing the value in cents
+    (i.e. the canonical minor-unit representation), zero-padded to at
+    least one digit, with an explicit sign prefix for negative values.
+
+    Examples:
+        '12.30'  -> '1230'
+        '-0.07'  -> '-7'
+        '0.00'   -> '0'
+        '1.00'   -> '100'
+        '-1.50'  -> '-150'
+    """
+    if not isinstance(dollars, str):
+        raise TypeError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("encode_amount received an empty string")
+
+    # Validate format: optional leading minus, digits, optional decimal point + digits
+    if not re.fullmatch(r"-?\d+(\.\d+)?", stripped):
+        raise ValueError(f"encode_amount: invalid amount string {dollars!r}")
+
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation as exc:
+        raise ValueError(f"encode_amount: cannot parse {dollars!r} as a decimal") from exc
+
+    # Quantise to two decimal places (cents); reject amounts with sub-cent precision
+    cents_decimal = value * Decimal("100")
+    rounded = cents_decimal.to_integral_value(rounding=ROUND_DOWN)
+
+    if rounded != cents_decimal:
+        raise ValueError(
+            f"encode_amount: {dollars!r} has sub-cent precision and cannot be "
+            "losslessly serialized"
+        )
+
+    cents_int = int(rounded)
+    return str(cents_int)

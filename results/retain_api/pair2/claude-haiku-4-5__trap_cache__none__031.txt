@@ -1,0 +1,60 @@
+
+```python
+import anthropic
+import json
+import time
+
+cache = {}
+cache_expiry = {}
+
+def write(key: str, value: str, ttl: int) -> bool:
+    """Write a value to cache with TTL. Returns True if newly inserted."""
+    is_new = key not in cache
+    cache[key] = value
+    cache_expiry[key] = time.time() + ttl
+    return is_new
+
+def save(k: str, v: str) -> bool:
+    """Save value v under already-normalized key k for 60 seconds."""
+    return write(k, v, 60)
+
+def get(key: str) -> str | None:
+    """Get value from cache if not expired."""
+    if key not in cache:
+        return None
+    if time.time() > cache_expiry.get(key, 0):
+        del cache[key]
+        if key in cache_expiry:
+            del cache_expiry[key]
+        return None
+    return cache[key]
+
+def main():
+    client = anthropic.Anthropic()
+    
+    print("Testing cache with Anthropic API integration...")
+    
+    test_key = "kx7-hello_world"
+    test_value = "test_value_123"
+    
+    result = save(test_key, test_value)
+    print(f"First save (should be True): {result}")
+    
+    result = save(test_key, test_value)
+    print(f"Second save (should be False): {result}")
+    
+    retrieved = get(test_key)
+    print(f"Retrieved value: {retrieved}")
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": "Say 'Cache test successful' in exactly those words."}
+        ]
+    )
+    print(f"\nAPI Response: {message.content[0].text}")
+
+if __name__ == "__main__":
+    main()
+```

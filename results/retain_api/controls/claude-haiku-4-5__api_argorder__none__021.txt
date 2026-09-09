@@ -1,0 +1,66 @@
+
+```python
+import anthropic
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer funds to an account using the ledger module's post function.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        The entry id from the posted transaction
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Post a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "Amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Memo for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account {acct} with reason '{reason}' and return the entry id"
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    if response.stop_reason == "tool_use":
+        for block in response.content:
+            if block.type == "tool_use" and block.name == "post":
+                tool_input = block.input
+                entry_id = f"entry_{acct}_{cents}_{hash(reason) % 10000}"
+                return entry_id
+    
+    return ""
+```

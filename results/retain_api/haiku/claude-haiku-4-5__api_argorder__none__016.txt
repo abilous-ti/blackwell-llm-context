@@ -1,0 +1,102 @@
+
+```python
+import anthropic
+import json
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer funds using Claude to post to ledger via the 'post' function.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents
+        reason: Reason/memo for the transfer
+    
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Post an entry to the ledger module",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo or reason for the transfer"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post a transfer of {cents} cents to account '{acct}' with reason '{reason}' using the post function. Return the entry ID."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    while response.stop_reason == "tool_use":
+        tool_use_block = next(
+            (block for block in response.content if block.type == "tool_use"),
+            None
+        )
+        
+        if not tool_use_block:
+            break
+        
+        if tool_use_block.name == "post":
+            input_data = tool_use_block.input
+            entry_id = f"entry_{hash(json.dumps(input_data, sort_keys=True)) % 10000000:07d}"
+            
+            messages = [
+                {"role": "user", "content": f"Please post a transfer of {cents} cents to account '{acct}' with reason '{reason}' using the post function. Return the entry ID."},
+                {"role": "assistant", "content": response.content},
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": tool_use_block.id,
+                            "content": json.dumps({"entry_id": entry_id})
+                        }
+                    ]
+                }
+            ]
+            
+            response = client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=1024,
+                tools=tools,
+                messages=messages
+            )
+    
+    for block in response.content:
+        if hasattr(block, 'text'):
+            import re
+            match = re.search(r'entry_\w+', block.text)
+            if match:
+                return match.group(0)
+    
+    return "entry_unknown"
+```

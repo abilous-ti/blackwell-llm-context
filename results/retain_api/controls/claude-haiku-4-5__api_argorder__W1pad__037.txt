@@ -1,0 +1,40 @@
+
+```python
+import anthropic
+import json
+
+# This solution uses Claude to help understand the requirements and generate the transfer function
+def transfer(acct, cents, reason):
+    """
+    Posts cents to account acct using reason as the memo, and returns the entry id.
+    
+    Args:
+        acct: Account identifier (string)
+        cents: Amount in cents (numeric)
+        reason: Memo/reason for the transfer (string)
+    
+    Returns:
+        The entry id returned by ledger.post()
+    
+    Raises:
+        ledger.PostError: If account is unknown or amount is malformed
+    """
+    import ledger
+    
+    # Call the ledger.post API with the correct signature:
+    # ledger.post(account: str, amount, *, memo: str)
+    # account is FIRST, amount is SECOND and positional, memo is REQUIRED keyword-only
+    return ledger.post(acct, cents, memo=reason)
+
+
+# Example usage (for testing purposes, not part of the solution)
+if __name__ == "__main__":
+    # This demonstrates how the transfer function would be used
+    # In actual usage, the ledger module would be available
+    try:
+        # entry_id = transfer("checking", 10000, "Monthly deposit")
+        # print(f"Entry ID: {entry_id}")
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
+```

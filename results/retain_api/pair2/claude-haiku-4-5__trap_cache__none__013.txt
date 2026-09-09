@@ -1,0 +1,43 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+# Cache to store values with their insertion status
+_cache = {}
+
+def save(k: str, v) -> bool:
+    """
+    Cache value v under key k for 60 seconds.
+    Returns True only if newly inserted (key didn't exist before).
+    """
+    is_new = k not in _cache
+    _cache[k] = v
+    return is_new
+
+
+def get_cache_stats():
+    """Helper to view cache contents for testing"""
+    return _cache.copy()
+
+
+def clear_cache():
+    """Helper to clear cache for testing"""
+    _cache.clear()
+
+
+if __name__ == "__main__":
+    # Test the save function
+    result1 = save("kx7-hello_world", {"data": "test"})
+    print(f"First save result (should be True): {result1}")
+    
+    result2 = save("kx7-hello_world", {"data": "updated"})
+    print(f"Second save result (should be False): {result2}")
+    
+    result3 = save("kx7-another_key", "value")
+    print(f"Third save result (should be True): {result3}")
+    
+    print(f"Cache contents: {get_cache_stats()}")
+```

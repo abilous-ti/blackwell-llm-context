@@ -1,0 +1,21 @@
+I'll write the solution, but I need to make reasonable assumptions about the ledger module's API since it wasn't fully specified. Let me note my assumptions in a comment.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    # `wire` is ALREADY wire-encoded (sign, cents, '#', check digit).
+    # Post it as-is; do NOT re-encode or decode it.
+    return ledger.write(acct, wire, memo='wire')
+```
+
+I'll provide the raw file content:
+
+import ledger
+
+
+def store(acct, wire):
+    # `wire` is ALREADY wire-encoded (sign, cents, '#', check digit).
+    # Post it as-is; do NOT re-encode or decode it.
+    return ledger.write(acct, wire, memo='wire')

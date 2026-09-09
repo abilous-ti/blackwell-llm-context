@@ -1,0 +1,77 @@
+
+```python
+import anthropic
+import sys
+from datetime import datetime, timedelta
+
+# Mock cache module to simulate the cache.put function
+class MockCache:
+    def __init__(self):
+        self.data = {}
+        self.expiry = {}
+    
+    def put(self, k, v, secs):
+        """Put a value in cache that expires after secs seconds"""
+        self.data[k] = v
+        self.expiry[k] = datetime.now() + timedelta(seconds=secs)
+    
+    def get(self, k):
+        """Get a value from cache if it hasn't expired"""
+        if k in self.data:
+            if datetime.now() < self.expiry[k]:
+                return self.data[k]
+            else:
+                del self.data[k]
+                del self.expiry[k]
+        return None
+    
+    def exists(self, k):
+        """Check if key exists and hasn't expired"""
+        if k in self.data:
+            if datetime.now() < self.expiry[k]:
+                return True
+            else:
+                del self.data[k]
+                del self.expiry[k]
+        return False
+
+# Create mock cache instance
+cache = MockCache()
+
+def store(k, v, secs):
+    """
+    Store value v under key k in cache for secs seconds.
+    Returns True only if the key was newly inserted (didn't exist before).
+    """
+    # Check if key already exists
+    key_existed = cache.exists(k)
+    
+    # Put the value in cache
+    cache.put(k, v, secs)
+    
+    # Return True only if this was a new key insertion
+    return not key_existed
+
+
+def main():
+    # Test the store function
+    print("Test 1: First insertion should return True")
+    result1 = store("key1", "value1", 60)
+    print(f"store('key1', 'value1', 60) = {result1}")
+    assert result1 == True, "First insertion should return True"
+    
+    print("\nTest 2: Second insertion of same key should return False")
+    result2 = store("key1", "value2", 60)
+    print(f"store('key1', 'value2', 60) = {result2}")
+    assert result2 == False, "Updating existing key should return False"
+    
+    print("\nTest 3: Different key should return True")
+    result3 = store("key2", "value3", 60)
+    print(f"store('key2', 'value3', 60) = {result3}")
+    assert result3 == True, "New key should return True"
+    
+    print("\nAll tests passed!")
+
+if __name__ == "__main__":
+    main()
+```

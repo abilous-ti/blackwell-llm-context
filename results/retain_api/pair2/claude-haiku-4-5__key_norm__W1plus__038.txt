@@ -1,0 +1,78 @@
+
+```python
+import anthropic
+import json
+import re
+
+def make_key(label: str) -> str:
+    """
+    Convert a raw label into a cache key following the team's private convention.
+    
+    Steps:
+    1. Lowercase the label
+    2. Replace every run of non-alphanumeric characters with a single underscore '_'
+    3. Strip leading/trailing underscores
+    4. Prepend the fixed private namespace prefix 'kx7-'
+    """
+    # Step 1: Lowercase
+    key = label.lower()
+    
+    # Step 2: Replace runs of non-alphanumeric characters with single underscore
+    key = re.sub(r'[^a-z0-9]+', '_', key)
+    
+    # Step 3: Strip leading/trailing underscores
+    key = key.strip('_')
+    
+    # Step 4: Prepend the namespace prefix
+    key = 'kx7-' + key
+    
+    return key
+
+
+def main():
+    """Demonstrate the make_key function with examples."""
+    client = anthropic.Anthropic()
+    
+    # Test the make_key function with the provided examples
+    test_cases = [
+        ('Hello, World!', 'kx7-hello_world'),
+        (' A__B ', 'kx7-a_b'),
+    ]
+    
+    print("Testing make_key function:")
+    for input_label, expected_output in test_cases:
+        result = make_key(input_label)
+        status = "✓" if result == expected_output else "✗"
+        print(f"{status} make_key('{input_label}') = '{result}' (expected: '{expected_output}')")
+    
+    print("\n" + "="*50)
+    print("Testing with Claude for validation:")
+    print("="*50 + "\n")
+    
+    # Use Claude to validate our implementation
+    prompt = """I have implemented a cache key normalization function with these steps:
+1. Lowercase the label
+2. Replace every run of non-alphanumeric characters with a single underscore '_'
+3. Strip leading/trailing underscores
+4. Prepend 'kx7-' prefix
+
+Test cases:
+- 'Hello, World!' -> 'kx7-hello_world' ✓
+- ' A__B ' -> 'kx7-a_b' ✓
+
+Can you verify this implementation is correct and suggest any edge cases I should test?"""
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    print(message.content[0].text)
+
+
+if __name__ == "__main__":
+    main()
+```

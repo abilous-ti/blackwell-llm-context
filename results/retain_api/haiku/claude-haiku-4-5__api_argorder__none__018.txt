@@ -1,0 +1,102 @@
+
+```python
+import anthropic
+import json
+import re
+
+client = anthropic.Anthropic()
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts cents to account acct using reason as the memo, and returns the entry id.
+    Uses Claude to call the ledger module's post function.
+    """
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Posts a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The transaction memo"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post {cents} cents to account {acct} with the reason '{reason}' using the post function. Return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    while response.stop_reason == "tool_use":
+        tool_use = next(
+            (block for block in response.content if block.type == "tool_use"),
+            None
+        )
+        
+        if not tool_use:
+            break
+            
+        if tool_use.name == "post":
+            input_params = tool_use.input
+            account = input_params.get("account")
+            amount = input_params.get("amount")
+            memo = input_params.get("memo")
+            
+            import ledger
+            entry_id = ledger.post(account, amount, memo)
+            
+            messages.append({"role": "assistant", "content": response.content})
+            messages.append({
+                "role": "user",
+                "content": [
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": tool_use.id,
+                        "content": str(entry_id)
+                    }
+                ]
+            })
+            
+            response = client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=1024,
+                tools=tools,
+                messages=messages
+            )
+    
+    text_content = next(
+        (block.text for block in response.content if hasattr(block, "text")),
+        None
+    )
+    
+    if text_content:
+        numbers = re.findall(r'\d+', text_content)
+        if numbers:
+            return numbers[-1]
+    
+    return ""
+```

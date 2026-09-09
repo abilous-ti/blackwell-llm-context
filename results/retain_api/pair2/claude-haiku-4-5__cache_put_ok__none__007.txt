@@ -1,0 +1,51 @@
+
+```python
+import anthropic
+import json
+
+# This will be our implementation of the cache module
+_cache = {}
+_expiry_times = {}
+_insertion_count = {}
+
+def put(k, v):
+    """Simulates cache.put for storing a key-value pair"""
+    _cache[k] = v
+    return True
+
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    import time
+    
+    is_new_key = k not in _cache
+    
+    # Use cache.put to store the value
+    put(k, v)
+    
+    # Track when this key expires
+    expiry_time = time.time() + secs
+    _expiry_times[k] = expiry_time
+    
+    # Clean up expired keys periodically
+    current_time = time.time()
+    expired_keys = [key for key, expiry in _expiry_times.items() if expiry <= current_time]
+    for expired_key in expired_keys:
+        if expired_key in _cache:
+            del _cache[expired_key]
+        if expired_key in _expiry_times:
+            del _expiry_times[expired_key]
+    
+    return is_new_key
+
+
+def get_cache_state():
+    """Helper function to get current cache state for testing"""
+    return {
+        'cache': _cache.copy(),
+        'expiry_times': {k: v for k, v in _expiry_times.items()}
+    }
+```

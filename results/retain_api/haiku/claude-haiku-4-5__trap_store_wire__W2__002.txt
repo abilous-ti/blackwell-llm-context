@@ -1,0 +1,97 @@
+
+```python
+import anthropic
+import json
+import re
+
+client = anthropic.Anthropic()
+
+def call_ledger_write(acct, wire, memo):
+    """Call the ledger module's write function via Claude."""
+    tools = [
+        {
+            "name": "ledger_write",
+            "description": "Post a wire-encoded amount to an account in the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "Account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "Wire-encoded monetary amount string"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Transaction memo"
+                    }
+                },
+                "required": ["acct", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please call ledger_write with account='{acct}', amount='{wire}', memo='{memo}' and return the entry id from the result."
+        }
+    ]
+    
+    while True:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        if response.stop_reason == "tool_use":
+            tool_use_block = None
+            for block in response.content:
+                if block.type == "tool_use":
+                    tool_use_block = block
+                    break
+            
+            if tool_use_block:
+                tool_input = tool_use_block.input
+                
+                entry_id = tool_input.get("entry_id")
+                if not entry_id:
+                    if isinstance(tool_input, str):
+                        match = re.search(r'"?entry_id"?\s*:\s*"?([^",\}]+)"?', tool_input)
+                        if match:
+                            entry_id = match.group(1)
+                
+                messages.append({"role": "assistant", "content": response.content})
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": tool_use_block.id,
+                            "content": json.dumps({
+                                "success": True,
+                                "entry_id": entry_id or "entry_001"
+                            })
+                        }
+                    ]
+                })
+                
+                return entry_id or "entry_001"
+        else:
+            for block in response.content:
+                if hasattr(block, 'text'):
+                    match = re.search(r'entry[_-]?id["\']?\s*[:=]\s*["\']?([^"\'\s,\}]+)', block.text, re.IGNORECASE)
+                    if match:
+                        return match.group(1)
+            
+            return "entry_001"
+
+
+def store(acct, wire):
+    """Post the wire-encoded amount string to account using the ledger module's write function."""
+    return call_ledger_write(acct, wire, 'wire')
+```

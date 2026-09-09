@@ -1,0 +1,52 @@
+I'll analyze this problem. The issue is that "this team's private wire format" isn't specified anywhere—there's no documentation, examples, or reference implementation provided.
+
+Since I cannot know an undocumented, private, team-specific wire format, I'll implement a reasonable, self-consistent serialization that handles the money semantics correctly (sign, dollars, cents) and document my assumptions clearly.
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string to a wire format.
+
+    NOTE: The exact 'private wire format' was not specified in the task.
+    In the absence of a spec, this implements a well-defined, reversible
+    encoding: an integer number of cents rendered as a signed, fixed-form
+    token 'M<sign><cents>' where sign is '+' or '-'.
+
+    Examples:
+        '12.30'  -> 'M+1230'
+        '-0.07'  -> 'M-7'
+        '0'      -> 'M+0'
+    """
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Determine sign.
+    negative = False
+    if s[0] in "+-":
+        negative = s[0] == "-"
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits")
+
+    # Split into whole and fractional parts.
+    if "." in s:
+        whole, _, frac = s.partition(".")
+        if "." in frac:
+            raise ValueError("multiple decimal points")
+    else:
+        whole, frac = s, ""
+
+    whole = whole or "0"
+
+    if not whole.isdigit() or (frac and not frac.isdigit()):
+        raise ValueError(f"invalid amount: {dollars!r}")
+
+    # Normalize fractional part to exactly 2 digits (cents).
+    if len(frac) > 2:
+        raise ValueError("more than two decimal places")
+    frac = (frac + "00")[:2]
+
+    cents = int(whole) * 100 + int(frac)
+
+    sign = "-" if (negative and cents != 0) else "+"
+    return f"M{sign}{cents}"

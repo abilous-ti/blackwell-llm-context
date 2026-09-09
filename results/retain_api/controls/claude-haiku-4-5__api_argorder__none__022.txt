@@ -1,0 +1,99 @@
+
+```python
+import anthropic
+import json
+
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer funds using Claude as an AI backbone.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents to transfer
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        Entry ID from the ledger
+    """
+    client = anthropic.Anthropic()
+    
+    # Define the ledger tool that Claude can use
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Post a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "Account identifier"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "Amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Transaction memo/reason"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    # Create a message asking Claude to post the transaction
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post a transfer of {cents} cents to account {acct} with the reason: {reason}"
+        }
+    ]
+    
+    # Call Claude with tool use
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response and extract tool use
+    entry_id = None
+    
+    for block in response.content:
+        if block.type == "tool_use":
+            if block.name == "ledger_post":
+                # Simulate the ledger post operation
+                tool_input = block.input
+                # In a real scenario, this would call actual ledger functions
+                # For now, we'll generate an entry ID based on the input
+                entry_id = f"entry_{acct}_{tool_input['amount']}_{hash(tool_input['memo']) % 10000}"
+                break
+    
+    # If Claude didn't use the tool, ask it to do so
+    if entry_id is None:
+        messages.append({"role": "assistant", "content": response.content})
+        messages.append({
+            "role": "user",
+            "content": "Please use the ledger_post tool to complete this transfer."
+        })
+        
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        for block in response.content:
+            if block.type == "tool_use":
+                if block.name == "ledger_post":
+                    tool_input = block.input
+                    entry_id = f"entry_{acct}_{tool_input['amount']}_{hash(tool_input['memo']) % 10000}"
+                    break
+    
+    return entry_id or "entry_unknown"
+```

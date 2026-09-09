@@ -1,0 +1,19 @@
+I'll write a `store` function that posts the pre-encoded wire string as-is, without re-encoding or decoding it.
+
+However, I need to make some reasonable assumptions about the ledger module's `write` function signature since it isn't specified. I'll write to you the most sensible interpretation and note it.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')
+```
+
+Let me give you the clean file content:
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

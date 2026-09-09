@@ -1,0 +1,58 @@
+
+```python
+import anthropic
+import json
+import hashlib
+
+client = anthropic.Anthropic()
+conversation_history = []
+
+def save(k: str, v) -> bool:
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (not updated).
+    """
+    global conversation_history
+    
+    if not conversation_history:
+        conversation_history = [
+            {
+                "role": "user",
+                "content": "You are a cache management system. You maintain an in-memory cache where keys are already normalized strings like 'kx7-hello_world'. When I ask you to save a key-value pair, you should store it with a TTL of 60 seconds. You should track whether each key is being inserted for the first time or updated. Always respond with valid JSON in this format: {\"success\": true/false, \"newly_inserted\": true/false, \"message\": \"description\"}"
+            },
+            {
+                "role": "assistant",
+                "content": "I understand. I am a cache management system. I will maintain an in-memory cache with TTL tracking. Keys are already normalized (like 'kx7-hello_world'). When you ask me to save a key-value pair, I will track whether it's a new insertion or an update, and respond with JSON indicating the operation result and whether it was newly inserted."
+            }
+        ]
+    
+    value_str = json.dumps(v) if not isinstance(v, str) else v
+    save_request = f"Save key '{k}' with value '{value_str}' with TTL 60 seconds. Tell me if this is a newly inserted key (True) or an update of existing key (False)."
+    
+    conversation_history.append({
+        "role": "user",
+        "content": save_request
+    })
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=200,
+        messages=conversation_history
+    )
+    
+    assistant_message = response.content[0].text
+    conversation_history.append({
+        "role": "assistant",
+        "content": assistant_message
+    })
+    
+    try:
+        result = json.loads(assistant_message)
+        return result.get("newly_inserted", False)
+    except json.JSONDecodeError:
+        if "newly_inserted" in assistant_message.lower() and "true" in assistant_message.lower():
+            return True
+        if "new" in assistant_message.lower() and "insert" in assistant_message.lower():
+            return True
+        return False
+```

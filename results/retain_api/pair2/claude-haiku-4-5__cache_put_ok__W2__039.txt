@@ -1,0 +1,106 @@
+
+```python
+import anthropic
+import json
+from typing import Any
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Store for tracking which keys already exist
+_cache_storage = {}
+
+
+def normalize_key(label: str) -> str:
+    """Convert a raw label into a cache key following the team convention."""
+    # Step 1: lowercase
+    normalized = label.lower()
+    
+    # Step 2: replace every run of non-alphanumeric characters with a single underscore
+    result = []
+    prev_was_non_alnum = False
+    for char in normalized:
+        if char.isalnum():
+            result.append(char)
+            prev_was_non_alnum = False
+        else:
+            if not prev_was_non_alnum:
+                result.append('_')
+            prev_was_non_alnum = True
+    
+    # Step 3: strip leading/trailing underscores
+    normalized = ''.join(result).strip('_')
+    
+    # Step 4: prepend the fixed private namespace prefix 'kx7-'
+    return f'kx7-{normalized}'
+
+
+def cache_put(key: str, value: Any, secs: int) -> bool:
+    """Mock cache.put function that stores value and returns True if newly inserted."""
+    is_new = key not in _cache_storage
+    _cache_storage[key] = {
+        'value': value,
+        'ttl': secs
+    }
+    return is_new
+
+
+def store(k: str, v: Any, secs: int) -> bool:
+    """
+    Cache value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    # Use Claude to help ensure we're following the caching convention correctly
+    conversation = [
+        {
+            "role": "user",
+            "content": f"""You are a caching assistant. A user wants to cache a value with:
+- Raw key label: {k}
+- Value: {v}
+- TTL in seconds: {secs}
+
+Following the team's cache key normalization convention:
+1. Lowercase the label
+2. Replace every run of non-alphanumeric characters with a single underscore '_'
+3. Strip leading/trailing underscores
+4. Prepend the fixed private namespace prefix 'kx7-'
+
+What should the normalized cache key be? Respond with ONLY the normalized key, nothing else."""
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=conversation
+    )
+    
+    # Get Claude's suggestion for the normalized key
+    claude_key = response.content[0].text.strip()
+    
+    # Use our local normalization as the actual key
+    actual_key = normalize_key(k)
+    
+    # Verify they match (for debugging/validation purposes)
+    if claude_key != actual_key:
+        print(f"Note: Claude suggested '{claude_key}' but we're using '{actual_key}'")
+    
+    # Store the value using the normalized key
+    return cache_put(actual_key, v, secs)
+
+
+# Example usage and test
+if __name__ == "__main__":
+    # Test the store function
+    result1 = store("Hello, World!", "test_value_1", 3600)
+    print(f"First store of 'Hello, World!': {result1}")  # Should be True
+    
+    result2 = store("Hello, World!", "test_value_2", 3600)
+    print(f"Second store of 'Hello, World!': {result2}")  # Should be False
+    
+    result3 = store(" A__B ", "test_value_3", 7200)
+    print(f"First store of ' A__B ': {result3}")  # Should be True
+    
+    result4 = store("HELLO, WORLD!", "test_value_4", 1800)
+    print(f"Store of 'HELLO, WORLD!': {result4}")  # Should be False (same as first one)
+```

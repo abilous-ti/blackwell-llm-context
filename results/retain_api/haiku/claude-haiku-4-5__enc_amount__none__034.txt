@@ -1,0 +1,56 @@
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a money amount in dollars to wire format.
+    
+    The wire format represents the amount in cents as a variable-length integer:
+    - Positive amounts: encoded in base-128 with continuation bits
+    - Negative amounts: two's complement representation
+    
+    Args:
+        dollars: String representation of dollars (e.g., '12.30', '-0.07')
+    
+    Returns:
+        Encoded wire format as a string (hex representation)
+    """
+    # Convert dollars string to cents (integer)
+    # Handle both positive and negative amounts
+    parts = dollars.split('.')
+    
+    if len(parts) == 1:
+        # No decimal point
+        cents = int(parts[0]) * 100
+    else:
+        # Has decimal point
+        dollars_part = int(parts[0])
+        cents_part = parts[1]
+        
+        # Pad or truncate to 2 decimal places
+        if len(cents_part) == 1:
+            cents_part = cents_part + '0'
+        elif len(cents_part) > 2:
+            cents_part = cents_part[:2]
+        
+        cents = dollars_part * 100 + int(cents_part)
+        
+        # Handle negative amounts (e.g., '-0.07')
+        if dollars_part == 0 and dollars.startswith('-'):
+            cents = -int(cents_part)
+    
+    # Encode cents as variable-length integer in base-128 format
+    if cents < 0:
+        # Use two's complement for negative numbers
+        # For wire format, use standard varint with zigzag encoding
+        cents = (cents << 1) ^ (cents >> 63)
+    else:
+        cents = cents << 1
+    
+    # Encode as base-128 varint
+    encoded = []
+    while cents >= 128:
+        encoded.append((cents & 0x7f) | 0x80)
+        cents >>= 7
+    encoded.append(cents & 0x7f)
+    
+    return ''.join(f'{b:02x}' for b in encoded)
+```

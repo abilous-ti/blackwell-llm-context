@@ -1,0 +1,6 @@
+```python
+import ledger
+
+def transfer(acct, cents, reason):
+    return ledger.post(acct, cents, memo=reason)
+```

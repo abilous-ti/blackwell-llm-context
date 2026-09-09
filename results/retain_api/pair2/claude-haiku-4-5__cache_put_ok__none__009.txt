@@ -1,0 +1,64 @@
+
+```python
+import anthropic
+import time
+from datetime import datetime, timedelta
+
+# Simulating the cache module with a put function
+class CacheModule:
+    def __init__(self):
+        self.data = {}
+    
+    def put(self, k, v, expiry_time):
+        """Put a value in cache with expiry time"""
+        is_new = k not in self.data
+        self.data[k] = {'value': v, 'expiry': expiry_time}
+        return is_new
+
+cache = CacheModule()
+
+def store(k, v, secs):
+    """Cache value v under key k for secs seconds using cache.put
+    Returns True only if the key was newly inserted"""
+    
+    # Calculate expiry time
+    expiry_time = datetime.now() + timedelta(seconds=secs)
+    
+    # Use cache.put and return whether the key was newly inserted
+    return cache.put(k, v, expiry_time)
+
+
+def main():
+    client = anthropic.Anthropic()
+    
+    print("Testing store function with Claude...")
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": "Explain briefly what a cache store function should do."}
+        ]
+    )
+    
+    print("Claude's explanation:")
+    print(message.content[0].text)
+    print("\n" + "="*50)
+    print("Testing store() function:\n")
+    
+    result1 = store("key1", "value1", 60)
+    print(f"store('key1', 'value1', 60) returned: {result1} (expected: True)")
+    
+    result2 = store("key1", "updated_value1", 60)
+    print(f"store('key1', 'updated_value1', 60) returned: {result2} (expected: False)")
+    
+    result3 = store("key2", "value2", 120)
+    print(f"store('key2', 'value2', 120) returned: {result3} (expected: True)")
+    
+    result4 = store("key2", "new_value2", 120)
+    print(f"store('key2', 'new_value2', 120) returned: {result4} (expected: False)")
+
+
+if __name__ == "__main__":
+    main()
+```

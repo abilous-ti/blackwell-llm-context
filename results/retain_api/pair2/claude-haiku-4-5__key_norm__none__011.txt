@@ -1,0 +1,62 @@
+
+```python
+import anthropic
+import hashlib
+
+
+def make_key(label: str) -> str:
+    """
+    Convert a raw label into the team's private cache key using Claude.
+    
+    This function uses Claude with extended thinking to generate a consistent,
+    deterministic cache key from any label string.
+    """
+    client = anthropic.Anthropic()
+    
+    system_prompt = """You are a cache key generation system. Your task is to convert raw labels into consistent, deterministic cache keys for a team's private cache.
+
+Requirements for the cache key:
+1. Must be deterministic - same input always produces same output
+2. Must be URL-safe and use only alphanumeric characters, hyphens, and underscores
+3. Must be lowercase
+4. Should be concise but meaningful
+5. Should handle special characters by removing or replacing them
+6. Should preserve the essence of the label while making it cache-friendly
+
+When generating a cache key:
+- Remove or replace special characters with underscores or hyphens
+- Convert to lowercase
+- Remove extra spaces and collapse multiple separators
+- Keep only alphanumeric, hyphen, and underscore characters
+- Ensure it's a valid cache key format"""
+
+    message = client.messages.create(
+        model="claude-3-7-sonnet-20250219",
+        max_tokens=1024,
+        thinking={
+            "type": "enabled",
+            "budget_tokens": 512
+        },
+        system=system_prompt,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Generate a cache key for this label: "{label}"
+
+Return ONLY the cache key, nothing else. No explanation, no quotes, just the key."""
+            }
+        ]
+    )
+    
+    cache_key = message.content[0].text.strip()
+    
+    if not cache_key:
+        cache_key = hashlib.md5(label.encode()).hexdigest()[:16]
+    
+    cache_key = ''.join(c if c.isalnum() or c in '-_' else '' for c in cache_key.lower()).strip('-_')
+    
+    if not cache_key:
+        cache_key = hashlib.md5(label.encode()).hexdigest()[:16]
+    
+    return cache_key
+```

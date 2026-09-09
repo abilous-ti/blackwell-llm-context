@@ -1,0 +1,35 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Define the cache module API contract as a system prompt
+CACHE_API_CONTRACT = """
+You are helping implement a caching function. The cache module has the following API:
+
+cache.put(key: str, value, *, ttl: int)
+- key (str, FIRST positional arg): The cache key (already normalized, e.g. 'kx7-hello_world')
+- value (SECOND positional arg): The value to cache
+- ttl (REQUIRED keyword-only int arg): Time-to-live in seconds
+- Returns: True if key was NEWLY inserted, False if it REPLACED an existing value
+- Raises: cache.CacheError on empty key (NOT ValueError, NOT KeyError)
+
+The key is ALREADY normalized - do NOT re-normalize it.
+"""
+
+def save(k, v):
+    """
+    Caches value v under the already-normalized key k for ttl 60 seconds.
+    
+    Args:
+        k: Already-normalized cache key (e.g. 'kx7-hello_world')
+        v: Value to cache
+        
+    Returns:
+        True if newly inserted, False if replaced existing value
+    """
+    import cache
+    return cache.put(k, v, ttl=60)
+```

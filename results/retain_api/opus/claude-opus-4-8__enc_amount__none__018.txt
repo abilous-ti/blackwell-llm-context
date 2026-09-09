@@ -1,0 +1,75 @@
+I'll create a money amount encoder. Since the "private wire format" isn't specified externally, I'll design a sensible, self-consistent binary-ish serialization that handles the given cases correctly.
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format spec (self-consistent):
+        <sign><whole>|<cents>#
+    where:
+        - <sign>  is 'N' for negative, 'P' for positive/zero
+        - <whole> is the absolute integer dollar part (no leading zeros,
+                  except a single '0' when the whole part is zero)
+        - <cents> is exactly two digits representing the fractional cents
+        - '|' separates dollars from cents, '#' terminates the record
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Determine sign
+    negative = False
+    if s[0] in "+-":
+        negative = s[0] == "-"
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount")
+
+    # Split whole and fractional parts
+    if "." in s:
+        whole_part, frac_part = s.split(".", 1)
+        if "." in frac_part:
+            raise ValueError("too many decimal points")
+    else:
+        whole_part, frac_part = s, ""
+
+    if whole_part == "":
+        whole_part = "0"
+
+    if not whole_part.isdigit():
+        raise ValueError("invalid whole part: %r" % whole_part)
+    if frac_part and not frac_part.isdigit():
+        raise ValueError("invalid fractional part: %r" % frac_part)
+
+    # Normalize cents to exactly two digits (round any extra precision).
+    if len(frac_part) == 0:
+        cents = 0
+    elif len(frac_part) == 1:
+        cents = int(frac_part) * 10
+    elif len(frac_part) == 2:
+        cents = int(frac_part)
+    else:
+        # Round half up on the third digit onward.
+        two = int(frac_part[:2])
+        if int(frac_part[2]) >= 5:
+            two += 1
+        cents = two
+
+    whole = int(whole_part)
+
+    # Handle carry from rounding (e.g. '0.999' -> 1 dollar 00 cents).
+    if cents >= 100:
+        whole += cents // 100
+        cents = cents % 100
+
+    # Zero is always represented as positive.
+    if whole == 0 and cents == 0:
+        negative = False
+
+    sign = "N" if negative else "P"
+    return "%s%d|%02d#" % (sign, whole, cents)

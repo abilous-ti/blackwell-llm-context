@@ -1,0 +1,18 @@
+
+```python
+import anthropic
+from ledger import write
+
+def store(acct, wire):
+    """Posts a wire-encoded amount string to an account using the ledger module.
+    
+    Args:
+        acct: The account identifier
+        wire: The wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger write operation
+    """
+    entry_id = write(acct, wire, 'wire')
+    return entry_id
+```

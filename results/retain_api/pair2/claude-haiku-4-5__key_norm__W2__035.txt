@@ -1,0 +1,12 @@
+import re
+
+def make_key(label: str) -> str:
+    # Step 1: lowercase
+    key = label.lower()
+    # Step 2: replace every run of non-alphanumeric characters with single underscore
+    key = re.sub(r'[^a-z0-9]+', '_', key)
+    # Step 3: strip leading/trailing underscores
+    key = key.strip('_')
+    # Step 4: prepend fixed private namespace prefix
+    key = 'kx7-' + key
+    return key

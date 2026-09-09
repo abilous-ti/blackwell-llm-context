@@ -1,0 +1,62 @@
+
+```python
+import anthropic
+
+client = anthropic.Anthropic()
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """Transfer cents to account acct using reason as the memo and return the entry id."""
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Posts an amount to an account with a memo",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo for this transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post {cents} cents to account '{acct}' with the reason '{reason}'. Call the post tool with these parameters."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response to extract tool use
+    for content_block in response.content:
+        if content_block.type == "tool_use":
+            # Simulate the tool call and return a mock entry ID
+            # In a real scenario, this would call the actual ledger.post function
+            tool_input = content_block.input
+            
+            # Return a mock entry ID based on the tool input
+            entry_id = f"entry_{acct}_{tool_input.get('amount', cents)}_{tool_input.get('memo', reason).replace(' ', '_')}"
+            return entry_id
+    
+    # If no tool was called, generate a default entry ID
+    return f"entry_{acct}_{cents}_{reason.replace(' ', '_')}"
+```

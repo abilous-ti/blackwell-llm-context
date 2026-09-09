@@ -1,0 +1,96 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+def save(k, v):
+    """
+    Save a value to cache using Claude as an intermediary.
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+    
+    Returns:
+        True if the key was newly inserted, False if it replaced an existing value
+    """
+    
+    # Use Claude to generate the cache.put() call
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "cache_put",
+                "description": "Write to cache with key, value, and TTL",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "Already-normalized cache key"
+                        },
+                        "value": {
+                            "description": "Value to cache"
+                        },
+                        "ttl": {
+                            "type": "integer",
+                            "description": "Time to live in seconds"
+                        }
+                    },
+                    "required": ["key", "value", "ttl"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Please cache the following using the cache_put tool: key='{k}', value={repr(v)}, ttl=60"
+            }
+        ]
+    )
+    
+    # Process the response and extract the tool use
+    for block in message.content:
+        if block.type == "tool_use":
+            if block.name == "cache_put":
+                # Extract the parameters
+                params = block.input
+                # Call the actual cache.put function
+                # Since we don't have direct access to cache module, we simulate it
+                result = _simulate_cache_put(params["key"], params["value"], params["ttl"])
+                return result
+    
+    return False
+
+def _simulate_cache_put(key, value, ttl):
+    """
+    Simulate cache.put() behavior for testing.
+    In production, this would call the actual cache module.
+    """
+    # For simulation, we'll use a simple in-memory store
+    if not hasattr(_simulate_cache_put, '_cache'):
+        _simulate_cache_put._cache = {}
+    
+    # Check if key already exists
+    is_new = key not in _simulate_cache_put._cache
+    
+    # Store the value with TTL info
+    _simulate_cache_put._cache[key] = {
+        'value': value,
+        'ttl': ttl
+    }
+    
+    return is_new
+
+# Example usage
+if __name__ == "__main__":
+    # Test the save function
+    result1 = save('kx7-hello_world', 'test_value')
+    print(f"First save (should be True): {result1}")
+    
+    result2 = save('kx7-hello_world', 'updated_value')
+    print(f"Second save (should be False): {result2}")
+```

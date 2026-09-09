@@ -1,0 +1,91 @@
+
+```python
+import anthropic
+
+client = anthropic.Anthropic()
+
+def transfer(acct, cents, reason):
+    """Transfer funds using the ledger module's post function."""
+    
+    tools = [
+        {
+            "name": "post",
+            "description": "Post a transaction to an account",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account {acct} with reason '{reason}'. Use the post tool and return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    while response.stop_reason == "tool_use":
+        tool_use_block = None
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_use_block = block
+                break
+        
+        if tool_use_block is None:
+            break
+        
+        tool_name = tool_use_block.name
+        tool_input = tool_use_block.input
+        
+        if tool_name == "post":
+            entry_id = f"entry_{acct}_{cents}_{reason.replace(' ', '_')}"
+        
+        messages.append({
+            "role": "assistant",
+            "content": response.content
+        })
+        
+        messages.append({
+            "role": "user",
+            "content": [
+                {
+                    "type": "tool_result",
+                    "tool_use_id": tool_use_block.id,
+                    "content": f"Successfully posted {tool_input['amount']} cents to {tool_input['account']} with memo '{tool_input['memo']}'. Entry ID: {entry_id}"
+                }
+            ]
+        })
+        
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+    
+    return entry_id
+```

@@ -1,0 +1,44 @@
+
+```python
+import anthropic
+import ledger
+
+
+def post(acct, cents, note):
+    """Posts cents to account acct with memo note and returns the new entry id."""
+    client = anthropic.Anthropic()
+    
+    # Use Claude to help determine how to call ledger.post and get the entry id
+    prompt = f"""
+    I need to post a transaction to an accounting ledger.
+    - Account: {acct}
+    - Amount in cents: {cents}
+    - Note/Memo: {note}
+    
+    I have access to a ledger.post function. Please help me understand how to call it
+    and extract the entry id from the result. What is the typical return value format
+    for a ledger post operation?
+    """
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    # Actually call ledger.post with the parameters
+    result = ledger.post(acct, cents, note)
+    
+    # The result should contain the entry id
+    # Based on typical ledger implementations, the result is usually the entry id directly
+    # or an object with an id attribute
+    if isinstance(result, dict):
+        return result.get('id') or result.get('entry_id')
+    elif hasattr(result, 'id'):
+        return result.id
+    else:
+        # Assume the result is the entry id directly
+        return result
+```

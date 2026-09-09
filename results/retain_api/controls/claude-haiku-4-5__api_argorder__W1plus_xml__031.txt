@@ -1,0 +1,37 @@
+
+```python
+import ledger
+
+def transfer(acct, cents, reason):
+    """
+    Transfer funds to an account.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (integer)
+        reason: Reason for the transfer (memo)
+    
+    Returns:
+        The entry id from the ledger post operation
+    
+    Raises:
+        ledger.PostError: If the post operation fails
+    """
+    # Determine the sign
+    sign = '+' if cents >= 0 else '-'
+    
+    # Work with absolute value
+    abs_cents = abs(cents)
+    
+    # Convert to string with digits
+    digits = str(abs_cents)
+    
+    # Calculate check digit (sum of decimal digits mod 10)
+    check_digit = sum(int(d) for d in digits) % 10
+    
+    # Format the amount according to the wire encoding invariant
+    amount = f"{sign}{digits}#{check_digit}"
+    
+    # Post to the ledger with required keyword-only memo argument
+    return ledger.post(acct, amount, memo=reason)
+```

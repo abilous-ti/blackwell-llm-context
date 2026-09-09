@@ -1,0 +1,88 @@
+
+```python
+import anthropic
+import json
+import re
+
+# Mock ledger module for demonstration
+class MockLedger:
+    def __init__(self):
+        self.entries = []
+        self.entry_counter = 0
+    
+    def post(self, acct, cents, reason):
+        self.entry_counter += 1
+        entry = {
+            'id': self.entry_counter,
+            'account': acct,
+            'amount': cents,
+            'memo': reason
+        }
+        self.entries.append(entry)
+        return self.entry_counter
+
+# Initialize mock ledger
+ledger = MockLedger()
+
+def transfer(acct, cents, reason):
+    """
+    Transfer funds using Claude as an AI backbone.
+    This function uses Claude to help process the transfer request
+    and then posts it to the ledger.
+    """
+    client = anthropic.Anthropic()
+    
+    # Use Claude to validate and process the transfer request
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Process this transfer request:
+Account: {acct}
+Amount: {cents} cents
+Reason: {reason}
+
+Confirm this is a valid transfer request and return a JSON response with:
+- valid: boolean
+- processed_reason: string (cleaned up version of reason)
+- entry_data: object with account, amount, and memo fields
+
+Respond ONLY with valid JSON."""
+            }
+        ]
+    )
+    
+    # Parse Claude's response
+    response_text = message.content[0].text
+    
+    # Extract JSON from response
+    json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+    if json_match:
+        response_data = json.loads(json_match.group())
+    else:
+        response_data = json.loads(response_text)
+    
+    if response_data.get('valid', True):
+        processed_reason = response_data.get('processed_reason', reason)
+        # Post to ledger using the mock ledger's post method
+        entry_id = ledger.post(acct, cents, processed_reason)
+        return entry_id
+    else:
+        raise ValueError(f"Invalid transfer request: {reason}")
+
+
+if __name__ == "__main__":
+    # Test the transfer function
+    entry_id = transfer("savings", 50000, "Monthly savings deposit")
+    print(f"Transfer posted with entry ID: {entry_id}")
+    
+    entry_id = transfer("checking", 25000, "Utility payment")
+    print(f"Transfer posted with entry ID: {entry_id}")
+    
+    # Display all entries
+    print("\nLedger entries:")
+    for entry in ledger.entries:
+        print(f"  ID: {entry['id']}, Account: {entry['account']}, Amount: {entry['amount']} cents, Memo: {entry['memo']}")
+```

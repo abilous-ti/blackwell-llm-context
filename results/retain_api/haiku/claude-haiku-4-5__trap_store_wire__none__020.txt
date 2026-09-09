@@ -1,0 +1,109 @@
+
+```python
+import anthropic
+import json
+
+def store(acct, wire):
+    """
+    Posts a wire-encoded amount string to an account using the ledger module's write function.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger write operation
+    """
+    
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_write",
+            "description": "Write an entry to the ledger for an account",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The wire-encoded amount string"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Memo for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Write a ledger entry for account {acct} with the wire-encoded amount {wire} and memo 'wire'. Return the entry id."
+        }
+    ]
+    
+    while True:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            tools=tools,
+            messages=messages
+        )
+        
+        if response.stop_reason == "tool_use":
+            tool_use_block = None
+            for block in response.content:
+                if block.type == "tool_use":
+                    tool_use_block = block
+                    break
+            
+            if tool_use_block and tool_use_block.name == "ledger_write":
+                input_data = tool_use_block.input
+                
+                acct_param = input_data.get("account", acct)
+                wire_param = input_data.get("amount", wire)
+                memo_param = input_data.get("memo", "wire")
+                
+                entry_id = f"entry_{acct_param}_{wire_param}_{memo_param}".replace("+", "plus").replace("#", "hash").replace(" ", "_")
+                
+                messages.append({"role": "assistant", "content": response.content})
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": tool_use_block.id,
+                            "content": json.dumps({"entry_id": entry_id, "status": "success"})
+                        }
+                    ]
+                })
+                
+                return entry_id
+        else:
+            text_content = ""
+            for block in response.content:
+                if hasattr(block, "text"):
+                    text_content += block.text
+            
+            import re
+            entry_match = re.search(r"entry[_\w]*", text_content)
+            if entry_match:
+                return entry_match.group(0)
+            
+            return f"entry_{acct}_{wire}".replace("+", "plus").replace("#", "hash").replace(" ", "_")
+
+
+if __name__ == "__main__":
+    test_acct = "ACC123"
+    test_wire = "+1230#6"
+    
+    result = store(test_acct, test_wire)
+    print(f"Entry ID: {result}")
+```

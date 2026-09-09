@@ -1,0 +1,25 @@
+import cache
+
+def store(k, v, secs):
+    normalized_key = normalize_key(k)
+    return cache.put(normalized_key, v, secs)
+
+def normalize_key(label):
+    # Step 1: lowercase
+    lowercased = label.lower()
+    # Step 2: replace every run of non-alphanumeric characters with a single underscore
+    normalized = ''
+    in_run = False
+    for char in lowercased:
+        if char.isalnum():
+            normalized += char
+            in_run = False
+        else:
+            if not in_run:
+                normalized += '_'
+                in_run = True
+    # Step 3: strip leading/trailing underscores
+    normalized = normalized.strip('_')
+    # Step 4: prepend the fixed private namespace prefix 'kx7-'
+    normalized = 'kx7-' + normalized
+    return normalized

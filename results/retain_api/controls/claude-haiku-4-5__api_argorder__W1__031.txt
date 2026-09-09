@@ -1,0 +1,15 @@
+def transfer(acct, cents, reason):
+    """Transfer cents to account acct with reason as memo.
+    
+    Args:
+        acct: Account name
+        cents: Amount in cents
+        reason: Memo text
+        
+    Returns:
+        The entry id from ledger.post()
+        
+    Raises:
+        ledger.PostError: If account is unknown or amount is malformed
+    """
+    return ledger.post(acct, cents, memo=reason)

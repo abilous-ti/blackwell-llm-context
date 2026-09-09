@@ -1,0 +1,5 @@
+```python
+def make_key(label: str) -> str:
+    """Convert a raw label into a private cache key."""
+    return f"_cache_{label}"
+```

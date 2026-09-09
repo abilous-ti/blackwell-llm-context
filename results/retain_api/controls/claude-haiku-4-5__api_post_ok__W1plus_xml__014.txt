@@ -1,0 +1,28 @@
+```python
+import ledger
+
+
+def record(acct, cents, note):
+    """
+    Posts a monetary amount to an account using the ledger module.
+    
+    Args:
+        acct: Account identifier (string)
+        cents: Amount in minor units (integer cents)
+        note: Memo/description for the transaction (string)
+    
+    Returns:
+        The new entry id (integer >= 1)
+    
+    Raises:
+        ledger.PostError: If the account is unknown or amount is malformed
+    """
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits_str = str(abs_cents)
+    check_digit = sum(int(d) for d in digits_str) % 10
+    amount_encoded = f"{sign}{digits_str}#{check_digit}"
+    
+    entry_id = ledger.post(acct, amount_encoded, memo=note)
+    return entry_id
+```

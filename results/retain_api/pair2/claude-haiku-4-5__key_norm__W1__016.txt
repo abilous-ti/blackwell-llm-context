@@ -1,0 +1,30 @@
+
+```python
+def make_key(label: str) -> str:
+    """
+    Converts a raw label into the team's private cache key format.
+    
+    Args:
+        label: The raw label to convert
+        
+    Returns:
+        A properly formatted cache key string
+    """
+    if not label:
+        raise ValueError("Label cannot be empty")
+    
+    # Convert label to a valid cache key format
+    # Remove leading/trailing whitespace and convert to lowercase
+    key = label.strip().lower()
+    
+    # Replace spaces with underscores for valid key format
+    key = key.replace(" ", "_")
+    
+    # Remove any other special characters except underscores and alphanumerics
+    key = "".join(c if c.isalnum() or c == "_" else "" for c in key)
+    
+    if not key:
+        raise ValueError("Label must contain at least one alphanumeric character")
+    
+    return key
+```

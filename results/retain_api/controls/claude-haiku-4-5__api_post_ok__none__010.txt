@@ -1,0 +1,84 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Simulated ledger module with a post function
+class LedgerModule:
+    def __init__(self):
+        self.entries = []
+        self.next_id = 1
+    
+    def post(self, acct, cents, note):
+        """Posts a transaction to the ledger and returns the entry id"""
+        entry_id = self.next_id
+        self.entries.append({
+            'id': entry_id,
+            'account': acct,
+            'amount': cents,
+            'memo': note
+        })
+        self.next_id += 1
+        return entry_id
+
+# Create a global ledger instance
+ledger = LedgerModule()
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post
+    Returns the new entry id
+    """
+    # Use Claude to help us understand and execute this request
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Given these parameters:
+- account: {acct}
+- cents: {cents}
+- note: {note}
+
+Generate valid Python code that:
+1. Calls ledger.post(acct, cents, note)
+2. Returns the entry_id from the post result
+
+Return ONLY the Python code without any explanation."""
+            }
+        ]
+    )
+    
+    # Extract the code from Claude's response
+    code = message.content[0].text.strip()
+    
+    # Execute the code with the ledger module in scope
+    local_scope = {'ledger': ledger, 'acct': acct, 'cents': cents, 'note': note}
+    exec(code, local_scope)
+    
+    # If the code was valid and set entry_id, return it
+    if 'entry_id' in local_scope:
+        return local_scope['entry_id']
+    
+    # Fallback: directly call ledger.post
+    entry_id = ledger.post(acct, cents, note)
+    return entry_id
+
+
+if __name__ == "__main__":
+    # Test the record function
+    entry_id = record("checking", 5000, "Initial deposit")
+    print(f"New entry ID: {entry_id}")
+    
+    entry_id = record("savings", 10000, "Transfer to savings")
+    print(f"New entry ID: {entry_id}")
+    
+    # Show all ledger entries
+    print("\nLedger entries:")
+    for entry in ledger.entries:
+        print(f"  ID {entry['id']}: {entry['account']} {entry['amount']} cents - {entry['memo']}")
+```

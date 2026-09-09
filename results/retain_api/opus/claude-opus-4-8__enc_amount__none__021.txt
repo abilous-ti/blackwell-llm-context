@@ -1,0 +1,91 @@
+I'll analyze this problem. The catch is that there's no specification of what "this team's private wire format" actually is—it's undefined. I need to make a reasonable, self-consistent choice and document it clearly.
+
+```python
+"""solution.py
+
+Serialize a money amount to this team's private wire format.
+
+Since the wire format is private to the team and not otherwise specified here,
+this module defines a concrete, self-consistent, and reversible encoding.
+
+Wire format specification
+--------------------------
+A money amount such as '12.30' or '-0.07' is normalized to an integer number
+of cents (the smallest currency unit) and then serialized as::
+
+    M<sign><cents>
+
+where:
+  * The literal prefix ``M`` marks the value as a money field.
+  * ``<sign>`` is ``+`` for zero or positive amounts and ``-`` for negative
+    amounts. It is always present so the format is unambiguous.
+  * ``<cents>`` is the absolute value of the amount expressed in whole cents,
+    written in base-10 with no leading zeros (a value of zero is ``0``).
+
+Examples:
+  encode_amount('12.30')  -> 'M+1230'
+  encode_amount('-0.07')  -> 'M-7'
+  encode_amount('0')      -> 'M+0'
+  encode_amount('-0.00')  -> 'M+0'
+  encode_amount('1000')   -> 'M+100000'
+"""
+
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string to the team's private wire format.
+
+    Parameters
+    ----------
+    dollars:
+        A decimal money amount as a string, e.g. ``'12.30'`` or ``'-0.07'``.
+        Leading/trailing whitespace and an optional leading ``+``/``-`` sign
+        are accepted. Optional currency symbols like a leading ``$`` are also
+        tolerated.
+
+    Returns
+    -------
+    str
+        The value encoded as ``M<sign><cents>``.
+
+    Raises
+    ------
+    ValueError
+        If ``dollars`` is not a valid money amount.
+    """
+    if not isinstance(dollars, str):
+        raise ValueError("amount must be a string")
+
+    text = dollars.strip()
+    if not text:
+        raise ValueError("empty amount")
+
+    # Tolerate a leading currency symbol.
+    if text[:1] == '$':
+        text = text[1:].strip()
+
+    # Remove thousands separators if present.
+    text = text.replace(',', '')
+
+    if not text:
+        raise ValueError("empty amount")
+
+    try:
+        value = Decimal(text)
+    except InvalidOperation:
+        raise ValueError(f"invalid money amount: {dollars!r}")
+
+    if not value.is_finite():
+        raise ValueError(f"non-finite money amount: {dollars!r}")
+
+    # Convert to an integer number of cents, rounding half up to the nearest
+    # cent so that inputs with excess precision are handled deterministically.
+    cents = (value * 100).quantize(Decimal(1), rounding=ROUND_HALF_UP)
+    cents_int = int(cents)
+
+    sign = '-' if cents_int < 0 else '+'
+    magnitude = abs(cents_int)
+
+    return f"M{sign}{magnitude}"
+```

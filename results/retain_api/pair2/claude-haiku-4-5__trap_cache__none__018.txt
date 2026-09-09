@@ -1,0 +1,65 @@
+
+```python
+import anthropic
+import json
+import hashlib
+
+client = anthropic.Anthropic()
+
+cache = {}
+cache_timestamps = {}
+
+TTL = 60
+
+def write(key: str, value: str) -> bool:
+    """
+    Internal cache write function that stores a value with a TTL.
+    Returns True if this is a new key (newly inserted), False if updating existing.
+    """
+    import time
+    current_time = time.time()
+    is_new = key not in cache
+    cache[key] = value
+    cache_timestamps[key] = current_time
+    return is_new
+
+def save(k: str, v: str) -> bool:
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted.
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+        
+    Returns:
+        True if this was a newly inserted key, False if updating existing
+    """
+    return write(k, v)
+
+def get(k: str) -> str | None:
+    """
+    Retrieve a cached value if it exists and hasn't expired.
+    """
+    import time
+    if k not in cache:
+        return None
+    
+    current_time = time.time()
+    if current_time - cache_timestamps[k] > TTL:
+        del cache[k]
+        del cache_timestamps[k]
+        return None
+    
+    return cache[k]
+
+def cleanup_expired():
+    """Remove expired entries from cache."""
+    import time
+    current_time = time.time()
+    expired_keys = [k for k, t in cache_timestamps.items() 
+                   if current_time - t > TTL]
+    for k in expired_keys:
+        del cache[k]
+        del cache_timestamps[k]
+```

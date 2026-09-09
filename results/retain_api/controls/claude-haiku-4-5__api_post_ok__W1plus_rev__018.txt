@@ -1,0 +1,35 @@
+import ledger
+
+
+def record(acct, cents, note):
+    """Posts cents to account acct with memo note using ledger.post.
+    
+    Args:
+        acct: account name (string)
+        cents: amount in minor units (integer)
+        note: memo text (string)
+    
+    Returns:
+        The new entry id (integer >= 1)
+    
+    Raises:
+        ledger.PostError: if account is unknown or amount is malformed
+    """
+    # Determine sign
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    
+    # Convert to string of digits
+    digits_str = str(abs_cents)
+    
+    # Calculate Luhn check digit
+    digit_sum = sum(int(d) for d in digits_str)
+    check_digit = digit_sum % 10
+    
+    # Construct wire-encoded amount
+    amount = f"{sign}{digits_str}#{check_digit}"
+    
+    # Call ledger.post with account first, amount second, memo as keyword-only
+    entry_id = ledger.post(acct, amount, memo=note)
+    
+    return entry_id

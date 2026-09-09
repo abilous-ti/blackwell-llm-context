@@ -1,0 +1,37 @@
+
+```python
+import anthropic
+import json
+
+cache = {}
+cache_ttl = {}
+
+def write(key: str, value: str, ttl: int) -> bool:
+    """Write to cache with TTL, return True if newly inserted."""
+    is_new = key not in cache
+    cache[key] = value
+    cache_ttl[key] = ttl
+    return is_new
+
+def save(k: str, v: str) -> bool:
+    """Save value v under key k with 60 second TTL, return True if newly inserted."""
+    return write(k, v, 60)
+
+def main():
+    client = anthropic.Anthropic()
+    
+    result = save("kx7-hello_world", "test_value")
+    print(f"First save (should be True): {result}")
+    
+    result = save("kx7-hello_world", "test_value_2")
+    print(f"Second save (should be False): {result}")
+    
+    result = save("kx7-another_key", "another_value")
+    print(f"Third save with different key (should be True): {result}")
+    
+    print(f"\nCache contents: {cache}")
+    print(f"Cache TTLs: {cache_ttl}")
+
+if __name__ == "__main__":
+    main()
+```

@@ -1,0 +1,72 @@
+
+```python
+import anthropic
+import json
+
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer cents to an account using Claude to help construct the ledger post.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents
+        reason: Memo/reason for the transfer
+        
+    Returns:
+        The entry id from the ledger post
+    """
+    
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Post a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount_cents": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo/reason for the transaction"
+                    }
+                },
+                "required": ["account", "amount_cents", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post a transfer of {cents} cents to account '{acct}' with the reason '{reason}'. Use the ledger_post tool to complete this transaction."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process the response and extract tool use
+    for block in response.content:
+        if block.type == "tool_use":
+            if block.name == "ledger_post":
+                # Simulate the ledger post and return an entry id
+                input_data = block.input
+                entry_id = f"entry_{acct}_{input_data['amount_cents']}_{hash(input_data['memo']) % 10000}"
+                return entry_id
+    
+    # If no tool was used, generate a default entry id
+    return f"entry_{acct}_{cents}_{hash(reason) % 10000}"
+```

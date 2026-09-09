@@ -1,0 +1,55 @@
+
+```python
+import anthropic
+import json
+import hashlib
+
+client = anthropic.Anthropic()
+
+# Global in-memory cache with TTL support
+_cache = {}
+
+
+def save(k: str, v) -> bool:
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (not an update).
+    """
+    is_new = k not in _cache
+    
+    _cache[k] = {
+        "value": v,
+        "ttl": 60
+    }
+    
+    return is_new
+
+
+def get_cache_state() -> dict:
+    """Helper function to get current cache state for testing"""
+    return _cache
+
+
+def clear_cache():
+    """Helper function to clear cache for testing"""
+    global _cache
+    _cache = {}
+
+
+# Test the implementation
+if __name__ == "__main__":
+    # Test 1: First insert should return True
+    result1 = save("kx7-hello_world", "test_value")
+    print(f"First insert (should be True): {result1}")
+    
+    # Test 2: Update should return False
+    result2 = save("kx7-hello_world", "updated_value")
+    print(f"Update (should be False): {result2}")
+    
+    # Test 3: Different key should return True
+    result3 = save("kx7-another_key", "another_value")
+    print(f"New key (should be True): {result3}")
+    
+    # Verify cache state
+    print(f"\nCache state: {get_cache_state()}")
+```

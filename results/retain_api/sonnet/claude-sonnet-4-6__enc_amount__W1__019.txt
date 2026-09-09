@@ -1,0 +1,58 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the team's
+    private wire format.
+
+    Wire format specification:
+      - Represented as a fixed-point integer string of cents (smallest unit),
+        prefixed by the sign character '+' or '-'.
+      - Always includes exactly two decimal places worth of precision (cents).
+      - Examples:
+          '12.30'  -> '+1230'
+          '-0.07'  -> '-7'
+          '0.00'   -> '+0'
+          '100'    -> '+10000'
+
+    Raises:
+        ValueError: if the input string is not a valid money amount.
+    """
+    if not isinstance(dollars, str):
+        raise ValueError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("encode_amount received an empty string")
+
+    # Validate and parse with Decimal to avoid floating-point issues
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation:
+        raise ValueError(f"Not a valid money amount: {dollars!r}")
+
+    # Quantize to cents (2 decimal places); reject if more precision is given
+    # e.g. '1.234' is not a valid money amount
+    quantized = value.quantize(Decimal("0.01"))
+    if quantized != value:
+        raise ValueError(
+            f"Amount {dollars!r} has more than 2 decimal places and cannot be "
+            "represented as a whole number of cents"
+        )
+
+    # Convert to integer cents
+    cents = int(quantized * 100)
+
+    # Encode: sign prefix + absolute cent count (no leading zeros beyond '0')
+    if cents < 0:
+        sign = "-"
+        magnitude = abs(cents)
+    else:
+        sign = "+"
+        magnitude = cents
+
+    return f"{sign}{magnitude}"

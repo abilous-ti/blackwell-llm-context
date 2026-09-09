@@ -1,0 +1,3 @@
+def transfer(acct, cents, reason):
+    """Transfer cents to account, using reason as memo."""
+    return ledger.post(acct, cents, memo=reason)

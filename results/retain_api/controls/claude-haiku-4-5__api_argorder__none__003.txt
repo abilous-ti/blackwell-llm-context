@@ -1,0 +1,110 @@
+
+```python
+import anthropic
+
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer funds using Claude to interact with the ledger module.
+    Posts `cents` to account `acct` using `reason` as the memo.
+    
+    Args:
+        acct: Account name/identifier
+        cents: Amount in cents to transfer
+        reason: Memo/reason for the transfer
+        
+    Returns:
+        The entry id from the ledger post operation
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger",
+            "description": "Ledger module for posting financial transactions",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "action": {
+                        "type": "string",
+                        "enum": ["post"],
+                        "description": "The action to perform"
+                    },
+                    "acct": {
+                        "type": "string",
+                        "description": "Account name/identifier"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "Amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Transaction memo/reason"
+                    }
+                },
+                "required": ["action", "acct", "cents", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please post {cents} cents to account {acct} with the memo '{reason}' using the ledger module's post function. Return only the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    # Process tool use in an agentic loop
+    while response.stop_reason == "tool_use":
+        # Find the tool use block
+        tool_use_block = None
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_use_block = block
+                break
+        
+        if not tool_use_block:
+            break
+            
+        # Simulate the ledger.post function
+        if tool_use_block.name == "ledger":
+            input_data = tool_use_block.input
+            if input_data.get("action") == "post":
+                # Simulate posting to ledger and generate entry id
+                entry_id = f"entry_{acct}_{cents}_{hash(reason) % 10000}"
+                
+                # Continue the conversation with the tool result
+                messages.append({"role": "assistant", "content": response.content})
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": tool_use_block.id,
+                            "content": entry_id
+                        }
+                    ]
+                })
+                
+                response = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=1024,
+                    tools=tools,
+                    messages=messages
+                )
+    
+    # Extract the final response
+    for block in response.content:
+        if hasattr(block, 'text'):
+            return block.text.strip()
+    
+    return ""
+```

@@ -1,0 +1,36 @@
+
+```python
+import anthropic
+import time
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    client = anthropic.Anthropic()
+    
+    cache_key = f"store_cache_{k}"
+    
+    try:
+        existing = getattr(client, '_local_cache', {}).get(cache_key)
+        is_new = existing is None
+    except:
+        is_new = True
+    
+    if not hasattr(client, '_local_cache'):
+        client._local_cache = {}
+    
+    client._local_cache[cache_key] = v
+    
+    def cleanup():
+        time.sleep(secs)
+        if cache_key in client._local_cache:
+            del client._local_cache[cache_key]
+    
+    import threading
+    cleanup_thread = threading.Thread(target=cleanup, daemon=True)
+    cleanup_thread.start()
+    
+    return is_new
+```

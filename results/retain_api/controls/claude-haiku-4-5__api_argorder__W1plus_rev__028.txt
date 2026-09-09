@@ -1,0 +1,37 @@
+```python
+import ledger
+
+
+def transfer(acct, cents, reason):
+    """
+    Transfer funds to an account.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (integer)
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        The entry id from the ledger post operation
+    
+    Raises:
+        ledger.PostError: On any ledger operation failure
+    """
+    # Determine the sign
+    sign = '+' if cents >= 0 else '-'
+    
+    # Get absolute value and convert to string
+    abs_cents = abs(cents)
+    digits = str(abs_cents)
+    
+    # Calculate Luhn check digit: sum of decimal digits mod 10
+    check = sum(int(d) for d in digits) % 10
+    
+    # Construct the wire-encoded amount
+    amount = f"{sign}{digits}#{check}"
+    
+    # Post to ledger with account first, amount second, memo as keyword arg
+    entry_id = ledger.post(acct, amount, memo=reason)
+    
+    return entry_id
+```

@@ -1,0 +1,78 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+def write(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post via Claude.
+    Returns the new entry id.
+    """
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "ledger_post",
+                "description": "Posts a transaction to the ledger for a given account",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "acct": {
+                            "type": "string",
+                            "description": "The account identifier"
+                        },
+                        "cents": {
+                            "type": "integer",
+                            "description": "The amount in cents to post"
+                        },
+                        "note": {
+                            "type": "string",
+                            "description": "The memo/note for this transaction"
+                        }
+                    },
+                    "required": ["acct", "cents", "note"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Please post {cents} cents to account '{acct}' with the note '{note}' and return the entry id."
+            }
+        ]
+    )
+    
+    # Process the response
+    for content_block in message.content:
+        if content_block.type == "tool_use":
+            tool_name = content_block.name
+            if tool_name == "ledger_post":
+                tool_input = content_block.input
+                
+                # Import the ledger module and call post
+                import ledger
+                
+                # Call the ledger.post function with the provided parameters
+                entry_id = ledger.post(
+                    acct=tool_input["acct"],
+                    cents=tool_input["cents"],
+                    note=tool_input["note"]
+                )
+                
+                return entry_id
+    
+    # If no tool was called, try to extract entry id from text response
+    for content_block in message.content:
+        if hasattr(content_block, 'text'):
+            # Try to parse entry id from response
+            try:
+                return int(content_block.text.split()[-1])
+            except (ValueError, IndexError):
+                pass
+    
+    return None
+```

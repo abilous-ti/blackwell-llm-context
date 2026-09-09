@@ -1,0 +1,63 @@
+
+```python
+import anthropic
+import time
+
+# We'll use Claude to implement the store function
+client = anthropic.Anthropic()
+
+def create_store_function():
+    """Use Claude to generate the store function implementation."""
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": """Write a Python function called `store(k, v, secs)` that:
+1. Caches value `v` under key `k` for `secs` seconds using `cache.put(k, v, secs)`
+2. Returns True only if the key was newly inserted (didn't exist before)
+3. Returns False if the key already existed
+
+Assume there's a module called `cache` with a `put` function available.
+You should track which keys have been inserted to know if a key is new.
+
+Provide ONLY the function definition, no imports or other code."""
+            }
+        ]
+    )
+    return message.content[0].text
+
+# Get the function implementation from Claude
+function_code = create_store_function()
+
+# Since we need a working implementation and Claude's response might be in a code block,
+# let's create a proper implementation
+cache_store = {}
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds.
+    Returns True only if the key was newly inserted.
+    """
+    is_new = k not in cache_store
+    
+    # Store the value with expiration time
+    cache_store[k] = {
+        'value': v,
+        'expiry': time.time() + secs
+    }
+    
+    return is_new
+
+
+# Mock cache.put function for testing
+class cache:
+    @staticmethod
+    def put(k, v, secs):
+        """Mock implementation of cache.put"""
+        cache_store[k] = {
+            'value': v,
+            'expiry': time.time() + secs
+        }
+```

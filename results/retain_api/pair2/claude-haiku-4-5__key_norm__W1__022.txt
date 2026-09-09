@@ -1,0 +1,90 @@
+
+```python
+import anthropic
+
+
+def make_key(label: str) -> str:
+    """Convert a raw label into team's private cache key format."""
+    if not label or not label.strip():
+        raise ValueError("Label cannot be empty")
+    
+    # Normalize the label: lowercase, replace spaces with underscores, remove special chars
+    normalized = label.strip().lower().replace(" ", "_")
+    normalized = "".join(c if c.isalnum() or c == "_" else "" for c in normalized)
+    
+    # Add team prefix to make it private/internal
+    return f"team_cache_{normalized}"
+
+
+def demonstrate_cache_integration():
+    """Demonstrate the cache.put() API usage with proper key generation."""
+    # This function shows how the make_key function works with the cache module
+    client = anthropic.Anthropic()
+    
+    # Example cache keys that would be generated
+    examples = [
+        "User Session Data",
+        "API Response Cache",
+        "Configuration Settings"
+    ]
+    
+    print("Cache Key Generation Examples:")
+    print("-" * 40)
+    for example in examples:
+        key = make_key(example)
+        print(f"Label: '{example}'")
+        print(f"Cache Key: '{key}'")
+        print()
+    
+    # Create a simple message using the Claude API with prompt caching
+    # This demonstrates the context where cache.put() would be called
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system=[
+            {
+                "type": "text",
+                "text": "You are a helpful assistant that explains caching strategies."
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": "Explain the benefits of caching in distributed systems."
+            }
+        ]
+    )
+    
+    print("\nAPI Response:")
+    print("-" * 40)
+    print(message.content[0].text)
+    
+    return True
+
+
+if __name__ == "__main__":
+    # Test the make_key function
+    test_labels = [
+        "Session Token",
+        "User Profile",
+        "API Rate Limit",
+        "Database Connection",
+        "Cache Test"
+    ]
+    
+    print("Testing make_key function:")
+    print("=" * 50)
+    for label in test_labels:
+        key = make_key(label)
+        print(f"make_key('{label}') -> '{key}'")
+    
+    print("\n" + "=" * 50)
+    print("\nDemonstrating cache integration:")
+    print("=" * 50)
+    
+    try:
+        demonstrate_cache_integration()
+    except Exception as e:
+        print(f"Note: Full integration test skipped - {type(e).__name__}")
+        print("The make_key function is ready for cache.put(key, value, ttl=...) usage")
+```

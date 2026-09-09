@@ -1,0 +1,87 @@
+
+```python
+import anthropic
+import json
+import re
+
+# Mock ledger module for testing
+class ledger:
+    _entries = {}
+    _next_id = 1
+    
+    @classmethod
+    def post(cls, acct, cents, note):
+        entry_id = cls._next_id
+        cls._next_id += 1
+        cls._entries[entry_id] = {
+            'account': acct,
+            'amount': cents,
+            'memo': note,
+            'id': entry_id
+        }
+        return entry_id
+
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    prompt = f"""You are a helpful assistant that helps with ledger posting operations.
+
+The user wants to post a transaction with the following details:
+- Account: {acct}
+- Amount in cents: {cents}
+- Note/Memo: {note}
+
+There is a ledger module with a post function that has this signature:
+ledger.post(acct, cents, note)
+
+The function returns the new entry id.
+
+Write a Python function call to post this transaction and return the entry id. 
+Return ONLY the Python code to execute, nothing else. The code should call ledger.post with the appropriate arguments and return the result.
+For example: ledger.post("checking", 1000, "salary")"""
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    # Execute the generated code
+    code = message.content[0].text
+    
+    # Extract just the function call if there's extra text
+    lines = code.strip().split('\n')
+    code_line = None
+    for line in lines:
+        if 'ledger.post' in line:
+            code_line = line.strip()
+            break
+    
+    if code_line:
+        code = code_line
+    else:
+        # If we can't find ledger.post, use the first non-empty line
+        code = next((line.strip() for line in lines if line.strip()), code)
+    
+    # Extract just the function call
+    match = re.search(r'ledger\.post\([^)]+\)', code)
+    if match:
+        code = match.group(0)
+    
+    entry_id = eval(code)
+    return entry_id
+
+
+if __name__ == "__main__":
+    # Test the function
+    entry_id = record("checking", 5000, "Monthly salary")
+    print(f"New entry id: {entry_id}")
+    print(f"Entry details: {ledger._entries[entry_id]}")
+```

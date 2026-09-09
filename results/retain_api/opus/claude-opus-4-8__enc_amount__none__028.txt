@@ -1,0 +1,79 @@
+I'll analyze this problem. Since no specific wire format is described, I need to make reasonable assumptions about a "private wire format" for money amounts.
+
+I'll create a sensible, well-documented format that serializes money by converting to integer cents with a sign marker, which is a common approach to avoid floating-point issues.
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string to this team's private wire format.
+
+    The wire format encodes the value as signed integer cents in the form:
+
+        <sign>C<cents>
+
+    where:
+      - <sign> is 'P' for positive/zero or 'N' for negative
+      - 'C' is a literal separator marking the cents payload
+      - <cents> is the absolute value of the amount expressed in whole cents
+
+    Examples:
+      '12.30'  -> 'PC1230'
+      '-0.07'  -> 'NC7'
+      '0.00'   -> 'PC0'
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("amount must not be empty")
+
+    # Determine sign.
+    negative = False
+    if s[0] in "+-":
+        negative = s[0] == "-"
+        s = s[1:]
+
+    if not s:
+        raise ValueError("amount has no digits")
+
+    # Split into integer and fractional parts.
+    if "." in s:
+        int_part, frac_part = s.split(".", 1)
+        if "." in frac_part:
+            raise ValueError("invalid amount: multiple decimal points")
+    else:
+        int_part, frac_part = s, ""
+
+    if int_part == "":
+        int_part = "0"
+
+    if not int_part.isdigit():
+        raise ValueError("invalid integer part: %r" % int_part)
+    if frac_part and not frac_part.isdigit():
+        raise ValueError("invalid fractional part: %r" % frac_part)
+
+    # Normalize fractional part to exactly two digits (cents).
+    if len(frac_part) == 0:
+        cents_frac = 0
+    elif len(frac_part) == 1:
+        cents_frac = int(frac_part) * 10
+    elif len(frac_part) == 2:
+        cents_frac = int(frac_part)
+    else:
+        # More than two decimal places: round half up to the nearest cent.
+        keep = frac_part[:2]
+        next_digit = frac_part[2]
+        cents_frac = int(keep)
+        if next_digit >= "5":
+            cents_frac += 1
+
+    total_cents = int(int_part) * 100 + cents_frac
+
+    # Handle rounding overflow (e.g. '0.999' -> 100 cents) already covered
+    # since cents_frac can become 100 and total_cents accounts for it.
+
+    # Zero is always encoded as positive to keep a canonical representation.
+    if total_cents == 0:
+        negative = False
+
+    sign = "N" if negative else "P"
+    return "%sC%d" % (sign, total_cents)

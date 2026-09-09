@@ -1,0 +1,108 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Simulated ledger module for demonstration
+class ledger:
+    _entries = {}
+    _next_id = 1
+    
+    @staticmethod
+    def post(acct, cents, note):
+        """Post a transaction and return the entry ID"""
+        entry_id = ledger._next_id
+        ledger._entries[entry_id] = {
+            'account': acct,
+            'cents': cents,
+            'note': note
+        }
+        ledger._next_id += 1
+        return entry_id
+
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post
+    and RETURNS the new entry id.
+    """
+    # Call the ledger.post function with the provided parameters
+    entry_id = ledger.post(acct, cents, note)
+    return entry_id
+
+
+def main():
+    """Test the record function with Claude"""
+    
+    # Test the record function directly
+    print("Testing record function directly:")
+    entry_id = record("checking", 10050, "Salary deposit")
+    print(f"Posted entry with ID: {entry_id}")
+    
+    entry_id2 = record("savings", 5000, "Monthly savings")
+    print(f"Posted entry with ID: {entry_id2}")
+    
+    # Use Claude to understand and verify the function
+    conversation_history = []
+    
+    # First message
+    user_message = "I have a Python function that records transactions in a ledger. The function should post cents to an account with a memo note and return the new entry ID. Can you help me understand how this works?"
+    conversation_history.append({
+        "role": "user",
+        "content": user_message
+    })
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=conversation_history
+    )
+    
+    assistant_message = response.content[0].text
+    conversation_history.append({
+        "role": "assistant",
+        "content": assistant_message
+    })
+    
+    print(f"\nClaude's response:\n{assistant_message}")
+    
+    # Second turn - ask Claude to verify the implementation
+    user_message2 = f"""
+    Here's my implementation:
+    
+    def record(acct, cents, note):
+        entry_id = ledger.post(acct, cents, note)
+        return entry_id
+    
+    I just tested it with these calls:
+    - record("checking", 10050, "Salary deposit") returned {entry_id}
+    - record("savings", 5000, "Monthly savings") returned {entry_id2}
+    
+    Does this look correct?
+    """
+    
+    conversation_history.append({
+        "role": "user",
+        "content": user_message2
+    })
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=conversation_history
+    )
+    
+    assistant_message2 = response.content[0].text
+    conversation_history.append({
+        "role": "assistant",
+        "content": assistant_message2
+    })
+    
+    print(f"\nClaude's verification:\n{assistant_message2}")
+
+
+if __name__ == "__main__":
+    main()
+```

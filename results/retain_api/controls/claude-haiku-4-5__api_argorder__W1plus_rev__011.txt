@@ -1,0 +1,42 @@
+```python
+import ledger
+
+
+def transfer(acct, cents, reason):
+    """Transfer cents to account with reason as memo.
+    
+    Args:
+        acct: Account identifier string
+        cents: Amount in minor units (integer cents)
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        The new entry id (>=1) on success
+    
+    Raises:
+        ledger.PostError: On invalid account, malformed amount, or other failures
+    """
+    # Encode the amount as a wire-format string
+    # Format: <sign><digits>#<check>
+    # where check = (sum of decimal digits in <digits>) mod 10
+    
+    if cents >= 0:
+        sign = '+'
+        digits_str = str(cents)
+    else:
+        sign = '-'
+        digits_str = str(-cents)
+    
+    # Calculate Luhn-style check digit
+    digit_sum = sum(int(d) for d in digits_str)
+    check = digit_sum % 10
+    
+    # Format: sign + digits + # + check
+    amount = f"{sign}{digits_str}#{check}"
+    
+    # Call ledger.post with account first, amount second (positional),
+    # and memo as required keyword-only argument
+    entry_id = ledger.post(acct, amount, memo=reason)
+    
+    return entry_id
+```

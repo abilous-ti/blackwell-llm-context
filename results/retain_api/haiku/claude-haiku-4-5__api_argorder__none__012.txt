@@ -1,0 +1,89 @@
+
+```python
+import anthropic
+import json
+import re
+
+client = anthropic.Anthropic()
+
+# Define the ledger tools
+ledger_tools = [
+    {
+        "name": "ledger_post",
+        "description": "Posts a transaction to the ledger. Returns the entry ID.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "description": "The account to post to"
+                },
+                "cents": {
+                    "type": "integer",
+                    "description": "The amount in cents"
+                },
+                "memo": {
+                    "type": "string",
+                    "description": "The memo for the transaction"
+                }
+            },
+            "required": ["account", "cents", "memo"]
+        }
+    }
+]
+
+def transfer(acct, cents, reason):
+    """Transfer cents to account acct using reason as the memo, returning the entry id."""
+    
+    # Use Claude to call the ledger_post tool
+    prompt = f"Post {cents} cents to account '{acct}' with memo '{reason}'. Return only the entry ID."
+    
+    messages = [
+        {"role": "user", "content": prompt}
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=ledger_tools,
+        messages=messages
+    )
+    
+    # Process the response
+    entry_id = None
+    
+    # Check if Claude wants to use the tool
+    if response.stop_reason == "tool_use":
+        for block in response.content:
+            if block.type == "tool_use" and block.name == "ledger_post":
+                tool_input = block.input
+                # Simulate the ledger post operation
+                entry_id = simulate_ledger_post(tool_input["account"], tool_input["cents"], tool_input["memo"])
+    
+    # Try to extract entry ID from the response text
+    if entry_id is None:
+        for block in response.content:
+            if hasattr(block, 'text'):
+                text = block.text
+                # Look for patterns like "entry id: 123" or just a number
+                match = re.search(r'(?:entry\s+)?(?:id[:\s]+)?(\d+)', text, re.IGNORECASE)
+                if match:
+                    entry_id = match.group(1)
+                    break
+    
+    return entry_id
+
+def simulate_ledger_post(account, cents, memo):
+    """Simulate posting to the ledger and return an entry ID."""
+    # For demonstration, generate a simple entry ID based on the inputs
+    import hashlib
+    combined = f"{account}{cents}{memo}".encode()
+    hash_digest = hashlib.md5(combined).hexdigest()
+    entry_id = int(hash_digest[:8], 16) % 1000000
+    return str(entry_id)
+
+if __name__ == "__main__":
+    # Test the transfer function
+    entry_id = transfer("checking", 5000, "Monthly salary")
+    print(f"Entry ID: {entry_id}")
+```

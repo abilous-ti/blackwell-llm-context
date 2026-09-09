@@ -1,0 +1,22 @@
+import ledger
+
+def transfer(acct, cents, reason):
+    # Convert cents to encoded string format
+    # Format: <sign><digits>#<check>
+    # where check = sum of decimal digits mod 10
+    
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits_str = str(abs_cents)
+    
+    # Calculate Luhn-style check digit
+    digit_sum = sum(int(d) for d in digits_str)
+    check = digit_sum % 10
+    
+    # Construct encoded amount
+    encoded_amount = f"{sign}{digits_str}#{check}"
+    
+    # Post to ledger
+    entry_id = ledger.post(acct, encoded_amount, reason)
+    
+    return entry_id

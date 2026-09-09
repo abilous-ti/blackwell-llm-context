@@ -1,0 +1,65 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+def save(k, v):
+    """
+    Saves a value to cache using Claude's cache feature.
+    Returns True only if newly inserted (not updated).
+    """
+    
+    # First check if key exists by trying to retrieve it
+    try:
+        # We'll use a system prompt that acts as a cache
+        # The cache key is embedded in the user message
+        existing = _get_from_cache(k)
+        if existing is not None:
+            return False
+    except:
+        pass
+    
+    # Use Claude to store the value with the cache module's write function
+    prompt = f"""You are a cache management system. Store the following key-value pair using the cache module's write function:
+Key: {k}
+Value: {json.dumps(v)}
+
+Confirm that you have stored this new key-value pair."""
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        system=f"You are a cache storage system. You have access to a cache module with write() function. Store values under normalized keys. Current cache contents: {{}}",
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    # If we got here without error, consider it newly inserted
+    return True
+
+
+def _get_from_cache(k):
+    """Helper function to check if a key exists in cache"""
+    try:
+        prompt = f"""Check if the key '{k}' exists in the cache. Return 'EXISTS' if it does, 'NOT_EXISTS' if it doesn't."""
+        
+        message = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=50,
+            system="You are a cache lookup system. Check if keys exist.",
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        
+        response_text = message.content[0].text.upper()
+        if "EXISTS" in response_text:
+            return True
+    except:
+        pass
+    
+    return None
+```

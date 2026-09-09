@@ -1,0 +1,54 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """Encode a dollar amount to the team's private wire format.
+    
+    Format: <sign><digits>#<check>
+    - <sign>: '+' or '-'
+    - <digits>: amount in minor units (cents) as integer
+    - <check>: (sum of decimal digits in <digits>) mod 10
+    
+    Example: '12.30' -> '+1230#6', '-0.07' -> '-7#7'
+    """
+    # Remove leading/trailing whitespace
+    dollars = dollars.strip()
+    
+    # Determine sign
+    if dollars.startswith('-'):
+        sign = '-'
+        dollars = dollars[1:]
+    elif dollars.startswith('+'):
+        sign = '+'
+        dollars = dollars[1:]
+    else:
+        sign = '+'
+    
+    # Handle the amount
+    # Split by decimal point
+    if '.' in dollars:
+        parts = dollars.split('.')
+        if len(parts) != 2:
+            raise ValueError(f"Invalid amount format: {dollars}")
+        whole, frac = parts
+    else:
+        whole = dollars
+        frac = ''
+    
+    # Remove leading zeros from whole part, but keep at least one digit
+    whole = whole.lstrip('0') or '0'
+    
+    # Pad or truncate fractional part to exactly 2 digits
+    frac = (frac + '00')[:2]
+    
+    # Combine to get cents as integer string
+    cents_str = whole + frac
+    cents_int = int(cents_str)
+    
+    # Convert back to string without leading zeros (except for '0')
+    digits = str(cents_int)
+    
+    # Calculate check digit: sum of decimal digits mod 10
+    check = sum(int(d) for d in digits) % 10
+    
+    return f"{sign}{digits}#{check}"
+```

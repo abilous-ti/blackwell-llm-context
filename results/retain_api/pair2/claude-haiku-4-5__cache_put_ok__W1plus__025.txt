@@ -1,0 +1,21 @@
+import cache
+
+def store(k, v, secs):
+    normalized_key = 'kx7-' + ''.join(c.lower() if c.isalnum() else '_' for c in k).strip('_')
+    normalized_key = 'kx7-' + '_'.join(filter(None, ''.join(c.lower() if c.isalnum() else '_' for c in k).split('_')))
+    
+    parts = []
+    current = []
+    for c in k.lower():
+        if c.isalnum():
+            current.append(c)
+        else:
+            if current:
+                parts.append(''.join(current))
+                current = []
+    if current:
+        parts.append(''.join(current))
+    
+    normalized_key = 'kx7-' + '_'.join(parts)
+    
+    return cache.put(normalized_key, v, ttl=secs)

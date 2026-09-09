@@ -1,0 +1,60 @@
+
+```python
+import anthropic
+import time
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# This is a simple in-memory cache with TTL
+cache_storage = {}
+
+def put(k, v, secs):
+    """Mock cache.put function that stores a value with TTL"""
+    global cache_storage
+    is_new = k not in cache_storage
+    cache_storage[k] = {
+        'value': v,
+        'expires_at': time.time() + secs
+    }
+    return is_new
+
+def store(k, v, secs):
+    """Cache value v under key k for secs seconds using cache.put, returns True if key was newly inserted"""
+    
+    # Check if key already exists and hasn't expired
+    if k in cache_storage:
+        if cache_storage[k]['expires_at'] > time.time():
+            # Key exists and hasn't expired, so it's not a new insertion
+            cache_storage[k] = {
+                'value': v,
+                'expires_at': time.time() + secs
+            }
+            return False
+    
+    # Key doesn't exist or has expired, so this is a new insertion
+    result = put(k, v, secs)
+    return result
+
+# Test the implementation
+if __name__ == "__main__":
+    # Test case 1: First insertion should return True
+    result1 = store("key1", "value1", 10)
+    print(f"First insertion of key1: {result1}")  # Should be True
+    
+    # Test case 2: Second insertion of same key should return False
+    result2 = store("key1", "value2", 10)
+    print(f"Second insertion of key1: {result2}")  # Should be False
+    
+    # Test case 3: Different key should return True
+    result3 = store("key2", "value3", 10)
+    print(f"First insertion of key2: {result3}")  # Should be True
+    
+    # Test case 4: Wait for expiration and re-insert
+    result4 = store("key3", "value4", 1)
+    print(f"First insertion of key3: {result4}")  # Should be True
+    time.sleep(1.1)
+    result5 = store("key3", "value5", 10)
+    print(f"After expiration, re-insert key3: {result5}")  # Should be True
+```

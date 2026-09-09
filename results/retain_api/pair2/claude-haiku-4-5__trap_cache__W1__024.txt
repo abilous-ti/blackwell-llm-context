@@ -1,0 +1,6 @@
+```python
+import cache
+
+def save(k, v):
+    return cache.put(k, v, ttl=60)
+```

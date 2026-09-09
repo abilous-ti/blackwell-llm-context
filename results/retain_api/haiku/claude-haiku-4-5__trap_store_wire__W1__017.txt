@@ -1,0 +1,8 @@
+```python
+import ledger
+
+
+def store(acct, wire):
+    """Post a wire-encoded amount to an account and return the new entry id."""
+    return ledger.post(acct, wire, memo='wire')
+```

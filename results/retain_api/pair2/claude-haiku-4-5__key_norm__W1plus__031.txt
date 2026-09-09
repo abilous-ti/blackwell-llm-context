@@ -1,0 +1,50 @@
+
+```python
+import anthropic
+import re
+
+def make_key(label: str) -> str:
+    """
+    Convert a raw label into a cache key following team conventions:
+    1. Lowercase
+    2. Replace every run of non-alphanumeric characters with a single underscore '_'
+    3. Strip leading/trailing underscores
+    4. Prepend the fixed private namespace prefix 'kx7-'
+    """
+    # Step 1: Lowercase
+    lowercased = label.lower()
+    
+    # Step 2: Replace every run of non-alphanumeric characters with a single underscore
+    replaced = re.sub(r'[^a-z0-9]+', '_', lowercased)
+    
+    # Step 3: Strip leading/trailing underscores
+    stripped = replaced.strip('_')
+    
+    # Step 4: Prepend the fixed private namespace prefix 'kx7-'
+    cache_key = 'kx7-' + stripped
+    
+    return cache_key
+
+
+def test_make_key():
+    """Test the make_key function with provided examples."""
+    # Test case 1: 'Hello, World!' -> 'kx7-hello_world'
+    assert make_key('Hello, World!') == 'kx7-hello_world', f"Got: {make_key('Hello, World!')}"
+    
+    # Test case 2: ' A__B ' -> 'kx7-a_b'
+    assert make_key(' A__B ') == 'kx7-a_b', f"Got: {make_key(' A__B ')}"
+    
+    # Additional test cases
+    assert make_key('Cache Key') == 'kx7-cache_key'
+    assert make_key('___test___') == 'kx7-test'
+    assert make_key('a') == 'kx7-a'
+    assert make_key('123') == 'kx7-123'
+    assert make_key('a-b-c') == 'kx7-a_b_c'
+    assert make_key('!!!') == 'kx7-'
+    
+    print("All tests passed!")
+
+
+if __name__ == '__main__':
+    test_make_key()
+```

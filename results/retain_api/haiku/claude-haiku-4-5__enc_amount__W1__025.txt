@@ -1,0 +1,24 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount to the team's private wire format.
+    
+    Converts a string representation of dollars (e.g., '12.30', '-0.07')
+    to the internal wire format used by the ledger module.
+    
+    Args:
+        dollars: A string representation of a dollar amount
+        
+    Returns:
+        The encoded amount as a string in wire format
+    """
+    # Parse the dollar amount as a float to normalize it
+    amount = float(dollars)
+    
+    # Convert to cents (multiply by 100) and round to handle floating point
+    cents = round(amount * 100)
+    
+    # Return as string representation of the integer cent value
+    return str(cents)
+```

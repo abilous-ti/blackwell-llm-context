@@ -1,0 +1,61 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Define the ledger module functions
+class ledger:
+    _entries = {}
+    _next_id = 1
+    
+    @staticmethod
+    def post(acct, cents, note):
+        """Post a transaction to the ledger and return the entry id"""
+        entry_id = ledger._next_id
+        ledger._entries[entry_id] = {
+            'account': acct,
+            'cents': cents,
+            'note': note,
+            'id': entry_id
+        }
+        ledger._next_id += 1
+        return entry_id
+
+
+def record(acct, cents, note):
+    """
+    Write record to ledger by posting cents to account acct with memo note.
+    Returns the new entry id.
+    """
+    # Use Claude to help understand and execute the ledger operation
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""I need to post a ledger entry with these details:
+- Account: {acct}
+- Amount in cents: {cents}
+- Note/memo: {note}
+
+Please confirm I should use the ledger.post function to record this transaction and return the entry id. 
+Just respond with 'confirmed' if this is correct."""
+            }
+        ]
+    )
+    
+    # Execute the ledger.post operation
+    entry_id = ledger.post(acct, cents, note)
+    
+    return entry_id
+
+
+if __name__ == "__main__":
+    # Test the record function
+    test_id = record("checking", 10050, "Salary deposit")
+    print(f"New entry ID: {test_id}")
+    print(f"Entry details: {ledger._entries[test_id]}")
+```

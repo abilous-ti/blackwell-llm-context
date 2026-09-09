@@ -1,0 +1,29 @@
+I'll analyze this task. The key constraint is that the wire string is ALREADY encoded—I should pass it through as-is without decoding or re-encoding.
+
+However, I don't have visibility into the actual `ledger` module's `write` function signature. Let me write a reasonable implementation based on the description, using a common signature convention.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    """
+    Post an ALREADY wire-encoded amount string to an account.
+
+    The `wire` argument (e.g. '+1230#6') is already serialized. We pass it
+    through to the ledger unchanged -- no decoding, no re-encoding.
+
+    Returns the new entry id from the ledger write.
+    """
+    return ledger.write(acct, wire, 'wire')
+```
+
+I need to make a few assumptions here since I cannot inspect the `ledger` module directly:
+
+1. **The wire string is passed through verbatim** — this is the central requirement. I do not call any parse/decode/encode/format function on it.
+2. **The `write` signature** — I've assumed `write(account, amount, memo)`. This is the most natural argument ordering given the phrasing "posts... to account `acct` (memo 'wire')".
+3. **Return value** — `write` is assumed to return the new entry id, which I return directly.
+
+If the actual `ledger.write` uses keyword arguments or a different ordering (e.g., `write(acct, amount=..., memo=...)`), the call would need adjustment, but the critical invariant—not touching `wire`—is preserved.
+
+Given only this description, this is my best-supported implementation.

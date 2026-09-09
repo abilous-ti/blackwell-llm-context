@@ -1,0 +1,64 @@
+
+```python
+import anthropic
+
+def make_key(label: str) -> str:
+    """Convert a raw label into the team's private cache key format."""
+    # Step 1: Lowercase
+    lowercased = label.lower()
+    
+    # Step 2: Replace every run of non-alphanumeric characters with a single underscore
+    result = ""
+    prev_was_non_alnum = False
+    for char in lowercased:
+        if char.isalnum():
+            result += char
+            prev_was_non_alnum = False
+        else:
+            if not prev_was_non_alnum:
+                result += "_"
+                prev_was_non_alnum = True
+    
+    # Step 3: Strip leading/trailing underscores
+    result = result.strip("_")
+    
+    # Step 4: Prepend the fixed private namespace prefix
+    result = "kx7-" + result
+    
+    return result
+
+
+def demonstrate_cache_api():
+    """Demonstrate the team's cache module API contract."""
+    client = anthropic.Anthropic()
+    
+    # Test examples from the context
+    test_cases = [
+        ("Hello, World!", "kx7-hello_world"),
+        (" A__B ", "kx7-a_b"),
+        ("Cache-Key-Format", "kx7-cache_key_format"),
+        ("TEST_123", "kx7-test_123"),
+    ]
+    
+    print("Cache Key Normalization Examples:")
+    print("-" * 50)
+    
+    for label, expected in test_cases:
+        result = make_key(label)
+        status = "✓" if result == expected else "✗"
+        print(f"{status} '{label}' -> '{result}'")
+        if result != expected:
+            print(f"  Expected: '{expected}'")
+    
+    print("\n" + "-" * 50)
+    print("API Contract Summary:")
+    print("- cache.put(key: str, value, *, ttl: int)")
+    print("- 'key' is FIRST, 'value' is SECOND (positional)")
+    print("- 'ttl' is REQUIRED keyword-only argument (seconds)")
+    print("- Returns True if NEWLY inserted, False if REPLACED")
+    print("- Raises cache.CacheError on empty key")
+
+
+if __name__ == "__main__":
+    demonstrate_cache_api()
+```

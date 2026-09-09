@@ -1,0 +1,110 @@
+
+```python
+import anthropic
+import json
+import hashlib
+from datetime import datetime, timedelta
+
+# In-memory cache storage
+_cache_store = {}
+
+def save(k, v):
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (key didn't exist before).
+    
+    Args:
+        k: Already-normalized cache key string (e.g., 'kx7-hello_world')
+        v: Value to cache
+        
+    Returns:
+        True if newly inserted, False if key already existed
+    """
+    is_new = k not in _cache_store
+    
+    # Store the value with expiration time
+    expiration = datetime.now() + timedelta(seconds=60)
+    _cache_store[k] = {
+        'value': v,
+        'expires_at': expiration.isoformat()
+    }
+    
+    return is_new
+
+
+def _get_cached(k):
+    """
+    Retrieve a cached value if it exists and hasn't expired.
+    
+    Args:
+        k: Cache key
+        
+    Returns:
+        The cached value if found and not expired, None otherwise
+    """
+    if k not in _cache_store:
+        return None
+    
+    entry = _cache_store[k]
+    expires_at = datetime.fromisoformat(entry['expires_at'])
+    
+    # Check if expired
+    if datetime.now() > expires_at:
+        del _cache_store[k]
+        return None
+    
+    return entry['value']
+
+
+def _clear_expired():
+    """Clear all expired entries from the cache."""
+    now = datetime.now()
+    expired_keys = [
+        k for k, v in _cache_store.items()
+        if datetime.fromisoformat(v['expires_at']) <= now
+    ]
+    for k in expired_keys:
+        del _cache_store[k]
+
+
+# Example usage demonstrating the cache
+if __name__ == "__main__":
+    # Test the save function
+    result1 = save('kx7-hello_world', {'message': 'Hello, World!'})
+    print(f"First save (should be True): {result1}")
+    
+    result2 = save('kx7-hello_world', {'message': 'Updated'})
+    print(f"Second save with same key (should be False): {result2}")
+    
+    result3 = save('kx7-another_key', {'data': 'test'})
+    print(f"Save with different key (should be True): {result3}")
+    
+    # Verify retrieval
+    cached_value = _get_cached('kx7-hello_world')
+    print(f"Retrieved cached value: {cached_value}")
+    
+    # Test with Anthropic API
+    client = anthropic.Anthropic()
+    
+    # Example: cache a prompt and response
+    prompt = "What is 2 + 2?"
+    cache_key = 'kx7-math_question'
+    
+    # Check if we have a cached response
+    cached_response = _get_cached(cache_key)
+    if cached_response:
+        print(f"Using cached response: {cached_response}")
+    else:
+        # Make API call and cache the result
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=100,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        
+        result_text = response.content[0].text
+        was_new = save(cache_key, result_text)
+        print(f"Cached new response (was_new={was_new}): {result_text}")
+```

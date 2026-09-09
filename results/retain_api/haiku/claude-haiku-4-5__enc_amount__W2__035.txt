@@ -1,0 +1,54 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encode a monetary amount to team's wire format.
+    
+    Format: <sign><digits>#<check>
+    - sign: '+' or '-'
+    - digits: amount in MINOR UNITS (cents, as integer)
+    - check: Luhn-style digit = (sum of decimal digits) mod 10
+    
+    Examples:
+    - '12.30' -> '+1230#6'
+    - '-0.07' -> '-7#7'
+    """
+    # Determine sign
+    if dollars.startswith('-'):
+        sign = '-'
+        amount_str = dollars[1:]
+    else:
+        sign = '+'
+        amount_str = dollars.lstrip('+')
+    
+    # Parse dollars and cents
+    if '.' in amount_str:
+        dollar_part, cent_part = amount_str.split('.')
+        # Pad or truncate cents to 2 digits
+        cent_part = (cent_part + '00')[:2]
+    else:
+        dollar_part = amount_str
+        cent_part = '00'
+    
+    # Ensure dollar part is at least '0'
+    if not dollar_part:
+        dollar_part = '0'
+    
+    # Convert to cents (minor units)
+    cents = int(dollar_part) * 100 + int(cent_part)
+    digits = str(cents)
+    
+    # Calculate check digit: sum of all decimal digits mod 10
+    check_digit = sum(int(d) for d in digits) % 10
+    
+    return f"{sign}{digits}#{check_digit}"
+
+
+if __name__ == "__main__":
+    # Test cases from the problem
+    print(encode_amount('-0.07'))  # Should be '-7#7'
+    print(encode_amount('12.30'))  # Should be '+1230#6'
+    print(encode_amount('0.00'))   # Should be '+0#0'
+    print(encode_amount('-12.30')) # Should be '-1230#6'
+    print(encode_amount('100.00')) # Should be '+10000#1'
+```

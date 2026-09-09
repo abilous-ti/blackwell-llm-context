@@ -1,0 +1,45 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+def save(k, v):
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True if newly inserted, False if replaced.
+    
+    This function uses Claude to interact with the cache module API.
+    """
+    
+    # Create a prompt that will guide Claude to call the cache API correctly
+    prompt = f"""You are a Python code executor. Your task is to execute the following cache operation:
+
+Cache module API contract:
+- Call cache.put(key, value, *, ttl=seconds)
+- key is FIRST positional argument
+- value is SECOND positional argument
+- ttl is REQUIRED keyword-only argument (integer, in seconds)
+- put() returns True if key was newly inserted, False if replaced
+- On empty key, raises cache.CacheError
+
+Execute this cache operation:
+cache.put({repr(k)}, {repr(v)}, ttl=60)
+
+Return only the boolean result (True or False) of this cache operation."""
+
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    # Parse the response
+    result_text = response.content[0].text.strip().lower()
+    
+    # Return True if the response indicates a new insertion, False otherwise
+    return "true" in result_text
+```

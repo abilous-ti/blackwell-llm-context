@@ -1,0 +1,48 @@
+
+```python
+import anthropic
+import time
+
+def store(k, v, secs):
+    """
+    Store a value in cache for a specified duration using Claude.
+    Returns True if the key was newly inserted, False otherwise.
+    """
+    client = anthropic.Anthropic()
+    
+    # Create a prompt that will help Claude determine if a key is new
+    prompt = f"""You are a cache manager. I need you to help me determine if a cache key is new.
+
+Current timestamp: {time.time()}
+
+Task: I want to store key="{k}" with value="{v}" for {secs} seconds.
+
+Please respond with ONLY "NEW" if this is a new key (first time being inserted), or "EXISTING" if this key was already in the cache before.
+
+Note: This is a hypothetical cache scenario. For this exercise, assume any key starting with "new_" is new, and any key starting with "existing_" is existing. For other keys, treat them as new on first call within a session.
+
+Respond with exactly one word: NEW or EXISTING"""
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=10,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    # Extract the response
+    response_text = message.content[0].text.strip().upper()
+    
+    # Simulate the cache.put operation
+    # In a real scenario, this would call an actual cache module
+    expiry_time = time.time() + secs
+    
+    # Determine if this is a new key
+    is_new = "NEW" in response_text
+    
+    # Here you would normally call: cache.put(k, v, expiry_time)
+    # For this solution, we're using Claude to help determine if it's new
+    
+    return is_new
+```

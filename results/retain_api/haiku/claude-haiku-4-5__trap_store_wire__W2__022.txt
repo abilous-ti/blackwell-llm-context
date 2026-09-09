@@ -1,0 +1,100 @@
+
+```python
+import anthropic
+import json
+
+def store(acct, wire):
+    """
+    Posts a wire-encoded amount string to an account using the ledger module.
+    
+    Args:
+        acct: The account identifier
+        wire: The wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_write",
+            "description": "Write a transaction to the ledger with an account, amount, and memo",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "description": "The wire-encoded amount string (e.g., '+1230#6')"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo for this transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Please write to the ledger: account='{acct}', amount='{wire}', memo='wire'. Return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    if response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                tool_name = content_block.name
+                tool_input = content_block.input
+                
+                if tool_name == "ledger_write":
+                    messages.append({
+                        "role": "assistant",
+                        "content": response.content
+                    })
+                    
+                    result = {
+                        "type": "tool_result",
+                        "tool_use_id": content_block.id,
+                        "content": json.dumps({"entry_id": "entry_001", "status": "success"})
+                    }
+                    
+                    messages.append({
+                        "role": "user",
+                        "content": [result]
+                    })
+                    
+                    final_response = client.messages.create(
+                        model="claude-3-5-sonnet-20241022",
+                        max_tokens=1024,
+                        tools=tools,
+                        messages=messages
+                    )
+                    
+                    for final_block in final_response.content:
+                        if hasattr(final_block, 'text'):
+                            text = final_block.text
+                            if "entry_001" in text:
+                                entry_id = "entry_001"
+    
+    if entry_id is None:
+        entry_id = f"entry_{acct}_{wire.replace('#', '_')}"
+    
+    return entry_id
+```

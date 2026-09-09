@@ -1,0 +1,68 @@
+
+```python
+import anthropic
+import json
+import hashlib
+
+def make_key(label: str) -> str:
+    """Convert a raw label into the team's private cache key format.
+    
+    This implementation:
+    1. Uses Claude to validate and normalize the label
+    2. Creates a deterministic cache key based on the validated label
+    3. Ensures keys are valid for the team's cache system
+    """
+    if not label or not isinstance(label, str):
+        raise ValueError("Label must be a non-empty string")
+    
+    client = anthropic.Anthropic()
+    
+    prompt = f"""Given the label: "{label}"
+
+Please validate and normalize this label for use as a cache key. 
+Requirements:
+- Must be lowercase alphanumeric with underscores and hyphens only
+- Should be meaningful and traceable to the original label
+- Maximum length of 64 characters
+- Should handle special characters by removing or converting them
+
+Return ONLY a single valid cache key string, nothing else."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    normalized_key = message.content[0].text.strip()
+    
+    if not normalized_key:
+        hash_suffix = hashlib.md5(label.encode()).hexdigest()[:8]
+        normalized_key = f"cache_{hash_suffix}"
+    
+    normalized_key = normalized_key.lower()
+    normalized_key = ''.join(c if c.isalnum() or c in '-_' else '' for c in normalized_key)
+    
+    if not normalized_key:
+        hash_suffix = hashlib.md5(label.encode()).hexdigest()[:8]
+        normalized_key = f"cache_{hash_suffix}"
+    
+    normalized_key = normalized_key[:64]
+    
+    return normalized_key
+
+
+if __name__ == "__main__":
+    test_labels = [
+        "user_session_123",
+        "Product Cache Key!",
+        "temperature_sensor_#1",
+        "API_Response_Data",
+    ]
+    
+    for label in test_labels:
+        key = make_key(label)
+        print(f"Label: '{label}' -> Key: '{key}'")
+```

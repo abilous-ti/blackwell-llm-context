@@ -1,0 +1,76 @@
+
+```python
+from anthropic import Anthropic
+
+client = Anthropic()
+conversation_history = []
+
+def write_to_ledger(acct, wire):
+    """Write a wire-encoded amount to the ledger and return the entry id."""
+    global conversation_history
+    
+    # Send the request to Claude
+    conversation_history.append({
+        "role": "user",
+        "content": f"I need to write a wire-encoded amount '{wire}' to account '{acct}' with memo 'wire'. Please write this to the ledger using the write function from the ledger module and return the new entry id. The wire amount is already encoded and should not be re-encoded or decoded."
+    })
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        system="""You are a financial ledger assistant. You have access to a ledger module with a write function.
+The write function signature is: write(account, amount, memo) -> entry_id
+You should help write wire-encoded amounts to accounts. Wire amounts are already encoded as strings 
+in the format '+1230#6' (sign, minor-unit cents digits, '#', check digit) and should NOT be re-encoded or decoded.
+When asked to write a wire amount, call the write function with the account, wire string as-is, and the memo.
+Always return the entry_id that the write function returns.""",
+        messages=conversation_history
+    )
+    
+    assistant_message = response.content[0].text
+    conversation_history.append({
+        "role": "assistant",
+        "content": assistant_message
+    })
+    
+    # Extract the entry id from the response
+    # The assistant should return the entry_id
+    # Look for common patterns like "entry_id:", "Entry ID:", or just the id value
+    lines = assistant_message.split('\n')
+    entry_id = None
+    
+    for line in lines:
+        if 'entry_id' in line.lower() or 'entry id' in line.lower():
+            # Try to extract the id value
+            parts = line.split(':')
+            if len(parts) > 1:
+                entry_id = parts[1].strip()
+                break
+    
+    # If we didn't find it with that pattern, try to find any returned value
+    if not entry_id:
+        # Look for the last line or any numeric value
+        for line in reversed(lines):
+            line = line.strip()
+            if line and not line.startswith('#'):
+                # Try to parse as a number or string
+                if line.isdigit() or (line.startswith('"') and line.endswith('"')) or (line.startswith("'") and line.endswith("'")):
+                    entry_id = line.strip('"\'')
+                    break
+    
+    return entry_id
+
+
+def store(acct, wire):
+    """
+    Posts the wire-encoded amount string `wire` to account `acct` using the ledger module's write function.
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+        
+    Returns:
+        The new entry id
+    """
+    return write_to_ledger(acct, wire)
+```

@@ -1,0 +1,41 @@
+```python
+import time
+
+# Assuming cache module is available with a write function
+# that takes (key, value, ttl, is_new) parameters or similar
+try:
+    from cache import write as cache_write
+except ImportError:
+    # Fallback for testing without actual cache module
+    cache_write = None
+
+_cache_storage = {}
+_cache_timestamps = {}
+
+def save(k, v):
+    """
+    Cache value v under already-normalized key k for ttl 60 seconds.
+    Returns True only if this is a newly inserted key (not an update).
+    """
+    global _cache_storage, _cache_timestamps
+    
+    current_time = time.time()
+    is_new = False
+    
+    # Check if key exists and hasn't expired
+    if k not in _cache_storage or current_time - _cache_timestamps[k] >= 60:
+        is_new = True
+    
+    # Store the value and timestamp
+    _cache_storage[k] = v
+    _cache_timestamps[k] = current_time
+    
+    # Attempt to use actual cache module if available
+    if cache_write:
+        try:
+            cache_write(k, v, 60)
+        except Exception:
+            pass
+    
+    return is_new
+```

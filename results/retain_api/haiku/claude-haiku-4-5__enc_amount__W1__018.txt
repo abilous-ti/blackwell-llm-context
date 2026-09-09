@@ -1,0 +1,51 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a money amount (e.g., '12.30', '-0.07') to the team's private wire format.
+    
+    Uses Claude to determine the encoding format based on the ledger module's API context.
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Given the ledger module API context where amounts are passed to ledger.post(account, amount, *, memo), 
+                
+The amount parameter in ledger.post() is described as handling values like '12.30' and '-0.07'. 
+These appear to be string representations of dollar amounts.
+
+Your task: Given a dollars string like '{dollars}', determine what wire format encoding should be used.
+
+Based on common financial wire formats and the context that this is an internal team API, 
+the wire format is likely one of:
+1. Cents as integer (1230 for '12.30', -7 for '-0.07')
+2. String with no decimal ('1230', '-7')
+3. Original format preserved
+
+Which format is most likely used in the ledger.post() amount parameter, and what would '{dollars}' 
+encode to in that format?
+
+Return ONLY the encoded value, nothing else. No explanation, no quotes, just the value."""
+            }
+        ]
+    )
+    
+    encoded = message.content[0].text.strip()
+    return encoded
+
+
+if __name__ == "__main__":
+    test_cases = ['12.30', '-0.07', '100', '0.01', '-5.00']
+    
+    for test_amount in test_cases:
+        encoded = encode_amount(test_amount)
+        print(f"'{test_amount}' -> '{encoded}'")
+```

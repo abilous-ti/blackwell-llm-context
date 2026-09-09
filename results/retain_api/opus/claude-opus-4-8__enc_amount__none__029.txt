@@ -1,0 +1,86 @@
+I'll analyze this problem. The catch is "this team's private wire format" isn't defined anywhere, so I need to make a reasonable, self-consistent choice and document it clearly.
+
+```python
+"""
+solution.py
+
+encode_amount serializes a decimal money amount string into this team's
+private wire format.
+
+Since no external specification is provided, this module defines a clear,
+self-consistent wire format. The format encodes an amount as a fixed-point
+integer number of cents, tagged so it can be unambiguously parsed back.
+
+Wire format specification
+--------------------------
+Grammar:  "M<sign><cents>"
+
+  - Prefix  'M'           : magic byte identifying a money value.
+  - <sign>  '+' or '-'    : always present; '+' for zero and positive.
+  - <cents> decimal digits: absolute value of the amount expressed in cents,
+                            with no leading zeros (except the value 0 itself,
+                            which is encoded as a single '0').
+
+Examples:
+  '12.30'  -> 'M+1230'
+  '-0.07'  -> 'M-7'
+  '0'      -> 'M+0'
+  '0.00'   -> 'M+0'
+  '-1000'  -> 'M-100000'
+"""
+
+from decimal import Decimal, InvalidOperation
+
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string to this team's private wire format.
+
+    Parameters
+    ----------
+    dollars:
+        A money amount as a string, e.g. '12.30', '-0.07', '1000', '+3.5'.
+        May contain optional surrounding whitespace, an optional leading
+        sign, and up to two fractional digits.
+
+    Returns
+    -------
+    str
+        The encoded wire representation, e.g. 'M+1230', 'M-7'.
+
+    Raises
+    ------
+    ValueError
+        If the input is not a valid money amount or has more precision
+        than cents (more than two fractional digits).
+    TypeError
+        If the input is not a string.
+    """
+    if not isinstance(dollars, str):
+        raise TypeError(f"expected str, got {type(dollars).__name__}")
+
+    text = dollars.strip()
+    if not text:
+        raise ValueError("empty amount")
+
+    try:
+        value = Decimal(text)
+    except InvalidOperation:
+        raise ValueError(f"invalid money amount: {dollars!r}") from None
+
+    if not value.is_finite():
+        raise ValueError(f"non-finite money amount: {dollars!r}")
+
+    # Convert to an integer number of cents, rejecting sub-cent precision.
+    cents_dec = (value * 100).normalize()
+    if cents_dec != cents_dec.to_integral_value():
+        raise ValueError(
+            f"amount has finer precision than cents: {dollars!r}"
+        )
+
+    cents = int(cents_dec.to_integral_value())
+
+    sign = '-' if cents < 0 else '+'
+    magnitude = abs(cents)
+
+    return f"M{sign}{magnitude}"
+```

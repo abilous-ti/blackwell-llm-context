@@ -1,0 +1,60 @@
+I need more details about the "private wire format" to implement this correctly. Since the format isn't specified, I'll make reasonable assumptions and create a clear, documented implementation.
+
+Since no format spec is provided, I'll implement a sensible, self-consistent wire format: encode as signed integer number of cents (avoiding floating-point issues), which is a common private money serialization.
+
+```python
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount to this team's private wire format.
+
+    The wire format encodes the value as a signed integer count of cents,
+    which avoids floating-point rounding issues. Examples:
+        '12.30'  -> '1230'
+        '-0.07'  -> '-7'
+        '0'      -> '0'
+        '5'      -> '500'
+    """
+    if dollars is None:
+        raise ValueError("amount cannot be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Handle sign.
+    negative = False
+    if s[0] in "+-":
+        negative = s[0] == "-"
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits")
+
+    # Split integer and fractional parts.
+    if "." in s:
+        int_part, _, frac_part = s.partition(".")
+        if "." in frac_part:
+            raise ValueError("invalid amount: multiple decimal points")
+    else:
+        int_part, frac_part = s, ""
+
+    # Allow empty integer part (e.g. '.07') or empty fractional part (e.g. '12.').
+    int_part = int_part or "0"
+    frac_part = frac_part or "0"
+
+    if not int_part.isdigit() or not frac_part.isdigit():
+        raise ValueError(f"invalid amount: {dollars!r}")
+
+    # Normalize fractional part to exactly 2 digits (cents).
+    if len(frac_part) < 2:
+        frac_part = frac_part.ljust(2, "0")
+    elif len(frac_part) > 2:
+        # Truncate extra precision beyond cents.
+        frac_part = frac_part[:2]
+
+    cents = int(int_part) * 100 + int(frac_part)
+
+    if negative and cents != 0:
+        cents = -cents
+
+    return str(cents)
+```

@@ -1,0 +1,28 @@
+import cache
+
+
+def store(k, v, secs):
+    """
+    Store value v under key k with ttl of secs seconds.
+    Returns True if the key was newly inserted, False if it replaced an existing value.
+    """
+    cache_key = normalize_key(k)
+    return cache.put(cache_key, v, ttl=secs)
+
+
+def normalize_key(label):
+    """
+    Normalize a raw label to a cache key following the house convention:
+    1. Lowercase
+    2. Replace every run of non-alphanumeric characters with a single underscore
+    3. Strip leading/trailing underscores
+    4. Prepend the fixed private namespace prefix 'kx7-'
+    """
+    import re
+    
+    lowercased = label.lower()
+    normalized = re.sub(r'[^a-z0-9]+', '_', lowercased)
+    stripped = normalized.strip('_')
+    cache_key = 'kx7-' + stripped
+    
+    return cache_key

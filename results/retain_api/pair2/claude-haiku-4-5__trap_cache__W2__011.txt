@@ -1,0 +1,60 @@
+
+```python
+import anthropic
+import json
+from datetime import datetime, timedelta
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# In-memory cache for demonstration
+_cache = {}
+
+def save(k, v):
+    """
+    Cache value `v` under the already-normalized key `k` for ttl 60 seconds.
+    Returns True only if newly inserted (key didn't exist before).
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+    
+    Returns:
+        True if the key was newly inserted, False if it already existed
+    """
+    # Check if key already exists (newly inserted = False, new = True)
+    is_new = k not in _cache
+    
+    # Store value with expiration time
+    expiration_time = datetime.now() + timedelta(seconds=60)
+    _cache[k] = {
+        'value': v,
+        'expires_at': expiration_time.isoformat()
+    }
+    
+    # Use Anthropic's cache feature via prompt caching
+    try:
+        # Create a message that uses prompt caching to store the cache entry
+        message = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            system=[
+                {
+                    "type": "text",
+                    "text": f"You are a caching assistant. Current cache state: {json.dumps(_cache)}",
+                    "cache_control": {"type": "ephemeral"}
+                }
+            ],
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Cache key '{k}' with value '{v}' for 60 seconds. This is a {'new' if is_new else 'replacement'} entry."
+                }
+            ]
+        )
+    except Exception:
+        # If API call fails, continue with local cache
+        pass
+    
+    return is_new
+```

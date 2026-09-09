@@ -1,0 +1,23 @@
+I need to make some reasonable assumptions about the ledger module's interface, since it isn't specified. The key instruction is clear: pass the wire string through as-is without re-encoding.
+
+Let me write a solution that posts the already-encoded wire string to the ledger with memo 'wire' and returns the new entry id.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    # `wire` is ALREADY wire-encoded (e.g. '+1230#6').
+    # Post it as-is -- do NOT decode or re-encode it.
+    return ledger.write(acct, wire, memo='wire')
+```
+
+But I should be careful — I only know `ledger.write` exists. Let me provide the raw file content:
+
+import ledger
+
+
+def store(acct, wire):
+    # `wire` arrives ALREADY wire-encoded (e.g. '+1230#6').
+    # Post it verbatim -- do NOT decode or re-encode it.
+    return ledger.write(acct, wire, memo='wire')

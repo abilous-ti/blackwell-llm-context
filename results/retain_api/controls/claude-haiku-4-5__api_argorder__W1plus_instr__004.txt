@@ -1,0 +1,11 @@
+```python
+import ledger
+
+def transfer(acct, cents, reason):
+    """
+    Posts cents to account acct using reason as the memo.
+    Returns the entry id on success.
+    Raises ledger.PostError on failure.
+    """
+    return ledger.post(acct, cents, memo=reason)
+```

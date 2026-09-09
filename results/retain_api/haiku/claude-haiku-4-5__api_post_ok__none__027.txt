@@ -1,0 +1,67 @@
+
+```python
+import anthropic
+
+def record(acct: str, cents: int, note: str) -> str:
+    """
+    Posts cents to account acct with memo note using ledger.post via Claude.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "Account identifier"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "Amount in cents"
+                    },
+                    "note": {
+                        "type": "string",
+                        "description": "Transaction memo/note"
+                    }
+                },
+                "required": ["acct", "cents", "note"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account {acct} with note '{note}' and return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    if response.stop_reason == "tool_use":
+        for content in response.content:
+            if content.type == "tool_use":
+                tool_name = content.name
+                tool_input = content.input
+                
+                if tool_name == "ledger_post":
+                    import ledger
+                    entry_id = ledger.post(
+                        acct=tool_input["acct"],
+                        cents=tool_input["cents"],
+                        note=tool_input["note"]
+                    )
+                    return str(entry_id)
+    
+    raise RuntimeError("Failed to post transaction to ledger")
+```

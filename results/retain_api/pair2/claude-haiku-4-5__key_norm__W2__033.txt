@@ -1,0 +1,84 @@
+
+```python
+import anthropic
+import re
+
+
+def make_key(label: str) -> str:
+    """
+    Convert a raw label into a cache key following the team's normalization rules:
+    1. Lowercase the label
+    2. Replace every run of non-alphanumeric characters with a single underscore '_'
+    3. Strip leading/trailing underscores
+    4. Prepend the fixed private namespace prefix 'kx7-'
+    """
+    # Step 1: Lowercase
+    lowercased = label.lower()
+    
+    # Step 2: Replace runs of non-alphanumeric characters with single underscore
+    normalized = re.sub(r'[^a-z0-9]+', '_', lowercased)
+    
+    # Step 3: Strip leading/trailing underscores
+    stripped = normalized.strip('_')
+    
+    # Step 4: Prepend the prefix
+    cache_key = f'kx7-{stripped}'
+    
+    return cache_key
+
+
+def main():
+    """
+    Demonstrate using Claude to understand and validate the cache key normalization.
+    """
+    client = anthropic.Anthropic()
+    
+    # Test cases to verify the implementation
+    test_cases = [
+        'Hello, World!',
+        ' A__B ',
+        'Test-Case_123',
+        '!!!Leading and trailing!!!',
+        'MixedCASE with spaces',
+        'Multiple___underscores',
+    ]
+    
+    print("Cache Key Generation Examples:")
+    print("-" * 50)
+    
+    for test_case in test_cases:
+        key = make_key(test_case)
+        print(f"'{test_case}' -> '{key}'")
+    
+    print("\n" + "-" * 50)
+    print("Verifying with Claude...")
+    
+    # Use Claude to verify the implementation
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Given the cache key normalization rules:
+1. Lowercase the label
+2. Replace every run of non-alphanumeric characters with a single underscore '_'
+3. Strip leading/trailing underscores
+4. Prepend the fixed private namespace prefix 'kx7-'
+
+Verify these transformations are correct:
+- 'Hello, World!' -> '{make_key('Hello, World!')}'
+- ' A__B ' -> '{make_key(' A__B ')}'
+- 'Test-Case_123' -> '{make_key('Test-Case_123')}'
+
+Are these correct? Explain your reasoning."""
+            }
+        ]
+    )
+    
+    print(response.content[0].text)
+
+
+if __name__ == "__main__":
+    main()
+```

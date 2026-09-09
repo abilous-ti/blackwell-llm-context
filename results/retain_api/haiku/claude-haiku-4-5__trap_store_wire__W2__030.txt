@@ -1,0 +1,78 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Mock ledger module to simulate the ledger.write function
+class MockLedger:
+    def __init__(self):
+        self.entries = {}
+        self.next_id = 1
+    
+    def write(self, acct, amount, memo):
+        """Write an entry to the ledger"""
+        entry_id = self.next_id
+        self.entries[entry_id] = {
+            'id': entry_id,
+            'account': acct,
+            'amount': amount,
+            'memo': memo
+        }
+        self.next_id += 1
+        return entry_id
+
+# Global ledger instance
+ledger = MockLedger()
+
+def store(acct, wire):
+    """
+    Posts the wire-encoded amount string to account.
+    The wire string is already encoded as per the house format:
+    <sign><digits>#<check>
+    
+    Args:
+        acct: Account identifier
+        wire: Wire-encoded amount string (e.g., '+1230#6')
+    
+    Returns:
+        The new entry id from the ledger
+    """
+    # Use Claude to help validate and process the wire-encoded amount
+    # This demonstrates that we're using Claude as a tool to understand
+    # the wire format while keeping the actual posting simple
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are validating a wire-encoded monetary amount. 
+                The format is: <sign><digits>#<check> where:
+                - <sign> is '+' or '-'
+                - <digits> is the amount in MINOR UNITS (cents)
+                - <check> is a Luhn-style check digit = (sum of decimal digits) mod 10
+
+                Validate this wire string and confirm it's properly formatted: {wire}
+                
+                Just respond with 'VALID' if the format is correct, or explain the error."""
+            }
+        ]
+    )
+    
+    # Extract the validation response
+    validation_response = message.content[0].text.strip()
+    
+    # If validation passes, post to ledger
+    if "VALID" in validation_response.upper():
+        # Post the wire-encoded amount directly to the ledger
+        # We pass it as-is since it's already serialized
+        entry_id = ledger.write(acct, wire, 'wire')
+        return entry_id
+    else:
+        # If validation fails, raise an error
+        raise ValueError(f"Invalid wire format: {validation_response}")
+```

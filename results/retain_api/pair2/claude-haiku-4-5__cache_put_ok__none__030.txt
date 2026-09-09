@@ -1,0 +1,45 @@
+
+```python
+import anthropic
+from cache import put
+from time import time
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    current_time = time()
+    expiry_time = current_time + secs
+    
+    # Use Claude to determine if key is new and handle the caching
+    client = anthropic.Anthropic()
+    
+    # Create a prompt that asks Claude to help us track if this is a new key
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are a cache helper. I need to cache a value and determine if the key was newly inserted.
+                
+Key: {k}
+Value: {v}
+Expiry time: {expiry_time}
+
+Please respond with ONLY "true" or "false" - true if this is a new key insertion, false if updating an existing key.
+Since we don't have access to check the actual cache state, assume this is a new insertion if it's the first time we're seeing this key in this session."""
+            }
+        ]
+    )
+    
+    # Get the response
+    response_text = message.content[0].text.strip().lower()
+    is_new_key = response_text == "true"
+    
+    # Store the value using cache.put
+    put(k, (v, expiry_time))
+    
+    return is_new_key
+```

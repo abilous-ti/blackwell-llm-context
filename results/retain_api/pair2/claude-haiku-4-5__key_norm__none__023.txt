@@ -1,0 +1,75 @@
+
+```python
+import anthropic
+import hashlib
+
+
+def make_key(label: str) -> str:
+    """
+    Converts a raw label into our team's private cache key using Claude.
+    
+    Uses prompt caching to efficiently generate consistent cache keys.
+    """
+    client = anthropic.Anthropic()
+    
+    # Create a deterministic system prompt that will be cached
+    system_prompt = """You are a cache key generator. Your job is to convert labels into consistent, 
+deterministic cache keys. Always follow these rules:
+1. Convert to lowercase
+2. Replace spaces and special characters with underscores
+3. Remove any leading/trailing underscores
+4. Prefix with "cache_"
+5. Keep the result under 64 characters
+6. Always produce the same output for the same input"""
+    
+    # Use prompt caching to cache the system prompt for efficiency
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        system=[
+            {
+                "type": "text",
+                "text": system_prompt,
+                "cache_control": {"type": "ephemeral"}
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Generate a cache key for this label: {label}"
+            }
+        ]
+    )
+    
+    # Extract the generated key from the response
+    response_text = message.content[0].text.strip()
+    
+    # Parse the response to get just the key (Claude might include explanation)
+    # Look for the key pattern in the response
+    lines = response_text.split('\n')
+    for line in lines:
+        line = line.strip()
+        if line.startswith('cache_'):
+            return line
+    
+    # Fallback: if we can't find a proper key, generate one ourselves
+    # This ensures we always return a valid cache key
+    processed = label.lower()
+    processed = ''.join(c if c.isalnum() else '_' for c in processed)
+    processed = processed.strip('_')
+    return f"cache_{processed[:58]}"
+
+
+if __name__ == "__main__":
+    # Test the make_key function
+    test_labels = [
+        "User Profile Cache",
+        "api-response-data",
+        "CUSTOMER_DATA_v2",
+        "Cache for 2024 Q1 reports!"
+    ]
+    
+    for label in test_labels:
+        key = make_key(label)
+        print(f"Label: '{label}' -> Key: '{key}'")
+```

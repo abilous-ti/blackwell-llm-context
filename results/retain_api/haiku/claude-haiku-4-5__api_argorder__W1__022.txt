@@ -1,0 +1,5 @@
+def transfer(acct, cents, reason):
+    try:
+        return ledger.post(acct, cents, memo=reason)
+    except ledger.PostError:
+        raise

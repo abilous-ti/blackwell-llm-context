@@ -1,0 +1,29 @@
+```python
+def transfer(acct, cents, reason):
+    """
+    Transfer monetary amount to an account.
+    
+    Args:
+        acct: Account identifier string
+        cents: Amount in cents (integer)
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        Entry ID from ledger.post()
+    
+    Raises:
+        ledger.PostError: If account is unknown or amount is malformed
+    """
+    import ledger
+    
+    # Encode cents as wire format: <sign><digits>#<check>
+    sign = '+' if cents >= 0 else '-'
+    digits = str(abs(cents))
+    check = sum(int(d) for d in digits) % 10
+    amount = f"{sign}{digits}#{check}"
+    
+    # Post to ledger with memo as keyword-only argument
+    entry_id = ledger.post(acct, amount, memo=reason)
+    
+    return entry_id
+```

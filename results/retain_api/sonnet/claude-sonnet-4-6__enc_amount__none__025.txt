@@ -1,0 +1,38 @@
+
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a dollar amount string to the team's private wire format.
+    
+    The wire format encodes a money amount as a fixed-point integer in cents,
+    represented as a big-endian signed 8-byte (64-bit) integer, then base64-encoded.
+    """
+    import base64
+    import struct
+    
+    # Parse the dollar amount
+    negative = dollars.startswith('-')
+    if negative:
+        dollars = dollars[1:]
+    
+    # Split into dollars and cents
+    if '.' in dollars:
+        dollar_part, cent_part = dollars.split('.')
+        # Ensure cent_part is exactly 2 digits
+        cent_part = cent_part.ljust(2, '0')[:2]
+    else:
+        dollar_part = dollars
+        cent_part = '00'
+    
+    # Convert to total cents
+    total_cents = int(dollar_part) * 100 + int(cent_part)
+    
+    if negative:
+        total_cents = -total_cents
+    
+    # Pack as big-endian signed 64-bit integer
+    encoded_bytes = struct.pack('>q', total_cents)
+    
+    # Base64 encode
+    result = base64.b64encode(encoded_bytes).decode('ascii')
+    
+    return result

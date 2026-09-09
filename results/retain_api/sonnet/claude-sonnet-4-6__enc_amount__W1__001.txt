@@ -1,0 +1,55 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
+_WIRE_VERSION = 1
+_CENT_MULTIPLIER = 100
+
+
+def encode_amount(dollars: str) -> str:
+    """Serialize a money amount string to the team's private wire format.
+
+    Wire format: "v<version>:<sign><integer_cents>"
+    Example: '12.30'  -> 'v1:+1230'
+             '-0.07'  -> 'v1:-7'
+             '0.00'   -> 'v1:+0'
+
+    Args:
+        dollars: A string representing a dollar amount, e.g. '12.30', '-0.07'.
+
+    Returns:
+        A wire-format string understood by the internal ledger system.
+
+    Raises:
+        ValueError: If the input cannot be parsed as a valid monetary amount.
+    """
+    if not isinstance(dollars, str):
+        raise ValueError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("encode_amount received an empty string")
+
+    # Validate format: optional leading sign, digits, optional decimal point with digits
+    if not re.fullmatch(r'-?\d+(\.\d+)?', stripped):
+        raise ValueError(
+            f"encode_amount: {dollars!r} is not a valid monetary amount string"
+        )
+
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation as exc:
+        raise ValueError(
+            f"encode_amount: cannot parse {dollars!r} as a decimal amount"
+        ) from exc
+
+    # Round to exactly two decimal places (cents)
+    cents_decimal = (value * _CENT_MULTIPLIER).to_integral_value(rounding=ROUND_HALF_UP)
+    cents_int = int(cents_decimal)
+
+    sign_char = "-" if cents_int < 0 else "+"
+    abs_cents = abs(cents_int)
+
+    wire = f"v{_WIRE_VERSION}:{sign_char}{abs_cents}"
+    return wire

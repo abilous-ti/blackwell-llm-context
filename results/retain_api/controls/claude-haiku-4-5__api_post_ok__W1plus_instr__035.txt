@@ -1,0 +1,24 @@
+
+```python
+import anthropic
+import ledger
+
+def record(acct: str, cents: int, note: str) -> int:
+    """Post a ledger entry and return the new entry id."""
+    # Convert cents to the wire-encoding format: <sign><digits>#<check>
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits_str = str(abs_cents)
+    
+    # Calculate check digit: sum of decimal digits mod 10
+    check_digit = sum(int(d) for d in digits_str) % 10
+    
+    # Format: <sign><digits>#<check>
+    amount_str = f"{sign}{digits_str}#{check_digit}"
+    
+    # Call ledger.post with the correct signature
+    # account is FIRST, amount is SECOND (positional), memo is keyword-only
+    entry_id = ledger.post(acct, amount_str, memo=note)
+    
+    return entry_id
+```

@@ -1,0 +1,23 @@
+
+```python
+import anthropic
+import ledger
+
+
+def transfer(acct: str, cents: int, reason: str) -> int:
+    """
+    Transfer funds using the ledger module's post function.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents
+        reason: Reason for the transfer (memo)
+    
+    Returns:
+        The entry id from the ledger post operation
+    
+    Raises:
+        ledger.PostError: If the ledger operation fails
+    """
+    return ledger.post(acct, cents, memo=reason)
+```

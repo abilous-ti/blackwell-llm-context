@@ -1,0 +1,36 @@
+```python
+def record(acct, cents, note):
+    """
+    Posts a transaction to the ledger.
+    
+    Args:
+        acct: Account name (string)
+        cents: Amount in cents (integer)
+        note: Memo/description for the transaction (string)
+    
+    Returns:
+        The new entry id from ledger.post
+    
+    Raises:
+        ledger.PostError: If posting fails
+    """
+    # Encode cents to wire format: <sign><digits>#<check>
+    # where check = (sum of decimal digits) mod 10
+    
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits_str = str(abs_cents)
+    
+    # Calculate Luhn-style check digit
+    digit_sum = sum(int(d) for d in digits_str)
+    check = digit_sum % 10
+    
+    # Format: <sign><digits>#<check>
+    amount = f"{sign}{digits_str}#{check}"
+    
+    # Call ledger.post with correct signature:
+    # post(account: str, amount, *, memo: str)
+    entry_id = ledger.post(acct, amount, memo=note)
+    
+    return entry_id
+```

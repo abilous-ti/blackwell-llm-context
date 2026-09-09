@@ -1,0 +1,53 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+def generate_code():
+    """Use Claude to generate the record function for posting to a ledger."""
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": """Write a Python function called `record` that:
+1. Takes parameters: acct (account), cents (amount in cents), note (memo text)
+2. Posts the entry using ledger.post(acct, cents, note)
+3. Returns the new entry id from the post operation
+
+The function should handle the ledger module's post function and extract/return the entry id.
+Assume ledger.post returns an entry object or dict with an 'id' field.
+
+Write ONLY the function definition, nothing else. Do not include any imports or module setup."""
+            }
+        ]
+    )
+    
+    return message.content[0].text
+
+def main():
+    # Generate the record function using Claude
+    code = generate_code()
+    print(code)
+
+if __name__ == "__main__":
+    main()
+```
+
+Wait, I need to provide the actual solution.py content that implements the record function. Let me reconsider - the task asks for solution.py content that uses ledger.post. Here's the correct implementation:
+
+```python
+import ledger
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    entry = ledger.post(acct, cents, note)
+    return entry.id
+```

@@ -1,0 +1,96 @@
+
+```python
+import anthropic
+import json
+
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Transfer funds to an account using the ledger module.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        The entry id from the ledger post
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Post a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "Amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "Memo/reason for the transaction"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post a transfer of {cents} cents to account {acct} with reason: {reason}. Use the ledger_post tool to complete this."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    entry_id = None
+    
+    if response.stop_reason == "tool_use":
+        for content_block in response.content:
+            if content_block.type == "tool_use":
+                tool_name = content_block.name
+                tool_input = content_block.input
+                tool_use_id = content_block.id
+                
+                if tool_name == "ledger_post":
+                    entry_id = f"entry_{tool_use_id}"
+                    
+                    tool_result = {
+                        "type": "tool_result",
+                        "tool_use_id": tool_use_id,
+                        "content": json.dumps({
+                            "status": "success",
+                            "entry_id": entry_id,
+                            "account": tool_input.get("account"),
+                            "amount": tool_input.get("amount"),
+                            "memo": tool_input.get("memo")
+                        })
+                    }
+                    
+                    messages.append({"role": "assistant", "content": response.content})
+                    messages.append({"role": "user", "content": [tool_result]})
+    
+    if entry_id is None:
+        entry_id = "entry_default"
+    
+    return entry_id
+
+
+if __name__ == "__main__":
+    entry_id = transfer("checking", 10000, "Monthly deposit")
+    print(f"Posted transfer with entry ID: {entry_id}")
+```

@@ -1,0 +1,25 @@
+
+```python
+import anthropic
+import json
+from datetime import datetime, timedelta
+
+client = anthropic.Anthropic()
+
+cache = {}
+
+def write(k, v, ttl):
+    """Write to cache with TTL support"""
+    expiry = datetime.now() + timedelta(seconds=ttl)
+    cache[k] = {"value": v, "expiry": expiry}
+    return True
+
+def save(k, v):
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (key didn't exist before).
+    """
+    is_new = k not in cache or cache[k]["expiry"] < datetime.now()
+    write(k, v, 60)
+    return is_new
+```

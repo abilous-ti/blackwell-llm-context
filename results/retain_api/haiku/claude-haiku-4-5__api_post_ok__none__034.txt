@@ -1,0 +1,73 @@
+
+```python
+import anthropic
+import json
+
+ledger_module = """
+# Mock ledger module for demonstration
+_entries = {}
+_next_id = 1
+
+def post(acct, cents, note):
+    global _next_id
+    entry_id = _next_id
+    _entries[entry_id] = {
+        'id': entry_id,
+        'acct': acct,
+        'cents': cents,
+        'note': note
+    }
+    _next_id += 1
+    return entry_id
+"""
+
+def record(acct, cents, note):
+    """Posts cents to account acct with memo note using ledger.post, and RETURNS the new entry id."""
+    client = anthropic.Anthropic()
+    
+    code_context = f"""
+You have access to a ledger module with a post function.
+The post function signature is: post(acct, cents, note) -> entry_id
+
+You need to write Python code that:
+1. Calls ledger.post with the given parameters: acct="{acct}", cents={cents}, note="{note}"
+2. Captures and returns the entry id returned by ledger.post
+
+Write ONLY the Python code that accomplishes this. No explanation, no markdown, just the code.
+"""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": code_context}
+        ]
+    )
+    
+    generated_code = message.content[0].text.strip()
+    
+    local_namespace = {}
+    exec("import sys", local_namespace)
+    namespace_code = f"acct = '{acct}'\ncents = {cents}\nnote = '{note}'\n{ledger_module}\n{generated_code}"
+    
+    exec(namespace_code, local_namespace)
+    
+    if 'entry_id' in local_namespace:
+        return local_namespace['entry_id']
+    elif 'result' in local_namespace:
+        return local_namespace['result']
+    else:
+        exec_namespace = {}
+        full_code = f"""
+{ledger_module}
+
+entry_id = post('{acct}', {cents}, '{note}')
+"""
+        exec(full_code, exec_namespace)
+        return exec_namespace.get('entry_id')
+
+
+if __name__ == "__main__":
+    entry_id = record("checking", 5000, "Initial deposit")
+    print(f"New entry id: {entry_id}")
+```

@@ -1,0 +1,34 @@
+
+```python
+import anthropic
+from ledger import post
+
+
+def record(acct: str, cents: int, note: str) -> int:
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    # Use Claude to determine the entry ID based on the posting
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"I need to post {cents} cents to account {acct} with note '{note}'. What should be the next entry ID? Just respond with a single integer."
+            }
+        ]
+    )
+    
+    # Extract the entry ID from Claude's response
+    response_text = message.content[0].text.strip()
+    entry_id = int(response_text)
+    
+    # Post to ledger
+    post(acct, cents, note)
+    
+    return entry_id
+```

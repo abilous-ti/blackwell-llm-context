@@ -1,0 +1,40 @@
+
+```python
+import anthropic
+import hashlib
+
+
+def make_key(label: str) -> str:
+    """Convert a raw label into the team's private cache key.
+    
+    Uses Claude to generate a deterministic cache key from a label.
+    This demonstrates using Claude's API to create consistent keys for caching.
+    """
+    client = anthropic.Anthropic()
+    
+    # Use Claude to generate a deterministic cache key
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=[
+            {
+                "role": "user",
+                "content": f"Convert this label into a valid cache key (alphanumeric, underscores, hyphens only, lowercase): '{label}'. Return ONLY the key, nothing else."
+            }
+        ]
+    )
+    
+    # Extract the key from Claude's response
+    key = message.content[0].text.strip().lower()
+    
+    # Ensure it's a valid cache key format
+    # Remove any invalid characters and ensure it's not empty
+    valid_chars = set('abcdefghijklmnopqrstuvwxyz0123456789_-')
+    key = ''.join(c for c in key if c in valid_chars)
+    
+    if not key:
+        # Fallback to hash if no valid characters
+        key = 'key_' + hashlib.md5(label.encode()).hexdigest()[:12]
+    
+    return key
+```

@@ -1,0 +1,92 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+def save(k, v):
+    """
+    Save a value to cache with the given normalized key.
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+        
+    Returns:
+        True if the key was newly inserted, False if it replaced an existing value
+    """
+    # Use Claude to interact with the cache module
+    # We need to call the cache.put function with the correct signature
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "cache_put",
+                "description": "Write a value to cache with the given key and TTL",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "The cache key (already normalized)"
+                        },
+                        "value": {
+                            "type": "string",
+                            "description": "The value to cache"
+                        },
+                        "ttl": {
+                            "type": "integer",
+                            "description": "Time to live in seconds"
+                        }
+                    },
+                    "required": ["key", "value", "ttl"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Please cache the value '{v}' under key '{k}' with a TTL of 60 seconds and return whether it was newly inserted."
+            }
+        ]
+    )
+    
+    # Extract the result from Claude's response
+    # Since we're using Claude to manage the cache interaction,
+    # we'll parse the response to determine if it was newly inserted
+    response_text = message.content[0].text if message.content else ""
+    
+    # For the actual implementation, we would use the cache module directly
+    # but since we're demonstrating the API contract, here's the direct approach:
+    
+    # Import the cache module (this would be available in the actual environment)
+    try:
+        import cache
+        result = cache.put(k, v, ttl=60)
+        return result
+    except ImportError:
+        # If cache module is not available, we simulate based on Claude's response
+        # In a real scenario, the cache module would be available
+        return "newly inserted" in response_text.lower() or "new" in response_text.lower()
+```
+
+Wait, let me reconsider. The task asks for a solution that uses the cache module's write function directly. Let me simplify:
+
+```python
+import cache
+
+def save(k, v):
+    """
+    Save a value to cache with the given normalized key.
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+        
+    Returns:
+        True if the key was newly inserted, False if it replaced an existing value
+    """
+    return cache.put(k, v, ttl=60)
+```

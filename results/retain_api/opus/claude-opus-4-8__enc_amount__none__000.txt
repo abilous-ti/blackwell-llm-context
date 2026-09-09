@@ -1,0 +1,77 @@
+I'll write this function, but I need to make reasonable assumptions about a "private wire format" since no specification was provided. I'll design a clear, self-documented format that encodes the amount as integer cents.
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format specification
+    --------------------------
+    The amount is normalized to an integer number of cents and encoded as:
+
+        "M<sign><cents>E"
+
+    where:
+      - "M" and "E" are fixed start/end markers.
+      - <sign> is '+' for non-negative amounts and '-' for negative amounts.
+      - <cents> is the absolute value of the amount expressed in whole
+        cents, with no leading zeros (except a lone '0' for zero).
+
+    Examples:
+      '12.30'  -> 'M+1230E'
+      '-0.07'  -> 'M-7E'
+      '0'      -> 'M+0E'
+    """
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Extract sign.
+    negative = False
+    if s[0] in "+-":
+        negative = s[0] == "-"
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits in amount")
+
+    # Split into whole and fractional parts.
+    if "." in s:
+        whole, _, frac = s.partition(".")
+        if "." in frac:
+            raise ValueError("malformed amount: multiple decimal points")
+    else:
+        whole, frac = s, ""
+
+    # Default empty whole part (e.g. '.5') to zero.
+    if whole == "":
+        whole = "0"
+
+    if not whole.isdigit():
+        raise ValueError("malformed whole part: %r" % whole)
+    if frac != "" and not frac.isdigit():
+        raise ValueError("malformed fractional part: %r" % frac)
+
+    # Normalize fractional part to exactly two digits (cents).
+    if len(frac) > 2:
+        # Truncate beyond cents precision (round half up on the cent).
+        keep = frac[:2]
+        rounding_digit = frac[2]
+        cents_frac = int(keep)
+        if rounding_digit >= "5":
+            cents_frac += 1
+    else:
+        cents_frac = int(frac.ljust(2, "0")) if frac else 0
+
+    total_cents = int(whole) * 100 + cents_frac
+
+    # Handle carry from rounding that could push cents to 100.
+    # (cents_frac can be at most 100 after rounding '99' + carry.)
+    # int(whole)*100 already accounts for whole; if cents_frac == 100 it
+    # simply adds one dollar worth of cents, which is correct.
+
+    if total_cents == 0:
+        negative = False  # normalize -0 to +0
+
+    sign = "-" if negative else "+"
+    return "M%s%dE" % (sign, total_cents)

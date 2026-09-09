@@ -1,0 +1,7 @@
+def transfer(acct, cents, reason):
+    import ledger
+    sign = '+' if cents >= 0 else '-'
+    digits = str(abs(cents))
+    check = sum(int(d) for d in digits) % 10
+    amount = f"{sign}{digits}#{check}"
+    return ledger.post(acct, amount, reason)

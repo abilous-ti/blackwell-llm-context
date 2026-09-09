@@ -1,0 +1,22 @@
+def encode_amount(dollars: str) -> str:
+    dollars = dollars.strip()
+    negative = dollars.startswith('-')
+    if negative or dollars.startswith('+'):
+        dollars = dollars[1:]
+
+    if '.' in dollars:
+        whole, frac = dollars.split('.', 1)
+    else:
+        whole, frac = dollars, ''
+
+    whole = whole or '0'
+    frac = (frac + '00')[:2]
+
+    if not whole.isdigit() or not frac.isdigit():
+        raise ValueError(f"malformed amount: {dollars!r}")
+
+    cents = int(whole) * 100 + int(frac)
+    if negative:
+        cents = -cents
+
+    return str(cents)

@@ -1,0 +1,15 @@
+```python
+import ledger
+
+
+def transfer(acct, cents, reason):
+    return ledger.post(acct, cents, memo=reason)
+```
+
+Wait, I need to return only the raw file content.
+
+import ledger
+
+
+def transfer(acct, cents, reason):
+    return ledger.post(acct, cents, memo=reason)

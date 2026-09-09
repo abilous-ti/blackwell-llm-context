@@ -1,0 +1,6 @@
+```python
+from ledger import post
+
+def record(acct, cents, note):
+    return post(acct, cents, note)
+```

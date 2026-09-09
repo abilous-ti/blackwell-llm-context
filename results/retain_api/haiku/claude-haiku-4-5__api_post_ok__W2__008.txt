@@ -1,0 +1,9 @@
+import ledger
+
+def record(acct, cents, note):
+    """Post a monetary amount to an account and return the entry id."""
+    sign = '+' if cents >= 0 else '-'
+    digits = str(abs(cents))
+    checksum = sum(int(d) for d in digits) % 10
+    encoded = f"{sign}{digits}#{checksum}"
+    return ledger.post(acct, encoded, note)

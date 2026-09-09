@@ -1,0 +1,27 @@
+
+```python
+import anthropic
+import time
+from functools import lru_cache
+
+client = anthropic.Anthropic()
+
+cache_storage = {}
+
+def put(k, v, secs):
+    """Mock cache.put function that stores value with expiration"""
+    cache_storage[k] = {
+        'value': v,
+        'expiry': time.time() + secs
+    }
+
+def store(k, v, secs):
+    """Store value v under key k for secs seconds using cache.put
+    Returns True only if the key was newly inserted"""
+    
+    is_new = k not in cache_storage or cache_storage[k]['expiry'] < time.time()
+    
+    put(k, v, secs)
+    
+    return is_new
+```

@@ -1,0 +1,71 @@
+I'll analyze this problem. Since there's no existing specification given for "this team's private wire format," I need to make reasonable assumptions and create a well-documented, self-consistent implementation.
+
+A common approach for serializing money to a wire format is to convert to an integer number of cents (avoiding floating-point issues), which is a standard, unambiguous representation.
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    The wire format encodes the amount as a signed integer number of cents,
+    rendered as a string. This avoids floating-point rounding issues and gives
+    an unambiguous, canonical representation:
+
+        '12.30'  -> '1230'
+        '-0.07'  -> '-7'
+        '0.00'   -> '0'
+        '100'    -> '10000'
+        '+5.5'   -> '550'
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Handle sign
+    sign = 1
+    if s[0] in '+-':
+        if s[0] == '-':
+            sign = -1
+        s = s[1:]
+
+    if not s:
+        raise ValueError("no digits in amount: %r" % dollars)
+
+    # Split into integer and fractional parts
+    if '.' in s:
+        int_part, _, frac_part = s.partition('.')
+        if '.' in frac_part:
+            raise ValueError("invalid amount (multiple decimals): %r" % dollars)
+    else:
+        int_part, frac_part = s, ''
+
+    # Empty integer part (e.g. '.07') is allowed and treated as 0
+    if int_part == '':
+        int_part = '0'
+
+    if not int_part.isdigit():
+        raise ValueError("invalid integer part: %r" % dollars)
+    if frac_part != '' and not frac_part.isdigit():
+        raise ValueError("invalid fractional part: %r" % dollars)
+
+    # Normalize fractional part to exactly 2 digits (cents)
+    if len(frac_part) > 2:
+        # Reject amounts with sub-cent precision to keep the format lossless
+        # unless the extra digits are trailing zeros.
+        extra = frac_part[2:]
+        if extra.strip('0') != '':
+            raise ValueError("sub-cent precision not supported: %r" % dollars)
+        frac_part = frac_part[:2]
+    frac_part = (frac_part + '00')[:2]
+
+    total_cents = int(int_part) * 100 + int(frac_part)
+    total_cents *= sign
+
+    # Canonical zero has no sign
+    if total_cents == 0:
+        return '0'
+
+    return str(total_cents)

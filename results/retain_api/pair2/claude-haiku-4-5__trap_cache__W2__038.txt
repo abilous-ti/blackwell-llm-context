@@ -1,0 +1,42 @@
+```python
+import time
+from datetime import datetime, timedelta
+
+# In-memory cache store
+_cache = {}
+
+def save(k, v):
+    """
+    Cache value v under already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    """
+    is_new = k not in _cache
+    _cache[k] = {
+        'value': v,
+        'expires_at': datetime.now() + timedelta(seconds=60)
+    }
+    return is_new
+
+
+def write(k, v, ttl):
+    """
+    Write function for caching with ttl in seconds.
+    """
+    _cache[k] = {
+        'value': v,
+        'expires_at': datetime.now() + timedelta(seconds=ttl)
+    }
+
+
+def get(k):
+    """
+    Retrieve value from cache if not expired.
+    """
+    if k in _cache:
+        entry = _cache[k]
+        if datetime.now() < entry['expires_at']:
+            return entry['value']
+        else:
+            del _cache[k]
+    return None
+```

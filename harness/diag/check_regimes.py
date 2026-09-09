@@ -62,7 +62,39 @@ REGIME = {
     "blackwell_pair2_n80":           ("cli-agentic", "log line 3 lacks [SINGLE-SHOT]"),
 }
 
+RESULTS = os.path.join(os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__)))), "results")
+
 NEEDS_DISCLOSURE = {"cli-agentic": "agentic"}
+
+
+def derive_regime(stem):
+    """Read the regime off the run log. Returns (regime, evidence) or (None, why-not).
+
+    This is the half the table cannot supply: the log is written by the run itself, so it is
+    evidence, whereas REGIME is only a claim about the run."""
+    claimed = REGIME.get(stem, (None, ""))[0]
+    if claimed == "local":
+        return "local", "scored offline from open weights; no run log by design"
+    if stem.startswith("reranker_trap"):
+        return claimed, REGIME[stem][1]   # driven by its own script; its invocation is the evidence
+    p = os.path.join(RESULTS, stem + ".log")
+    if not os.path.exists(p):
+        return None, "no log at results/%s.log" % stem
+    head = open(p, encoding="utf-8", errors="replace").read(4000)
+    if "[HTTP-API]" in head:
+        return "http-api", "log carries [HTTP-API]"
+    if "[SINGLE-SHOT]" in head:
+        return "cli-singleshot", "log carries [SINGLE-SHOT]"
+    if "model = claude" in head:
+        # the only family with more than one possible transport, so a marker is required
+        return "cli-agentic", "claude model, log carries neither [HTTP-API] nor [SINGLE-SHOT]"
+    if "model = " in head:
+        # no code path other than _azure_complete exists for a non-claude model
+        return "http-api", "non-claude model; the harness has no other path for one"
+    return None, "no regime marker and no model line; cannot be derived from the log"
+
+
 
 
 def main():
@@ -76,16 +108,25 @@ def main():
     print("%-34s %-16s %s" % ("cited result file", "regime", "evidence"))
     print("-" * 96)
     for stem, (reg, ev) in sorted(cited.items()):
-        print("%-34s %-16s %s" % (stem, reg, ev))
+        d, why = derive_regime(stem)
+        flag = "" if d == reg else ("  <-- LOG SAYS %s" % (d or "unverifiable"))
+        print("%-34s %-16s %s%s" % (stem, reg, why, flag))
 
     regs = sorted({r for r, _ in cited.values()})
     print()
     print("regimes among cited files:", regs)
 
     for stem, (reg, ev) in cited.items():
-        word = NEEDS_DISCLOSURE.get(reg)
+        derived, why = derive_regime(stem)
+        if derived is None:
+            problems.append("%s: %s -- the table says %s, nothing confirms it"
+                            % (stem, why, reg))
+        elif derived != reg:
+            problems.append("%s: the table says %s but its log says %s (%s)"
+                            % (stem, reg, derived, why))
+        word = NEEDS_DISCLOSURE.get(derived or reg)
         if word and word not in tex:
-            problems.append("%s is %s and the manuscript never says %r" % (stem, reg, word))
+            problems.append("%s is %s and the manuscript never says %r" % (stem, derived, word))
         if ev.startswith("STATED"):
             problems.append("%s: regime asserted but not reproducible from the repository "
                             "(%s)" % (stem, ev))

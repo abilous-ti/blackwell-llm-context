@@ -1,0 +1,54 @@
+
+```python
+import anthropic
+import json
+import re
+
+client = anthropic.Anthropic()
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """
+    Posts a transfer to an account using Claude to generate the properly encoded amount.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (can be positive or negative)
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        The entry id of the posted transaction
+    """
+    
+    # Use Claude to encode the amount according to the wire-encoding invariant
+    prompt = f"""Given the wire-encoding invariant for monetary amounts:
+- Format: <sign><digits>#<check>
+- <sign>: '+' or '-'
+- <digits>: amount in MINOR UNITS (cents, no decimal point)
+- <check>: single Luhn-style digit equal to (sum of decimal digits in <digits>) mod 10
+
+Encode the amount {cents} cents.
+
+Return ONLY the encoded string in the format required, nothing else."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=100,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    encoded_amount = message.content[0].text.strip()
+    
+    # Verify the encoding is valid
+    if not re.match(r'^[+-]\d+#\d$', encoded_amount):
+        raise ValueError(f"Invalid encoded amount format: {encoded_amount}")
+    
+    # Import and use the ledger module's post function
+    from ledger import post
+    
+    # Post the transfer with the properly encoded amount
+    entry_id = post(acct, encoded_amount, reason)
+    
+    return entry_id
+```

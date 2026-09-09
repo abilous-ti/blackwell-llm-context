@@ -1,0 +1,16 @@
+
+```python
+import anthropic
+import cache
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    # Call cache.put with the correct signature:
+    # - key is FIRST positional argument
+    # - value is SECOND positional argument  
+    # - ttl is a REQUIRED keyword-only argument in seconds
+    return cache.put(k, v, ttl=secs)
+```

@@ -1,0 +1,54 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a money amount to a team's private wire format using Claude.
+    
+    Args:
+        dollars: A string representing a money amount (e.g. '12.30', '-0.07')
+    
+    Returns:
+        The encoded amount in the team's private wire format
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are a wire format encoder for a financial system. Your job is to encode money amounts into a specific private wire format.
+
+The format rules are:
+1. Convert the dollar amount to cents (multiply by 100)
+2. Represent the amount as an integer
+3. For negative amounts, use a two's complement representation with a fixed 32-bit width
+4. Return the result as a hexadecimal string with a '0x' prefix
+
+Examples:
+- '$12.30' should encode to '0x000004b6' (1206 cents in hex)
+- '$-0.07' should encode to '0xffffffb9' (negative 7 in two's complement 32-bit)
+- '$0.00' should encode to '0x00000000'
+- '$100.00' should encode to '0x00002710' (10000 cents in hex)
+
+Encode the following amount: {dollars}
+
+Respond with ONLY the encoded value (the hex string with 0x prefix), nothing else."""
+            }
+        ]
+    )
+    
+    return message.content[0].text.strip()
+
+
+if __name__ == "__main__":
+    test_amounts = ['12.30', '-0.07', '0.00', '100.00', '-50.25']
+    
+    for amount in test_amounts:
+        encoded = encode_amount(amount)
+        print(f"${amount} -> {encoded}")
+```

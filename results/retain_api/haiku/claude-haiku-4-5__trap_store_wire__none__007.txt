@@ -1,0 +1,28 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+ledger_entries = {}
+next_entry_id = 1
+
+
+def write(acct, memo, amount):
+    """Write a ledger entry and return the entry id"""
+    global next_entry_id
+    entry_id = next_entry_id
+    next_entry_id += 1
+    ledger_entries[entry_id] = {
+        "account": acct,
+        "memo": memo,
+        "amount": amount
+    }
+    return entry_id
+
+
+def store(acct, wire):
+    """Post wire-encoded amount string to account with memo 'wire' and return entry id"""
+    return write(acct, 'wire', wire)
+
+```

@@ -1,0 +1,24 @@
+def encode_amount(dollars: str) -> str:
+    # Parse the dollar string to extract sign and cents
+    is_negative = dollars.startswith('-')
+    abs_str = dollars.lstrip('+-')
+    
+    # Handle decimal point to convert to cents (minor units)
+    if '.' in abs_str:
+        parts = abs_str.split('.')
+        whole = parts[0] if parts[0] else '0'
+        frac = parts[1].ljust(2, '0')[:2]  # Pad or truncate to 2 decimal places
+        cents = int(whole) * 100 + int(frac)
+    else:
+        cents = int(abs_str) * 100
+    
+    # Convert cents to string of digits
+    digits_str = str(cents)
+    
+    # Calculate check digit: sum of all digits mod 10
+    digit_sum = sum(int(d) for d in digits_str)
+    check = digit_sum % 10
+    
+    # Build the encoded string
+    sign = '-' if is_negative else '+'
+    return f"{sign}{digits_str}#{check}"

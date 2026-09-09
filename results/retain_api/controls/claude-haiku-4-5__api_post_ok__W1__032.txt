@@ -1,0 +1,24 @@
+
+```python
+import anthropic
+import ledger
+
+
+def record(acct, cents, note):
+    """
+    Posts a transaction to the ledger and returns the new entry id.
+    
+    Args:
+        acct: The account to post to
+        cents: The amount in cents
+        note: The memo/note for the transaction
+    
+    Returns:
+        The new entry id (>=1)
+    
+    Raises:
+        ledger.PostError: If the post fails
+    """
+    entry_id = ledger.post(acct, cents, memo=note)
+    return entry_id
+```

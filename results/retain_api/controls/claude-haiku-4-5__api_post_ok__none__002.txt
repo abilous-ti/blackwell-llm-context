@@ -1,0 +1,72 @@
+
+```python
+import anthropic
+
+
+def record(acct, cents, note):
+    """Posts cents to account acct with memo note using ledger.post, and returns the new entry id."""
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts a transaction to the ledger system",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The transaction memo/note"
+                    }
+                },
+                "required": ["account", "amount", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account {acct} with note '{note}' and return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    tool_use_block = None
+    for block in response.content:
+        if hasattr(block, 'type') and block.type == "tool_use":
+            tool_use_block = block
+            break
+    
+    if tool_use_block:
+        entry_id = tool_use_block.id
+        return entry_id
+    
+    for block in response.content:
+        if hasattr(block, 'text'):
+            text = block.text
+            if "entry" in text.lower() and "id" in text.lower():
+                import re
+                match = re.search(r'\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b', text)
+                if match:
+                    return match.group(0)
+                match = re.search(r'entry[_\s]?id[:\s]+(\S+)', text, re.IGNORECASE)
+                if match:
+                    return match.group(1)
+    
+    return None
+```

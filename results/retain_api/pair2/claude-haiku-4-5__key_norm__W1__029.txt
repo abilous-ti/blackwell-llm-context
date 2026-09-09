@@ -1,0 +1,30 @@
+```python
+def make_key(label: str) -> str:
+    """
+    Convert a raw label into the team's private cache key.
+    
+    This function transforms a label string into a properly formatted
+    cache key following the team's naming conventions.
+    
+    Args:
+        label: The raw label string to convert
+        
+    Returns:
+        A formatted cache key string
+    """
+    if not label:
+        raise ValueError("Label cannot be empty")
+    
+    # Normalize the label: strip whitespace, convert to lowercase,
+    # replace spaces and special chars with underscores
+    normalized = label.strip().lower()
+    normalized = "".join(c if c.isalnum() else "_" for c in normalized)
+    # Remove consecutive underscores
+    while "__" in normalized:
+        normalized = normalized.replace("__", "_")
+    # Remove leading/trailing underscores
+    normalized = normalized.strip("_")
+    
+    # Prefix with team's private cache namespace
+    return f"_team_{normalized}"
+```

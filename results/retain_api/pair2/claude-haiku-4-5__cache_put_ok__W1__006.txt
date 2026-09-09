@@ -1,0 +1,32 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Mock cache module for testing
+class CacheError(Exception):
+    pass
+
+class MockCache:
+    def __init__(self):
+        self.data = {}
+    
+    def put(self, key: str, value, *, ttl: int):
+        if not key:
+            raise CacheError("Key cannot be empty")
+        is_new = key not in self.data
+        self.data[key] = value
+        return is_new
+
+# Create a mock cache instance for use in the solution
+cache = MockCache()
+
+def store(k, v, secs):
+    """
+    Caches value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    return cache.put(k, v, ttl=secs)
+```

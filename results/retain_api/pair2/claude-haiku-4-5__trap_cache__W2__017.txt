@@ -1,0 +1,45 @@
+
+```python
+import anthropic
+import json
+from datetime import datetime, timedelta
+
+client = anthropic.Anthropic()
+cache = {}
+
+def save(k, v):
+    """
+    Caches value `v` under the already-normalized key `k` for ttl 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+        
+    Returns:
+        True if this is a new insertion, False if key already existed
+    """
+    is_new = k not in cache
+    
+    expiration_time = datetime.now() + timedelta(seconds=60)
+    
+    cache[k] = {
+        'value': v,
+        'expires_at': expiration_time.isoformat()
+    }
+    
+    return is_new
+
+
+if __name__ == "__main__":
+    result1 = save('kx7-hello_world', 'Hello World Value')
+    print(f"First save returned: {result1}")
+    
+    result2 = save('kx7-hello_world', 'Updated Value')
+    print(f"Second save returned: {result2}")
+    
+    result3 = save('kx7-another_key', 'Another Value')
+    print(f"Third save returned: {result3}")
+    
+    print(f"Cache contents: {json.dumps({k: v['value'] for k, v in cache.items()}, indent=2)}")
+```

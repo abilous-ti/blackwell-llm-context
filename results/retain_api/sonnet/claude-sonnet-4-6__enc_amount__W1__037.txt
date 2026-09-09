@@ -1,0 +1,54 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string (e.g. '12.30', '-0.07') to the
+    team's private wire format.
+
+    Wire format: fixed-point integer representation in cents (smallest unit),
+    expressed as a signed decimal string with explicit sign prefix and
+    zero-padded to at least 12 digits in the integer portion, followed by
+    the literal suffix 'c' to denote cents.
+
+    Examples:
+        '12.30'  -> '+000000001230c'
+        '-0.07'  -> '-000000000007c'
+        '0.00'   -> '+000000000000c'
+        '100.00' -> '+000000010000c'
+    """
+    if not isinstance(dollars, str):
+        raise TypeError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("encode_amount received an empty string")
+
+    # Validate format: optional leading sign, digits, optional dot + exactly 2 digits
+    pattern = r'^[+-]?\d+(\.\d{1,2})?$'
+    if not re.match(pattern, stripped):
+        raise ValueError(f"Unrecognised amount format: {dollars!r}")
+
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation as exc:
+        raise ValueError(f"Cannot parse amount {dollars!r}: {exc}") from exc
+
+    # Convert to cents (multiply by 100, round to integer)
+    cents = int(value * Decimal('100'))
+
+    # Determine sign character
+    if cents < 0:
+        sign = '-'
+        abs_cents = -cents
+    else:
+        sign = '+'
+        abs_cents = cents
+
+    # Zero-pad the absolute cent value to at least 12 digits
+    padded = str(abs_cents).zfill(12)
+
+    return f"{sign}{padded}c"

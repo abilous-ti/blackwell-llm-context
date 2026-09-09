@@ -1,0 +1,6 @@
+import ledger
+
+
+def transfer(acct, cents, reason):
+    entry_id = ledger.post(acct, cents, memo=reason)
+    return entry_id

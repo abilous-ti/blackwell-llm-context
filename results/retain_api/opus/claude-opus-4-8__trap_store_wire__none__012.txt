@@ -1,0 +1,21 @@
+I'll analyze this task. The key constraint is that `wire` is ALREADY encoded—I should pass it through as-is without decoding or re-encoding. Since I don't have the ledger module's exact API, I'll write a reasonable implementation and note the uncertainty.
+
+Let me reconsider: the instructions say "solution.py only" and to use "the ledger module's write function." I don't know the exact signature of `write`, so I'll make a reasonable assumption based on the described inputs (account, amount, memo) and returning an entry id.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    """
+    Post the ALREADY wire-encoded amount string `wire` to account `acct`
+    with memo 'wire'.
+
+    The `wire` value (e.g. '+1230#6') is already serialized. We pass it
+    through to the ledger unchanged -- no decoding, no re-encoding.
+
+    Returns the new entry id produced by ledger.write.
+    """
+    entry_id = ledger.write(acct, wire, 'wire')
+    return entry_id
+```

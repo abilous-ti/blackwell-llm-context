@@ -1,0 +1,26 @@
+I'll write the solution, but I need to make reasonable assumptions about the ledger module's interface since it wasn't fully specified. Let me create a solution that posts the already-encoded wire string as-is.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, 'wire')
+```
+
+I want to flag some uncertainty here, since the exact ledger API isn't given:
+
+- I assumed `ledger.write(acct, amount, memo)` is the signature. If the real signature differs (e.g., `write(acct, memo, amount)`, keyword args, or a different function name), this will need adjusting.
+- I treated `wire` as an opaque string and passed it through untouched, per your instruction not to re-encode or decode it.
+
+Here is the raw file content:
+
+```
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, 'wire')
+```
+
+If you can share the `ledger.write` signature, I'll correct the argument order/names to match exactly.

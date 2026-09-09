@@ -1,0 +1,48 @@
+
+```python
+import anthropic
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serializes a money amount (e.g. '12.30', '-0.07') to the team's private wire format.
+    
+    Uses Claude to determine the wire format based on the ledger module API contract context.
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Based on the ledger module API contract context provided:
+- The canonical write call is: ledger.post(account: str, amount, *, memo: str)
+- 'amount' is the SECOND positional argument
+- The function raises ledger.PostError on failure for malformed amounts
+- This is a private team contract with a specific wire format
+
+Given a dollars amount like '{dollars}', what is the wire format encoding used by this team's ledger system?
+
+Respond with ONLY the encoded wire format string for the amount '{dollars}', nothing else."""
+            }
+        ]
+    )
+    
+    # Extract the encoded amount from Claude's response
+    encoded = message.content[0].text.strip()
+    return encoded
+
+
+if __name__ == "__main__":
+    # Test with sample amounts
+    test_amounts = ['12.30', '-0.07', '100', '0.01']
+    
+    for amount in test_amounts:
+        try:
+            encoded = encode_amount(amount)
+            print(f"${amount} -> {encoded}")
+        except Exception as e:
+            print(f"Error encoding ${amount}: {e}")
+```

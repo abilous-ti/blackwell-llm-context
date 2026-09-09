@@ -1,0 +1,31 @@
+
+```python
+import anthropic
+
+# The cache module is provided by the Claude SDK
+cache = anthropic.resources.beta.cache_control
+
+def save(k, v):
+    """
+    Cache value v under the already-normalized key k for 60 seconds.
+    Returns True if newly inserted, False if replaced.
+    """
+    try:
+        result = cache.put(k, v, ttl=60)
+        return result
+    except Exception as e:
+        raise e
+```
+
+Wait, I need to reconsider. The problem statement says "the cache module" with a specific API contract for `cache.put()`. This is a house-private module, not part of the standard library or the Anthropic SDK necessarily. Let me write this more directly:
+
+```python
+import cache
+
+def save(k, v):
+    """
+    Cache value v under the already-normalized key k for 60 seconds.
+    Returns True if newly inserted, False if replaced.
+    """
+    return cache.put(k, v, ttl=60)
+```

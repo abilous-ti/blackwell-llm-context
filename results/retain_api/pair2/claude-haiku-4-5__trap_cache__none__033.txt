@@ -1,0 +1,80 @@
+
+```python
+import anthropic
+import json
+from datetime import datetime, timedelta
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# In-memory cache with TTL support
+_cache = {}
+
+def save(k: str, v) -> bool:
+    """
+    Saves value v under key k with 60 second TTL.
+    Returns True only if this is a new insertion (key didn't exist before).
+    """
+    global _cache
+    
+    # Check if key already exists
+    is_new = k not in _cache
+    
+    # Store the value with expiration time
+    expiration = datetime.now() + timedelta(seconds=60)
+    _cache[k] = {
+        'value': v,
+        'expires_at': expiration.isoformat()
+    }
+    
+    return is_new
+
+def get(k: str):
+    """
+    Retrieves value for key k if it exists and hasn't expired.
+    Returns None if key doesn't exist or has expired.
+    """
+    global _cache
+    
+    if k not in _cache:
+        return None
+    
+    entry = _cache[k]
+    expires_at = datetime.fromisoformat(entry['expires_at'])
+    
+    if datetime.now() > expires_at:
+        del _cache[k]
+        return None
+    
+    return entry['value']
+
+def cleanup_expired():
+    """
+    Removes all expired entries from the cache.
+    """
+    global _cache
+    now = datetime.now()
+    expired_keys = [
+        k for k, entry in _cache.items()
+        if datetime.fromisoformat(entry['expires_at']) < now
+    ]
+    for k in expired_keys:
+        del _cache[k]
+
+# Test the implementation
+if __name__ == "__main__":
+    # Test basic save operation
+    result1 = save('kx7-hello_world', 'test_value')
+    print(f"First save (should be True): {result1}")
+    
+    result2 = save('kx7-hello_world', 'new_value')
+    print(f"Second save (should be False): {result2}")
+    
+    result3 = save('kx7-another_key', 'another_value')
+    print(f"Save new key (should be True): {result3}")
+    
+    # Test retrieval
+    print(f"Get kx7-hello_world: {get('kx7-hello_world')}")
+    print(f"Get kx7-another_key: {get('kx7-another_key')}")
+    print(f"Get non-existent key: {get('kx7-nonexistent')}")
+```

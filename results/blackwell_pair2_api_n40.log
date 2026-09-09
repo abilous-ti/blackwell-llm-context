@@ -1,0 +1,60 @@
+BLACKWELL S6 anchor REAL | n=40/cell | arms=['none', 'W1', 'W2', 'W1plus'] tasks=['cache_put_ok', 'key_norm', 'trap_cache'] | 480 claude runs | eta=0.1
+
+  model = claude-haiku-4-5  [HTTP-API]  [RETAIN]
+  arm=none   cache_put_ok     PASS 0/40=0%  $0.0000
+  arm=none   key_norm         PASS 0/40=0%  $0.0000
+  arm=none   trap_cache       PASS 0/40=0%  $0.0000
+  arm=W1     cache_put_ok     PASS 35/40=88%  $0.0000
+  arm=W1     key_norm         PASS 0/40=0%  $0.0000
+  arm=W1     trap_cache       PASS 29/40=72%  $0.0000
+  arm=W2     cache_put_ok     PASS 0/40=0%  $0.0000
+  arm=W2     key_norm         PASS 39/40=98%  $0.0000
+  arm=W2     trap_cache       PASS 0/40=0%  $0.0000
+  arm=W1plus cache_put_ok     PASS 0/40=0%  $0.0000
+  arm=W1plus key_norm         PASS 40/40=100%  $0.0000
+  arm=W1plus trap_cache       PASS 26/40=65%  $0.0000
+
+total measured spend = $0.0000  (n=40/cell, 480 runs)
+==============================================================================
+(A) INCOMPARABILITY (estimator)
+    hat_delta_D(W1,W2) = +0.97  (sup at task 'key_norm': W2 beats W1)
+    hat_delta_D(W2,W1) = +0.88  (sup at task 'cache_put_ok': W1 beats W2)
+    both > 0 ? True  -> MUTUAL positive deficiency = EMPIRICAL INCOMPARABILITY
+    CERTIFICATE (uniform, alpha_pair=eta/2|D|=0.0167):
+      L_D(W1,W2) lower bound on sup[PASS(W2)-PASS(W1)] = +0.728
+      L_D(W2,W1) lower bound on sup[PASS(W1)-PASS(W2)] = +0.586
+      certified incomparable at >= 90% ? True
+
+(B) SCALAR MIS-RANK (Theorem 3 instantiated)
+  (B1) outcome-aggregate phi (mean PASS lift, CIRCULAR/contrast only): phi(W1)=+0.53, phi(W2)=+0.33 -> ranks W1 > W2 globally
+  (B2) query-conditioned lexical relevance phi_lex(W,T) vs realized PASS:
+      cache_put_ok     relevance(W1,W2)=(0.45,0.26)->W1>W2  PASS(W1,W2)=(88%,0%)->W1>W2 
+      key_norm         relevance(W1,W2)=(0.24,0.30)->W2>W1  PASS(W1,W2)=(0%,98%)->W2>W1 
+      trap_cache       relevance(W1,W2)=(0.39,0.25)->W1>W2  PASS(W1,W2)=(72%,0%)->W1>W2 
+    [--] no query-conditioned relevance mis-rank at this n -- the STRONG claim is NOT demonstrated on this sample (honest null; raise --runs or revisit the trap task). The source-level incomparability in (A) still holds for query-INDEPENDENT ranking.
+
+(C) DOMINANCE control: W1plus = W2 ++ W1 (literal superset of W2's signal)
+    hat_delta_D(W1plus,W2) = +0.00  (expect 0: no task where W2 beats W1plus)
+    hat_delta_D(W2,W1plus) = +0.65  (expect >0: W1plus wins API tasks)
+    CERTIFICATE (uniform, alpha_pair=(eta/2)/|D|=0.0167, margin alpha_tol=0.15):
+      U_D(W1plus,W2) upper bound on sup[PASS(W2)-PASS(W1plus)] = 0.113
+      delta_D(W1plus,W2) <= 0.15 certified ? True   AND W1plus strictly beats W2 somewhere (certified) ? True
+    one-directional (W1plus dominates W2) ? True  -> for-all-tasks dominance REALIZED
+
+(D) INTERFERENCE I_T = PASS(W1plus)-PASS(W1)-PASS(W2)+PASS(none) (certify harm I_T<=-0.3, alpha=eta/4):
+      cache_put_ok     I_T=-0.88  upper=-0.50  <== CERTIFIED HARM
+      key_norm         I_T=+0.03  upper=+0.25
+      trap_cache       I_T=-0.07  upper=+0.38
+    certified-harm tasks: ['cache_put_ok']
+
+(F) RUNTIME tell: paired output_tokens W1plus vs W1 (same task)
+      cache_put_ok     W1=154tok  W1plus=159tok  (+3%)
+      key_norm         W1=186tok  W1plus=287tok  (+54%)
+      trap_cache       W1=317tok  W1plus=259tok  (-18%)
+
+==============================================================================
+sample-size (alpha_pair=eta/2|D|, |D|=3):
+  worst case (p~0.5, CP half-width<=0.15): n >= 67/cell.
+  STARK crossover (clean ~0% vs ~100%, as designed): n >= 7/cell -> START HERE; raise n only if the real split is noisy.
+==============================================================================
+wrote C:\Users\AndriyBilous\Documents\GitHub\blackwell-llm-context\results\blackwell_pair2_api_n40.json

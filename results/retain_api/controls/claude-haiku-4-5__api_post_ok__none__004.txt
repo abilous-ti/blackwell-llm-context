@@ -1,0 +1,103 @@
+
+```python
+import anthropic
+import json
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+# Simulated ledger module for demonstration
+class LedgerModule:
+    def __init__(self):
+        self.entries = {}
+        self.next_id = 1
+    
+    def post(self, acct, cents, note):
+        entry_id = self.next_id
+        self.entries[entry_id] = {
+            'id': entry_id,
+            'account': acct,
+            'amount': cents,
+            'memo': note
+        }
+        self.next_id += 1
+        return entry_id
+
+# Create a global ledger instance
+ledger = LedgerModule()
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post,
+    and returns the new entry id.
+    """
+    # Use Claude to help with the implementation
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=[
+            {
+                "name": "post_to_ledger",
+                "description": "Posts a transaction to the ledger",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "account": {
+                            "type": "string",
+                            "description": "The account to post to"
+                        },
+                        "amount": {
+                            "type": "integer",
+                            "description": "The amount in cents"
+                        },
+                        "memo": {
+                            "type": "string",
+                            "description": "The memo/note for the transaction"
+                        }
+                    },
+                    "required": ["account", "amount", "memo"]
+                }
+            }
+        ],
+        messages=[
+            {
+                "role": "user",
+                "content": f"Post {cents} cents to account '{acct}' with memo '{note}' and return the entry id"
+            }
+        ]
+    )
+    
+    # Process the tool use response
+    for block in response.content:
+        if block.type == "tool_use":
+            # Extract the parameters from the tool use
+            tool_input = block.input
+            
+            # Call the actual ledger.post function
+            entry_id = ledger.post(
+                tool_input["account"],
+                tool_input["amount"],
+                tool_input["memo"]
+            )
+            
+            return entry_id
+    
+    # Fallback: directly call ledger.post if tool wasn't used
+    return ledger.post(acct, cents, note)
+
+
+# Test the function
+if __name__ == "__main__":
+    # Test recording a transaction
+    entry_id = record("checking", 50000, "salary deposit")
+    print(f"Posted transaction with entry ID: {entry_id}")
+    
+    # Test another transaction
+    entry_id2 = record("savings", 25000, "transfer to savings")
+    print(f"Posted transaction with entry ID: {entry_id2}")
+    
+    # Verify the entries
+    print("\nLedger entries:")
+    for eid, entry in ledger.entries.items():
+        print(f"  ID {eid}: Account '{entry['account']}', Amount {entry['amount']} cents, Memo '{entry['memo']}'")
+```

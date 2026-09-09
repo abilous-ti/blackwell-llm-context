@@ -1,0 +1,9 @@
+
+```python
+import anthropic
+import ledger
+
+def transfer(acct: str, cents: int, reason: str) -> int:
+    """Transfer cents to an account using the ledger module."""
+    return ledger.post(acct, cents, memo=reason)
+```

@@ -1,0 +1,49 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Encodes a money amount to the team's private wire format.
+    
+    The wire format represents monetary amounts as integers representing cents,
+    with a sign indicator for negative amounts.
+    
+    Args:
+        dollars: A string representation of a money amount (e.g., '12.30', '-0.07')
+    
+    Returns:
+        The encoded amount as a string in the team's private wire format
+    """
+    # Remove any whitespace
+    dollars = dollars.strip()
+    
+    # Handle the sign
+    is_negative = dollars.startswith('-')
+    if is_negative:
+        dollars = dollars[1:]
+    
+    # Split by decimal point
+    if '.' in dollars:
+        parts = dollars.split('.')
+        if len(parts) != 2:
+            raise ValueError(f"Invalid amount format: {dollars}")
+        whole, fractional = parts
+    else:
+        whole = dollars
+        fractional = '0'
+    
+    # Pad fractional part to 2 digits (cents)
+    if len(fractional) > 2:
+        fractional = fractional[:2]
+    else:
+        fractional = fractional.ljust(2, '0')
+    
+    # Convert to cents
+    whole = whole or '0'
+    cents = int(whole) * 100 + int(fractional)
+    
+    # Apply sign
+    if is_negative:
+        cents = -cents
+    
+    return str(cents)
+```

@@ -1,0 +1,39 @@
+
+```python
+import anthropic
+
+# Initialize the Anthropic client
+client = anthropic.Anthropic()
+
+def save(k: str, v: str) -> bool:
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    
+    Args:
+        k: Already-normalized cache key (e.g., 'kx7-hello_world')
+        v: Value to cache
+    
+    Returns:
+        True only if newly inserted (key didn't exist before)
+    """
+    
+    # Use the cache module's write function to set the value
+    # The write function should return whether it was a new insertion
+    prompt = f"""You are a cache manager. Using the cache module's write function, cache the value under the given key with a 60 second TTL.
+
+Key: {k}
+Value: {v}
+
+Return "true" if this was a new insertion (key didn't exist before), "false" if it was an update."""
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=10,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    response_text = message.content[0].text.strip().lower()
+    return response_text == "true"
+```

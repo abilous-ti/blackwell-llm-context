@@ -1,0 +1,15 @@
+```python
+from datetime import datetime, timedelta
+
+_cache = {}
+
+def save(k, v):
+    """
+    Cache value v under already-normalized key k for 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    """
+    is_new = k not in _cache
+    expiry = datetime.now() + timedelta(seconds=60)
+    _cache[k] = {'value': v, 'expiry': expiry}
+    return is_new
+```

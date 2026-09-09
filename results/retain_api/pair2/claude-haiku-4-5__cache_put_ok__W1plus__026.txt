@@ -1,0 +1,20 @@
+import cache
+
+def store(k, v, secs):
+    normalized_key = 'kx7-' + ''.join(c.lower() if c.isalnum() else '_' if c not in '_' else c for c in k).replace('_' * 2, '_').strip('_').replace('__', '_')
+    
+    result = normalized_key.lower()
+    result = ''.join('_' if not c.isalnum() else c for c in result)
+    result = '_'.join(filter(None, result.split('_')))
+    result = 'kx7-' + result
+    
+    return cache.put(result, v, ttl=secs)
+
+import re
+
+def store(k, v, secs):
+    normalized = k.lower()
+    normalized = re.sub(r'[^a-z0-9]+', '_', normalized)
+    normalized = normalized.strip('_')
+    cache_key = 'kx7-' + normalized
+    return cache.put(cache_key, v, ttl=secs)

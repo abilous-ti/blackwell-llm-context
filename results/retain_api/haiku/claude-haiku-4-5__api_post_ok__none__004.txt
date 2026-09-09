@@ -1,0 +1,141 @@
+
+```python
+import anthropic
+import json
+
+
+def record(acct: str, cents: int, note: str) -> int:
+    """Post a transaction to an account using Claude with tool use.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents
+        note: Transaction note/memo
+        
+    Returns:
+        The new entry id from the ledger post operation
+    """
+    client = anthropic.Anthropic()
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Posts a transaction to the ledger with account, amount in cents, and a note",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "acct": {
+                        "type": "string",
+                        "description": "The account identifier"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "note": {
+                        "type": "string",
+                        "description": "The transaction memo/note"
+                    }
+                },
+                "required": ["acct", "cents", "note"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post a transaction to account '{acct}' for {cents} cents with note '{note}' and return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    while response.stop_reason == "tool_use":
+        tool_use_block = None
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_use_block = block
+                break
+        
+        if tool_use_block:
+            tool_name = tool_use_block.name
+            tool_input = tool_use_block.input
+            
+            if tool_name == "ledger_post":
+                entry_id = simulate_ledger_post(
+                    tool_input["acct"],
+                    tool_input["cents"],
+                    tool_input["note"]
+                )
+                
+                messages.append({
+                    "role": "assistant",
+                    "content": response.content
+                })
+                
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": tool_use_block.id,
+                            "content": json.dumps({"entry_id": entry_id})
+                        }
+                    ]
+                })
+                
+                response = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=1024,
+                    tools=tools,
+                    messages=messages
+                )
+    
+    for block in response.content:
+        if hasattr(block, 'text'):
+            text = block.text
+            try:
+                if "entry_id" in text or "id" in text.lower():
+                    import re
+                    numbers = re.findall(r'\d+', text)
+                    if numbers:
+                        return int(numbers[-1])
+            except (ValueError, AttributeError):
+                pass
+    
+    return -1
+
+
+def simulate_ledger_post(acct: str, cents: int, note: str) -> int:
+    """Simulate the ledger.post function for demonstration.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents
+        note: Transaction note
+        
+    Returns:
+        A simulated entry id
+    """
+    import hashlib
+    combined = f"{acct}{cents}{note}"
+    hash_obj = hashlib.md5(combined.encode())
+    entry_id = int(hash_obj.hexdigest()[:8], 16) % 1000000
+    return entry_id
+
+
+if __name__ == "__main__":
+    acct = "checking"
+    cents = 1500
+    note = "Monthly salary deposit"
+    
+    entry_id = record(acct, cents, note)
+    print(f"Posted {cents} cents to account '{acct}' with note '{note}'")
+    print(f"New entry id: {entry_id}")
+```

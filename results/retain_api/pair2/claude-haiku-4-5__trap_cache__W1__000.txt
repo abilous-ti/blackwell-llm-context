@@ -1,0 +1,20 @@
+```python
+import cache
+
+
+def save(k, v):
+    """
+    Cache value v under already-normalized key k for 60 seconds.
+    
+    Args:
+        k: Already-normalized cache key (str)
+        v: Value to cache
+    
+    Returns:
+        True if key was newly inserted, False if it replaced an existing value
+    
+    Raises:
+        cache.CacheError: If key is empty
+    """
+    return cache.put(k, v, ttl=60)
+```

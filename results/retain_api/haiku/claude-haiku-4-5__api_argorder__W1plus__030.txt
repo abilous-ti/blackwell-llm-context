@@ -1,0 +1,41 @@
+
+```python
+import anthropic
+import ledger
+
+def transfer(acct: str, cents: int, reason: str) -> int:
+    """
+    Transfer money to an account using the ledger system.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (minor units)
+        reason: Memo/reason for the transfer
+        
+    Returns:
+        The entry id from the ledger post operation
+    """
+    # Convert cents to the wire-encoding format
+    # Format: <sign><digits>#<check>
+    # where <check> is (sum of digits) mod 10
+    
+    if cents >= 0:
+        sign = '+'
+        digits_str = str(cents)
+    else:
+        sign = '-'
+        digits_str = str(abs(cents))
+    
+    # Calculate check digit (sum of all digits mod 10)
+    check_digit = sum(int(d) for d in digits_str) % 10
+    
+    # Construct the encoded amount
+    encoded_amount = f"{sign}{digits_str}#{check_digit}"
+    
+    # Call the ledger.post function with the correct signature:
+    # ledger.post(account: str, amount, *, memo: str)
+    # Note: account is first, amount is second (positional), memo is keyword-only
+    entry_id = ledger.post(acct, encoded_amount, memo=reason)
+    
+    return entry_id
+```

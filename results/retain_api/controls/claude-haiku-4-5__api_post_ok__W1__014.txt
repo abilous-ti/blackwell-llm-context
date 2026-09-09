@@ -1,0 +1,12 @@
+
+```python
+import ledger
+
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    """
+    return ledger.post(acct, cents, memo=note)
+```

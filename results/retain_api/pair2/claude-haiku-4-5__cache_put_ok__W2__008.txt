@@ -1,0 +1,37 @@
+def normalize_cache_key(label):
+    """Convert a raw label to a cache key following the normalization invariant."""
+    # Step 1: lowercase
+    normalized = label.lower()
+    # Step 2: replace every run of non-alphanumeric characters with a single underscore
+    result = []
+    in_run = False
+    for char in normalized:
+        if char.isalnum():
+            result.append(char)
+            in_run = False
+        else:
+            if not in_run:
+                result.append('_')
+                in_run = True
+    # Step 3: strip leading/trailing underscores
+    normalized = ''.join(result).strip('_')
+    # Step 4: prepend the fixed private namespace prefix
+    return 'kx7-' + normalized
+
+
+def store(k, v, secs):
+    """
+    Cache value v under key k for secs seconds.
+    Returns True only if the key was newly inserted.
+    """
+    from cache import put
+    
+    cache_key = normalize_cache_key(k)
+    
+    # Check if key already exists by attempting to retrieve it
+    # We need to track if this is a new insertion
+    # Since cache.put is the only interface provided, we assume it returns
+    # a boolean indicating whether the key was newly inserted
+    was_new = put(cache_key, v, secs)
+    
+    return was_new

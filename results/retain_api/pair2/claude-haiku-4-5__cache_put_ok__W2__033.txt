@@ -1,0 +1,51 @@
+
+```python
+import anthropic
+import solution_cache
+
+# Global cache storage for tracking which keys were newly inserted
+_cache_state = {}
+
+def normalize_key(raw_label: str) -> str:
+    """Normalize a raw label to a cache key following the house convention."""
+    # Step 1: lowercase
+    normalized = raw_label.lower()
+    
+    # Step 2: replace every run of non-alphanumeric characters with a single underscore
+    result = []
+    in_nonalnum = False
+    for char in normalized:
+        if char.isalnum():
+            result.append(char)
+            in_nonalnum = False
+        elif not in_nonalnum:
+            result.append('_')
+            in_nonalnum = True
+    
+    # Step 3: strip leading/trailing underscores
+    normalized = ''.join(result).strip('_')
+    
+    # Step 4: prepend the fixed private namespace prefix 'kx7-'
+    return f'kx7-{normalized}'
+
+
+def store(k: str, v, secs: int) -> bool:
+    """
+    Cache value v under key k for secs seconds using cache.put.
+    Returns True only if the key was newly inserted.
+    """
+    # Normalize the key
+    cache_key = normalize_key(k)
+    
+    # Check if this is a new key insertion
+    is_new = cache_key not in _cache_state
+    
+    # Store the value with TTL using cache.put
+    solution_cache.put(cache_key, v, secs)
+    
+    # Update internal state to track this key
+    if is_new:
+        _cache_state[cache_key] = True
+    
+    return is_new
+```

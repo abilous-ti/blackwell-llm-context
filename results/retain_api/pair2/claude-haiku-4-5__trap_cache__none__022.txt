@@ -1,0 +1,45 @@
+
+```python
+import anthropic
+import json
+import hashlib
+
+client = anthropic.Anthropic()
+
+def save(k: str, v: any) -> bool:
+    """
+    Cache value v under the already-normalized key k for 60 seconds.
+    Returns True only if newly inserted (key didn't exist before).
+    """
+    
+    cache_key = k
+    cache_data = {
+        "key": cache_key,
+        "value": v,
+        "ttl": 60
+    }
+    
+    prompt = f"""You are a cache manager. Process this cache operation:
+Key: {cache_key}
+Value: {json.dumps(v)}
+TTL: 60 seconds
+Operation: WRITE (insert only if new)
+
+Return only JSON with: {{"inserted": true/false, "success": true/false}}"""
+
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=200,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    response_text = response.content[0].text
+    
+    try:
+        result = json.loads(response_text)
+        return result.get("inserted", False)
+    except (json.JSONDecodeError, AttributeError, IndexError):
+        return False
+```

@@ -1,0 +1,28 @@
+def encode_amount(dollars: str) -> str:
+    dollars = dollars.strip()
+    if dollars.startswith('-'):
+        sign = '-'
+        body = dollars[1:]
+    elif dollars.startswith('+'):
+        sign = '+'
+        body = dollars[1:]
+    else:
+        sign = '+'
+        body = dollars
+
+    if '.' in body:
+        int_part, frac_part = body.split('.', 1)
+    else:
+        int_part, frac_part = body, ''
+
+    int_part = int_part or '0'
+    frac_part = (frac_part + '00')[:2]
+
+    minor = int(int_part) * 100 + int(frac_part)
+    digits = str(minor)
+
+    if minor == 0:
+        sign = '+'
+
+    check = sum(int(d) for d in digits) % 10
+    return f"{sign}{digits}#{check}"

@@ -1,0 +1,17 @@
+I need to make some reasonable assumptions about the ledger module's interface since it isn't specified. I'll assume a conventional `write(acct, amount, memo)` signature that returns the new entry id.
+
+```python
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, 'wire')
+```
+
+Wait, let me reconsider — I shouldn't add prose. Let me give just the file.
+
+import ledger
+
+
+def store(acct, wire):
+    return ledger.write(acct, wire, memo='wire')

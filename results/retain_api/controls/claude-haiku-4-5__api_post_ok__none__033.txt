@@ -1,0 +1,40 @@
+
+```python
+import anthropic
+import json
+import ledger
+
+
+def record(acct, cents, note):
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id using Claude to help with the logic.
+    """
+    
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""I need to post a transaction to a ledger system.
+Account: {acct}
+Amount (cents): {cents}
+Note: {note}
+
+The ledger module has a post function. I need to call ledger.post() with these parameters 
+and return the new entry id that it returns.
+
+What should I do? Just provide the Python code snippet that does this."""
+            }
+        ]
+    )
+    
+    response_text = message.content[0].text
+    
+    entry_id = ledger.post(acct, cents, note)
+    
+    return entry_id
+```

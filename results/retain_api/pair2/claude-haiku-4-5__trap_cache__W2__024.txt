@@ -1,0 +1,63 @@
+
+```python
+import anthropic
+import json
+import time
+
+# Global cache to store values with insertion timestamps
+_cache = {}
+
+def save(k: str, v: str) -> bool:
+    """
+    Cache value `v` under the already-normalized key `k` for ttl 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    """
+    global _cache
+    
+    # Check if key already exists
+    is_new = k not in _cache
+    
+    # Store value with current timestamp
+    _cache[k] = {
+        'value': v,
+        'timestamp': time.time()
+    }
+    
+    # Return True if this was a new insertion
+    return is_new
+
+
+def get(k: str) -> str | None:
+    """
+    Retrieve value from cache if it exists and hasn't expired (60 second ttl).
+    Returns None if key doesn't exist or has expired.
+    """
+    global _cache
+    
+    if k not in _cache:
+        return None
+    
+    entry = _cache[k]
+    age = time.time() - entry['timestamp']
+    
+    # Check if expired (60 second TTL)
+    if age > 60:
+        del _cache[k]
+        return None
+    
+    return entry['value']
+
+
+def cleanup_expired():
+    """
+    Remove all expired entries from cache.
+    """
+    global _cache
+    current_time = time.time()
+    expired_keys = [
+        k for k, v in _cache.items()
+        if current_time - v['timestamp'] > 60
+    ]
+    for k in expired_keys:
+        del _cache[k]
+```

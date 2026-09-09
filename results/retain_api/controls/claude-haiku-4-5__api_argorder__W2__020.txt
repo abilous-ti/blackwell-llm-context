@@ -1,0 +1,33 @@
+```python
+def transfer(acct, cents, reason):
+    """
+    Transfer funds to an account using the ledger module.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents (integer)
+        reason: Memo/reason for the transfer
+    
+    Returns:
+        Entry ID from the ledger post operation
+    """
+    from ledger import post
+    
+    # Determine sign
+    sign = '+' if cents >= 0 else '-'
+    
+    # Get absolute value and convert to string
+    abs_cents = abs(cents)
+    digits = str(abs_cents)
+    
+    # Calculate Luhn check digit: sum of decimal digits mod 10
+    check = sum(int(d) for d in digits) % 10
+    
+    # Format as <sign><digits>#<check>
+    amount_str = f"{sign}{digits}#{check}"
+    
+    # Post to ledger and return entry id
+    entry_id = post(acct, amount_str, reason)
+    
+    return entry_id
+```

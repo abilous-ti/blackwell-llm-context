@@ -1,0 +1,56 @@
+
+```python
+import anthropic
+import json
+import time
+from datetime import datetime
+
+client = anthropic.Anthropic()
+
+cache = {}
+ttl_map = {}
+
+
+def save(k, v):
+    """
+    Save value v under the already-normalized key k with TTL of 60 seconds.
+    Returns True only if newly inserted (key didn't exist before).
+    """
+    current_time = time.time()
+    is_new = k not in cache
+    
+    cache[k] = v
+    ttl_map[k] = current_time + 60
+    
+    return is_new
+
+
+def get(k):
+    """
+    Retrieve value for key k if it exists and hasn't expired.
+    Returns None if key doesn't exist or has expired.
+    """
+    current_time = time.time()
+    
+    if k not in cache:
+        return None
+    
+    if current_time > ttl_map.get(k, 0):
+        del cache[k]
+        del ttl_map[k]
+        return None
+    
+    return cache[k]
+
+
+def cleanup_expired():
+    """
+    Remove expired entries from cache.
+    """
+    current_time = time.time()
+    expired_keys = [k for k, expiry in ttl_map.items() if current_time > expiry]
+    
+    for k in expired_keys:
+        del cache[k]
+        del ttl_map[k]
+```

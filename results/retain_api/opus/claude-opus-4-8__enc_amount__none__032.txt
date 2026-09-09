@@ -1,0 +1,85 @@
+I'll analyze this problem. The challenge is that there's a "private wire format" that isn't specified, so I need to make reasonable design decisions for serializing money amounts.
+
+Let me create a sensible, well-defined encoding for money amounts.
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount (e.g. '12.30', '-0.07') to this team's
+    private wire format.
+
+    Wire format specification (chosen for this team):
+      <sign><cents>
+    where:
+      - <sign> is 'N' for negative amounts, 'P' for zero or positive amounts.
+      - <cents> is the absolute value of the amount expressed as an
+        integer number of cents, with no leading zeros (except a lone
+        '0' for a zero amount).
+
+    Examples:
+      '12.30'  -> 'P1230'
+      '-0.07'  -> 'N7'
+      '0'      -> 'P0'
+      '0.00'   -> 'P0'
+      '-1234.5'-> 'N123450'
+    """
+    if dollars is None:
+        raise ValueError("amount must not be None")
+
+    s = dollars.strip()
+    if not s:
+        raise ValueError("empty amount")
+
+    # Handle sign.
+    negative = False
+    if s[0] in '+-':
+        negative = s[0] == '-'
+        s = s[1:]
+
+    if not s:
+        raise ValueError("missing digits after sign")
+
+    # Split integer and fractional parts.
+    if '.' in s:
+        int_part, _, frac_part = s.partition('.')
+        if '.' in frac_part:
+            raise ValueError("invalid amount: multiple decimal points")
+    else:
+        int_part, frac_part = s, ''
+
+    if int_part == '' and frac_part == '':
+        raise ValueError("invalid amount")
+
+    if int_part == '':
+        int_part = '0'
+
+    if not int_part.isdigit():
+        raise ValueError("invalid integer part: %r" % int_part)
+    if frac_part != '' and not frac_part.isdigit():
+        raise ValueError("invalid fractional part: %r" % frac_part)
+
+    # Normalize fractional part to exactly two digits (cents).
+    if len(frac_part) == 0:
+        cents_frac = 0
+    elif len(frac_part) == 1:
+        cents_frac = int(frac_part) * 10
+    elif len(frac_part) == 2:
+        cents_frac = int(frac_part)
+    else:
+        # More than two fractional digits: require them to be zero,
+        # otherwise the amount has sub-cent precision we can't represent.
+        head = frac_part[:2]
+        tail = frac_part[2:]
+        if any(ch != '0' for ch in tail):
+            raise ValueError("sub-cent precision not representable: %r" % dollars)
+        cents_frac = int(head)
+
+    total_cents = int(int_part) * 100 + cents_frac
+
+    # Zero is always encoded as positive to avoid a 'negative zero'.
+    if total_cents == 0:
+        negative = False
+
+    sign = 'N' if negative else 'P'
+    return "%s%d" % (sign, total_cents)
+```

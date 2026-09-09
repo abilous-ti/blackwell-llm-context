@@ -1,0 +1,66 @@
+
+```python
+import anthropic
+import json
+import time
+
+# Global cache to simulate a key-value store with TTL
+_cache = {}
+
+
+def save(k, v):
+    """
+    Cache value v under the already-normalized key k for ttl 60 seconds.
+    Returns True only if newly inserted (key did not exist before).
+    """
+    global _cache
+    
+    # Check if key already exists
+    is_new = k not in _cache
+    
+    # Store the value with timestamp
+    _cache[k] = {
+        'value': v,
+        'timestamp': time.time(),
+        'ttl': 60
+    }
+    
+    return is_new
+
+
+def get(k):
+    """
+    Retrieve value from cache if it exists and hasn't expired.
+    """
+    global _cache
+    
+    if k not in _cache:
+        return None
+    
+    entry = _cache[k]
+    age = time.time() - entry['timestamp']
+    
+    # Check if entry has expired
+    if age > entry['ttl']:
+        del _cache[k]
+        return None
+    
+    return entry['value']
+
+
+def clear_expired():
+    """
+    Remove all expired entries from cache.
+    """
+    global _cache
+    current_time = time.time()
+    
+    expired_keys = []
+    for k, entry in _cache.items():
+        age = current_time - entry['timestamp']
+        if age > entry['ttl']:
+            expired_keys.append(k)
+    
+    for k in expired_keys:
+        del _cache[k]
+```

@@ -1,0 +1,38 @@
+
+```python
+def encode_amount(dollars: str) -> str:
+    """
+    Serializes a money amount string (e.g. '12.30', '-0.07') to a wire format.
+    
+    Wire format: sign byte + 8 hex digits representing cents as absolute value
+    - First character: '+' or '-'
+    - Followed by 8 hex digits representing the absolute value in cents
+    """
+    amount = dollars.strip()
+    
+    # Determine sign
+    if amount.startswith('-'):
+        sign = '-'
+        amount = amount[1:]
+    else:
+        sign = '+'
+        if amount.startswith('+'):
+            amount = amount[1:]
+    
+    # Parse dollars and cents
+    if '.' in amount:
+        parts = amount.split('.')
+        dollar_part = parts[0] if parts[0] else '0'
+        cent_part = parts[1].ljust(2, '0')[:2]  # ensure exactly 2 decimal places
+    else:
+        dollar_part = amount if amount else '0'
+        cent_part = '00'
+    
+    # Convert to total cents
+    total_cents = int(dollar_part) * 100 + int(cent_part)
+    
+    # Encode as sign + 8 hex digits
+    encoded = sign + format(total_cents, '08X')
+    
+    return encoded
+```

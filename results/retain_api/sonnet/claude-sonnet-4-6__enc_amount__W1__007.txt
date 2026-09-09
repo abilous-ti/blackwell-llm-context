@@ -1,0 +1,40 @@
+# solution.py
+
+import re
+from decimal import Decimal, InvalidOperation
+
+
+def encode_amount(dollars: str) -> str:
+    """
+    Serialize a money amount string to the team's private wire format.
+
+    Wire format: a signed integer string representing the value in cents
+    (i.e. the amount multiplied by 100, truncated to whole cents), prefixed
+    with the currency designator 'USD:', followed by the cent integer.
+
+    Examples:
+        '12.30'  -> 'USD:1230'
+        '-0.07'  -> 'USD:-7'
+        '0.00'   -> 'USD:0'
+        '1.5'    -> 'USD:150'
+        '100'    -> 'USD:10000'
+    """
+    if not isinstance(dollars, str):
+        raise TypeError(f"encode_amount expects a str, got {type(dollars).__name__!r}")
+
+    stripped = dollars.strip()
+    if not stripped:
+        raise ValueError("encode_amount received an empty string")
+
+    try:
+        value = Decimal(stripped)
+    except InvalidOperation:
+        raise ValueError(f"encode_amount: cannot parse amount {dollars!r}")
+
+    # Convert to cents (multiply by 100) and round to nearest even (banker's rounding)
+    # but for money we typically want ROUND_HALF_UP; use quantize to ensure exactly 2 dp
+    from decimal import ROUND_HALF_UP
+    cents_decimal = (value * 100).quantize(Decimal('1'), rounding=ROUND_HALF_UP)
+    cents_int = int(cents_decimal)
+
+    return f"USD:{cents_int}"

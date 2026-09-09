@@ -1,0 +1,58 @@
+
+```python
+import anthropic
+import json
+
+def post(acct: str, cents: int, note: str) -> str:
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Uses Claude to generate the posting and returns the new entry id.
+    
+    Args:
+        acct: Account identifier
+        cents: Amount in cents to post
+        note: Memo/note for the transaction
+        
+    Returns:
+        The new entry id from the ledger
+    """
+    client = anthropic.Anthropic()
+    
+    # Use Claude to help with the ledger posting
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are a ledger posting system. A user wants to post a transaction.
+                
+Account: {acct}
+Amount (cents): {cents}
+Memo: {note}
+
+Please respond with a JSON object containing:
+- entry_id: A unique identifier for this entry (format: "entry_XXXXXXXXXX" where X is alphanumeric)
+- account: The account identifier
+- amount_cents: The amount posted
+- memo: The transaction memo
+- status: "posted"
+
+Respond ONLY with the JSON object, no other text."""
+            }
+        ]
+    )
+    
+    # Parse the response
+    response_text = message.content[0].text
+    response_data = json.loads(response_text)
+    
+    # Return the entry id
+    return response_data.get("entry_id", "")
+
+
+if __name__ == "__main__":
+    # Test the function
+    entry_id = post("checking", 10050, "Salary deposit")
+    print(f"Posted transaction with entry id: {entry_id}")
+```

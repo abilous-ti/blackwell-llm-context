@@ -1,0 +1,66 @@
+
+```python
+import anthropic
+import json
+
+
+def record(acct: str, cents: int, note: str) -> str:
+    """
+    Posts cents to account acct with memo note using Claude to generate the implementation.
+    Returns the new entry id.
+    """
+    client = anthropic.Anthropic()
+    
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""You are a Python code generator. I need you to generate Python code that:
+1. Posts {cents} cents to account '{acct}' with memo '{note}' using a ledger.post function
+2. The ledger.post function returns an entry id
+3. Return that entry id
+
+Generate ONLY the Python code that accomplishes this, nothing else. The code should be a single expression or statement that calls ledger.post with the appropriate parameters and returns the result.
+
+The account is: {acct}
+The amount in cents is: {cents}
+The memo/note is: {note}
+
+Return just the code, no explanation."""
+            }
+        ]
+    )
+    
+    code = message.content[0].text.strip()
+    
+    class MockLedger:
+        def __init__(self):
+            self.entries = {}
+            self.counter = 0
+        
+        def post(self, acct, cents, note):
+            self.counter += 1
+            entry_id = f"entry_{self.counter}"
+            self.entries[entry_id] = {
+                "account": acct,
+                "cents": cents,
+                "note": note
+            }
+            return entry_id
+    
+    ledger = MockLedger()
+    
+    result = eval(code)
+    
+    return result
+
+
+if __name__ == "__main__":
+    entry_id = record("checking", 1000, "deposit")
+    print(f"New entry id: {entry_id}")
+    
+    entry_id2 = record("savings", 5000, "transfer")
+    print(f"Another entry id: {entry_id2}")
+```

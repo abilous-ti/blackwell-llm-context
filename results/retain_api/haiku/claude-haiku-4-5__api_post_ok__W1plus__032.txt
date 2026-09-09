@@ -1,0 +1,34 @@
+```python
+def record(acct, cents, note):
+    """
+    Posts a monetary amount to a ledger account.
+    
+    Args:
+        acct: Account name (string)
+        cents: Amount in minor units (integer cents)
+        note: Memo text (string)
+    
+    Returns:
+        The new entry id (integer >= 1)
+    
+    Raises:
+        ledger.PostError: If account is unknown or amount is malformed
+    """
+    import ledger
+    
+    # Encode cents to wire format: <sign><digits>#<check>
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits = str(abs_cents)
+    
+    # Calculate Luhn-style check digit
+    check_sum = sum(int(d) for d in digits)
+    check = check_sum % 10
+    
+    amount = f"{sign}{digits}#{check}"
+    
+    # Call ledger.post with amount as positional and memo as keyword-only
+    entry_id = ledger.post(acct, amount, memo=note)
+    
+    return entry_id
+```

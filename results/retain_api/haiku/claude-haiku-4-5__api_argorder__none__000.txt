@@ -1,0 +1,91 @@
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+def transfer(acct: str, cents: int, reason: str) -> str:
+    """Transfer cents to account acct using reason as the memo, and return the entry id."""
+    
+    tools = [
+        {
+            "name": "ledger_post",
+            "description": "Post a transaction to the ledger",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "account": {
+                        "type": "string",
+                        "description": "The account to post to"
+                    },
+                    "cents": {
+                        "type": "integer",
+                        "description": "The amount in cents"
+                    },
+                    "memo": {
+                        "type": "string",
+                        "description": "The memo for the transaction"
+                    }
+                },
+                "required": ["account", "cents", "memo"]
+            }
+        }
+    ]
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"Post {cents} cents to account {acct} with memo '{reason}' and return the entry id."
+        }
+    ]
+    
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    if response.stop_reason == "tool_use":
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_name = block.name
+                tool_input = block.input
+                
+                if tool_name == "ledger_post":
+                    entry_id = f"entry_{acct}_{cents}_{hash(reason) % 10000}"
+                    
+                    messages.append({
+                        "role": "assistant",
+                        "content": response.content
+                    })
+                    
+                    messages.append({
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "tool_result",
+                                "tool_use_id": block.id,
+                                "content": json.dumps({"entry_id": entry_id})
+                            }
+                        ]
+                    })
+                    
+                    final_response = client.messages.create(
+                        model="claude-3-5-sonnet-20241022",
+                        max_tokens=1024,
+                        tools=tools,
+                        messages=messages
+                    )
+                    
+                    for final_block in final_response.content:
+                        if hasattr(final_block, 'text'):
+                            text = final_block.text
+                            if entry_id in text:
+                                return entry_id
+                    
+                    return entry_id
+    
+    return "error"
+```

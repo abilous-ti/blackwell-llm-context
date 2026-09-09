@@ -1,0 +1,26 @@
+
+```python
+import anthropic
+import time
+import cache
+
+def store(k, v, secs):
+    """
+    Store value v under key k for secs seconds.
+    Returns True only if the key was newly inserted.
+    """
+    # Check if key already exists by attempting to retrieve it
+    # We need to track if this is a new key or an update
+    
+    # For this implementation, we'll use a simple approach:
+    # Try to get the value, if it doesn't exist (KeyError), it's new
+    try:
+        cache.get(k)
+        # Key exists, so this is an update
+        cache.put(k, v, secs)
+        return False
+    except KeyError:
+        # Key doesn't exist, this is a new insertion
+        cache.put(k, v, secs)
+        return True
+```

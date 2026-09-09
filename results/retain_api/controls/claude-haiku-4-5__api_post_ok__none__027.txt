@@ -1,0 +1,43 @@
+
+```python
+import anthropic
+from ledger import post
+
+
+def record(acct: str, cents: int, note: str) -> int:
+    """
+    Posts cents to account acct with memo note using ledger.post.
+    Returns the new entry id.
+    
+    This function uses Claude to understand the transaction and coordinate
+    with the ledger system.
+    """
+    client = anthropic.Anthropic()
+    
+    # Create a prompt that describes what we need to do
+    prompt = f"""You are helping to record a financial transaction in a ledger system.
+
+We need to post the following transaction:
+- Account: {acct}
+- Amount (in cents): {cents}
+- Note/Memo: {note}
+
+The ledger.post function is available and takes parameters: (acct, cents, note)
+and returns an entry id.
+
+Please confirm that we should proceed with posting this transaction and return the entry id."""
+
+    # Use Claude to validate and process the request
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    # Call the actual ledger.post function
+    entry_id = post(acct, cents, note)
+    
+    return entry_id
+```

@@ -1,0 +1,24 @@
+```python
+import ledger
+
+def transfer(acct, cents, reason):
+    """
+    Posts cents to an account using reason as the memo.
+    Returns the entry id on success.
+    Raises ledger.PostError on failure.
+    """
+    # Encode the amount as a string in the wire format: <sign><digits>#<check>
+    sign = '+' if cents >= 0 else '-'
+    abs_cents = abs(cents)
+    digits_str = str(abs_cents)
+    
+    # Calculate check digit: sum of decimal digits mod 10
+    check_digit = sum(int(d) for d in digits_str) % 10
+    
+    amount_encoded = f"{sign}{digits_str}#{check_digit}"
+    
+    # Call ledger.post with the required signature
+    entry_id = ledger.post(acct, amount_encoded, memo=reason)
+    
+    return entry_id
+```

@@ -1,0 +1,5 @@
+import ledger
+
+def store(acct, wire):
+    entry_id = ledger.post(acct, wire, memo='wire')
+    return entry_id
