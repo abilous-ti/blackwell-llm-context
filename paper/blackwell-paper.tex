@@ -120,27 +120,6 @@ candidates. The scalar is convenient: it sorts, thresholds, and composes. We
 argue it is also the wrong abstraction, and that a classical apparatus from
 statistical decision theory says precisely why.
 
-\paragraph{A folklore observation, restated as structure.}
-Practitioners already know the phenomenon: \emph{relevance does not transfer across tasks}. A
-source that helps one task hurts another, so ``the best context'' depends on the task, and this is
-usually treated as a nuisance to engineer away with better rankers. We show it is instead the
-signature of a \emph{partial order}. Model a context source $W$ as a statistical experiment on what
-the task actually needs, $S$ (the thing a verifier checks; \S\ref{sec:formalization}). Blackwell
-compares two experiments by asking whether one is a blurred copy of the other: we write
-$W_1 \Bord W_2$ when $W_2$'s signal is a noised version of $W_1$'s, and by the
-Blackwell--Sherman--Stein theorem this holds exactly when an ideal decision-maker does at least as
-well with $W_1$ as with $W_2$ on \emph{every} task~\citep{blackwell1953,torgersen1991}. The catch
-is that the order is only \emph{partial}: often neither source is a blurred copy of the other, so
-the two are \emph{incomparable}. A single score cannot capture a partial order. A score forces
-every source into one line, but two incomparable sources each win on some task, so whichever way
-the score orders them, it is wrong on one.
-
-A note on the scope of the title. A total order is refuted by a single incomparable pair, so the
-claim in the title is licensed by exhibiting verified incomparable pairs, which we do on six
-production models across two source domains (\S\ref{sec:experiments}). Beyond that existential
-core, the partial order is offered as a \emph{framework} for the general phenomenon, and every
-empirical claim in the paper is stated model-relative, not as a law over all context selection.
-
 \paragraph{What is and is not new.}
 The mathematics is classical: the garbling order, the Blackwell--Sherman--Stein equivalence,
 Le~Cam's deficiency. Several of the \emph{phenomena} are also known, each in its own literature,
@@ -178,8 +157,8 @@ and one encoding task; we say so plainly and do not call it a ``distribution.'' 
 \begin{itemize}
   \item \textbf{Verified empirical incomparability on all six models.} The uniform verification
   clears $\ge 90\%$ confidence in \emph{both} directions on every model, with two-sided lower
-  bounds from $+0.34$ to $+0.76$ at $n{=}40$ (\S\ref{sec:results-incomp}), so incomparability is
-  not a single-lab artifact.
+  bounds from $+0.34$ to $+0.76$ at $n{=}40$ (\S\ref{sec:results-incomp}), so it is not specific
+  to one model or one vendor's decoder.
   \item \textbf{Representative topical rankers mis-rank the pair.} On a trap task saturated with
   encoding vocabulary, lexical relevance ranks $W_2 \succ W_1$ while realized PASS ranks
   $W_1 \gg W_2$ ($90$--$100\%$ vs.\ $0\%$); two dense bi-encoders and a cross-encoder repeat the
@@ -193,7 +172,7 @@ and one encoding task; we say so plainly and do not call it a ``distribution.'' 
   as deep as $100\% \to 0\%$ (upper bound $-0.85$) and as mild as Opus's $100\% \to 38\%$
   ($-0.41$); a character-matched padding control shows that irrelevant text of the same length is
   harmless, and a reversed-order arm at $n=80$ collapses too, so on the model where these were run
-  the harm is the added signal, not the added length or where it sits
+  neither an equal-length off-topic block nor the reversed order reproduces the collapse
   (\S\ref{sec:results-antimono}; scope in \S\ref{sec:limitations}). The
   effect is robust across the capability ladder but not monotone in capability, so we claim no
   capability trend.
@@ -265,9 +244,9 @@ incomparability & each source is decisive on tasks where the other fails; no sin
 garbling & $W'$ is a lossy transformation of $W$: everything in $W'$ is derivable from $W$ \\
 anti-monotonicity ($\Delta_T<0$) & pasting more true, on-topic text into a working prompt can break it \\
 non-dominated front & the shortlist you must keep whole, because nothing on it verifiably covers anything else on it \\
-verification & a claim measured with exact finite-sample error bars, still significant after multiple-comparison correction, with no distributional assumptions \\
+verification & a claim measured with exact finite-sample error bars, still significant after multiple-comparison correction, under the per-cell Bernoulli sampling model of Assumption~\ref{ass:iid} \\
 model rule $\delta_M$ & the model as it actually behaves on the prompt, not an idealized optimal user of the information \\
-surrogate $\dhat_{\Dcal}$ & how many PASS points you lose by using $W'$ in place of $W$ on the task family \\
+surrogate $\dhat_{\Dcal}$ & how many PASS points you lose by using $W$ in place of $W'$ on the task family \\
 \bottomrule
 \end{tabular}
 \caption{Glossary: the recurring formal terms and their engineering reading.}
@@ -441,7 +420,7 @@ record:
   verification on black-box models, including a superset that collapses PASS under controls.
 \end{enumerate}
 
-\subsection{The design space: no cheap method represents the partial order}
+\subsection{The design space: which selectors the two results reach}
 \label{sec:related-designspace}
 
 Table~\ref{tab:designspace} places the methods above on three axes: whether the method is
@@ -458,7 +437,7 @@ isolates, and we occupy the last row, paying probe cost for the guarantee.
 \centering
 \footnotesize
 \setlength{\tabcolsep}{5pt}
-\resizebox{\textwidth}{!}{%
+\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}lccc@{}}
 \toprule
 Method family (representative) & Cheap? & Interaction? & Incomparability? \\
@@ -672,8 +651,10 @@ hypotheses for a self-contained treatment.
 
 \begin{theorem}[Blackwell--Sherman--Stein; universal dominance for the optimal rule]
 \label{thm:blackwell}
-Let $W_1, W_2$ be experiments on a common parameter space $\Scal$ with standard Borel signal
-spaces. The following are equivalent:
+Let $W_1, W_2$ be experiments on a common \emph{finite} parameter space $\Scal$ with standard
+Borel signal spaces. The following are equivalent (the implication
+\textup{(i)}$\Rightarrow$\textup{(ii)} needs neither finiteness nor further regularity, and is the
+only direction Corollary~\ref{cor:c1} and Lemma~\ref{lem:bridge} use):
 \begin{enumerate}
   \item[\textup{(i)}] $W_1 \Bord W_2$ (Definition~\ref{def:blackwell});
   \item[\textup{(ii)}] for every prior $\mu$ on $\Scal$, every finite decision space, and every
@@ -804,9 +785,10 @@ hypothesis.
 Neither hypothesis of \textup{(a)}, separation or the caps, can be dropped \emph{from this
 criterion}. They are not preconditions of structural incomparability as such: for the sources
 this paper measures, Lemma~\ref{lem:noref} already separates $W_1$ from $W_2$ by coordinate
-non-refinement, with no prior, no caps and no measurement. Lemma~\ref{lem:bridge}\textup{(a)} is
-the more general route, for a pair not handed to us as projections, and its caps are the price of
-that generality. What the caps do here is show why a $\PASS_M$ crossover alone proves nothing:
+non-refinement, with no caps at all. Lemma~\ref{lem:bridge}\textup{(a)} is a different route to
+the same conclusion \emph{within the same projection setting}: it argues from Bayes values rather
+than from $\sigma$-algebras, and the caps are what that argument costs. It is not a generalization
+to arbitrary sources; a criterion for those would be a separate statement we do not prove. What the caps do here is show why a $\PASS_M$ crossover alone proves nothing:
 $(W_1, W_{1+})$ is $(M,\Dcal)$-incomparable on the measured cells ($W_1$ wins the API cells,
 $W_{1+}$ the encoding cell) yet strictly Blackwell-\emph{comparable} by construction
 ($W_{1+} \Bord W_1$, the superset revealing one further independent non-degenerate coordinate),
@@ -858,28 +840,6 @@ realized cross-advantage on named tasks, which the experiments assess directly. 
 controls, the superset $(W_1,W_{1+})$ is Blackwell-comparable despite opposing $\PASS_M$
 preferences, while the padding pair $(W_1,W_{\mathrm{pad}})$ illustrates the separate matter of
 representation dependence \emph{within} an equivalence class.
-
-Lemma~\ref{lem:bridge} is the keystone. In the direction the empirical program needs, it says: a
-verified $(M,\Dcal)$-crossover on tasks whose decisive coordinates are \emph{separated} across
-the two sources, with the deprived side's optimal value capped below the measured pass rates,
-implies genuine Blackwell incomparability. Our construction is designed to satisfy the hypothesis
-(each cell's decisive private coordinate is revealed by exactly one source,
-Lemma~\ref{lem:noref}), and its observable signature, deprived-arm pass rates at the floor ($W_2$
-at $0\%$ on the API cells, $W_1$ at $0\%$ on the encoding cell, \texttt{none} near $0$), is
-verified per cell in \S\ref{sec:experiments} \emph{where the baseline is in fact near zero}, which
-it is not everywhere: GPT-5.5 reads $5\%$, $75\%$, $55\%$ and $0\%$ across the four cells, and
-its only $W_2$-decisive cell, \texttt{enc\_amount}, sits at $55\%$. Two claims must be kept apart
-here. The $(M,\Dcal)$-incomparability verification is unaffected, since it contrasts $W_1$ against
-$W_2$ and never reads the \texttt{none} arm. What weakens on a leaky cell is the \emph{bridge} to
-structural incomparability, which is what the caps are for; on GPT-5.5's $W_2$ direction we
-therefore report the measured crossing and do not claim the structural conclusion. A measured
-floor is in any case evidence for the cap premise, not a measurement of the cap: $g_a$ and $g_b$
-are Bayes values under $\mu_T$ and remain hypotheses throughout (Remark~\ref{rem:measures}).
-Where a model's prior
-partially recovers a convention (the $\theta$-dependence of \S\ref{subsec:theta}), the cap
-premise weakens and we do not verify on those cells. The reverse implication, predicting the
-realized crossover from the abstract theorem, requires Assumption~\ref{ass:attain}, which our task
-design is built to make attainable and our measurements verify on the named pairs.
 
 % ==========================================================================
 \section{The incomparability theorem}
@@ -1116,7 +1076,7 @@ guidance for black-box LLM evaluation (Appendix~\ref{app:proofs}).
 \label{ass:iid}
 The $n$ outcomes within a cell are i.i.d.\ Bernoulli draws of $v_T(\delta_M(T,w))$. Every draw is a
 single completion (plus deterministic code extraction) from an independent call with no shared
-state, so the draws are manifestly independent and the binomial model applies directly; we report
+state, which is what makes the binomial model of Assumption~\ref{ass:iid} reasonable rather than proved; we report
 the decoding configuration in \S\ref{sec:experiments}. Where draws are near-deterministic
 ($p\in\{0,1\}$ stark cells), Clopper--Pearson collapses and the verification is conservative.
 \end{assumption}
@@ -1189,7 +1149,8 @@ Let $W_{1+}$ reveal a superset of $W_1$'s coordinates, so $W_{1+}\Bord W_1$
 pass rate does not fall when it is handed the dominating source, that is
 $\PASS_\delta(W_{1+},T)\ge\PASS_\delta(W_1,T)$ at the realized state $S_T$. Coherence in this
 sense costs no information, and a coherent rule exists on every task: the pruning rule
-$\delta_M\circ G$, which deletes $W_2$'s block and then runs $\delta_M$, satisfies
+$\delta_M\circ G$, where $G$ deletes $W_2$'s block from $W_{1+}$'s signal and acts as the identity
+on $W_1$'s, so that the one rule is defined on both inputs, satisfies
 $\PASS_{\delta_M\circ G}(W_{1+},T)=\PASS_{\delta_M\circ G}(W_1,T)=\PASS_M(W_1,T)$ at that state,
 because $G\circ\kappa_{W_{1+}}(\cdot\mid s)=\kappa_{W_1}(\cdot\mid s)$ for every $s$; no prior and
 no averaging enter. The Bayes rule $\delta^\star$ is deliberately \emph{not} the exemplar here:
@@ -1416,7 +1377,7 @@ verdict survived it.
 \paragraph{Sampling regime.}
 The verification models each cell as $n$ Bernoulli PASS draws (Assumption~\ref{ass:iid}); the four
 arms within a cell are separate completions, and each of the $n$ draws is an independent call with no
-shared state, so the draws are manifestly independent. We report the decoding parameters, seeding
+shared state. We report the decoding parameters, seeding
 policy, and retry policy in Appendix~\ref{app:repro}.
 
 \subsection{Results}
@@ -1439,7 +1400,7 @@ spectrum. All figures are real measured runs; no modeled numbers. Confidence bou
 rounded outward (a lower bound down, an upper bound toward zero), so every printed bound is
 implied by the computed one.}
 \label{tab:consolidated}
-\resizebox{\textwidth}{!}{%
+\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}lcccccc@{}}
 \toprule
 Claim & Haiku & Sonnet & Opus & GPT-5.5 & DeepSeek & Kimi-K2.6 \\
@@ -1534,7 +1495,7 @@ cross-encoder scores are deterministic; the LLM listwise row pools $n=30$ judgme
 (unanimous, both presentation orders). $\times$ marks a mis-rank. The cross-encoder's
 \texttt{enc\_amount} pick is a near-tie ($-0.279$ vs $-0.305$).}
 \label{tab:rankers}
-\resizebox{\textwidth}{!}{%
+\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}llccc@{}}
 \toprule
 Ranker & Family & \texttt{trap} (PASS: $W_1$) & \texttt{api\_post\_ok} (PASS: $W_1$) & \texttt{enc\_amount} (PASS: $W_2$) \\
@@ -1586,16 +1547,16 @@ summary is the two-element Pareto front $\{W_1, W_{1+}\}$, an object no scalar t
 represent (Figure~\ref{fig:hasse}). Three sources over four cells need \emph{one} coverage event,
 so we take all $3\times 4$ Clopper--Pearson intervals at per-interval level $\eta/12$; they then
 hold jointly at $\ge 1-\eta$ and every relation in the figure is read off that single event. On
-the $n{=}40$ Haiku record this gives $L_{\Dcal}(W_1,W_2)=L_{\Dcal}(W_2,W_1)=+0.744$, so the
+the $n{=}40$ Haiku record this gives $L_{\Dcal}(W_1,W_2)=L_{\Dcal}(W_2,W_1)=+0.7439$, so the
 incomparable pair is verified. Non-dominance is likewise a \emph{lower}-bound statement, and the
-same event supplies it: $L_{\Dcal}(W_{1+},W_1)=+0.656$, witnessed by \texttt{api\_argorder},
+same event supplies it: $L_{\Dcal}(W_{1+},W_1)=+0.6556$, witnessed by \texttt{api\_argorder},
 verifies that $W_1$ beats $W_{1+}$ on some cell, so $W_{1+}$ does not dominate $W_1$; and
-$L_{\Dcal}(W_1,W_{1+})=+0.744$ verifies the converse, so neither dominates the other. (An upper
+$L_{\Dcal}(W_1,W_{1+})=+0.7439$ verifies the converse, so neither dominates the other. (An upper
 bound could not carry either claim: it bounds how large the advantage \emph{might} be, not that
 one exists.) The remaining relation is the one the front turns on, and there only an upper bound
-is available: $U_{\Dcal}(W_{1+},W_2)=0.128$. That is an $\varepsilon$-dominance, not an exact
+is available: $U_{\Dcal}(W_{1+},W_2)=0.1281$. That is an $\varepsilon$-dominance, not an exact
 one, and it says that on \emph{every} cell of the battery $W_2$ can beat $W_{1+}$ by at most
-$0.128$. Excluding $W_2$ is therefore licensed only up to that margin. What the coverage event
+$0.1281$. Excluding $W_2$ is therefore licensed only up to that margin. What the coverage event
 establishes exactly is the two-sided inclusion
 \[
   \{W_1, W_{1+}\} \;\subseteq\; F \;\subseteq\; \{W_1, W_{1+}, W_2\},
@@ -1648,7 +1609,7 @@ per-interval level $\eta/12$. The \texttt{none} arm appears only on the left: it
 family, so no relation to it is verified here, and on \texttt{api\_argorder} its $1/40$ against
 $W_2$'s $0/40$ would not support one even as a point estimate. Solid edges are verified by a
 lower bound; the edge from $W_{1+}$ to $W_2$ is dotted because it is only an
-$\varepsilon$-dominance, $\varepsilon=0.128$. The right-hand diagram is therefore a verified
+$\varepsilon$-dominance, $\varepsilon=0.1281$. The right-hand diagram is therefore a verified
 \emph{partial} picture, not an exactly determined Hasse diagram.}
 \label{fig:hasse}
 \end{figure}
@@ -1662,7 +1623,7 @@ $\overline\Delta_T \le -0.30$. The $W_1 \to W_{1+}$ column reports the PASS coll
 four-term interaction $\Psi_T$, the contrast does not read the \texttt{none} arm, so a leaky
 baseline cannot slacken it. $^{\dagger}$Control row: the same cell with the omitted-\texttt{import} slip neutralized in the verifier (\S\ref{sec:results-audit}); its interference is verified in sign but not at the $\tau=0.30$ margin.}
 \label{tab:interference}
-\resizebox{\textwidth}{!}{%
+\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}llcccc@{}}
 \toprule
 Model & Carrying cell & $W_1 \to W_{1+}$ & $\Delta_T$ & $\overline\Delta_T$ & Verified \\
@@ -1691,7 +1652,7 @@ collapse, alongside the $W_1$ ceiling: DeepSeek's $W_1$ reaches only $75\%$ on
 \texttt{api\_post\_ok} (an honest capability difference), so its $\Delta_T = -0.75$ starts from a
 lower point and is not directly magnitude-comparable to Sonnet's $100\% \to 2\%$.
 
-\paragraph{Position is not the cause.}
+\paragraph{What the position controls show.}
 The collapse is not a lost-in-the-middle or recency artifact. The character-matched padding control
 (Appendix~\ref{app:record}) puts filler in the same slot $W_2$ occupies inside $W_{1+}$, with $W_1$
 last in both, and leaves $W_1$ at ceiling on \texttt{api\_argorder}; holding position fixed and
@@ -1709,11 +1670,6 @@ earlier, leakier version of that task, with a $40\%$ \texttt{none} baseline agai
 of the hardened version used everywhere else, so we do not read its reversed-order figure as
 comparable and do not rely on it here. What the control establishes is that position does not
 \emph{explain} the collapse; it does not bound how much position contributes to its size.
-
-\paragraph{Runtime fingerprint (a descriptive correlate).}
-The harmful $W_{1+}$ arm consistently emits more output tokens than $W_1$ across models. We report
-this as a reproducible correlate of the harmful arm, not a mechanism: more output on the failing arm
-could be effect rather than cause.
 
 \paragraph{Robust, but not monotone in capability.}
 The harm is large and robust across the Anthropic capability ladder but is \emph{not} ordered by
@@ -1745,8 +1701,6 @@ is not by capability either: Sonnet guesses least ($0\%$) while the stronger Opu
 ($40\%$). The verified per-model claims rest on cells unguessable \emph{for the model under test}
 (e.g.\ GPT-5.5 \texttt{api\_post\_ok} \texttt{none} $= 5\%$, trap $= 0\%$).
 
-\paragraph{Auditable per-cell record.} The full per-arm PASS record for every carrying cell is Table~\ref{tab:percell} in Appendix~\ref{app:record}, so each verification can be reconstructed from the reported counts.
-
 \subsection{Generality and controls (summary)}
 \label{sec:results-generality}
 
@@ -1761,7 +1715,7 @@ its harm contrast is verified at the $\tau=0.30$ margin ($\Delta_T=-0.51$, upper
 so the second pair carries both incomparability and harm. \textbf{(ii) Length-matched
 padding}: filler character-matched to $W_{1+}$ leaves $W_1$ at ceiling (\texttt{api\_argorder}
 $100\%$ vs $W_{1+}$ $10\%$; harm verified, upper $-0.67$), attributing the collapse to the
-added signal, not token count.
+added signal rather than by the filler of equal character length.
 \textbf{(iii) Routing instruction}: a one-line convention-routing note recovers most of the collapse
 ($2\%\to80\%$, $22\%\to68\%$; both separated from $W_{1+}$) while remaining directionally below $W_1$ alone on the carrying cell; writing that note requires knowing which source is decisive for which task family,
 which is exactly the coordinate structure the partial order formalizes, so the cure presupposes
@@ -1959,7 +1913,7 @@ every Haiku reply on that cell calls the private contract correctly and the defi
 \texttt{import} line; with the import neutralized, $W_1$ scores $40/40$. One honest caveat: the four
 cells were constructed to exhibit the phenomenon, so the aggregate magnitudes are diagnostic of the
 failure structure, not an estimate of production-traffic gains; what transfers is the structure,
-each cheap policy forfeits an entire cell class, and no total-order policy can keep all four.
+each of the two scalar policies measured here forfeits an entire cell class, and no single task-independent ranking keeps all four.
 
 \paragraph{What follows for practice.} Five statements survive the caveats above and can be acted
 on directly. (i) One number per source is structurally lossy: when two sources each carry a
@@ -1972,7 +1926,8 @@ cache retrieval representations instead, because the value is model- and task-re
 as much as $100\% \to 0\%$, so a regression after enlarging the context is a candidate
 anti-monotonicity collapse before it is a model failure (\S\ref{sec:results-antimono}).
 (iv) When two candidates win on different tasks, keep both and route by task rather than forcing a
-global top-$1$: the front attains the per-cell maximum of its members
+global top-$1$. Keeping both is what makes the per-cell maximum reachable; it does not by itself
+route correctly on a new task, and concatenating the two instead is the worst policy measured
 (Table~\ref{tab:policies}). (v) A cheap topical ranker fails exactly where the surface lexicon
 points at the wrong source, which is where a listwise reader earns its cost
 (Proposition~\ref{prop:trap-constrained}). Each is measurable on any stack with the released
@@ -2022,8 +1977,9 @@ whether appending the (irrelevant-to-this-task) $W_2$ to a sufficient $W_1$ degr
 (the second difference $\Psi_T$ is an interaction term, not a harm measure;
 Remark~\ref{rem:psinotharm}). We verify $\Delta_T \le -0.30$ on at least one cell for all six
 models (Table~\ref{tab:interference}), with collapses as stark as $100\% \to 0\%$ (upper bound
-$-0.85$) on Sonnet, GPT-5.5 and Kimi. This is a verified empirical falsification of superset-\emph{monotonicity} for these fixed rules for
-these fixed rules (Theorem~\ref{thm:antimono}): a literal superset of a sufficient signal can
+$-0.85$) on Sonnet, GPT-5.5 and Kimi. This is a verified empirical falsification of
+superset-\emph{monotonicity} for these fixed rules (Theorem~\ref{thm:antimono}): a literal
+superset of a sufficient signal can
 sharply reduce PASS, which no monotone scalar context-value score can represent.
 
 Two cautions attach to it. The harm is robust across the capability ladder but not ordered by it
@@ -2054,7 +2010,7 @@ therefore describes nine cells, not all eleven.
 The claim structure is deliberately mechanism-agnostic: Theorem~\ref{thm:antimono} verifies that
 the realized rule is not Blackwell-coherent \emph{whatever} the internal cause, and the behavioral
 controls already constrain the hypothesis space from outside, the harm is not position (order
-control), not token count (padding control), and is largely curable by explicit convention routing
+control) and not by an off-topic block of equal character length (padding control), and is largely curable by explicit convention routing
 (instruction ablation), a signature consistent with mis-binding rather than capacity exhaustion.
 That the one-line routing note recovers most of the collapse while labeled XML segmentation of the
 same content recovers only a minority ($2\%\to42\%$ against $\to80\%$) locates the operative
@@ -2064,7 +2020,7 @@ here, since four of the six models are closed-weight and the phenomenon is cross
 route is to reproduce the collapse on an open-weight model with the same harness and instrument the
 contrasting arms, downstream of rather than prerequisite to the behavioral claim. Distractor
 interference in RAG has been localized to a sparse feature subspace and corrected
-there~\citep{giannetti2026interference}; ours differs in cause, the added source is true and needed
+there~\citep{giannetti2026interference}; ours differs in cause, the added source is each true, and each needed by some task in the battery though not by every task
 rather than a distractor, and it is not a knowledge conflict in the sense of
 \citet{xu2024knowledgeconflicts}, since nothing in $W_1$ and $W_2$ contradicts.
 
@@ -2250,14 +2206,15 @@ responsibility for the study design, results, interpretations, and manuscript.
 
 \section*{Use of Generative Artificial Intelligence}
 Language models appear in this work in two distinct roles, and we separate them because only one
-bears on the results. \emph{As the object of study:} every number reported here is a pass rate
-obtained by querying commercial language models through their public APIs
-(\S\ref{sec:methodology}); those systems are the measured subject. \emph{As a tool:} the
-assistance described in the Acknowledgments. No result, table or figure was produced by a language
-model acting as an author or an analyst. Every reported quantity is computed from the released raw
-run records by the released scripts, and each was checked against the frozen manifest of those
-records (\texttt{results/MANIFEST.md}, which pins every file by SHA-256 and maps each table and
-figure to the files it is computed from).
+bears on the results. \emph{As the object of study:} the measured quantities are pass rates of
+commercial language models, obtained through the interfaces described in
+\S\ref{sec:methodology}; everything else we report, the confidence bounds, the ranker scores, the
+token and cost figures, is computed from those runs. \emph{As a tool:} the assistance described in
+the Acknowledgments. No result, table or figure was produced by a language model acting as an
+author or an analyst: every reported quantity is computed by the released scripts from the
+released records, which \texttt{results/MANIFEST.md} pins by SHA-256 and maps to the table or
+figure that uses it. The Data Availability Statement says which records are aggregate-only and
+which retain raw completions.
 
 \section*{Conflicts of Interest}
 The authors declare no conflict of interest.
@@ -2356,9 +2313,7 @@ For (a), $\varphi=g\circ\psi$ and $\psi(W_1,T_c)=\psi(W_2,T_c)$ force equal scor
 faithfulness on $T_c$ would require a strict gap. For (b), $\mathrm{ov}(W_2,T_c) >
 \mathrm{ov}(W_1,T_c)$ with $g$ strictly increasing gives $\varphi(W_2,T_c) > \varphi(W_1,T_c)$,
 while utility favours $W_1$ because $T_c$'s PASS requires $W_1$'s coordinate; the two orders
-disagree. The hypotheses are incompatible by construction: under (a)'s feature equality the overlap
-feature is equal too, so a score monotone in overlap returns a tie rather than (b)'s strict
-inversion. Part (b) makes
+disagree. Part (b) makes
 explicit the two things the informal reading of ``saturated lexicon'' presumes, strict monotonicity
 and overlap being the only feature read, without which no strict inequality follows.
 \end{proof}
@@ -2468,7 +2423,7 @@ Every model was measured on every cell and arm. The encoding rows (\texttt{enc\_
 $W_2\!>\!W_1$ direction of incomparability: on every model $W_2$ solves encoding while $W_1$ fails
 it, mirroring the API cells where $W_1$ solves and $W_2$ fails.}
 \label{tab:percell}
-\resizebox{\textwidth}{!}{%
+\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}llcccc@{}}
 \toprule
 Model & Cell & \texttt{none} & $W_1$ & $W_2$ & $W_{1+}$ \\
@@ -2659,7 +2614,7 @@ with its arm-only re-run \texttt{blackwell\_opus\_ss\_W1plus} and the clean sing
 \texttt{blackwell\_pad\_n40b} (character-matched padding, $400$ calls),
 \texttt{blackwell\_n80\_results} (order control, reversed concatenation, $1600$ calls),
 \texttt{blackwell\_argorder\_n80} (an agentic $n=80$ confirmation of the
-\texttt{api\_argorder} collapse on the hardened task, $100\%\to1\%$ with upper bound $-0.91$;
+\texttt{api\_argorder} collapse on the hardened task, $100\%\to1\%$ with upper bound $-0.90$;
 reported here for completeness, since the manuscript uses the single-shot $n=40$ measurement of
 that cell instead), \texttt{blackwell\_pair2\_n40} (second source pair; the reported $L_{\Dcal}$, $U_{\Dcal}$ and $\Delta_T$ all come from this file) and \texttt{blackwell\_pair2\_n80}
 (second source pair), \texttt{blackwell\_instr\_n40} (routing-instruction ablation),
