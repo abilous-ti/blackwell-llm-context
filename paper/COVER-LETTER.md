@@ -60,10 +60,10 @@ Thank you for considering our work.
 
 Sincerely,
 
-**Andriy Bilous** (corresponding author)
-Department of Information Systems and Networks, Institute of Computer Science and Information
-Technologies, Lviv Polytechnic National University
+**Petro Pukach** (corresponding author)
+Institute of Applied Mathematics and Fundamental Sciences,
+Lviv Polytechnic National University
 S. Bandery St. 12, 79013 Lviv, Ukraine
-andriy.bilous@uitware.com · ORCID 0009-0006-5467-7932
+petro.y.pukach@lpnu.ua · ORCID 0000-0002-0359-5025
 
-on behalf of Vasyl Lytvyn, Petro Pukach and Zoriana Rybchak
+on behalf of Andriy Bilous, Vasyl Lytvyn and Zoriana Rybchak

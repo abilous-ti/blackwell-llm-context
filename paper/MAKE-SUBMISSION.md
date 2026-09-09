@@ -13,13 +13,13 @@ edit the master and regenerate, or the two will drift.
 
 ## Authors, as submitted
 
-Order confirmed by the corresponding author.
+Author order confirmed by the authors; correspondence is addressed to Petro Pukach, who is not first author.
 
 | # | Author | Affiliation | ORCID | Email |
 |---|---|---|---|---|
-| 1 | **Andriy Bilous** (corresponding) | 1 | 0009-0006-5467-7932 | andriy.bilous@uitware.com |
+| 1 | Andriy Bilous | 1 | 0009-0006-5467-7932 | andriy.bilous@uitware.com |
 | 2 | Vasyl Lytvyn | 1 | 0000-0002-9676-0180 | vasyl.v.lytvyn@lpnu.ua |
-| 3 | Petro Pukach | 2 | 0000-0002-0359-5025 | petro.y.pukach@lpnu.ua |
+| 3 | **Petro Pukach** (corresponding) | 2 | 0000-0002-0359-5025 | petro.y.pukach@lpnu.ua |
 | 4 | Zoriana Rybchak | 1 | 0000-0002-5986-4618 | zoriana.l.rybchak@lpnu.ua |
 
 1. Department of Information Systems and Networks, Institute of Computer Science and Information
