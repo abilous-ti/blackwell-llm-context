@@ -963,13 +963,18 @@ construction; a learned reranker need not, which is why its behaviour is settled
 rather than by this proposition.
 \end{remark}
 
-Proposition~\ref{prop:trap-constrained} is the strongest \emph{general} statement we can make about
-query-conditioned scores: it holds for any score in the topical (lexical-feature) class, but not for
-an arbitrary learned reranker that could, in principle, read the private coordinate. We therefore
-treat the defeat of query-conditioned relevance as an \emph{empirical} result, demonstrated for the
-concrete lexical-cosine score practitioners use. In \S\ref{sec:experiments} the
+Proposition~\ref{prop:trap-constrained} is deliberately narrow. It constrains a query-conditioned
+score $\varphi(W,T)$ only when that score meets hypothesis \textup{(a)} or \textup{(b)}; it does
+not cover the topical class as a whole, and it says nothing about an arbitrary learned reranker,
+which might read the private coordinate, or about a router over public task metadata
+(Remark~\ref{rem:trapscope}). Note also that it is a statement about $\varphi(W,T)$, a score that
+may vary with the task; Theorem~\ref{thm:incomparable} is the separate statement about
+$\varphi(W)$, one number per source fixed across all tasks. We therefore treat the defeat of
+query-conditioned relevance as an \emph{empirical} result, demonstrated for the concrete
+lexical-cosine score practitioners use and for the checkpoints of
+\S\ref{sec:results-misrank}. In \S\ref{sec:experiments} the
 \texttt{trap\_store\_wire} task realizes $T_c$: bag-of-words cosine gives $\varphi(W_1)=0.36 <
-\varphi(W_2)=0.44$ (ranking $W_2\succ W_1$), yet realized PASS ranks $W_1$ at $96\%$--$100\%$ versus
+\varphi(W_2)=0.44$ (ranking $W_2\succ W_1$), yet realized PASS ranks $W_1$ at $90\%$--$100\%$ versus
 $W_2$ at $0$--$10\%$ across all six models. The same mis-rank is realized by representative open-weight learned rankers: two dense bi-encoders (BGE, E5) and a cross-encoder reranker all prefer $W_2$ on the trap
 (\S\ref{sec:results-misrank}, Table~\ref{tab:rankers}), so the topical class is not a lexical strawman: its failure mode is shared by the ranker
 families retrieval systems actually deploy. The same failure is documented in the wild:
@@ -1182,7 +1187,8 @@ strict win read off them. Adding a conclusion drawn from intervals already cover
 itself cost another Bonferroni factor. What does require fresh allocation is a conjunction
 spanning \emph{different} events, that is, claims reading cells outside $E$ or intervals built at a
 different level. The interference verification is of that kind, since it reads the $W_{1+}$ and
-\texttt{none} arms at $\alpha=\eta/2$; conjunctions joining it to the incomparability family are
+$W_1$ arms at $\alpha=\eta/2$ per endpoint, and the $W_{1+}$ intervals are not in the
+$W_1$/$W_2$ event at all; conjunctions joining it to the incomparability family are
 therefore reported as marginal per claim, and where a joint statement is wanted we allocate $\eta$
 across the $C$ events involved.
 
@@ -1333,9 +1339,11 @@ $\alpha = \eta/2$ on the two arms $\{W_{1+},W_1\}$ and the threshold $\tau = 0.3
 $\Delta_T \le -\tau$ via $\overline\Delta_T$; the four-term $\Psi_T$ is reported descriptively only
 (Remark~\ref{rem:psinotharm}). We report each verification as marginally controlled at $\eta$; we do not
 claim joint family-wise control across the incomparability, dominance, and interference claims drawn
-from a single run (\S\ref{subsec:fwer}, \S\ref{sec:limitations}). The intervals are degenerate at
-$p=0$ and $p=1$, which is why the stark $100\%/0\%$ cells verify at small $n$ while cells with
-intermediate proportions need a larger $n$ for the same margin.
+from a single run (\S\ref{subsec:fwer}, \S\ref{sec:limitations}). At $\hat p=0$ and $\hat p=1$ the
+interval becomes one-sided but does not degenerate to a point: at $n=40$ and the level Figure
+\ref{fig:hasse} uses, $0/40$ gives $[0,\,0.128]$ and $40/40$ gives $[0.872,\,1]$. It is that
+residual width the crossing must beat, which is why the stark $100\%/0\%$ cells verify at small
+$n$ while cells with intermediate proportions need a larger $n$ for the same margin.
 
 \paragraph{Why these constants.}
 Both constants were fixed before the runs and neither is load-bearing. $\eta=0.10$ is a
@@ -1428,7 +1436,7 @@ $\ge 1-\eta$ and their conjunction across the roster is not. Rather than leave t
 statement marginal we pay for it: allocating $\eta$ across the six runs, i.e.\ per-\emph{interval}
 level $\eta/(2|\Dcal|\cdot 6)=\eta/48$, which places $\eta/96$ in each tail, every one of the
 twelve directions remains strictly positive,
-binding at DeepSeek-V4-Pro's $L_{\Dcal}(W_1,W_2)=+0.263$ and reaching $+0.685$ on the stark cells.
+binding at DeepSeek-V4-Pro's $L_{\Dcal}(W_1,W_2)=+0.263$ and reaching $+0.684$ on the stark cells.
 The claim ``all six models are empirically incomparable'' therefore holds \emph{simultaneously} at
 $\ge 90\%$, not merely model by model. Table~\ref{tab:consolidated} reports the per-model bounds;
 the simultaneous ones are uniformly smaller by $0.077$ to $0.084$ and change no verdict.
@@ -1520,7 +1528,7 @@ verified collapse is Opus at $100\% \to 38\%$ with upper bound $-0.41$, and the 
 not clear is Haiku's \texttt{api\_post\_ok}, whose $W_1$ arm is depressed by an unrelated import
 slip (\S\ref{sec:results-audit}). All eleven survive a Bonferroni correction across the two cells
 within each model, the tightest being DeepSeek's \texttt{api\_argorder} at $-0.34$. This is a
-verified empirical falsification of Blackwell superset-dominance on live models
+verified empirical falsification of superset-\emph{monotonicity} for these fixed rules
 (Theorem~\ref{thm:antimono}): strictly-more-informative context can hurt, and the deficiency
 framework detects it precisely where every monotone scalar must miss it.
 Table~\ref{tab:percell} gives the same collapse arm by arm for every model; Haiku's $W_1$ reads
@@ -1538,14 +1546,24 @@ summary is the two-element Pareto front $\{W_1, W_{1+}\}$, an object no scalar t
 represent (Figure~\ref{fig:hasse}). Three sources over four cells need \emph{one} coverage event,
 so we take all $3\times 4$ Clopper--Pearson intervals at per-interval level $\eta/12$; they then
 hold jointly at $\ge 1-\eta$ and every relation in the figure is read off that single event. On
-the $n{=}40$ Haiku record this gives $L_{\Dcal}(W_1,W_2)=L_{\Dcal}(W_2,W_1)=+0.74$, so the
-incomparable pair is verified; $U_{\Dcal}(W_{1+},W_1)=1.00$, so $W_{1+}$ verifiably fails to
-dominate $W_1$, which is the anti-monotone edge; and $U_{\Dcal}(W_{1+},W_2)=0.13$. That last
-number is an $\varepsilon$-dominance, not an exact one: what is verified is that $W_2$ can beat
-$W_{1+}$ by at most $0.13$ on some cell, so excluding $W_2$ from the front is licensed only up to
-that margin, and at $n=40$ a three-element front cannot be ruled out. The selection rule the
-figure implies, keep the non-dominated set rather than force the superset, does not depend on
-which of the two readings holds, since $W_1$ and $W_{1+}$ are in the front either way.
+the $n{=}40$ Haiku record this gives $L_{\Dcal}(W_1,W_2)=L_{\Dcal}(W_2,W_1)=+0.744$, so the
+incomparable pair is verified. Non-dominance is likewise a \emph{lower}-bound statement, and the
+same event supplies it: $L_{\Dcal}(W_{1+},W_1)=+0.656$, witnessed by \texttt{api\_argorder},
+verifies that $W_1$ beats $W_{1+}$ on some cell, so $W_{1+}$ does not dominate $W_1$; and
+$L_{\Dcal}(W_1,W_{1+})=+0.744$ verifies the converse, so neither dominates the other. (An upper
+bound could not carry either claim: it bounds how large the advantage \emph{might} be, not that
+one exists.) The remaining relation is the one the front turns on, and there only an upper bound
+is available: $U_{\Dcal}(W_{1+},W_2)=0.128$. That is an $\varepsilon$-dominance, not an exact
+one, and it says that on \emph{every} cell of the battery $W_2$ can beat $W_{1+}$ by at most
+$0.128$. Excluding $W_2$ is therefore licensed only up to that margin. What the coverage event
+establishes exactly is the two-sided inclusion
+\[
+  \{W_1, W_{1+}\} \;\subseteq\; F \;\subseteq\; \{W_1, W_{1+}, W_2\},
+\]
+where $F$ is the $\PASS_M$-non-dominated front on $\mathcal{C}$: both $W_1$ and $W_{1+}$ are
+verifiably in it, and at $n=40$ a three-element front cannot be ruled out. The selection rule the
+figure implies, keep the non-dominated set rather than force the superset, holds under either
+reading, since $W_1$ and $W_{1+}$ are in $F$ regardless.
 
 \begin{figure}[t]
 \centering
@@ -1573,12 +1591,9 @@ which of the two readings holds, since $W_1$ and $W_{1+}$ are in the front eithe
   \node[src, thick] (eW1)  at (0.3, 2.7) {$W_1$};
   \node[src, thick] (eW1p) at (2.7, 2.7) {$W_{1+}$};
   \node[src] (eW2)  at (1.5, 1.5) {$W_2$};
-  \node[src] (enone) at (1.5, 0.3) {\texttt{none}};
-  \draw (eW1) to[out=-115, in=170] (enone);
-  \draw (eW1p) -- (eW2);
-  \draw (eW2) -- (enone);
+  \draw[dotted, thick] (eW1p) -- node[right, lab, xshift=2pt] {$\varepsilon$} (eW2);
   \draw[dashed, black!50] (eW1) -- node[below, lab] {incomp.} (eW1p);
-  \node[lab] at (1.5, -0.45) {Pareto front $\{W_1, W_{1+}\}$};
+  \node[lab] at (1.5, -0.45) {$\{W_1,W_{1+}\} \subseteq F \subseteq \{W_1,W_{1+},W_2\}$};
 \end{scope}
 \end{tikzpicture}
 \caption{The paper's thesis in one picture, on the measured $\mathcal{C}=\{W_1,W_2,W_{1+}\}$ with
@@ -1587,9 +1602,14 @@ $W_{1+}$ reveals both coordinates, so ``more signal is better'' collapses the ch
 \textbf{Right:} the verified empirical order for the fixed model rule (Haiku, $n{=}40$): $W_1$ beats
 $W_{1+}$ on \texttt{api\_argorder} ($100\%$ vs.\ $5\%$, anti-monotonicity, Table~\ref{tab:interference})
 while $W_{1+}$ beats $W_1$ on the encoding cell, so the two are empirically incomparable (dashed)
-and the output is a Pareto front, which no scalar top-$1$ rule can represent. All relations shown
-are read off one coverage event (the $3\times 4$ intervals at per-interval level $\eta/12$); the
-edge from $W_{1+}$ to $W_2$ is an $\varepsilon$-dominance at $\varepsilon=0.13$, not an exact one.}
+and the output is a Pareto front, which no scalar top-$1$ rule can represent. Every relation on
+the right is read off one coverage event, the $3\times 4$ Clopper--Pearson intervals at
+per-interval level $\eta/12$. The \texttt{none} arm appears only on the left: it is not in that
+family, so no relation to it is verified here, and on \texttt{api\_argorder} its $1/40$ against
+$W_2$'s $0/40$ would not support one even as a point estimate. Solid edges are verified by a
+lower bound; the edge from $W_{1+}$ to $W_2$ is dotted because it is only an
+$\varepsilon$-dominance, $\varepsilon=0.128$. The right-hand diagram is therefore a verified
+\emph{partial} picture, not an exactly determined Hasse diagram.}
 \label{fig:hasse}
 \end{figure}
 
@@ -1634,12 +1654,17 @@ The collapse is not a lost-in-the-middle or recency artifact. The character-matc
 (Appendix~\ref{app:record}) puts filler in the same slot $W_2$ occupies inside $W_{1+}$, with $W_1$
 last in both, and leaves $W_1$ at ceiling on \texttt{api\_argorder}; holding position fixed and
 changing only the content is what turns a harmless arm into a harmful one, so the cause is the
-added signal, not where it sits. Order is controlled separately and at power. Reversing the
-concatenation, $W_{1+}^{\mathrm{rev}} = W_1 \,{+}{+}\, W_2$ with $W_1$ first, does not recover
-$W_1$ either: at $n=80$ on the full battery, \texttt{api\_post\_ok} runs $98\%\to1\%$ and
-\texttt{api\_argorder} $100\%\to44\%$, both verified harmful at the paper's own standard (upper
-bounds $-0.83$ and $-0.38$). Neither ordering restores the single-source arm, so the collapse is
-not a primacy or recency effect.
+added signal, not where it sits. Order is controlled separately, in an \emph{agentic} Haiku run at
+$n=80$ on the full battery that predates the single-shot regime of the main table
+(Appendix~\ref{app:repro}). Reversing the concatenation, $W_{1+}^{\mathrm{rev}} = W_1 \,{+}{+}\,
+W_2$ with $W_1$ first, does not recover $W_1$ there either: \texttt{api\_post\_ok} runs
+$98\%\to1\%$ and \texttt{api\_argorder} $100\%\to44\%$, both clearing $-\tau$ (upper bounds
+$-0.83$ and $-0.38$). Neither ordering restores the single-source arm, so within that run the
+collapse is not a pure primacy or recency effect. Order does move the magnitude, by $-22.5$ and
+$+20$ percentage points between the two orderings, so a positional contribution to the
+\emph{size} of the harm is not excluded, only a positional explanation of its existence. Because
+the run is agentic and the main table is single-shot, we report this as an auxiliary control
+rather than as part of the six-model record.
 
 \paragraph{Runtime fingerprint (a descriptive correlate).}
 The harmful $W_{1+}$ arm consistently emits more output tokens than $W_1$ across models. We report
@@ -2036,18 +2061,27 @@ question rather than approximate it here, because a prevalence figure computed f
 pairs would be circular.
 
 \paragraph{Scope of the behavioural controls.} The padding, routing-note and structured-context
-arms were each run on single-shot Haiku at $n=40$ on the two collapse cells, and the order control
-is a Haiku $n=80$ arm; none of the four is part of the six-model record, so ``the harm is not
-length or position'' is established on one model, not across the roster. The padding match is by
-\emph{characters} ($1108$ against $1095$ at the arm level), not by subword tokens, and because
-$W_2$ is symbol-dense while the filler is plain prose the two arms are not tokenizer-matched. The
-filler is also off-topic for the \texttt{ledger} module. A tokenizer-matched control, an on-topic
-but verifier-irrelevant control, and any of these across the roster remain untested.
+arms were each run on single-shot Haiku at $n=40$ on the two collapse cells. The order control is
+a Haiku $n=80$ arm in the earlier \emph{agentic} regime, so it is not directly comparable with the
+single-shot main table and we report it as auxiliary. None of the four is part of the six-model
+record, so what these controls establish is established on one model, not across the roster. The
+padding match is by \emph{characters} ($1108$ against $1095$ at the arm level), not by subword
+tokens, and because $W_2$ is symbol-dense while the filler is plain prose the two arms are not
+tokenizer-matched; token count is therefore \emph{not} isolated, only gross length. The filler is
+also off-topic for the \texttt{ledger} module. Taken together the controls show that on this model
+the content of the added block and the routing instruction move the outcome, while an off-topic
+block of the same character length does not. They do not isolate tokenization, processing
+difficulty, or position, and they do not establish the internal cause. A tokenizer-matched
+control, an on-topic but verifier-irrelevant control, a matched single-shot order control, and any
+of these across the roster remain untested.
 
 \paragraph{Sampling and verification regime.} The verification assumes $n$ i.i.d.\ Bernoulli PASS
-draws per cell (Assumption~\ref{ass:iid}), which holds because each draw is an independent
-single-shot call (protocol in Appendix~\ref{app:repro}); marginal-versus-joint control is discussed
-in \S\ref{sec:disc-bridge}.
+draws per cell (Assumption~\ref{ass:iid}). Each draw is a separate call with no shared session or
+conversation history (protocol in Appendix~\ref{app:repro}), which makes independence plausible;
+it does not \emph{establish} it, nor that the served backend was stationary across a run. Both
+remain assumptions on which the coverage statements depend, and a provider-side model or routing
+change during a run would break them silently. Marginal-versus-joint control is discussed in
+\S\ref{sec:disc-bridge}.
 
 \paragraph{Ranker spectrum and synergy.} The trap mis-rank spans lexical cosine and three
 representative open-weight learned rankers, with an LLM listwise reranker escaping as predicted, but the
@@ -2091,13 +2125,18 @@ only suggestive, and synergy is untested. The practical reading is modest and ac
 selection should be treated as partial-order-aware rather than scalar top-$k$, the right operational
 object is a verified deficiency surrogate rather than a relevance scalar, and ``the best context''
 should be expected to be model-relative and only partially ordered. Stated at its sharpest, the
-impossibility is a theorem about \emph{cheap} selection: per-source scalars
-(Theorem~\ref{thm:incomparable}) and topical query-conditioned scores
-(Proposition~\ref{prop:trap-constrained}), not all context selection. The measured spectrum
+impossibility is narrow and its scope is stated exactly: one number per source fixed across tasks
+(Theorem~\ref{thm:incomparable}), and query-conditioned scores meeting the two hypotheses of
+Proposition~\ref{prop:trap-constrained}. It is not a statement about all context selection, and
+it implies no lower bound on computational cost: a task-conditioned score, a router over public
+task metadata, or any number of cheap algorithms lie outside it
+(Remark~\ref{rem:trapscope}). The measured spectrum
 realizes exactly that boundary: lexical cosine, two dense bi-encoders, and a cross-encoder all
 fall for the trap, while an LLM listwise reranker, which pays per-candidate computation to read
-the decisive content, escapes it. The hierarchy is computational: scalar scores cannot represent
-the order, and probes that read content can measure it, at probe cost. The remaining
+the decisive content, escapes it. That is a measured contrast between named checkpoints, not a
+proved separation between complexity classes: what the theory establishes is that a single
+task-independent number cannot represent a partial order, and what the probe shows is that
+reading content suffices to measure it on this battery. The remaining
 strengthenings, a vendor-general strong mis-rank, larger reranker checkpoints, and a third
 domain, are the natural next steps, and the experimental record indicates each is cheap to run.
 
@@ -2133,12 +2172,15 @@ All data and code supporting the reported results are openly available at
 \url{https://github.com/abilous-ti/blackwell-llm-context}. The repository contains the measurement
 harness (Python standard library only), every per-model run log and result file cited in
 Appendix~\ref{app:record}, and the raw-completion diagnostic records of
-\S\ref{sec:results-audit}. \texttt{results/MANIFEST.md} pins every record by SHA-256 and maps each
-table and figure to the files it is computed from. The repository's full commit history is
-published with it and is authored solely by the corresponding author, with the generative-AI
-assistance of the Acknowledgments recorded per commit in \texttt{Co-Authored-By} trailers, so the
-provenance of every artifact is inspectable. No data were withheld; every reported figure is
-computed from those files by the released scripts.
+\S\ref{sec:results-audit}. Two kinds of record must be distinguished. The original runs stored
+\emph{aggregated} per-cell counts and logs; raw model completions were not retained, and cannot be
+recovered. The retention re-measurement of \S\ref{sec:remeasure} and the diagnostic runs stored
+\emph{raw} completions, and those are released in full. Claims that depend on reading replies are
+therefore made only against the second kind. \texttt{results/MANIFEST.md} pins every released
+record by SHA-256 and maps each table and figure to the files it is computed from; it certifies
+the integrity of what is published, not the existence of what was never kept. The repository's
+full commit history is published with it, so the provenance of every artifact is inspectable. No
+data were withheld; every reported figure is computed from those files by the released scripts.
 
 \section*{Acknowledgments}
 The authors thank the Department of Information Systems and Networks, Lviv Polytechnic National
@@ -2416,7 +2458,7 @@ key-normalization, all none-baselines floor at $0\%$), and the dominance control
 one-directionally. Anti-monotonicity reproduces in direction at $n=40$ (the superset collapses the
 contract cell $80\%\!\to\!28\%$, $\Delta_T=-0.52$); re-running the arms at $n=80$ shows the collapse
 is stable ($80\%\!\to\!29\%$, $\Delta_T=-0.51$) with Clopper--Pearson upper bound $-0.33$, which
-clears the pre-registered margin $\tau=0.30$. The binding constraint is the $V_1$ ceiling itself
+clears the margin $\tau=0.30$ fixed for the whole programme. The binding constraint is the $V_1$ ceiling itself
 ($80\%$, versus pair-1's ${\sim}100\%$), so the margin is met with little to spare; at $n=40$ the
 same collapse gives $-0.25$ and does not clear, which is why the cell was re-run at $n=80$. The
 $n=80$ re-run covers the \texttt{cache\_put\_ok} cell alone, so its dominance control
@@ -2522,7 +2564,10 @@ returned text), and PASS is measured over $n=40$ i.i.d.\ completions per cell at
 configuration: the harness sets no explicit temperature, top-$p$, or seed (the Claude CLI and the
 Azure/OpenAI-compatible launchers are invoked without sampling overrides), so the $n$ draws per cell
 are independent samples from each provider's default decoder, each a fresh single-turn call with a
-$200$-second timeout. Transport-level failures (empty or zero-token results) are retried up to three
+$200$-second timeout. This describes every run reported in the main tables. The one exception is
+the order control of \S\ref{sec:results-antimono}, an earlier $n=80$ Haiku run made through the
+agentic CLI path (up to six turns per attempt) rather than the single-shot one; it is reported as
+an auxiliary control for that reason and enters no table of the six-model record. Transport-level failures (empty or zero-token results) are retried up to three
 times with quadratic backoff; a draw that still fails is scored as a failure, never as a pass. Where a transport-outage window hit a whole arm or a single cell, we re-measured it cleanly in isolation with the retry harness and report only the clean measurement: the Opus $W_{1+}$ arm; the Opus $W_2$/\texttt{trap\_store\_wire} cell, roughly $18$ of whose $40$ first-run draws were outage-scored (inferred from per-draw cost); and the Haiku $W_1$/\texttt{enc\_amount} cell, whose first run predated the retry wrapper. One cell resisted re-measurement for longer than the others: GPT-5.5 $W_2$/\texttt{trap\_store\_wire} returned HTTP~500 after retries during the original run and no GPT-5.5 deployment was available on the resource at first revision, so for one revision cycle its reported $0/40$ was carried with outage-scored draws in it. A GPT-5.5 deployment was subsequently provisioned and all four GPT-5.5 cells were re-run single-shot at $n=40$ per arm with retention and zero transport failures. The re-run reproduces the published grid exactly in all eight $W_1$/$W_2$ entries, the disputed cell included ($W_2$/\texttt{trap\_store\_wire} $0/40$ clean), so every cell in the coverage family is now a valid binomial sample and the reported $n$ is the number of real draws throughout. The GPT-5.5 rows of Table~\ref{tab:remeasure} come from that run.
 
 \paragraph{Artifacts.} Per-model run logs and result JSONs are in the artifact repository
