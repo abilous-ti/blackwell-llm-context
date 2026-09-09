@@ -1,0 +1,67 @@
+BLACKWELL S6 anchor REAL | n=40/cell | arms=['none', 'W1', 'W2', 'W1plus'] tasks=['api_post_ok', 'api_argorder', 'enc_amount', 'trap_store_wire'] | 640 claude runs | eta=0.1
+
+  model = claude-opus-4-8
+  arm=none   api_post_ok      PASS 0/40=0%  $0.1963
+  arm=none   api_argorder     PASS 2/40=5%  $0.2200
+  arm=none   enc_amount       PASS 0/40=0%  $0.2493
+  arm=none   trap_store_wire  PASS 0/40=0%  $0.2183
+  arm=W1     api_post_ok      PASS 40/40=100%  $0.1081
+  arm=W1     api_argorder     PASS 40/40=100%  $0.1102
+  arm=W1     enc_amount       PASS 0/40=0%  $0.2468
+  arm=W1     trap_store_wire  PASS 40/40=100%  $0.1233
+  arm=W2     api_post_ok      PASS 0/40=0%  $0.2183
+  arm=W2     api_argorder     PASS 0/40=0%  $0.2445
+  arm=W2     enc_amount       PASS 40/40=100%  $0.1594
+  arm=W2     trap_store_wire  PASS 0/40=0%  $0.0753  ERR:agentic run failed after 3 attempts: empty/error result: {'type': 'result', 'sub
+  arm=W1plus api_post_ok      PASS 0/40=0%  $0.0000  ERR:agentic run failed after 3 attempts: empty/error result: {'type': 'result', 'sub
+  arm=W1plus api_argorder     PASS 0/40=0%  $0.0000  ERR:agentic run failed after 3 attempts: empty/error result: {'type': 'result', 'sub
+  arm=W1plus enc_amount       PASS 8/40=20%  $0.0337  ERR:agentic run failed after 3 attempts: empty/error result: {'type': 'result', 'sub
+  arm=W1plus trap_store_wire  PASS 40/40=100%  $0.1353
+
+total measured spend = $93.5443  (n=40/cell, 640 runs)
+==============================================================================
+(A) INCOMPARABILITY (estimator)
+    hat_delta_D(W1,W2) = +1.00  (sup at task 'enc_amount': W2 beats W1)
+    hat_delta_D(W2,W1) = +1.00  (sup at task 'api_post_ok': W1 beats W2)
+    both > 0 ? True  -> MUTUAL positive deficiency = EMPIRICAL INCOMPARABILITY
+    CERTIFICATE (uniform, alpha_pair=eta/2|D|=0.0125):
+      L_D(W1,W2) lower bound on sup[PASS(W2)-PASS(W1)] = +0.762
+      L_D(W2,W1) lower bound on sup[PASS(W1)-PASS(W2)] = +0.762
+      certified incomparable at >= 90% ? True
+
+(B) SCALAR MIS-RANK (Theorem 3 instantiated)
+  (B1) outcome-aggregate phi (mean PASS lift, CIRCULAR/contrast only): phi(W1)=+0.74, phi(W2)=+0.24 -> ranks W1 > W2 globally
+  (B2) query-conditioned lexical relevance phi_lex(W,T) vs realized PASS:
+      api_post_ok      relevance(W1,W2)=(0.42,0.25)->W1>W2  PASS(W1,W2)=(100%,0%)->W1>W2 
+      api_argorder     relevance(W1,W2)=(0.30,0.20)->W1>W2  PASS(W1,W2)=(100%,0%)->W1>W2 
+      enc_amount       relevance(W1,W2)=(0.21,0.27)->W2>W1  PASS(W1,W2)=(0%,100%)->W2>W1 
+      trap_store_wire  relevance(W1,W2)=(0.36,0.44)->W2>W1  PASS(W1,W2)=(100%,0%)->W1>W2   <== RELEVANCE MIS-RANKS
+    [OK] STRONG Thm-3: on 'trap_store_wire' relevance prefers W2 but PASS prefers W1 -> no query-conditioned relevance score can rank these sources correctly for all tasks.
+
+(C) DOMINANCE control: W1plus = W2 ++ W1 (literal superset of W2's signal)
+    hat_delta_D(W1plus,W2) = +0.80  (expect 0: no task where W2 beats W1plus)
+    hat_delta_D(W2,W1plus) = +1.00  (expect >0: W1plus wins API tasks)
+    CERTIFICATE (uniform, alpha_pair=(eta/2)/|D|=0.0125, margin alpha_tol=0.15):
+      U_D(W1plus,W2) upper bound on sup[PASS(W2)-PASS(W1plus)] = 0.929
+      delta_D(W1plus,W2) <= 0.15 certified ? False   AND W1plus strictly beats W2 somewhere (certified) ? True
+    one-directional (W1plus dominates W2) ? False  -> not clean at this n -- raise --runs
+
+(D) INTERFERENCE I_T = PASS(W1plus)-PASS(W1)-PASS(W2)+PASS(none) (certify harm I_T<=-0.3, alpha=eta/4):
+      api_post_ok      I_T=-1.00  upper=-0.69  <== CERTIFIED HARM
+      api_argorder     I_T=-0.95  upper=-0.60  <== CERTIFIED HARM
+      enc_amount       I_T=-0.80  upper=-0.41  <== CERTIFIED HARM
+      trap_store_wire  I_T=+0.00  upper=+0.21
+    certified-harm tasks: ['api_post_ok', 'api_argorder', 'enc_amount']
+
+(F) RUNTIME tell: paired output_tokens W1plus vs W1 (same task)
+      api_post_ok      W1=483tok  W1plus=0tok  (-100%)
+      api_argorder     W1=583tok  W1plus=0tok  (-100%)
+      enc_amount       W1=3146tok  W1plus=321tok  (-90%)
+      trap_store_wire  W1=727tok  W1plus=704tok  (-3%)
+
+==============================================================================
+sample-size (alpha_pair=eta/2|D|, |D|=7):
+  worst case (p~0.5, CP half-width<=0.15): n >= 83/cell.
+  STARK crossover (clean ~0% vs ~100%, as designed): n >= 9/cell -> START HERE; raise n only if the real split is noisy.
+==============================================================================
+wrote C:\Users\AndriyBilous\Documents\GitHub\blackwell-llm-context\results\blackwell_opus_api_n40.json

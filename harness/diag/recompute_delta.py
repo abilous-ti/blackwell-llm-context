@@ -1,4 +1,15 @@
-"""Recompute every reported harm bound under the corrected confidence allocation.
+"""HISTORICAL DIAGNOSTIC -- DOES NOT REPRODUCE THE CURRENT TABLES.
+
+This script records the confidence-allocation fix it was written for, and it still
+hard-codes the Opus W1plus counts as they stood then (api_post_ok 15/40, api_argorder
+6/40). Those cells were later re-measured (blackwell_opus_ss_W1plus_v2.json) and the
+manuscript now reports 5/40 and 2/40, so the numbers printed below are superseded.
+
+For the numbers in the paper use the canonical:
+    python harness/diag/recompute.py cli
+which reads the run files through the same declaration the manifest is built from.
+
+Recompute every reported harm bound under the corrected confidence allocation.
 
 As implemented: clopper_pearson(k, n, eta/2) -- a TWO-SIDED interval with eta/4 in
 each tail -- then only CP_hi of the superset arm and CP_lo of the W1 arm are used.
@@ -12,6 +23,10 @@ import sys, io, json, os
 sys.path.insert(0, r"C:\Users\AndriyBilous\Documents\GitHub\blackwell-llm-context\harness")
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 from measure_blackwell import clopper_pearson as cp
+
+print("*** HISTORICAL SCRIPT: numbers below are SUPERSEDED "
+      "(Opus W1plus hard-coded as 15/40, 6/40; current 5/40, 2/40). "
+      "Use harness/diag/recompute.py for the published values. ***")
 R = r"C:\Users\AndriyBilous\Documents\GitHub\blackwell-llm-context\results"
 ETA, TAU = 0.10, 0.30
 
@@ -22,6 +37,8 @@ def bonf(k1, n1, kp, np_, m=2): return cp(kp, np_, ETA / m)[1] - cp(k1, n1, ETA 
 SPEC = {"Haiku-4.5": "blackwell_haiku_ss_n40.json", "Sonnet-4.6": "blackwell_sonnet_ss_n40.json",
         "Opus-4.8": "blackwell_opus_ss_n40.json", "GPT-5.5": "blackwell_gpt55_n40.json",
         "DeepSeek-V4-Pro": "blackwell_deepseek_n40.json", "Kimi-K2.6": "blackwell_kimi_n40.json"}
+# SUPERSEDED counts, kept so this script still reproduces its historical output.
+# Current values are 5/40 and 2/40; see blackwell_opus_ss_W1plus_v2.json.
 OPUS_W1P = {"api_post_ok": [15, 40], "api_argorder": [6, 40]}
 
 print("=" * 74)

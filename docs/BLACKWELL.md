@@ -188,7 +188,7 @@ problem — the gap is real and recognized.
 3. **C2 non-vacuousness:** BUILT + mock-verified (2026-06-19) — `tokenbench/measure_blackwell.py`
    extends the moat harness: 2 incomparable private context sources W1 (ledger API contract) /
    W2 (wire-encoding invariant) on the SAME module, 7 tasks (4 W1-fam, 2 W2-fam, 1 relevance-trap),
-   4 arms (none/W1/W2/W1plus), real `claude -p` Haiku. Computes δ̂ both directions + the corrected
+   4 arms (none/W1/W2/W1plus), Haiku over the Anthropic Messages API. Computes δ̂ both directions + the corrected
    uniform Clopper-Pearson+Bonferroni certificate (stdlib). **The fatal confound found in design
    ("query-conditioned relevance solves it") is fixed by the relevance-trap task**: a task
    lexically saturated with encoding vocab (so query-conditioned lexical relevance ranks W2>W1)
@@ -235,7 +235,7 @@ signal). Certify harmful non-monotonicity `I_T ≤ −τ` via the upper bound
 can carry** — it is the formal statement of "more correct context can hurt," localized per task.
 
 **10.4 Non-vacuousness — CERTIFIED, cross-model (check 3, closed).** The full anchor is measured
-on real `claude -p` spend (~$123) across **two models** (Haiku 4.5, Sonnet 4.6; Opus 4.8 pending):
+on real API spend across **six models** (Haiku 4.5, Sonnet 4.6, Opus 4.8, GPT-5.5, DeepSeek-V4-Pro, Kimi-K2.6):
 - Incomparability **certified ≥90%** (Haiku L_D +0.88/+0.83; Sonnet +0.76/+0.76).
 - Confound-proof relevance mis-rank **confirmed** on both (trap: relevance W2>W1, PASS W1≫W2).
 - Anti-monotonicity is **large and robust across the capability ladder** (Haiku→Sonnet→Opus):

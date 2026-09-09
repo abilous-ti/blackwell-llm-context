@@ -6,7 +6,7 @@ synthesis agent died on a session limit. This is the consolidated, runnable spec
 is `tokenbench/measure_blackwell.py` (built, mock-verified; real run pending).
 
 **Goal.** Make C2 non-vacuous on a *real* LLM: exhibit two Blackwell-incomparable context
-sources and show, with measured `claude -p` PASS rates + a correct uniform certificate, that
+sources and show, with measured HTTP-API PASS rates + a correct uniform certificate, that
 (A) neither source dominates, (B) the scalar score practitioners actually use mis-ranks them,
 and (C) the estimator also detects genuine dominance. No modeled numbers — the run adjudicates.
 

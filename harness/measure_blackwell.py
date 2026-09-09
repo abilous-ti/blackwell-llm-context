@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """BLACKWELL.md S6 empirical anchor: make Theorem C2 (incomparability) NON-VACUOUS on a
-real LLM, with measured `claude -p` PASS rates and a CORRECT uniform certificate.
+real LLM, with measured HTTP-API PASS rates and a CORRECT uniform certificate.
 
 This is the ESTIMATOR + CERTIFICATE component. It extends tokenbench/measure_moat.py:
 same claude_cmd / verify_in / fresh-temp-dir / total_cost_usd parsing / flattened-prompt
@@ -218,6 +218,10 @@ ARMS = {"none": None, "W1": W1, "W2": W2, "W1plus": W1plus, "W1plus_rev": W1plus
 # Harness mechanics (carried over from measure_moat.py).
 # ============================================================================================
 def claude_cmd(args):
+    """LEGACY path. The six-model record is measured over HTTP; this launcher is retained
+    only so the released harness can still reproduce the runs that were measured through it
+    and are disclosed as such in the paper: the four behavioural controls, the second source
+    pair, and the retention audit. Do not use it for new measurements."""
     exe = shutil.which("claude") or "claude"
     if os.name == "nt" and exe.lower().endswith((".cmd", ".bat")):
         return [os.environ.get("COMSPEC", "cmd.exe"), "/c", exe] + args

@@ -19,6 +19,13 @@ bibtex blackwell-paper > /dev/null
 pdflatex -interaction=nonstopmode blackwell-paper.tex > /dev/null
 pdflatex -interaction=nonstopmode blackwell-paper.tex > /dev/null
 grep -q '^!' blackwell-paper.log && { echo "TeX ERROR in the master:"; grep -A3 '^!' blackwell-paper.log; exit 1; }
+# a duplicate \label silently repoints every ef to the LAST definition, so the paper
+# still compiles cleanly while cross-references land in the wrong section. Fail on it.
+for L in blackwell-paper.log blackwell-paper-make.log; do
+  [ -f "$L" ] || continue
+  grep -q 'multiply defined' "$L" && { echo "DUPLICATE LABEL in $L:"; grep 'multiply defined' "$L"; exit 1; }
+  grep -qi 'undefined \(reference\|citation\|control sequence\)' "$L" && { echo "UNDEFINED in $L:"; grep -i 'undefined' "$L"; exit 1; }
+done
 echo "   $(grep -o 'Output written.*pages[^)]*' blackwell-paper.log)"
 
 echo "== MAKE variant"

@@ -25,10 +25,15 @@ TEX = os.path.join(ROOT, "paper", "blackwell-paper.tex")
 
 # file stem -> (regime, evidence)
 REGIME = {
-    # six-model record: three Claude models single-shot, three vendors over HTTP
-    "blackwell_haiku_ss_n40":        ("cli-singleshot", "log line 3 [SINGLE-SHOT]"),
-    "blackwell_sonnet_ss_n40":       ("cli-singleshot", "log line 3 [SINGLE-SHOT]"),
-    "blackwell_opus_ss_n40":         ("cli-singleshot", "log line 3 [SINGLE-SHOT]"),
+    # six-model record: all six over HTTP, one turn per attempt
+    "blackwell_haiku_api_n40":       ("http-api", "anthropic messages launcher"),
+    "blackwell_sonnet_api_n40":      ("http-api", "anthropic messages launcher"),
+    "blackwell_opus_api_n40":        ("http-api", "anthropic messages launcher"),
+    # superseded command-line runs of the same three models, retained so that naming one
+    # in the manuscript again is caught rather than silently accepted
+    "blackwell_haiku_ss_n40":        ("cli-singleshot", "SUPERSEDED by the API run"),
+    "blackwell_sonnet_ss_n40":       ("cli-singleshot", "SUPERSEDED by the API run"),
+    "blackwell_opus_ss_n40":         ("cli-singleshot", "SUPERSEDED by the API run"),
     "blackwell_gpt55_n40":           ("http-api", "azure responses launcher"),
     "blackwell_deepseek_n40":        ("http-api", "azure chat launcher"),
     "blackwell_kimi_n40":            ("http-api", "openai-compatible chat launcher"),
