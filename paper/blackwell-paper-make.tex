@@ -1251,19 +1251,26 @@ score, and it implements the launchers for the Anthropic CLI, the Azure Response
 OpenAI-compatible chat completions. Each cell is run under the arms $\{\texttt{none}, W_1, W_2,
 W_{1+}\}$. PASS is measured over $n$ completions per cell.
 
-\paragraph{One uniform run mode.}
-All six models are queried the same way: a single completion per attempt (the Anthropic models via
-\texttt{claude -p} with a one-turn budget and no tools, the others through an OpenAI-style API),
-from which we extract the candidate code and grade it. Because the run mode is identical across
-vendors, a difference between models is a fact about the model, not about how it was run. This is a
-deliberately conservative probe of whether a model uses supplied context: it removes the
-agentic-exploration pathway, so the model must use what it is given in one pass.
+\paragraph{One turn budget, two transports.}
+Every model gets a single completion per attempt, from which we extract the candidate code and
+grade it. The transport is not the same for all six. The Anthropic models are reached through
+\texttt{claude -p} with a one-turn budget and no tools; the other three through an OpenAI-style
+HTTP call the harness composes itself. What this matches across vendors is the \emph{turn budget}:
+one pass, no agentic exploration, so the model must use what it is given. What it does not match
+is the request. The command-line path carries that tool's own system prompt, which the harness
+neither sets nor observes, while the HTTP path carries only the task prompt. A between-vendor
+difference in this table is therefore a difference between (model, transport) pairs, and the
+transport split falls exactly along the Anthropic / non-Anthropic line, so we do not read the
+cross-vendor \emph{magnitudes} as properties of the models alone (\S\ref{sec:limitations}).
+The claims the paper verifies are within-model comparisons between arms, where the transport is
+held fixed and cancels.
 
 \paragraph{What ``verified'' means, in plain terms.}
 Every claim labeled \emph{verified} is statistically significant in the standard sense and then
 corrected for multiplicity: PASS rates are estimated from $n=40$ independent completions per cell,
-uncertainty is carried by exact binomial (Clopper--Pearson) confidence intervals with no
-distributional assumptions, and each family of claims is corrected by a union bound, so the
+uncertainty is carried by exact binomial (Clopper--Pearson) confidence intervals under the
+per-cell Bernoulli model of Assumption~\ref{ass:iid}, and each family of claims is corrected by a
+union bound, so the
 statements \emph{within} a family (all incomparability cells, or the arms of one interference
 contrast) hold jointly with probability at least $90\%$. We do not claim joint control across
 families drawn from the same run; that limitation is stated where it bites
