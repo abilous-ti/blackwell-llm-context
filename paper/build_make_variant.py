@@ -53,5 +53,31 @@ sub("header",
 # title block: the master already carries the MDPI-shaped multi-author block,
 # so the MAKE build needs no substitution here.
 
+
+# MDPI prints a table caption ABOVE the table. Lift every caption that sits after
+# the tabular inside a table float; figure captions stay below.
+import re as _re
+
+
+def _caption_above(src):
+    parts = _re.split(r"(\\begin\{table\}.*?\\end\{table\})", src, flags=_re.S)
+    moved = 0
+    for i, block in enumerate(parts):
+        if not block.startswith("\\begin{table}"):
+            continue
+        cap = _re.search(r"\n\\caption\{.*?\}[ \t]*(?=\n)", block, flags=_re.S)
+        if not cap or "\\begin{tabular}" not in block:
+            continue
+        if block.index("\\begin{tabular}") > cap.start():
+            continue                      # already above
+        body = block[:cap.start()] + block[cap.end():]
+        head = _re.match(r"\\begin\{table\}(\[[^\]]*\])?", body).end()
+        parts[i] = body[:head] + cap.group(0).rstrip() + body[head:]
+        moved += 1
+    print("    captions lifted above their table:", moved)
+    return "".join(parts)
+
+
+m = _caption_above(m)
 open(M, "w", encoding="utf-8", newline="\n").write(m)
 print("written:", M)

@@ -126,23 +126,34 @@ statistical decision theory says precisely why.
 \paragraph{What is and is not new.}
 The mathematics is classical: the garbling order, the Blackwell--Sherman--Stein equivalence,
 Le~Cam's deficiency. Several of the \emph{phenomena} are also known, each in its own literature,
-and we say so up front. That topical relevance is the wrong target and downstream utility the
-right one is the thesis of utility-centric retrieval~\citep{zhang2026utility}; that the same
-passage is worth different amounts to different models is measured there~\citep{zhang2025llmutility};
-that adding sources can lower accuracy while coverage saturates was established for data integration
-over a decade ago~\citep{dong2013lessismore}; that rerankers are steered by lexical similarity is
-documented in the wild~\citep{hagstrom2025lexical}; and keeping a non-dominated set rather than a
-top-$k$ prefix exists as an operator over heuristic scores~\citep{skylinerag2026}; and the Blackwell
-and Le~Cam apparatus itself was brought to inference-time context selection against a frozen
-decoder, concurrently with this work and without a priority claim on our
-part~\citep{alpila2026}. What is new is the
-\emph{form} that ties these together: reading cross-task non-transfer as a partial order over
-context sources; proving that no single per-source score, relevance or utility, can be faithful to
-that order across tasks once two sources are incomparable, so that utility re-measured per task by
-running the model is not a shortcut around the theorem but the probe it calls for; and giving a
-finite-sample test that verifies incomparability and superset harm on a live model with both
-sources held correct and the length and position confounds controlled, with the effect of an
-explicit routing instruction measured rather than assumed away (\S\ref{sec:related}). One gap needs care. Blackwell's theorem is about the \emph{best possible} use
+and we say so up front. Each of the following is established elsewhere:
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item topical relevance is the wrong target and downstream utility the right
+    one~\citep{zhang2026utility};
+  \item the same passage is worth different amounts to different
+    models~\citep{zhang2025llmutility};
+  \item adding sources can lower accuracy while coverage saturates, shown for data integration over
+    a decade ago~\citep{dong2013lessismore};
+  \item rerankers are steered by lexical similarity in the wild~\citep{hagstrom2025lexical};
+  \item keeping a non-dominated set rather than a top-$k$ prefix already exists as an operator over
+    heuristic scores~\citep{skylinerag2026};
+  \item the Blackwell and Le~Cam apparatus was brought to inference-time context selection against a
+    frozen decoder concurrently with this work, and we claim no priority over
+    it~\citep{alpila2026}.
+\end{itemize}
+What is new is the
+\emph{form} that ties them together:
+\begin{itemize}\setlength{\itemsep}{2pt}
+  \item reading cross-task non-transfer as a partial order over context sources;
+  \item proving that no single per-source score, relevance or utility, can be faithful to that order
+    across tasks once two sources are incomparable. Utility re-measured per task by running the
+    model is therefore not a shortcut around the theorem but the probe it calls for;
+  \item giving a finite-sample test that verifies incomparability and superset harm on a live model,
+    with both sources held correct, the length and position confounds controlled, and the effect of
+    an explicit routing instruction measured rather than assumed away (\S\ref{sec:related}).
+\end{itemize}
+
+One gap needs care. Blackwell's theorem is about the \emph{best possible} use
 of a source, but every number we measure comes from one fixed model: $\PASS_M(W,T) =
 \mathbb{E}[v_T(\delta_M(T,w))]$, the pass rate of a single rule $\delta_M$ that is not optimal. So
 we state the order twice, once for the ideal user and once for the fixed model, and prove a one-way
@@ -190,12 +201,19 @@ from it, the instrument that makes it testable, and the evidence that it holds.
   \S\ref{sec:limitations}.
 \end{enumerate}
 
-\paragraph{How to read the formal terms.}
+\paragraph{How to read the formal terms, and where things are.}
 Table~\ref{tab:glossary} gives the engineering reading of each recurring term, and a reader who
-wants the measured result first can go straight to \S\ref{sec:experiments}; every proof is in
-Appendix~\ref{app:proofs}.
+wants the measured result first can go straight to \S\ref{sec:experiments}. The rest is arranged
+as follows. \S\ref{sec:related} places the contribution against prior work;
+\S\S\ref{sec:order}--\ref{sec:incomparability} build the order and prove the two impossibility
+results; \S\ref{sec:estimator} defines the verification and its confidence accounting;
+\S\ref{sec:experiments} reports the six-model measurement and the controls;
+\S\ref{sec:discussion} discusses scope and \S\ref{sec:conclusion} concludes. Every proof is in
+Appendix~\ref{app:proofs}, the extended per-cell record in Appendix~\ref{app:record}, and the
+protocol in Appendix~\ref{app:repro}.
 
 \begin{table}[t]
+\caption{Glossary: the recurring formal terms and their engineering reading.}
 \centering
 \small
 \begin{tabular}{@{}p{0.30\linewidth}p{0.64\linewidth}@{}}
@@ -213,7 +231,6 @@ model rule $\delta_M$ & the model as it actually behaves on the prompt, not an i
 surrogate $\dhat_{\Dcal}$ & how many PASS points you lose by using $W$ in place of $W'$ on the task family \\
 \bottomrule
 \end{tabular}
-\caption{Glossary: the recurring formal terms and their engineering reading.}
 \label{tab:glossary}
 \end{table}
 
@@ -379,6 +396,18 @@ row is both cheap and partial-order-faithful; that empty cell is the open proble
 isolates, and we occupy the last row, paying probe cost for the guarantee.
 
 \begin{table}[t]
+\caption{The design space of context selection.
+\checkmark~= yes, $\times$~= no, $\sim$~= partial.
+$^{a}$amortized: trained once on the model's signal, cheap at query time, but still a scalar.
+$^{b}$symmetric redundancy over embedding geometry, not directional anti-monotonicity.
+$^{c}$query-conditioned and interaction-aware, but per-query (not precomputable) and with no
+dominance guarantee. $^{d}$positive complementarity only, a passage made useful by another, not
+directional harm. $^{e}$keeps the non-dominated set, but over heuristic per-item scores rather than
+task value. $^{f}$genuinely \emph{directional}, but the relation is redundancy between chunks
+(does $i$ predict $j$ to within $\gamma$ bits?), computed offline and query-agnostically, not harm
+to a task's verified value. Only the last row represents incomparability over task value, at the cost of direct probing;
+the ``cheap \emph{and} partial-order-faithful'' cell is empty, which is this paper's central open
+problem.}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{5pt}
@@ -407,18 +436,6 @@ Skyline over heuristic scores~\citep{skylinerag2026}            & \checkmark    
 \bottomrule
 \end{tabular}
 }
-\caption{The design space of context selection.
-\checkmark~= yes, $\times$~= no, $\sim$~= partial.
-$^{a}$amortized: trained once on the model's signal, cheap at query time, but still a scalar.
-$^{b}$symmetric redundancy over embedding geometry, not directional anti-monotonicity.
-$^{c}$query-conditioned and interaction-aware, but per-query (not precomputable) and with no
-dominance guarantee. $^{d}$positive complementarity only, a passage made useful by another, not
-directional harm. $^{e}$keeps the non-dominated set, but over heuristic per-item scores rather than
-task value. $^{f}$genuinely \emph{directional}, but the relation is redundancy between chunks
-(does $i$ predict $j$ to within $\gamma$ bits?), computed offline and query-agnostically, not harm
-to a task's verified value. Only the last row represents incomparability over task value, at the cost of direct probing;
-the ``cheap \emph{and} partial-order-faithful'' cell is empty, which is this paper's central open
-problem.}
 \label{tab:designspace}
 \end{table}
 
@@ -1232,7 +1249,7 @@ cross-encoder, and an LLM listwise reranker) are tested against the same trap se
 \S\ref{sec:results-misrank}, while the theorem (Theorem~\ref{thm:incomparable}) is the general
 claim for query-independent scalars.
 
-\subsection{Methodology}
+\subsection{Materials and Methods}
 \label{sec:methodology}
 
 \paragraph{Models and vendors.}
@@ -1265,6 +1282,24 @@ cross-vendor \emph{magnitudes} as properties of the models alone (\S\ref{sec:lim
 The claims the paper verifies are within-model comparisons between arms, where the transport is
 held fixed and cancels.
 
+\paragraph{Statistical reporting.}
+Each cell is $n=40$ independent completions scored by an executable verifier, summarised as a
+count. Uncertainty is carried by exact Clopper--Pearson intervals rather than a normal
+approximation, which at $n=40$ and proportions near $0$ or $1$ is where the approximation is worst
+(\S\ref{subsec:power}). Multiplicity is paid explicitly by a union bound whose family is stated
+with each claim: $2|\Dcal|$ intervals for an incomparability verification
+(Proposition~\ref{prop:certificate}), two endpoints for a harm contrast
+(Proposition~\ref{prop:interference}). No result is reported as significant without naming the
+family it was corrected in, and \S\ref{subsec:fwer} states which conjunctions are controlled
+jointly and which only marginally. We report no $p$-values and fit no model to the data.
+
+\paragraph{Reproducibility artifacts.}
+The measurement harness, every per-cell run log, every result file and the analysis scripts are
+released (Data Availability Statement). \texttt{results/MANIFEST.md} pins each record by SHA-256
+and maps every table and figure to the files it is computed from, and
+\texttt{harness/diag/check\_regimes.py} reports the transport and turn budget of each cited run
+with the evidence for it. Appendix~\ref{app:repro} gives the decoding configuration, the retry and
+outage policy, and the cells that were re-measured, with why.
 \paragraph{What ``verified'' means, in plain terms.}
 Every claim labeled \emph{verified} is statistically significant in the standard sense and then
 corrected for multiplicity: PASS rates are estimated from $n=40$ independent completions per cell,
@@ -1815,6 +1850,14 @@ on held-out tasks, against matched latency and token budgets. This paper does no
 the number below should not be read as a measured gain from a shipped selector.
 
 \begin{table}[t]
+\caption{Mean PASS (\%) over the four verified cells under four selection policies, per model,
+computed from the per-cell PASS counts behind Table~\ref{tab:percell} (averaging the rounded
+percentages instead would shift a column by up to $0.4$). The last column is the per-cell maximum
+of $W_1$ and $W_2$ \emph{read off the test outcomes}: an empirical oracle over the pair, not a
+router fixed in advance and then evaluated, and not a confidence bound on any policy's population
+quality. It is also not a ceiling over all selection policies, since it excludes $W_{1+}$ as a
+candidate: admitting it raises the Haiku oracle from $85.6$ to $86.25$, because $W_{1+}$ edges
+$W_1$ on the trap cell.}
 \centering
 \begin{tabular}{@{}lcccc@{}}
 \toprule
@@ -1830,14 +1873,6 @@ Kimi-K2.6       & 75.0 & 73.8 & 48.1 & \textbf{98.8} \\
 Mean            & 70.1 & 68.9 & 47.4 & \textbf{93.3} \\
 \bottomrule
 \end{tabular}
-\caption{Mean PASS (\%) over the four verified cells under four selection policies, per model,
-computed from the per-cell PASS counts behind Table~\ref{tab:percell} (averaging the rounded
-percentages instead would shift a column by up to $0.4$). The last column is the per-cell maximum
-of $W_1$ and $W_2$ \emph{read off the test outcomes}: an empirical oracle over the pair, not a
-router fixed in advance and then evaluated, and not a confidence bound on any policy's population
-quality. It is also not a ceiling over all selection policies, since it excludes $W_{1+}$ as a
-candidate: admitting it raises the Haiku oracle from $85.6$ to $86.25$, because $W_{1+}$ edges
-$W_1$ on the trap cell.}
 \label{tab:policies}
 \end{table}
 
