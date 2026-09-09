@@ -84,10 +84,23 @@ Names, affiliations and ORCIDs were verified against the ORCID public API.
 5. **Rotate the Azure API key** used for the GPT-5.5, DeepSeek and Kimi runs. It was pasted in
    plain text during development. It is in no tracked file and in no commit, but rotate it.
 
-6. **Optional, the biggest remaining reviewer lever:** prevalence is measured in a companion
-   study (16/85 pairs incomparable, 2/36 co-retrieved) but not imported here. The manuscript
-   currently declares prevalence unmeasured in `\S`Limitations. Importing it would answer the
-   most likely reviewer objection; leaving it out keeps this paper's scope clean. Undecided.
+6. ~~Prevalence import~~ — **decided: not importing.** A companion study probes prevalence on
+   three private code corpora (16/85 pairs verified incomparable, 2/36 among co-retrieved
+   pairs). It is not imported here and this paper is not linked to it. The reasons, recorded so
+   the question is not reopened by accident:
+
+   - the companion is an unposted draft with no arXiv id, DOI or Zenodo record, so there is
+     nothing citable in a submission, and posting it first is a sequencing commitment the
+     authors chose not to make;
+   - importing would entangle two manuscripts that MDPI would then check for overlap;
+   - this paper's claims are existential by design, and `\S`Limitations already states that
+     plainly and specifies the exact experiment that would settle prevalence. That is a
+     defensible position, not a gap left by omission.
+
+   **Expect a reviewer to raise it anyway** — "you show the phenomenon exists; how often does
+   it matter?" is the natural question. The prepared answer, for the response letter rather
+   than the manuscript: the paper is explicit that every claim is existential, names the
+   prevalence experiment in full, and does not report any number as a production estimate.
 
 ## Outstanding — production format
 
