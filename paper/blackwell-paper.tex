@@ -571,10 +571,10 @@ experiments target. One caution for what follows: $\PASS_M$ is \emph{not} an inv
 Blackwell-equivalence class, and it need not be: a rule keyed to surface form can prefer
 differently between two experiments that garble each other. The padding arm
 $W_{\mathrm{pad}}$ of Appendix~\ref{app:record} reveals no coordinate any verifier checks, so it
-is Blackwell-equivalent to $W_1$, and the two score $65\%$ against $50\%$ on
-\texttt{api\_post\_ok}. That gap is a point estimate, not a verified separation: at $n=40$ the
-exact $95\%$ intervals, $[0.48,0.79]$ and $[0.34,0.66]$, overlap. The pair illustrates the
-possibility rather than certifying an instance of it. Either way the
+is Blackwell-equivalent to $W_1$, yet the two do not score alike: $40/40$ against $31/40$ on
+\texttt{api\_argorder}, a difference whose two-sided $90\%$ interval $[+0.0203,+0.3845]$ excludes
+zero, and $40/40$ against $39/40$ on \texttt{api\_post\_ok}, where it does not. One cell therefore
+certifies an instance and the other only illustrates the possibility. Either way the
 $\delta_M$-restricted order of Section~\ref{subsec:bridge} is not read on the quotient.
 \end{remark}
 
@@ -1213,7 +1213,7 @@ at $\tau = 0.30$ through the upper bound $\overline\Delta_T$
 claim joint control across the incomparability, dominance and interference families drawn from a
 single run (see Sections~\ref{subsec:fwer} and~\ref{sec:limitations}). At $\hat p=0$ or $\hat p=1$ the interval
 becomes one-sided but does not degenerate to a point: at $n=40$ and the level
-Figure~\ref{fig:hasse} uses, $0/40$ gives $[0,\,0.128]$ and $40/40$ gives $[0.872,\,1]$. It is that
+Figure~\ref{fig:hasse} uses, $0/40$ gives $[0,\,0.1281]$ and $40/40$ gives $[0.8719,\,1]$. It is that
 residual width a crossing must beat, which is why the stark $100\%/0\%$ cells verify at this $n$
 while intermediate proportions would need a larger one. Results whose intervals do not separate are
 labeled \emph{reproduced but not verified} and are never used as evidence; the protocol reports its
@@ -1235,12 +1235,13 @@ conventional $90\%$ family level, and the headline separations are near-$0\%$ ag
 so tightening it does not move the verified conclusions. $\tau=0.30$ is an a priori materiality
 threshold: to count, interference must destroy at least $30$ PASS points, well above the interval
 widths at $n=40$, so noise cannot clear it. The data show the threshold doing real work. Verified
-collapses clear it with upper bounds from $-0.38$ to $-0.85$ (Table~\ref{tab:interference}) and the
-character-matched padding control at $-0.67$. What shows the choice is not load-bearing is that
+collapses clear it with upper bounds from $-0.38$ to $-0.85$ (Table~\ref{tab:interference}), and
+the superset falls below the character-matched padding arm at $-0.85$ on both control cells. What
+shows the choice is not load-bearing is that
 the verdict barely moves with it: every one of the twelve contrasts clears marginally for any
 $\tau$ from $0.10$ to $0.30$, and eleven of twelve up to $0.50$, so halving or raising the
-threshold leaves the conclusion intact. The margin is set by DeepSeek's two cells, at $-0.385$
-and $-0.541$, which are the first to drop out as $\tau$ rises.
+threshold leaves the conclusion intact. The margin is set by DeepSeek's two cells, at $-0.384$
+and $-0.540$, which are the first to drop out as $\tau$ rises.
 
 \paragraph{What the intervals do not cover.}
 The Clopper--Pearson intervals carry sampling error under Assumption~\ref{ass:iid}, a fixed success
@@ -1256,15 +1257,14 @@ the run it was drawn in, not a property of a vendor's model line. We read that a
 re-measurement bounds the drift component empirically, and the direction of every verdict survived
 it.
 \paragraph{Provenance.}
-Four re-measured arms or cells sit in grids whose other arms come from earlier runs
-(Appendix~\ref{app:repro}): the Opus $W_{1+}$ arm, carrying both Opus rows of
-Table~\ref{tab:interference}; the Opus $W_2$/\texttt{trap\_store\_wire} and Haiku
-$W_1$/\texttt{enc\_amount} cells, the latter carrying one of Haiku's two incomparability directions;
-and the structured-context arm of Appendix~\ref{app:record}. Those contrasts are across runs: a
-shared model name and transport do not establish a shared decoder, and their intervals price
-sampling error within an arm, not the gap between windows. The six-model record is itself
-contemporaneous and retained (Appendix~\ref{app:audit}), so the harm contrasts are read within
-one window; \texttt{results/MANIFEST.md} gives the run, and so the window, behind each number.
+Every cell of the six-model grid is read from that model's own complete run, so each harm contrast
+compares two arms collected in one window; the same holds for the four behavioural controls, which
+share a single run, and for the second source pair. One substitution remains: the GPT-5.5
+$W_2$/\texttt{trap\_store\_wire} cell is taken from a retained re-measurement because the base run
+logged an HTTP~500 there, so that one contrast is across windows and a shared model name and
+transport do not establish a shared decoder (Appendix~\ref{app:repro}). Raw completions were
+retained for three of the six models (Appendix~\ref{app:audit}); for the other three the record is
+aggregate-only. \texttt{results/MANIFEST.md} gives the run, and so the window, behind each number.
 
 \subsection{Results}
 \label{sec:results}
@@ -1278,15 +1278,15 @@ underlying quantities.
 \begin{table}[t]
 \centering
 \caption{Consolidated 6-model / 4-vendor verdict. Every model gets one completion per attempt at
-$n=40$ per cell; the transport differs between the Anthropic models and the rest, so cross-vendor
-magnitudes are compared under one uniform protocol (see Section~\ref{sec:methodology}), so
-what separates vendors here is the models, not the request path. ``Anti-mono.\ verified'' counts, of the two
+$n=40$ per cell, and all six models are queried over the same HTTP path
+(see Section~\ref{sec:methodology}), so what separates vendors here is the models, not the request
+path. ``Anti-mono.\ verified'' counts, of the two
 API cells tested per model, those on which the harm contrast's upper bound clears $-\tau = -0.30$
 at $\eta=0.10$. ``Argorder
 \texttt{none}'' is the no-context baseline PASS on \texttt{api\_argorder}, the model-relative-value
-spectrum. All figures are real measured runs; no modeled numbers. Confidence bounds are
-rounded outward (a lower bound down, an upper bound toward zero), so every printed bound is
-implied by the computed one.}
+spectrum. All figures are real measured runs; no modeled numbers. Confidence bounds are rounded
+away from the claim they support---a lower bound down, an upper bound up---so every printed bound
+is implied by the computed one.}
 \label{tab:consolidated}
 \resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
 \begin{tabular}{@{}lcccccc@{}}
@@ -1314,10 +1314,11 @@ On every model the empirical deficiency is mutually positive, $\dhat_{\Dcal}(W_1
 $\dhat_{\Dcal}(W_2,W_1) > 0$, and the uniform lower bounds $L_{\Dcal}$ in both directions clear zero,
 verifying empirical incomparability at $\ge 90\%$ (Table~\ref{tab:consolidated}). The crossover is stark:
 $W_1$ solves the API and trap cells and fails encoding, while $W_2$ solves encoding and fails the API
-and trap cells. For Haiku at $n=40$ the carrying cells are \texttt{api\_argorder}, where $W_1$
-passes $32/40$ and $W_2$ none, and \texttt{enc\_amount}, where $W_2$ passes $22/40$ and $W_1$
-none, giving $L_{\Dcal} = +0.226 / +0.762$. The first direction is the narrower one because
-neither carrying arm is at ceiling on this model.
+and trap cells. For Haiku at $n=40$ the two directions are attained by different cells:
+$L_{\Dcal}(W_2,W_1)=+0.762$ by \texttt{api\_post\_ok}, where $W_1$ passes $40/40$ and $W_2$ none,
+and $L_{\Dcal}(W_1,W_2)=+0.226$ by \texttt{enc\_amount}, where $W_2$ passes $22/40$ and $W_1$
+none. The encoding contrast is the binding direction, narrower because $W_2$ reaches only
+$22/40$ there.
 
 \paragraph{The six-model claim, made jointly.} Proposition~\ref{prop:certificate} controls the
 $2|\Dcal|$ intervals of \emph{one} model's run, so the per-model verifications above are each at
@@ -1506,7 +1507,7 @@ $\{W_1,W_{1+}\}\subseteq F\subseteq\{W_1,W_{1+},W_2\}$.}
 
 \begin{table}[t]
 \centering
-\caption{Anti-monotonicity verification on the carrying cell per model. $\Delta_T =
+\caption{Anti-monotonicity verification on both API cells of all six models. $\Delta_T =
 \PASS(W_{1+},T) - \PASS(W_1,T)$ is the harm contrast; $\overline\Delta_T$ is its $\eta/2$
 Clopper--Pearson upper bound over the two arms, and the cell is verified harmful when
 $\overline\Delta_T \le -0.30$. The $W_1 \to W_{1+}$ column reports the PASS collapse. Unlike the
@@ -1647,26 +1648,27 @@ evidence about what either model was trained on. The verified per-model claims r
 \label{sec:results-audit}
 
 
-Every draw behind the interference table was kept and read directly, $40$ completions per arm and
-cell (Appendix~\ref{app:diag}). Three things follow, and one does not.
-\emph{Packaging is not the explanation}: the extractor returned a non-empty code block on every
-retained draw, and the \texttt{import ledger} line the task needs is present in $239/240$ of the
-superset replies and $233/240$ of the $W_1$ replies, the absences concentrated in the arm that
-passes, so neither an empty extraction nor a missing import accounts for the collapse
-here. \emph{The harmful arm is verbose}: on Haiku the mean reply runs $105$ characters against
-$477$ on \texttt{api\_post\_ok} and $459$ against $633$ on \texttt{api\_argorder}, the same
-inflation reported in Section~\ref{sec:disc-mechanism}. \emph{No reply declined the task}:
-refusal language appears in none of the $480$ retained completions, on any model.
+Raw completions were retained for the three Anthropic models' rows of the interference table,
+$40$ per arm and cell; the other three models' rows are aggregate-only, so what follows is read
+off half the table (Appendix~\ref{app:diag}). Three text screens bear on the collapse, and all
+three come back negative on the $480$ replies of the $W_1$ and $W_{1+}$ arms there. The extractor
+returned a non-empty code block on every one of them; the \texttt{import ledger} line the task
+needs is present in $239/240$ of the superset replies and $233/240$ of the $W_1$ replies, the
+absences concentrated in the arm that passes; and a refusal screen over an explicit phrase list
+matches none. Each screen excludes what it tests---an empty extraction, a missing import, refusal
+language---rather than every packaging or declining behaviour, and none was run on the three
+models whose draws were not retained. \emph{The harmful arm is verbose}: on Haiku the mean reply runs $105$
+characters against $477$ on \texttt{api\_post\_ok} and $459$ against $633$ on
+\texttt{api\_argorder}, the same inflation reported in Section~\ref{sec:disc-mechanism}.
 
 What the retained text does \emph{not} establish is the mechanism. A textual flag for $W_2$'s wire
-encoding appearing in the reply, stated as a rule in Appendix~\ref{app:audit}, separates the arms
-completely: it fires on $240/240$ of the superset replies across the three models and both
-collapse cells, and on $0/240$ of the $W_1$ replies. It also fires on $238/240$ of the $W_2$
-replies in those cells, where that encoding is the contract and the reply passes, so what it
-reports is the encoding being present and not that its presence caused the failure. On this
-record the packaging explanations are excluded and the collapse is not attributed to any internal
-cause; Theorem~\ref{thm:antimono} constrains any rule whose PASS falls under a strict superset,
-whatever that cause turns out to be.
+encoding appearing in the reply, stated as a rule in Appendix~\ref{app:audit}, fires on $240/240$
+of the superset replies across the three models and both collapse cells and on $0/240$ of the
+$W_1$ replies. It also fires on $238/240$ of the $W_2$ replies in those cells, every one of which
+fails the API verifier, so it is not a test of correctness. These counts describe an output
+pattern associated with the source condition; they do not identify an internal cause.
+Theorem~\ref{thm:antimono} constrains any rule whose PASS falls under a strict superset, whatever
+that cause turns out to be.
 \subsection{Generality and controls (summary)}
 \label{sec:results-generality}
 
@@ -1692,7 +1694,8 @@ segmentation alone does not cure the interference and the operative variable is 
 knowledge. What the four arms show is a two-way contrast rather than a graded hierarchy:
 segmentation recovers nothing at all, while routing recovers most of the collapse and, on
 \texttt{api\_argorder}, matches or exceeds what $W_1$ alone achieves in this control ($39/40$
-against $31/40$, lower bound $+0.009$). Read as a mechanism this points at convention-to-task
+against $31/40$; the one-sided $90\%$ lower bound is $+0.0095$, while a two-sided $90\%$ interval
+contains zero). Read as a mechanism this points at convention-to-task
 routing rather than convention segmentation, but it is one model at $n=40$ and the reading is an
 interpretation of the contrasts, not a verified claim.
 
@@ -1795,11 +1798,12 @@ any total order must abandon at least one cell, not the choice of scorer
 (Theorem~\ref{thm:incomparable}, Proposition~\ref{prop:trap-constrained}). Second, the policy that
 refuses to choose is the \emph{worst} of the four: anti-monotonicity is the dominant cost
 (see Section~\ref{sec:results-antimono}). Third, the oracle shortfall from $100\%$ is neither pure selection
-error nor pure capability. For DeepSeek ($68$--$75\%$ band) it is the model's own limit; for Haiku
-the largest single shortfall is on \texttt{api\_argorder} ($32/40$), and it is not even that:
-the retained completions (see Section~\ref{sec:results-audit}) show the \texttt{import ledger}
-line the task needs missing from $7$ of that arm's $40$ replies, a packaging effect rather than a
-selection error. The four cells were built to exhibit the phenomenon, so
+error nor pure capability. For DeepSeek ($68$--$75\%$ band) it is residual failure under the
+prompts and decoder we tested, which is not a bound on what the model can do. For Haiku the
+largest remaining shortfall is on \texttt{enc\_amount} ($22/40$), and on \texttt{api\_argorder}
+($32/40$) the retained completions (see Section~\ref{sec:results-audit}) show the
+\texttt{import ledger} line the task needs missing from $7$ of that arm's $40$ replies, a
+packaging effect rather than a selection error. The four cells were built to exhibit the phenomenon, so
 these magnitudes diagnose the failure structure rather than estimate production-traffic gains.
 
 \paragraph{What follows for practice.} Four statements survive the caveats above.
@@ -1861,8 +1865,9 @@ The harm object is the direct contrast $\Delta_T = \PASS(W_{1+},T) - \PASS(W_1,T
 whether appending the (irrelevant-to-this-task) $W_2$ to a sufficient $W_1$ degrades performance
 (the second difference $\Psi_T$ is an interaction term, not a harm measure;
 Remark~\ref{rem:psinotharm}). We verify $\Delta_T \le -0.30$ on at least one cell for all six
-models (Table~\ref{tab:interference}), with collapses as stark as $100\% \to 0\%$ (upper bound
-$-0.85$) on Sonnet, GPT-5.5 and Kimi. This is a verified empirical falsification of
+models (Table~\ref{tab:interference}); nine of the twelve cells are a stark $40/40 \to 0/40$
+(upper bound $-0.85$), on both API cells of Sonnet, Opus, GPT-5.5 and Kimi and on Haiku's
+\texttt{api\_post\_ok}. This is a verified empirical falsification of
 superset-\emph{monotonicity} for these fixed rules (Theorem~\ref{thm:antimono}): a literal
 superset of a sufficient signal can
 sharply reduce PASS, which no monotone scalar context-value score can represent.
@@ -1943,15 +1948,21 @@ specified: draw document pairs from a natural corpus, keep the procedure of
 Section~\ref{sec:estimator} but write tasks and verifiers that corpus admits, since the four
 ledger and wire tests do not transfer, and report what fraction verifies incomparable and
 harmful, with the sampling frame stated. That fraction converts into a lower bound on prevalence
-without a union bound over pairs. Write $\pi$ for the probability that a drawn pair is
-incomparable and $V$ for the event that the procedure verifies it. The procedure is one-sided at
-level $\eta$, so $\Pr[V \mid \text{not incomparable}] \le \eta$ and therefore
-$\Pr[V] \le \pi + (1-\pi)\eta$, which rearranges to $\pi \ge (\Pr[V]-\eta)/(1-\eta)$. Replacing
-$\Pr[V]$ by an exact Clopper--Pearson lower bound $\underline{p}$ on the verified fraction over
-the sampled pairs gives $\pi \ge (\underline{p}-\eta)/(1-\eta)$ at confidence $1-\alpha$: the
-correction applies to one marginal probability, not once per pair. We name prevalence as the open
-question rather than approximate it here, because a figure computed from hand-built pairs would be
-circular.
+without a union bound over pairs. Write $\pi$ for the probability that a drawn pair has the
+property and $V$ for the event that the procedure verifies it. The procedure is one-sided at level
+$\eta$, so $\Pr[V \mid \text{not } I] \le \eta$ and therefore $\Pr[V] \le \pi + (1-\pi)\eta$,
+which rearranges to $\pi \ge (\Pr[V]-\eta)/(1-\eta)$. Replacing $\Pr[V]$ by an exact
+Clopper--Pearson lower bound $\underline{p}$ on the verified fraction over the sampled pairs gives
+$\pi \ge \max\{0,\,(\underline{p}-\eta)/(1-\eta)\}$ at confidence $1-\alpha$: the correction
+applies to one marginal probability, not once per pair, because nothing here asserts that each
+individual verified pair is a true positive. Three conditions bind. The pairs and the procedure's
+outcomes must be i.i.d.\ draws from the stated frame, which sharing documents across pairs or
+selecting them adaptively would break. The property $I$ is whatever the certificate actually
+verifies---PASS-incomparability for a named model on a named task battery, not unconditional
+Blackwell incomparability of the underlying sources. And a joint claim, ``incomparable
+\emph{and} harmful,'' needs $I$, $V$ and the one-sided error $\eta$ redefined for that conjunction
+rather than reusing these. We name prevalence as the open question rather than approximate it
+here, because a figure computed from hand-built pairs would be circular.
 
 \paragraph{Scope of the behavioural controls.} The padding, routing-note and structured-context
 arms, and the reversed-order arm, were each run over the same API path as the main record, on
@@ -1973,8 +1984,8 @@ refusal counts of Appendix~\ref{app:diag}, with the non-empty extraction record,
 automated flags over retained draws: they document what the failing replies contain, establish
 no universal causal mechanism, and do not exclude every packaging problem. A
 tokenizer-matched control and an on-topic but verifier-irrelevant control remain untested, as
-does any of these across the roster. The order control has been run, but on one model, over the
-command-line interface, and on the two collapse cells only
+does any of these across the roster. The order control has been run over the same API path as the
+rest of the controls, but on one model and on the two collapse cells only
 (see Section~\ref{sec:results-antimono}).
 
 \paragraph{Sampling and verification regime.} The verification assumes $n$ i.i.d.\ Bernoulli PASS
@@ -2004,21 +2015,27 @@ task-disjoint, so a complementary pair would be needed to test whether a superse
 \label{sec:conclusion}
 % ==========================================================================
 
-Context selection is a partial-order problem, not a scalar one. When two sources are incomparable,
-no single per-source score ranks them correctly for all tasks (Theorem~\ref{thm:incomparable}), and
-a value-deficiency surrogate with finite-sample bounds makes that order measurable on a live model.
-On six models across four vendors we verify at $\ge 90\%$ that two private sources cross in
-realized pass rate; on each of them a deployed relevance score ranks the pair the wrong way on a
-designed trap; and on all twelve cells adding a strictly larger source lowers the pass rate,
-as far as $100\%\to0\%$. What a private source is worth is model-relative: guessability runs from
+Context selection is a partial-order problem, not a scalar one. Blackwell's comparison of
+experiments identifies a structural limitation of task-independent context rankings: when two
+sources are incomparable, no one per-source score fixed across tasks ranks them correctly for every
+decision problem (Theorem~\ref{thm:incomparable}). For \emph{fixed} model rules we measure a
+separate, task-restricted PASS relation with finite-sample bounds, tied to the classical order only
+through the conditional bridge of Lemma~\ref{lem:bridge}. On six models across four vendors both
+directions of PASS-incomparability stay positive under a joint $90\%$ guarantee; on each of them a
+deployed relevance score ranks the pair the wrong way on a designed trap; and adding a strictly
+larger source lowers PASS on all twelve tested API contrasts, eleven of which meet the $0.30$ harm
+margin under joint $90\%$ control, with every model retaining at least one verified contrast. What a private source is worth is model-relative: guessability runs from
 $0\%$ to $100\%$ across the six models, one of which solves the task with no context at all, and
 what it tracks these runs cannot identify. Bringing Blackwell and Le~Cam to inference-time context is not ours to claim; concurrent
 work reached the same apparatus from the admission side (see Section~\ref{sec:related-deficiency}). What
 follows from taking \emph{incomparability} rather than deficiency-minimization as the object is the
 impossibility, and the instrument that tests it.
 
-The scope is narrow and stated exactly. The theorems concern the idealized Bayes-optimal user; the
-measured crossover and collapse are properties of a \emph{fixed} model; the two sources'
+The scope is narrow and stated exactly. Theorem~\ref{thm:incomparable} and
+Lemma~\ref{lem:bridge} concern the idealized Bayes-optimal user, while
+Theorem~\ref{thm:antimono} concerns the fixed rule a model realizes and invokes no such user at
+all; the measured crossover and collapse are properties of those \emph{fixed} rules; the two
+sources'
 incomparability is structural, resting on the projection construction and Lemma~\ref{lem:noref}
 rather than on measurement; Lemma~\ref{lem:bridge} is a conditional Bayes-value criterion whose
 guessing caps we do not estimate; and the estimator is a regret-gap surrogate, not a Le~Cam
@@ -2028,7 +2045,9 @@ transport confound; they remain read with caution as model differences and colle
 excludes is one number per source fixed across tasks and query-conditioned scores meeting the two
 hypotheses of Proposition~\ref{prop:trap-constrained}; a task-conditioned score, a router over
 public metadata, or a listwise reader that pays to read the decisive content lie outside it
-(Remark~\ref{rem:trapscope}). The decisive next test is prevalence: draw source pairs from a
+(Remark~\ref{rem:trapscope}). The behavioural controls constrain block-order and gross-length
+explanations on one model; they do not establish an internal mechanism. The decisive next test is
+prevalence: draw source pairs from a
 natural corpus rather than building them, run the same verification unchanged, and report how often
 a deployed retrieval stream produces a pair that verifies incomparable (see Section~\ref{sec:limitations}).
 \section*{Author Contributions}
@@ -2079,11 +2098,11 @@ Language models appear in this work in two distinct roles, and we separate them 
 bears on the results. \emph{As the object of study:} the measured quantities are pass rates of
 commercial language models, obtained through the interfaces described in
 Section~\ref{sec:methodology}; everything else we report, the confidence bounds, the ranker scores, the
-token and cost figures, is computed from those runs. \emph{As a tool:} the assistance described in
-the Acknowledgments. No result, table or figure was produced by a language model acting as an
-author or an analyst: every reported quantity is computed by the released scripts from the
-released records, which \texttt{results/MANIFEST.md} pins by SHA-256 and maps to the table or
-figure that uses it. The Data Availability Statement says which records are aggregate-only and
+token and cost figures, is computed from those runs. \emph{As a tool:} generative-AI tools assisted
+with the tasks disclosed in the Acknowledgments, analysis and interpretation among them. Every
+numerical result was computed by the released scripts from the released records, which
+\texttt{results/MANIFEST.md} pins by SHA-256 and maps to the table or figure that uses it, and was
+checked by the authors, who retain responsibility for the analysis and the conclusions. The Data Availability Statement says which records are aggregate-only and
 which retain raw completions.
 
 \section*{Conflicts of Interest}
@@ -2287,9 +2306,10 @@ level $\eta/8$, $0/40$ gives $[0,\,0.119]$ and $40/40$ gives $[0.881,\,1]$, and 
 $0.119$ the crossing has to beat. The incomparability verification
 \eqref{eq:LD} is carried by exactly such cells ($W_1$ at $\approx100\%$, $W_2$ at $0\%$ and vice
 versa). The harm contrast \eqref{eq:deltaupper} needs the gap between two arms to exceed $\tau$
-after both intervals are paid for, so a mild collapse from a non-endpoint arm can be verified in
-sign without clearing $\tau=0.30$ at $n=40$: the second source pair, whose superset takes the trap
-cell from $29/40$ to $26/40$, is such a case.
+after both intervals are paid for, and a negative point estimate need not verify either the sign
+of the harm or the margin. On the second source pair's trap cell PASS moves from $29/40$ to
+$26/40$, but the one-sided $90\%$ upper bound on the difference is $+0.188345$: neither
+$\Delta_T<0$ nor $\Delta_T\le-0.30$ is verified by that contrast.
 
 
 % ==========================================================================
@@ -2344,6 +2364,14 @@ Kimi-K2.6       & \texttt{trap\_store\_wire}       & 0  & 100 & 0   & 100 \\
 Four follow-up experiments address three threat axes: source-pair generality, the context-length
 confound, and whether the anti-monotonicity collapse is curable by cheap prompting.
 
+\emph{How the bounds below are to be read.} A bound on a two-arm difference is assembled from the
+two proportions' exact intervals. Each endpoint quoted here is a \emph{separate one-sided} $90\%$
+bound, which is the form Proposition~\ref{prop:interference} uses and the form in which each harm
+claim is made; the two endpoints together carry only $80\%$ joint coverage, so where a two-sided
+statement is wanted we assemble it from individual $95\%$ Clopper--Pearson regions and say so.
+Endpoints are printed rather than rounded, because rounding the non-claimed end of an interval
+inward strengthens it.
+
 \paragraph{A second incomparable pair, different domain.}
 We repeated the protocol with a second hand-built pair on a private \texttt{cache} module: $V_1$, the
 \texttt{cache.put(key, value, *, ttl)} call contract (argument order, required keyword-only
@@ -2356,11 +2384,13 @@ collapse on the contract cell: the superset takes \texttt{cache\_put\_ok} from $
 $\Delta_T=-0.87$ with an upper bound of $-0.62$ once the budget is spread over the pair's three
 contrasts, clearing the margin $\tau=0.30$ fixed for the whole programme. The other two cells do
 not: the superset lifts key-normalization from $0/40$ to $40/40$, and on the trap cell it moves
-$29/40$ to $26/40$, $\Delta_T=-0.07$ with bounds $[-0.32,+0.18]$, nowhere near the margin. The
+$29/40$ to $26/40$, $\Delta_T=-0.075$, one-sided $90\%$ bounds $-0.3294$ and $+0.1883$. The upper
+bound is positive, so this contrast verifies neither the sign of the harm nor the margin. The
 dominance control on the same run returns $U_{\Dcal}(W_{1+},W_2)=0.113$, inside the $0.15$
 tolerance, with a strict win the other way ($0.65$), so it covers the three-cell battery rather
 than a single cell. The relevance trap for this pair was a null, its prompt vocabulary leaning
-toward $V_1$ ($\varphi(V_1)=0.53 > \varphi(V_2)=0.33$), so relevance \emph{agreed} with PASS and
+toward $V_1$ ($\varphi_{\mathrm{lex}}(V_1)=0.39 > \varphi_{\mathrm{lex}}(V_2)=0.25$ on the trap
+prompt), so relevance \emph{agreed} with PASS and
 the strong mis-rank remains a pair-1 result. The contribution of the second pair is therefore
 \emph{generality of the incomparability, dominance and collapse results to a new domain}, not a
 second mis-rank.
@@ -2375,10 +2405,12 @@ $W_{1+}$ within $13$ characters, but carrying no coordinate any verifier checks 
 content). On Haiku at $n=40$ on the two collapse cells, padding is free while the
 equal-length dominated signal is catastrophic: on \texttt{api\_argorder}, $W_1$ $31/40$,
 $W_{\mathrm{pad}}$ $40/40$, $W_{1+}$ $0/40$; on \texttt{api\_post\_ok}, $W_1$ $39/40$,
-$W_{\mathrm{pad}}$ $40/40$, $W_{1+}$ $0/40$. The padded arm is never below $W_1$ alone
-($\Delta_T=+0.22$, bounds $[+0.05,+0.35]$, and $+0.02$, $[-0.07,+0.11]$), while the same-run harm
-verification clears on both cells against the superset ($\Delta_T=-0.77$, upper bound $-0.56$;
-and $-0.97$, upper bound $-0.81$). In the tested configuration the
+$W_{\mathrm{pad}}$ $40/40$, $W_{1+}$ $0/40$. The padded arm is never verified below $W_1$ alone:
+on \texttt{api\_argorder} $\Delta_T=+0.225$ with a two-sided $90\%$ interval of
+$[+0.0203,+0.3845]$, clear of zero, and on \texttt{api\_post\_ok} $\Delta_T=+0.025$ with
+$[-0.0875,+0.1316]$, consistent with no difference. Against the superset the same-run harm
+verification clears on both cells ($\Delta_T=-0.775$, one-sided $90\%$ upper bound $-0.5681$;
+and $-0.975$, upper bound $-0.8147$). In the tested configuration the
 collapse therefore does not follow from added length alone. The match is by characters, not
 subword tokens, and the filler is plain prose while $W_2$ is symbol-dense, so gross length is
 constrained but token count and processing difficulty are not. One residual axis is not
@@ -2394,13 +2426,15 @@ which convention serves which task family (``for tasks that call the ledger API 
 call contract; the wire-encoding invariant applies only to encode/decode tasks''). On Haiku at
 $n=40$ the instruction recovers most, but not all, of the collapse: on
 \texttt{api\_argorder}, $0/40 \to 39/40$, and on \texttt{api\_post\_ok}, $0/40 \to 33/40$; both
-recoveries over $W_{1+}$ are large, with non-overlapping exact $95\%$ intervals. Against $W_1$
-alone the instructed superset lands on either side depending on the cell: below it on
-\texttt{api\_post\_ok} ($33/40$ against $39/40$, $\Delta_T=-0.15$, bounds $[-0.30,+0.02]$, so not
-verified at the margin) and above it on \texttt{api\_argorder} ($39/40$ against $31/40$,
-$\Delta_T=+0.20$, bounds $[+0.009,+0.35]$, a lower bound that clears zero by very little). The
-instruction removes the collapse; whether it also closes the gap to $W_1$ alone is cell-dependent
-on this record. We pre-commit to the two readings jointly. First, the harm is substantially mediated by
+recoveries over $W_{1+}$ are large, with non-overlapping exact $95\%$ intervals on the two
+proportions. Against $W_1$ alone the picture is cell-dependent and much weaker. On
+\texttt{api\_argorder} the instructed superset scores $39/40$ against $31/40$,
+$\Delta_T=+0.200$, with a one-sided $90\%$ lower bound of $+0.0095$; that separate one-sided
+statement clears zero, but the two-sided $90\%$ interval assembled from individual $95\%$ regions
+is $[-0.0232,+0.3839]$ and does not. On \texttt{api\_post\_ok} it scores $33/40$ against $39/40$,
+$\Delta_T=-0.150$, one-sided bounds $-0.3024$ and $+0.0281$, so neither superiority nor
+inferiority to $W_1$ is verified. The record shows that the instruction removes the collapse; it
+does not show whether the instructed superset matches $W_1$ alone. We pre-commit to the two readings jointly. First, the harm is substantially mediated by
 convention interference that explicit routing knowledge prevents, so pipelines that can attach
 per-task routing labels have a cheap mitigation. Second, and decisively for the paper's thesis:
 \emph{writing the routing sentence requires already knowing which source is decisive for which
@@ -2433,7 +2467,7 @@ superset to dropping the dominated signal; what the arms separate is segmentatio
 nothing, from routing knowledge, which changes almost everything. As in
 Section~\ref{sec:disc-mechanism} this localization is an
 interpretation of the behavioural contrasts, not a verified claim, and it rests on one model at
-$n=40$ with the structure arm scored in a separate run.
+$n=40$, with the structure arm and the baselines it is compared against measured in one run.
 
 
 % ==========================================================================
@@ -2447,10 +2481,10 @@ results; it is the evidence for what the failing replies contain.
 \subsection{What the retained completions contain}
 \label{app:audit}
 
-Every draw behind the interference table was kept. This appendix reads them. The table below
-covers the two collapse cells of the three Anthropic models, $40$ completions per arm and cell,
-$480$ in total; the same retention is in place for the behavioural controls and the second
-source pair.
+Raw completions were kept for the three Anthropic models' rows of the interference table; the
+other three models' rows are aggregate-only. This appendix reads what was kept. The table below
+covers the two collapse cells of those three models, $40$ completions per arm and cell, $480$ in
+total; the same retention is in place for the behavioural controls and the second source pair.
 
 \begin{table}[t]
 \centering
@@ -2481,34 +2515,43 @@ Opus-4.8   & \texttt{api\_post\_ok}  & $W_1$     & $93$  & $40/40$ & $0/40$  & $
 \end{tabular}
 \end{table}
 
-Three readings follow and one is withheld. \emph{Packaging is excluded}: no draw produced an
-empty extraction, and the \texttt{import} line is present in $39$ or $40$ of $40$ replies
-everywhere except Haiku's $W_1$ arm on \texttt{api\_argorder} ($33/40$), which is the arm that
-passes, so those omissions depress the comparison arm and understate the harm rather than
-producing it. \emph{The harmful arm inflates output on every model}: $105\to477$ and
+Three screens follow and one thing is withheld. \emph{The packaging screens come back negative}:
+no draw produced an empty extraction, and the \texttt{import} line is present in $39$ or $40$ of
+$40$ replies everywhere except Haiku's $W_1$ arm on \texttt{api\_argorder} ($33/40$), which is the
+arm that passes, so those omissions depress the comparison arm and understate the harm rather than
+producing it. What this excludes is an empty extraction and a missing import, not every packaging
+explanation. \emph{The harmful arm inflates output on every model}: $105\to477$ and
 $459\to633$ characters on Haiku, $94\to383$ and $180\to253$ on Sonnet, $93\to286$ and
-$100\to252$ on Opus. \emph{No model declined}: refusal language appears in none of the $480$
-draws, so the refusal behaviour an earlier command-line record showed for Sonnet is not present
-here.
+$100\to252$ on Opus. \emph{The refusal screen comes back negative}: the phrase list below matches
+none of the $480$ draws, so the refusal behaviour an earlier command-line record showed for Sonnet
+is not present here. Being a phrase list, it bounds explicit refusal language rather than every
+way a reply could decline.
 
-The wire column applies one regular expression to the extracted code, the rule the released audit
-code uses:
+The wire and refusal columns are two regular expressions, the first applied to the extracted code
+and the second to the prose outside the code fences:
 
+\noindent\begin{minipage}{\linewidth}
 \begin{verbatim}
-re.search(r"#\{|f\"\{sign\}|check\s*=|% 10", code)
+wire     re.search(r"#\{|f\"\{sign\}|check\s*=|% 10", code)
+refusal  re.search(r"\bI can(?:no|')t\b|\bI won't\b|\bI'm (?:not able|unable)\b"
+                   r"|\bunable to (?:help|assist|comply)\b|\bI must decline\b",
+                   prose, re.I)
 \end{verbatim}
+\end{minipage}
 
 It matches the reply constructing $W_2$'s check-digit amount, whether as a literal or through an
 f-string, and it is quoted here because an earlier version of the same check looked only for a
 quoted literal and therefore reported zero on replies that plainly carry the encoding.
 
-What is withheld is the mechanism. The flag separates the arms completely, $240/240$ against
-$0/240$ over the three models and both cells, but it also fires on $238/240$ of the $W_2$ replies
-in those cells, where the encoding is the contract and the reply passes, and on $31/240$ of the
-no-context replies. What it reports is that the encoding is present, not that its presence caused
-the failure, and it says nothing about what the model represented internally.
-Theorem~\ref{thm:antimono} does not depend on the answer: it constrains any rule whose PASS falls
-under a strict superset, whatever the internal cause.
+What is withheld is the mechanism. The flag separates the arms completely on the two API cells,
+$240/240$ against $0/240$ over the three models. It is not a correctness test: on those same
+cells it fires on $238/240$ of the $W_2$ replies, every one of which fails the API verifier, and
+on $31/240$ of the no-context replies. On \texttt{enc\_amount}---a different population, in which
+applying the encoding \emph{is} the contract---it fires on $109/120$ of the $W_2$ replies while
+$102/120$ of them pass. What the flag reports is an output pattern tied to the source condition;
+it does not identify an internal cause and says nothing about what the model represented
+internally. Theorem~\ref{thm:antimono} does not depend on the answer: it constrains any rule whose
+PASS falls under a strict superset, whatever the internal cause.
 \subsection{Output-token inflation on the harmful arm}
 \label{app:tokens}
 
@@ -2524,8 +2567,10 @@ undercuts a clean
 correlate of the harmful arm, not a mechanism.
 
 One qualification governs this whole subsection. The retained completions
-(Appendix~\ref{app:audit}) exclude the packaging explanations but do not identify what replaces
-them, and no draw on any model declined the task.
+(Appendix~\ref{app:audit}) rule out the packaging faults the screens test but do not identify what
+replaces them, and no draw in the $480$ replies of the two collapse cells declined the task. That
+screen was never run on the three models whose draws were not retained, and elsewhere in the
+retained set it is not empty: it matches seven no-context Opus draws.
 
 The claim structure is deliberately mechanism-agnostic: Theorem~\ref{thm:antimono} verifies that
 the realized rule is not Blackwell-coherent \emph{whatever} the internal cause, and the behavioral
@@ -2583,9 +2628,9 @@ $200$-second timeout. This describes every run reported in the paper. Earlier ve
 record reached the Anthropic models, the four
 behavioural controls and the second source pair through the command line; each has since been
 re-measured over the API path, and every number reported here comes from those runs, whose logs
-carry the \texttt{[HTTP-API]} marker. The one exception is the raw-failure audit of
-Section~\ref{sec:results-audit}, which explains an anomaly of the superseded command-line record
-and therefore cannot be re-measured: it is what that record was.
+carry the \texttt{[HTTP-API]} marker, the raw-failure audit of
+Section~\ref{sec:results-audit} included: it reads the completions retained by those API runs
+(\texttt{results/retain\_api/}), not the record they replaced.
 
 The following concerns the command-line record that the HTTP runs replaced; no table in this
 version is computed from those files, and the one re-measurement still in use is the GPT-5.5 trap
@@ -2615,8 +2660,9 @@ they are read from.
 \begin{sloppypar}
 \paragraph{Artifacts.} Per-model run logs and result JSONs are in the artifact repository
 (\url{https://github.com/abilous-ti/blackwell-llm-context}) under the pattern
-\texttt{blackwell\_*.\{log,json\}}: the six single-turn $n=40$ model runs, each a complete file
-with no per-arm override (\texttt{blackwell\_haiku\_api\_n40},
+\texttt{blackwell\_*.\{log,json\}}: the six single-turn $n=40$ model runs, each a complete file and
+each read whole except for the GPT-5.5 $W_2$/\texttt{trap\_store\_wire} cell described above
+(\texttt{blackwell\_haiku\_api\_n40},
 \texttt{blackwell\_sonnet\_api\_n40}, \texttt{blackwell\_opus\_api\_n40},
 \texttt{blackwell\_gpt55\_n40}, \texttt{blackwell\_deepseek\_n40}, \texttt{blackwell\_kimi\_n40}),
 and the follow-up controls. All four behavioural controls share one run,
@@ -2632,9 +2678,10 @@ probe, deterministic local scoring of open-weight checkpoints at zero API cost;
 sketches) in \texttt{docs/BLACKWELL.md}.
 \end{sloppypar}
 
-\paragraph{Compute and cost.} The reported record is roughly $8{,}000$ model calls: $640$ per
-model across the six-model grid, $640$ for the behavioural controls, and the second pair and
-reranker probe on top. We do not report a spend figure: the HTTP endpoints used here return no
+\paragraph{Compute and cost.} The analysed record is $5{,}260$ model calls: $3{,}840$ across the
+six-model grid ($640$ per model), $640$ for the behavioural controls, $480$ for the second source
+pair and $300$ reranker judgments. The repository holds a good deal more---superseded
+command-line runs, arm-only re-measurements and diagnostics---none of which is analysed here. We do not report a spend figure: the HTTP endpoints used here return no
 cost field, so any total would be an estimate from token counts rather than a measurement. The dense/cross-encoder probe ran locally
 on open weights at zero API cost.
 

@@ -18,8 +18,10 @@ so it reported zero hits on replies that plainly do carry the encoding. The rule
 the released audit code uses (`audit_any.py`), and it is the one the paper now quotes.
 
 Read what it is: a textual flag for the encoding being present in the reply. It is not a semantic
-check and not evidence of causation. Its rate on the W2 arm, where the encoding is the contract
-and the reply is correct, is printed alongside for exactly that reason.
+check, not a correctness test, and not evidence of causation. On the two API cells it fires on
+238/240 of the W2 replies, and every one of those replies FAILS the API verifier -- W2 passes 0/240
+there. The cell where applying the encoding is the contract is enc_amount, a different population,
+and both PASS and the flag are printed for it below so the two are not confused again.
 
 Usage:  python harness/diag/retained_text_checks.py
 """
@@ -106,6 +108,26 @@ k, n = agg(["W1", "W1plus"], COLLAPSE, "ref")
 print("  refusals on W1 and W1plus together %d/%d" % (k, n))
 k, n = agg(["W1", "W1plus"], COLLAPSE, "empty")
 print("  empty extractions, same set        %d/%d" % (k, n))
+
+# The flag beside realized PASS, so the two are never read as the same thing. On the API cells the
+# flagged W2 replies all fail; the cell where the encoding is the contract is enc_amount.
+import json                                                          # noqa: E402
+RUNS = {"haiku": "blackwell_haiku_api_n40", "sonnet": "blackwell_sonnet_api_n40",
+        "opus": "blackwell_opus_api_n40"}
+PASS = {}
+for d, _mid, _label in MODELS:
+    c = json.load(open(os.path.join(ROOT, "results", RUNS[d] + ".json"), encoding="utf-8"))["counts"]
+    for t in TASKS:
+        for a in ARMS:
+            PASS[(d, t, a)] = tuple(c["%s|%s" % (a, t)])
+print()
+print("The flag against realized PASS:")
+for tasks, lab in ((COLLAPSE, "two API cells"), (["enc_amount"], "enc_amount")):
+    for a in ("W1plus", "W1", "W2"):
+        fk, fn = agg([a], tasks, "wire")
+        pk = sum(PASS[(d, t, a)][0] for d, _, _ in MODELS for t in tasks)
+        pn = sum(PASS[(d, t, a)][1] for d, _, _ in MODELS for t in tasks)
+        print("  %-14s %-7s flag %3d/%-4d PASS %3d/%d" % (lab, a, fk, fn, pk, pn))
 
 print()
 print("LaTeX rows for the appendix table:")

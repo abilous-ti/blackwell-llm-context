@@ -68,4 +68,7 @@ EOF
 
 echo "== verification"
 python harness/diag/check_regimes.py | tail -1
+# A bound printed tighter than the one computed asserts more than the data support. Two rounds
+# of review found instances of it, so it is checked here rather than by eye.
+python harness/diag/check_printed_bounds.py | tail -1
 echo "ALL DELIVERABLES BUILT"
