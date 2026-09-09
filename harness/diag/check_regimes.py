@@ -43,7 +43,8 @@ REGIME = {
     # probes
     "reranker_trap_n30":             ("cli-singleshot", "measure_reranker_trap.py:36 --max-turns 1"),
     "dense_trap":                    ("local", "measure_dense_trap.py, open weights, no API"),
-    # agentic runs, reported as auxiliary
+    "blackwell_order_ss_n40":        ("cli-singleshot", "log line 3 [SINGLE-SHOT]"),
+    # agentic runs, no longer cited by the manuscript
     "blackwell_n80_results":         ("cli-agentic", "log line 3 lacks [SINGLE-SHOT]"),
     "blackwell_argorder_n80":        ("cli-agentic", "log line 3 lacks [SINGLE-SHOT]"),
     "blackwell_pair2_n40":           ("cli-agentic", "log line 3 lacks [SINGLE-SHOT]"),

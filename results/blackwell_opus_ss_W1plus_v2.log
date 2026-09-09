@@ -1,0 +1,3 @@
+BLACKWELL arm re-measurement | arm=W1plus | tasks=['api_post_ok', 'api_argorder', 'enc_amount', 'trap_store_wire'] | n=40/cell | 160 calls
+  model = claude-opus-4-8  [SINGLE-SHOT]
+  prompt = published (measure_blackwell.run_one), no added instruction suffix
