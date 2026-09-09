@@ -1,0 +1,14 @@
+{
+ "counts": {
+  "W2|trap_store_wire": [
+   0,
+   40
+  ]
+ },
+ "model": "claude-opus-4-8",
+ "regime": "cli-singleshot",
+ "prompt": "published",
+ "n_per_cell": 40,
+ "transport_errors": 0,
+ "total_cost_usd": 2.43841
+}

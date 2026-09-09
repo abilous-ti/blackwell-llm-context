@@ -1,0 +1,14 @@
+{
+ "counts": {
+  "W1|enc_amount": [
+   0,
+   40
+  ]
+ },
+ "model": "claude-haiku-4-5-20251001",
+ "regime": "cli-singleshot",
+ "prompt": "published",
+ "n_per_cell": 40,
+ "transport_errors": 0,
+ "total_cost_usd": 0.85873
+}

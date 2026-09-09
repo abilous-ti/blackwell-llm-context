@@ -17,6 +17,7 @@ Regimes, as harness/measure_blackwell.py implements them:
 Run:  python harness/diag/check_regimes.py
 """
 import os
+import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -31,15 +32,20 @@ REGIME = {
     "blackwell_gpt55_n40":           ("http-api", "azure responses launcher"),
     "blackwell_deepseek_n40":        ("http-api", "azure chat launcher"),
     "blackwell_kimi_n40":            ("http-api", "openai-compatible chat launcher"),
-    # arm-only re-measurements: producer scripts are NOT in the repository
-    "blackwell_opus_ss_W1plus":      ("cli-singleshot", "STATED, producer script not in repo"),
-    "blackwell_opus_ss_W2_trap_rerun": ("cli-singleshot", "STATED, producer script not in repo"),
-    "blackwell_haiku_ss_W1_enc_rerun": ("cli-singleshot", "STATED, producer script not in repo"),
+    # arm-only re-measurements, re-run by harness/diag/rerun_arm.py with run logs
+    "blackwell_opus_ss_W1plus_v2":   ("cli-singleshot", "log line 2 [SINGLE-SHOT], rerun_arm.py"),
+    "blackwell_opus_ss_W2_trap_v2":  ("cli-singleshot", "log line 2 [SINGLE-SHOT], rerun_arm.py"),
+    "blackwell_haiku_ss_W1_enc_v2":  ("cli-singleshot", "log line 2 [SINGLE-SHOT], rerun_arm.py"),
+    "blackwell_xml_arm_v2":          ("cli-singleshot", "log line 2 [SINGLE-SHOT], rerun_arm.py"),
+    # superseded by the v2 re-measurements above
+    "blackwell_opus_ss_W1plus":      ("cli-singleshot", "STATED, superseded"),
+    "blackwell_opus_ss_W2_trap_rerun": ("cli-singleshot", "STATED, superseded"),
+    "blackwell_haiku_ss_W1_enc_rerun": ("cli-singleshot", "STATED, superseded"),
     # ablations
     "blackwell_pad_n40b":            ("cli-singleshot", "log line 3 [SINGLE-SHOT]"),
     "blackwell_instr_n40":           ("cli-singleshot", "log line 3 [SINGLE-SHOT]"),
     "blackwell_xml_n40":             ("cli-singleshot", "log line 3 [SINGLE-SHOT]"),
-    "blackwell_xml_arm_only":        ("cli-singleshot", "STATED, producer script not in repo"),
+    "blackwell_xml_arm_only":        ("cli-singleshot", "STATED, superseded"),
     # probes
     "reranker_trap_n30":             ("cli-singleshot", "measure_reranker_trap.py:36 --max-turns 1"),
     "dense_trap":                    ("local", "measure_dense_trap.py, open weights, no API"),
@@ -59,7 +65,7 @@ def main():
     problems, cited = [], {}
 
     for stem, (reg, ev) in sorted(REGIME.items()):
-        if stem.replace("_", r"\_") in tex:
+        if re.search(re.escape(stem.replace("_", "\\_")) + r"(?![A-Za-z0-9_\\])", tex):
             cited[stem] = (reg, ev)
 
     print("%-34s %-16s %s" % ("cited result file", "regime", "evidence"))

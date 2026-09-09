@@ -1,0 +1,6 @@
+BLACKWELL arm re-measurement | arm=W1plus_xml | tasks=['api_post_ok', 'api_argorder'] | n=40/cell | 80 calls
+  model = claude-haiku-4-5-20251001  [SINGLE-SHOT]
+  prompt = published (measure_blackwell.run_one), no added instruction suffix
+  arm=W1plus_xml api_post_ok        PASS 10/40=25%   (121s)
+  arm=W1plus_xml api_argorder       PASS 18/40=45%   (128s)
+wrote results/blackwell_xml_arm_v2.json   errors=0   cost=$1.6650

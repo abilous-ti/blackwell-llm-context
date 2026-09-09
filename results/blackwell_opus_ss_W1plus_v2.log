@@ -1,3 +1,8 @@
 BLACKWELL arm re-measurement | arm=W1plus | tasks=['api_post_ok', 'api_argorder', 'enc_amount', 'trap_store_wire'] | n=40/cell | 160 calls
   model = claude-opus-4-8  [SINGLE-SHOT]
   prompt = published (measure_blackwell.run_one), no added instruction suffix
+  arm=W1plus api_post_ok        PASS 5/40=12%   (179s)
+  arm=W1plus api_argorder       PASS 2/40=5%   (200s)
+  arm=W1plus enc_amount         PASS 40/40=100%   (203s)
+  arm=W1plus trap_store_wire    PASS 40/40=100%   (91s)
+wrote results/blackwell_opus_ss_W1plus_v2.json   errors=0   cost=$12.1576

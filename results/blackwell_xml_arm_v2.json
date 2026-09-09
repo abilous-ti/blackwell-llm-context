@@ -1,0 +1,18 @@
+{
+ "counts": {
+  "W1plus_xml|api_post_ok": [
+   10,
+   40
+  ],
+  "W1plus_xml|api_argorder": [
+   18,
+   40
+  ]
+ },
+ "model": "claude-haiku-4-5-20251001",
+ "regime": "cli-singleshot",
+ "prompt": "published",
+ "n_per_cell": 40,
+ "transport_errors": 0,
+ "total_cost_usd": 1.664967
+}

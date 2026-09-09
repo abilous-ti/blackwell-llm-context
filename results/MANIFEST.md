@@ -43,20 +43,9 @@ arm, the Opus `W2`/`trap_store_wire` cell and the Haiku `W1`/`enc_amount` cell. 
 verification scripts apply those overrides; see `harness/` and the reproducibility
 appendix of the manuscript for why each cell was re-measured.
 
-## A duplicate to be aware of
-
-`blackwell_haiku_singleshot_n40.json` and `blackwell_haiku_ss_n40.json` are byte-identical
-(same SHA-256 below), as are their `.log` files. They are one run under two names, kept because
-both names appear in the earlier experiment log. Do not count them as two replicates.
-
 ## Inventory
 
-The directory also holds records from companion studies that this manuscript does not use
-(notably the prevalence transcripts under `raw_transcripts/`). The mapping table above names
-exactly what each object in this paper is computed from; the inventory below is exhaustive so
-that the whole directory is pinned, not just the subset the paper reads.
-
-3313 files, 82.1 MB total.
+3323 files, 82.1 MB total.
 
 | File | Bytes | SHA-256 |
 |---|---:|---|
@@ -207,6 +196,8 @@ that the whole directory is pinned, not just the subset the paper reads.
 | `blackwell_haiku_singleshot_n40.json` | 3155 | `1848907b1bed143b117bedb2c3ac766286a2f39e1dbeed5a15f3026af4c5c892` |
 | `blackwell_haiku_singleshot_n40.log` | 4283 | `cccc985b51b0b924c09030cd707734894fa11db3aafaa7d3f847f96b872c2dd8` |
 | `blackwell_haiku_ss_W1_enc_rerun.json` | 4073 | `3a3726981b5b799d5adfbcbdd2524d73d0159fc029e7ae505480cf01a6ed0b4f` |
+| `blackwell_haiku_ss_W1_enc_v2.json` | 232 | `9b1c1941d8933d6296a58ada80be4458e1a3adcf9da64aa4a5b3d1bc7f237624` |
+| `blackwell_haiku_ss_W1_enc_v2.log` | 346 | `d0ae8a833773aa6cab2c7a36feec7e3cb4f97ff8fc2fa0000740f0490baec3a1` |
 | `blackwell_haiku_ss_n40.json` | 3155 | `1848907b1bed143b117bedb2c3ac766286a2f39e1dbeed5a15f3026af4c5c892` |
 | `blackwell_haiku_ss_n40.log` | 4283 | `cccc985b51b0b924c09030cd707734894fa11db3aafaa7d3f847f96b872c2dd8` |
 | `blackwell_instr_n40.json` | 2202 | `fc8775300917a6a498d351e4d1acc760a25b7647443331f46787c4f19f0dbbaa` |
@@ -219,11 +210,17 @@ that the whole directory is pinned, not just the subset the paper reads.
 | `blackwell_opus_n20.log` | 4494 | `c95dc66db8de4dc2d45fb8619fb7baf10df32069ed75dc2cdd96797c5bb4dd42` |
 | `blackwell_opus_ss_W1plus.json` | 262 | `28c07b6248272ca1e900f3dd4726ac23b32dd032636f229e099a5087378d484f` |
 | `blackwell_opus_ss_W1plus.log` | 193 | `be9d2f9bbac6bbc51b4542085f11d04243c7a1d8f8c0e62bc03247162543dc60` |
+| `blackwell_opus_ss_W1plus_v2.json` | 376 | `99032d516134018874e6f5f93075c1e2d8893e63956cec386f988c61513e49d5` |
+| `blackwell_opus_ss_W1plus_v2.log` | 562 | `718ac4d89ae15bdc2bfa46e1c040b6a3ac60860e4933147ec2932d811dc51b86` |
 | `blackwell_opus_ss_W2_trap_rerun.json` | 4084 | `2a1a47147ac99ba5635fb4013281df946a2a405753020b9eece2072d0466006f` |
+| `blackwell_opus_ss_W2_trap_v2.json` | 227 | `19bf8c71136a98ea93afeb40aabbfae5f4513313bd197000bd986b56f6e628d6` |
+| `blackwell_opus_ss_W2_trap_v2.log` | 341 | `206ed31d48077b6b33f8c51fc442b1108c9cb12ea0ec01505acda1360b3bb1c2` |
 | `blackwell_opus_ss_n40.json` | 3175 | `74eda0731afbe7db1f66281923bec34795452d25dc5c5974788a41a0dda1c0a2` |
 | `blackwell_opus_ss_n40.log` | 4743 | `1000573e417b068a638242ff805f4d032f041d1ac35da720c66336b6e9d25b78` |
 | `blackwell_orderC_results.json` | 3733 | `fb4cad21b3fc04e5efeb45128fa74f773c503ddd91bc120a4fb22ea0211cfdb6` |
 | `blackwell_orderC_run.log` | 4947 | `e0282894fe1c2611a0b7020160d6109735480689e50968739cb2e800e60660b8` |
+| `blackwell_order_ss_n40.json` | 8657 | `131858665d39ce75240ed760be2259de8ed582aabc5e9e6924c395dd86da1a6b` |
+| `blackwell_order_ss_n40.log` | 4153 | `e57e1b89042f822c7246e12ce95d94a7fa2c4f58eadb6328c3e56f4f5e4d4f6b` |
 | `blackwell_pad_n40b.json` | 2207 | `65e4bcf201811fb977973bba938c4e8cf229139796cf34d9b6fe7a70f0d1adf5` |
 | `blackwell_pad_n40b.log` | 3614 | `53b650d6f79de34903c99611b7f8b6c22a5783347454bead1404956c1e71632d` |
 | `blackwell_pair2_n40.json` | 2598 | `d7f7cc80375b48ba33e01986e1c954976661297ae1e8cde58bd580178a766b9f` |
@@ -238,6 +235,8 @@ that the whole directory is pinned, not just the subset the paper reads.
 | `blackwell_trap_run.log` | 1942 | `75c3b375c4c9dbea7a4b1fd3c7a4a2cbe5ce89dccea6734aca760fc4cd6ef6fa` |
 | `blackwell_xml_arm_only.json` | 156 | `9725d30844f32cfbde3662282f09f17c0c6f1af4503e1f50ce655398b886f57d` |
 | `blackwell_xml_arm_only.log` | 123 | `1a83501345bb0719289dc31b937f472ba3b6d5fc8dc7dc375445bb45926f1826` |
+| `blackwell_xml_arm_v2.json` | 296 | `862f571ab08147c13b6e84e3f5b96026fabdc3e4f12e35ee1cb94858f5138c05` |
+| `blackwell_xml_arm_v2.log` | 430 | `036ad9de40e994d7768c4d240609e8dabd6aa14ce9b42e167fd6b9dcb65161e2` |
 | `blackwell_xml_n40.json` | 2209 | `eea91cc5db896dc52eefcd05d65c8e59b9413dccc457b87fe6604b3f11f82e83` |
 | `blackwell_xml_n40.log` | 3709 | `9ac507ad24ce004029d1ebbdb349564bbaa674ee58827d5aec2d338a96070638` |
 | `dense_trap.json` | 1429 | `eeb97ad7b0b4636f08d553bcf0062a62b912dbb28e3469c72f1c5c2ad2963282` |

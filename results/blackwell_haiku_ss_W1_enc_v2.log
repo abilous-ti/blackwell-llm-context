@@ -1,0 +1,5 @@
+BLACKWELL arm re-measurement | arm=W1 | tasks=['enc_amount'] | n=40/cell | 40 calls
+  model = claude-haiku-4-5-20251001  [SINGLE-SHOT]
+  prompt = published (measure_blackwell.run_one), no added instruction suffix
+  arm=W1     enc_amount         PASS 0/40=0%   (166s)
+wrote results/blackwell_haiku_ss_W1_enc_v2.json   errors=0   cost=$0.8587

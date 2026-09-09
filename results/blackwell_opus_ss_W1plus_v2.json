@@ -1,0 +1,26 @@
+{
+ "counts": {
+  "W1plus|api_post_ok": [
+   5,
+   40
+  ],
+  "W1plus|api_argorder": [
+   2,
+   40
+  ],
+  "W1plus|enc_amount": [
+   40,
+   40
+  ],
+  "W1plus|trap_store_wire": [
+   40,
+   40
+  ]
+ },
+ "model": "claude-opus-4-8",
+ "regime": "cli-singleshot",
+ "prompt": "published",
+ "n_per_cell": 40,
+ "transport_errors": 0,
+ "total_cost_usd": 12.157569
+}

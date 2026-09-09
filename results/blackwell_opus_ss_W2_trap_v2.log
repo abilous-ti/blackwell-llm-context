@@ -1,0 +1,5 @@
+BLACKWELL arm re-measurement | arm=W2 | tasks=['trap_store_wire'] | n=40/cell | 40 calls
+  model = claude-opus-4-8  [SINGLE-SHOT]
+  prompt = published (measure_blackwell.run_one), no added instruction suffix
+  arm=W2     trap_store_wire    PASS 0/40=0%   (114s)
+wrote results/blackwell_opus_ss_W2_trap_v2.json   errors=0   cost=$2.4384
