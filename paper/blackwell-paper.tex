@@ -1629,6 +1629,63 @@ Opus-4.8        & \texttt{api\_argorder}            & $100\% \to 5\%$  & $-0.95$
 }
 \end{table}
 
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[x=8.2cm, y=0.40cm]
+\footnotesize
+% --- frame and grid -------------------------------------------------------
+\foreach \v in {-1.0,-0.8,-0.6,-0.4,-0.2,0.0}
+  \draw[black!12] (\v,0.2) -- (\v,12.8);
+\draw[black!45] (-1.05,0.2) -- (0.10,0.2);
+\foreach \v/\lab in {-1.0/{-1.0},-0.8/{-0.8},-0.6/{-0.6},-0.4/{-0.4},-0.2/{-0.2},0.0/{0}}
+  \draw[black!45] (\v,0.2) -- (\v,-0.1) node[below,inner sep=1pt] {\tiny $\lab$};
+% --- the tau threshold ----------------------------------------------------
+\draw[black,dashed,thick] (-0.30,0.2) -- (-0.30,12.9);
+\node[above,inner sep=1pt] at (-0.30,12.9) {\tiny $-\tau = -0.30$};
+% --- rows: {y}/{label}/{delta}/{marginal upper}/{joint upper}/{clears} -----
+\foreach \y/\lab/\d/\u/\j/\ok in {%
+  12/{Haiku \texttt{post\_ok}}/-0.375/-0.1101/0.0388/0,
+  11/{Haiku \texttt{argorder}}/-0.950/-0.7787/-0.6556/1,
+  10/{Sonnet \texttt{post\_ok}}/-0.975/-0.8147/-0.6961/1,
+   9/{Sonnet \texttt{argorder}}/-1.000/-0.8557/-0.7439/1,
+   8/{Opus \texttt{post\_ok}}/-0.875/-0.6828/-0.5519/1,
+   7/{Opus \texttt{argorder}}/-0.950/-0.7787/-0.6556/1,
+   6/{GPT-5.5 \texttt{post\_ok}}/-1.000/-0.8557/-0.7439/1,
+   5/{GPT-5.5 \texttt{argorder}}/-1.000/-0.8557/-0.7439/1,
+   4/{DeepSeek \texttt{post\_ok}}/-0.750/-0.5408/-0.4057/1,
+   3/{DeepSeek \texttt{argorder}}/-0.625/-0.3846/-0.2388/1,
+   2/{Kimi \texttt{post\_ok}}/-1.000/-0.8557/-0.7439/1,
+   1/{Kimi \texttt{argorder}}/-1.000/-0.8557/-0.7439/1}
+{
+  \node[left,inner sep=2pt] at (-1.06,\y) {\tiny \lab};
+  \draw[black!35,line width=0.9pt] (\d,\y) -- (\j,\y);          % to the joint bound
+  \draw[black,line width=1.5pt]    (\d,\y) -- (\u,\y);          % to the marginal bound
+  \draw[black] (\u,\y-0.28) -- (\u,\y+0.28);
+  \draw[black!45] (\j,\y-0.20) -- (\j,\y+0.20);
+  \ifnum\ok=1 \fill[black] (\d,\y) circle (1.5pt);
+  \else \fill[white] (\d,\y) circle (1.6pt); \draw[black] (\d,\y) circle (1.6pt); \fi
+}
+% --- legend ---------------------------------------------------------------
+\node[right,inner sep=1pt] at (-1.02,-1.5) {\tiny
+  \tikz[baseline=-0.5ex]\fill[black] (0,0) circle (1.5pt); \,$\Delta_T$\;
+  \tikz[baseline=-0.5ex]\draw[black,line width=1.5pt] (0,0)--(0.35,0); \,upper bound at $\eta$\;
+  \tikz[baseline=-0.5ex]\draw[black!35,line width=0.9pt] (0,0)--(0.35,0); \,upper bound under the joint budget $\eta/12$\;
+  \tikz[baseline=-0.5ex]{\fill[white](0,0)circle(1.6pt);\draw[black](0,0)circle(1.6pt);} \,does not clear $-\tau$};
+\end{tikzpicture}
+\caption{The harm contrast $\Delta_T=\PASS_M(W_{1+},T)-\PASS_M(W_1,T)$ on both API cells of every
+model, with the bound that carries the verification. A cell is verified harmful when the
+\emph{upper} bound clears $-\tau=-0.30$, so a bar ending left of the dashed line is a verified
+collapse. Thick bars are the marginal bounds at $\eta=0.10$, one family per cell: eleven of twelve
+clear. Thin grey bars are the same contrasts under a single $\eta$ spread across all twelve, at
+per-interval level $\eta/12$: ten clear, and every model keeps at least one. The one cell that
+never clears is Haiku's \texttt{api\_post\_ok}, whose $W_1$ arm is depressed by an omitted
+\texttt{import} rather than by the contract (\S\ref{sec:results-audit}). Values are those of
+Table~\ref{tab:interference}, recomputed from the released per-cell counts.}
+\label{fig:forest}
+\end{figure}
+
+
+
 \paragraph{What the position controls show.}
 The collapse is not a lost-in-the-middle or recency artifact. The character-matched padding control
 (Appendix~\ref{app:record}) puts filler in the same slot $W_2$ occupies inside $W_{1+}$, with $W_1$
@@ -1695,7 +1752,7 @@ added signal rather than by the filler of equal character length.
 ($2\%\to80\%$, $22\%\to68\%$; both separated from $W_{1+}$) while remaining directionally below $W_1$ alone on the carrying cell; writing that note requires knowing which source is decisive for which task family,
 which is exactly the coordinate structure the partial order formalizes, so the cure presupposes
 the diagnosis. \textbf{(iv) Structured context}: wrapping the same two conventions in labeled XML
-sections \emph{without} any routing statement mitigates only weakly ($2\%\to42\%$ on the carrying
+sections \emph{without} any routing statement mitigates only weakly ($2\%\to45\%$ on the carrying
 cell, versus $80\%$ with the routing note and $100\%$ for $W_1$ alone; verified against the raw
 superset, still far below $W_1$), so segmentation alone does not cure the interference, the
 operative variable is routing knowledge. The mitigation hierarchy, raw superset $<$ structure $<$
@@ -1872,6 +1929,51 @@ $W_1$ on the trap cell.}
 \label{tab:policies}
 \end{table}
 
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[x=1.75cm, y=0.042cm]
+\footnotesize
+% --- axes -----------------------------------------------------------------
+\foreach \v in {0,25,50,75,100} {
+  \draw[black!12] (-0.12,\v) -- (6.05,\v);
+  \node[left,inner sep=2pt] at (-0.14,\v) {\tiny \v};
+}
+\draw[black!45] (-0.12,0) -- (6.05,0);
+\node[rotate=90,anchor=south] at (-0.62,50) {\tiny mean PASS over the four cells (\%)};
+% --- bars: {x}/{model}/{fixed}/{topical}/{concat}/{oracle} ----------------
+\foreach \x/\m/\a/\b/\c/\d in {%
+  0/{Haiku}/60.6/63.1/53.1/85.6,
+  1/{Sonnet}/75.0/74.4/36.9/99.4,
+  2/{Opus}/75.0/74.4/54.4/99.4,
+  3/{GPT-5.5}/75.0/75.0/50.0/100.0,
+  4/{DeepSeek}/60.0/52.5/41.9/76.9,
+  5/{Kimi}/75.0/73.8/48.1/98.8}
+{
+  \fill[black!62] (\x+0.06,0) rectangle (\x+0.26,\a);
+  \fill[black!38] (\x+0.28,0) rectangle (\x+0.48,\b);
+  \fill[black!85] (\x+0.50,0) rectangle (\x+0.70,\c);
+  \fill[black!12] (\x+0.72,0) rectangle (\x+0.92,\d);
+  \draw[black!45] (\x+0.72,0) rectangle (\x+0.92,\d);
+  \node[below,inner sep=2pt] at (\x+0.49,0) {\tiny \m};
+}
+% --- legend ---------------------------------------------------------------
+\node[right,inner sep=1pt] at (-0.10,118) {\tiny
+  \tikz[baseline=-0.5ex]\fill[black!62] (0,-0.06) rectangle (0.20,0.14); \,best fixed source\quad
+  \tikz[baseline=-0.5ex]\fill[black!38] (0,-0.06) rectangle (0.20,0.14); \,topical top-1\quad
+  \tikz[baseline=-0.5ex]\fill[black!85] (0,-0.06) rectangle (0.20,0.14); \,concatenate $W_{1+}$\quad
+  \tikz[baseline=-0.5ex]{\fill[black!12](0,-0.06) rectangle (0.20,0.14);\draw[black!45](0,-0.06) rectangle (0.20,0.14);} \,oracle over $\{W_1,W_2\}$};
+\end{tikzpicture}
+\caption{Mean PASS over the four verified cells under the four selection policies of
+Table~\ref{tab:policies}, per model. Two things are visible that the table states in prose. The two
+scalar policies land within about a point of each other on most models while failing on
+\emph{different} cells, so the ceiling is the policy class rather than the choice of scorer. And
+concatenating both sources is the \emph{worst} of the four on every model, below even a fixed
+single source: refusing to choose costs more than choosing wrongly. The last column reads the
+per-cell maximum off the test outcomes and is an oracle over the pair, not a router fixed in
+advance and then evaluated.}
+\label{fig:policies}
+\end{figure}
+
 Three structural facts, not the magnitudes, are the point. First, the two scalar policies fail on
 \emph{different} cells, the fixed source can never carry encoding, topical top-1 forfeits the trap,
 yet land within about one point of the same aggregate: the cap is the policy \emph{class}, since
@@ -1990,7 +2092,7 @@ controls already constrain the hypothesis space from outside, the harm is not po
 control) and not by an off-topic block of equal character length (padding control), and is largely curable by explicit convention routing
 (instruction ablation), a signature consistent with mis-binding rather than capacity exhaustion.
 That the one-line routing note recovers most of the collapse while labeled XML segmentation of the
-same content recovers only a minority ($2\%\to42\%$ against $\to80\%$) locates the operative
+same content recovers only a minority ($2\%\to45\%$ against $\to80\%$) locates the operative
 variable in convention-to-task routing rather than formatting; this is an interpretation, not a
 finding, and every verified claim is independent of it. An activation-level account is out of reach
 here, since four of the six models are closed-weight and the phenomenon is cross-vendor; the direct
