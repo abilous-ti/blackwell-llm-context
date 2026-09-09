@@ -145,42 +145,6 @@ we state the order twice, once for the ideal user and once for the fixed model, 
 bridge from what we measure to what the theorem is about (\S\ref{sec:order}); and we call our
 estimator a \emph{value-deficiency surrogate}, not a Le~Cam deficiency (\S\ref{sec:estimator}).
 
-\paragraph{Empirical findings.}
-We test the theory on the two notes from the opening example: an API call contract $W_1$ and a
-wire-encoding rule $W_2$ for the same module (\S\ref{sec:experiments}), graded by a small battery
-of tasks whose verifier returns pass or fail (exit code $0$ is pass). The battery is a fixed,
-hand-built opposition, not a random sample of tasks, and the verified result rests on one API task
-and one encoding task; we say so plainly and do not call it a ``distribution.'' On this setup, from
-\emph{real} model calls with no invented numbers, we find:
-
-\begin{itemize}
-  \item \textbf{Verified empirical incomparability on all six models.} The uniform verification
-  clears $\ge 90\%$ confidence in \emph{both} directions on every model, with two-sided lower
-  bounds from $+0.34$ to $+0.76$ at $n{=}40$ (\S\ref{sec:results-incomp}), so it is not specific
-  to one model or one vendor's decoder.
-  \item \textbf{Representative topical rankers mis-rank the pair.} On a trap task saturated with
-  encoding vocabulary, lexical relevance ranks $W_2 \succ W_1$ while realized PASS ranks
-  $W_1 \gg W_2$ ($90$--$100\%$ vs.\ $0\%$); two dense bi-encoders and a cross-encoder repeat the
-  error, and an LLM listwise reranker escapes it (\S\ref{sec:results-misrank}). The lexical and
-  dense rankers agree with PASS on both honest cells, so their failure occurs \emph{only} where
-  surface relevance diverges from verifier-decisive content, which is the boundary
-  Proposition~\ref{prop:trap-constrained} draws.
-  \item \textbf{Verified anti-monotonicity.} The superset $W_{1+} = W_2 \,{+}{+}\, W_1$ (the
-  operator $\,{+}{+}\,$ is text concatenation) literally \emph{contains} $W_1$'s signal yet sharply
-  degrades the API cells: the harm contrast is verified on at least one cell for all six models,
-  as deep as $100\% \to 0\%$ (upper bound $-0.85$) and as mild as Opus's $100\% \to 38\%$
-  ($-0.41$); a character-matched padding control shows that irrelevant text of the same length is
-  harmless, while reversing the order collapses just as far, so on the model where these were run
-  the collapse follows the added signal rather than the added length or its position
-  (\S\ref{sec:results-antimono}; scope in \S\ref{sec:limitations}). The
-  effect is robust across the capability ladder but not monotone in capability, so we claim no
-  capability trend.
-  \item \textbf{A supporting observation: private-context value is model-relative.} The
-  \texttt{none}-arm baselines span $0\%$--$75\%$ guessability across vendors
-  (\S\ref{sec:results-moat}), an empirical instance of the theory's $\theta$-dependence, reported
-  as supporting evidence rather than a headline claim.
-\end{itemize}
-
 \paragraph{Contributions.} The paper makes one claim, that the order over context sources is
 \emph{partial} rather than total, and contributes the three pieces that claim needs: what follows
 from it, the instrument that makes it testable, and the evidence that it holds.
@@ -223,12 +187,9 @@ from it, the instrument that makes it testable, and the evidence that it holds.
 \end{enumerate}
 
 \paragraph{How to read the formal terms.}
-The argument is necessarily phrased in the language of statistical decision theory.
-Table~\ref{tab:glossary} gives the engineering reading of each recurring term; the empirical
-sections (\S\ref{sec:experiments} onward) can be followed with the right-hand column alone. A
-reader who wants the measured result first can go directly to \S\ref{sec:experiments}:
-\S\S\ref{sec:formalization}--\ref{sec:estimator} establish what the measured quantities mean and
-what may be concluded from them, and every proof is deferred to Appendix~\ref{app:proofs}.
+Table~\ref{tab:glossary} gives the engineering reading of each recurring term, and a reader who
+wants the measured result first can go straight to \S\ref{sec:experiments}; every proof is in
+Appendix~\ref{app:proofs}.
 
 \begin{table}[t]
 \centering
@@ -256,13 +217,6 @@ surrogate $\dhat_{\Dcal}$ & how many PASS points you lose by using $W$ in place 
 \section{Related Work}
 \label{sec:related}
 % ==========================================================================
-
-\paragraph{Positioning.}
-The tools we use are classical, Blackwell's garbling order~\citep{blackwell1953} and Le~Cam's
-deficiency~\citep{lecam1964,lecam1986}; we add no new core mathematics, and bringing them to
-inference-time context is concurrent with, not prior to, \citet{alpila2026}
-(\S\ref{sec:related-deficiency}). Our contribution is to take \emph{incomparability} as the object
-and make it measurable.
 
 \subsection{Scalar selection and its limits in information retrieval}
 \label{sec:related-scalar}\label{sec:related-ir}
@@ -407,18 +361,6 @@ design~\citep{vanrooyen2014}, and a survey of Blackwell's theorems for AI~\citep
 The one use of the order for language models at inference time that we know of sits on the
 other side of the model: \citet{zhang2026blackwellagents} rank the information structures induced
 by multi-agent protocols (voting, debate) and prove a pooled-posterior upper bound, a dominance
-result over protocols with no incomparable pair and no verification. Against all of the above, four things are new here, and each is checkable against the released
-record:
-\begin{enumerate}[topsep=2pt,itemsep=1pt,leftmargin=1.6em]
-  \item the object is the order \emph{between two admitted sources across tasks}, not a scalar risk
-  gap inside one declared decision problem;
-  \item partiality is \emph{measured}, mutual non-domination verified in both directions on six
-  production models, not assumed or asserted structurally;
-  \item the no-per-source-score impossibility is derived from it;
-  \item the order relation between \emph{named} sources gets a distribution-free finite-sample
-  verification on black-box models, including a superset that collapses PASS under controls.
-\end{enumerate}
-
 \subsection{The design space: which selectors the two results reach}
 \label{sec:related-designspace}
 
@@ -1645,12 +1587,6 @@ Opus-4.8        & \texttt{api\_argorder}            & $100\% \to 5\%$  & $-0.95$
 }
 \end{table}
 
-\paragraph{Ceilings differ, so magnitudes are not directly comparable.}
-Table~\ref{tab:interference} reports, per model, which cell carried the verification and its
-collapse, alongside the $W_1$ ceiling: DeepSeek's $W_1$ reaches only $75\%$ on
-\texttt{api\_post\_ok} (an honest capability difference), so its $\Delta_T = -0.75$ starts from a
-lower point and is not directly magnitude-comparable to Sonnet's $100\% \to 2\%$.
-
 \paragraph{What the position controls show.}
 The collapse is not a lost-in-the-middle or recency artifact. The character-matched padding control
 (Appendix~\ref{app:record}) puts filler in the same slot $W_2$ occupies inside $W_{1+}$, with $W_1$
@@ -2158,10 +2094,6 @@ A.B., V.L. and Z.R.; formal analysis, A.B. and P.P.; investigation, A.B.; resour
 curation, A.B.; writing---original draft preparation, A.B.; writing---review and editing, A.B.,
 V.L., P.P. and Z.R.; visualization, A.B. and Z.R.; supervision, V.L. and P.P.; project
 administration, V.L. All authors have read and agreed to the published version of the manuscript.
-
-The implementation is traceable in the artifact repository, whose commit history is authored
-solely by A.B.; the co-authors' contributions were made in discussion and review. The
-generative-AI assistance described in the Acknowledgments is a tool and holds no CRediT role.
 
 \section*{Funding}
 This research received no external funding. The measurement costs reported in
