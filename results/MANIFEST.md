@@ -43,6 +43,12 @@ arm, the Opus `W2`/`trap_store_wire` cell and the Haiku `W1`/`enc_amount` cell. 
 verification scripts apply those overrides; see `harness/` and the reproducibility
 appendix of the manuscript for why each cell was re-measured.
 
+## A duplicate to be aware of
+
+`blackwell_haiku_singleshot_n40.json` and `blackwell_haiku_ss_n40.json` are byte-identical
+(same SHA-256 below), as are their `.log` files. They are one run under two names, kept because
+both names appear in the earlier experiment log. Do not count them as two replicates.
+
 ## Inventory
 
 The directory also holds records from companion studies that this manuscript does not use

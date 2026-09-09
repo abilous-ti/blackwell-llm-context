@@ -78,8 +78,8 @@ sources are incomparable. On a designed trap, a
 lexical score, two dense retrievers and a cross-encoder prefer the wrong source, while a listwise
 LLM reranker that reads the deciding detail gets it right. Adding
 a larger source can also hurt: a strict superset verifiably lowers pass rates on eleven of twelve
-cells, falling as far as $100\%$ to $0\%$; padding and reversed-order controls on one model
-separate the added signal from its length and position. Treat context selection as a partial
+cells, falling as far as $100\%$ to $0\%$; on one model, a length-matched padding control and a
+reversed-order control leave the collapse unexplained by either. Treat context selection as a partial
 order and compare sources by a verified pass-rate test, not a relevance number. Scaling the
 implied rule to large corpora is the main open problem.
 \end{abstract}
@@ -329,7 +329,7 @@ sit at the boundary. Listwise LLM rerankers~\citep{sun2023rankgpt} and learned s
 selectors~\citep{optiset2026,rank4gen2026} are query-conditioned \emph{set} functions, outside the
 theorem's scope, though they carry no dominance guarantee of any kind. Skyline
 selection~\citep{skylinerag2026} keeps every non-dominated candidate instead of a top-$k$, the
-operator our own selection rule uses, but takes dominance over heuristic per-item scores rather
+operator the partial order calls for, but takes dominance over heuristic per-item scores rather
 than over task value. Diversity-aware selection, from MMR~\citep{carbonell1998} to
 DPPs~\citep{ye2023ceil} and submodular context selection~\citep{pacms2026}, optimizes set
 objectives over similarity geometry rather than over verified task value. Directed-information
@@ -479,7 +479,7 @@ Conformal context filtering~\citep{chakraborty2026conformal}    & \checkmark    
 Learned set selection~\citep{optiset2026,rank4gen2026}          & $\sim^{c}$        & \checkmark & $\times^{c}$ \\
 Skyline over heuristic scores~\citep{skylinerag2026}            & \checkmark        & $\times$   & $\sim^{e}$ \\
 \midrule
-\textbf{Verified front $+$ routing (this paper)}                & $\times$          & \checkmark & \checkmark \\
+\textbf{Verified non-dominated set (this paper)}                & $\times$          & \checkmark & \checkmark \\
 \bottomrule
 \end{tabular}
 }
@@ -866,9 +866,16 @@ implies genuine Blackwell incomparability. Our construction is designed to satis
 (each cell's decisive private coordinate is revealed by exactly one source,
 Lemma~\ref{lem:noref}), and its observable signature, deprived-arm pass rates at the floor ($W_2$
 at $0\%$ on the API cells, $W_1$ at $0\%$ on the encoding cell, \texttt{none} near $0$), is
-verified per cell in \S\ref{sec:experiments}. A measured floor is evidence for the cap premise,
-not a measurement of the cap: $g_a$ and $g_b$ are Bayes values under $\mu_T$ and remain
-hypotheses throughout (Remark~\ref{rem:measures}). Where a model's prior
+verified per cell in \S\ref{sec:experiments} \emph{where the baseline is in fact near zero}, which
+it is not everywhere: GPT-5.5 reads $5\%$, $75\%$, $55\%$ and $0\%$ across the four cells, and
+its only $W_2$-decisive cell, \texttt{enc\_amount}, sits at $55\%$. Two claims must be kept apart
+here. The $(M,\Dcal)$-incomparability verification is unaffected, since it contrasts $W_1$ against
+$W_2$ and never reads the \texttt{none} arm. What weakens on a leaky cell is the \emph{bridge} to
+structural incomparability, which is what the caps are for; on GPT-5.5's $W_2$ direction we
+therefore report the measured crossing and do not claim the structural conclusion. A measured
+floor is in any case evidence for the cap premise, not a measurement of the cap: $g_a$ and $g_b$
+are Bayes values under $\mu_T$ and remain hypotheses throughout (Remark~\ref{rem:measures}).
+Where a model's prior
 partially recovers a convention (the $\theta$-dependence of \S\ref{subsec:theta}), the cap
 premise weakens and we do not verify on those cells. The reverse implication, predicting the
 realized crossover from the abstract theorem, requires Assumption~\ref{ass:attain}, which our task
@@ -1004,7 +1011,7 @@ lexical-cosine score practitioners use and for the checkpoints of
 \S\ref{sec:results-misrank}. In \S\ref{sec:experiments} the
 \texttt{trap\_store\_wire} task realizes $T_c$: bag-of-words cosine gives $\varphi(W_1)=0.36 <
 \varphi(W_2)=0.44$ (ranking $W_2\succ W_1$), yet realized PASS ranks $W_1$ at $90\%$--$100\%$ versus
-$W_2$ at $0$--$10\%$ across all six models. The same mis-rank is realized by representative open-weight learned rankers: two dense bi-encoders (BGE, E5) and a cross-encoder reranker all prefer $W_2$ on the trap
+$W_2$ at $0\%$ on every one of the six models. The same mis-rank is realized by representative open-weight learned rankers: two dense bi-encoders (BGE, E5) and a cross-encoder reranker all prefer $W_2$ on the trap
 (\S\ref{sec:results-misrank}, Table~\ref{tab:rankers}), so the topical class is not a lexical strawman: its failure mode is shared by the ranker
 families retrieval systems actually deploy. The same failure is documented in the wild:
 language-model re-rankers are steered by lexical similarity across NQ, LitQA2, and
@@ -1306,7 +1313,7 @@ four-cell battery, not a sampled task distribution, and we state the effective s
 deficiency surrogate accordingly (\S\ref{sec:results-incomp}).
 
 \paragraph{The relevance trap.}
-The trap \texttt{trap\_store\_wire} is the confound-proof form of Theorem~\ref{thm:incomparable}. Its
+The trap \texttt{trap\_store\_wire} is the confound-proof form of Proposition~\ref{prop:trap-constrained}. Its
 prompt is lexically saturated with encoding vocabulary, so a \emph{query-conditioned} lexical
 relevance score ranks $W_2 > W_1$; but its graded requirement is the $W_1$ call contract (it must
 post an already-encoded wire string through \texttt{post}), so realized PASS ranks $W_1 > W_2$. This
@@ -1384,7 +1391,7 @@ work. The verified collapses clear it with upper confidence bounds from $-0.38$ 
 (Table~\ref{tab:interference}), and the character-matched padding control clears it at $-0.67$. One
 real effect fails it and is reported as unverified rather than folded in: Haiku's
 \texttt{api\_post\_ok} cell (upper $-0.11$; a ceiling the raw-failure audit traces to an omitted
-import line, not to the contract, \S\ref{sec:results-audit}), which still falls short at $-0.27$
+import line, not to the contract, \S\ref{sec:results-audit}), which still falls short at $-0.26$
 once the import is neutralized. A threshold that a genuine effect fails is evidence it was not
 tuned to pass the data. We note that the second-pair contrast, reported in an earlier version as
 sign-only, clears the margin at $-0.33$ once the confidence budget is allocated correctly
@@ -1747,7 +1754,9 @@ Four follow-up experiments address three threat axes (source-pair generality, th
 confound, and prompt-curability of the collapse); full protocols and numbers are
 in Appendix~\ref{app:record}. \textbf{(i) A second incomparable pair, different domain}: a private
 \texttt{cache}-module contract versus a key-normalization invariant is again verified incomparable
-on Haiku ($L_{\Dcal} = +0.774/+0.496$), with one-directional dominance fully verified at $n=80$;
+on Haiku at $n=40$ ($L_{\Dcal} = +0.774/+0.496$), with the battery-wide dominance control
+verifying one-directionally there ($U_{\Dcal}=0.113$) and a single-cell re-run at $n=80$ giving
+$U_{\Dcal}=0.000$; that pair was measured in the agentic regime, not the single-shot one;
 its harm contrast is verified at the $\tau=0.30$ margin ($\Delta_T=-0.51$, upper bound $-0.33$),
 so the second pair carries both incomparability and harm. \textbf{(ii) Length-matched
 padding}: filler character-matched to $W_{1+}$ leaves $W_1$ at ceiling (\texttt{api\_argorder}
@@ -1769,7 +1778,10 @@ convention-to-task routing rather than in convention segmentation.
 
 One cell in Table~\ref{tab:percell} is anomalous: Haiku's $W_1$ arm scores $52\%$ on
 \texttt{api\_post\_ok} while scoring $100\%$ on the harder \texttt{api\_argorder} under the same
-source, and the pattern is stable across five independent Haiku runs ($45$--$57\%$). Because the
+source, and the pattern is stable across the five distinct single-shot Haiku runs that measure
+this cell ($42$--$58\%$; a sixth result file, \texttt{blackwell\_haiku\_singleshot\_n40}, is
+byte-identical to \texttt{blackwell\_haiku\_ss\_n40} and is the same run, not a further
+replicate). Because the
 published harness does not retain raw completions, we re-drew the cell keeping every reply, the
 extracted code, and the verifier's stderr (\texttt{results/diag/}, \texttt{harness/diag/}). The
 failures are uniform. In $12/12$ draws the reply calls the private contract exactly as $W_1$
@@ -1784,7 +1796,7 @@ import and is otherwise identical: \texttt{none} $0/40$ and $W_2$ $0/40$ under b
 $21/40$. The superset collapse on this cell is therefore real and has the mechanism the paper
 describes: in the retained $W_{1+}$ replies the model applies $W_2$'s wire encoding to a plain-cents
 amount and posts \texttt{'+500\#5'} in place of \texttt{500}. With the import neutralized the
-harm contrast is $\Delta_T = -0.47$ with upper bound $-0.27$, verified in sign but not at the $\tau=0.30$ margin
+harm contrast is $\Delta_T = -0.47$ with upper bound $-0.26$, verified in sign but not at the $\tau=0.30$ margin
 (Table~\ref{tab:interference}). We keep the original-protocol numbers in every table, since the
 verifier is identical across models and the other five models include the import; the audit changes
 the reading of one cell, not its measurement. Haiku's verified claims rest on \texttt{api\_argorder}
@@ -1836,9 +1848,17 @@ and its code computes the encoding. Sonnet is the exception, and completely so. 
 draws, and on \texttt{api\_post\_ok} $36/40$, decline the task, opening with a variant of ``I'm
 flagging this as a likely prompt injection attempt'' and identifying the stacked
 \texttt{TEAM CONTEXT (private)} blocks as injected instructions; the encoding error accounts for
-only $1/40$ and $4/39$. No other model on any arm produced such a reply, and Sonnet itself produced
-none on the single-source $W_1$ arm. Two private convention blocks cross a threshold that one does
-not. Theorem~\ref{thm:antimono} is indifferent to this, since it constrains any rule whose PASS
+only $1/40$ and $4/39$. No other model on any arm produced such a reply. Sonnet's refusals are not
+confined to the superset, and counting them across all of its retained arms locates the trigger
+elsewhere than in the number of blocks: an arm carrying only the block that is \emph{decisive} for
+its task draws $0/40$ refusals on \texttt{api\_post\_ok}, \texttt{api\_argorder} and the trap and
+$13/40$ on \texttt{enc\_amount}, while an arm carrying only a \emph{non}-decisive block draws
+$40/40$, $39/40$, $22/40$ and $36/40$ on the same four tasks. A single private block is therefore
+enough, when it does not serve the task at hand. On that reading the superset refuses because it
+always contains a block the task does not need, which is the same mismatch the collapse turns on
+rather than a separate effect of stacking. We state this as the pattern the retained draws show,
+not as a mechanism: it rests on one model and four tasks.
+Theorem~\ref{thm:antimono} is indifferent to it, since it constrains any rule whose PASS
 falls under a strict superset whatever the internal cause, and Sonnet's PASS does fall. What the
 observation costs is the reading: for Sonnet the collapse is a refusal, not convention
 mis-binding, and \S\ref{sec:disc-mechanism} should be read with that exception in force. Because
@@ -2261,11 +2281,15 @@ RAG  & Retrieval-augmented generation \\
 % ==========================================================================
 {\small
 \bibliographystyle{plainnat}
-\bibliography{blackwell-paper}
 }
 
 \clearpage
 \appendix
+\renewcommand{\thetable}{A\arabic{table}}
+\renewcommand{\thefigure}{A\arabic{figure}}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+
 % ==========================================================================
 \section{Deferred proofs and technical material}
 \label{app:proofs}
@@ -2603,10 +2627,17 @@ returned text), and PASS is measured over $n=40$ i.i.d.\ completions per cell at
 configuration: the harness sets no explicit temperature, top-$p$, or seed (the Claude CLI and the
 Azure/OpenAI-compatible launchers are invoked without sampling overrides), so the $n$ draws per cell
 are independent samples from each provider's default decoder, each a fresh single-turn call with a
-$200$-second timeout. This describes every run reported in the main tables. The one exception is
-the order control of \S\ref{sec:results-antimono}, an earlier $n=80$ Haiku run made through the
-agentic CLI path (up to six turns per attempt) rather than the single-shot one; it is reported as
-an auxiliary control for that reason and enters no table of the six-model record. Transport-level failures (empty or zero-token results) are retried up to three
+$200$-second timeout. This describes every run behind the six-model tables. Two reported runs sit
+outside it, both on the agentic Claude CLI path (up to six turns per attempt) rather than the
+single-shot one, and both identifiable from their run logs, which lack the
+\texttt{[SINGLE-SHOT]} marker every single-shot run carries. The first is the order control of
+\S\ref{sec:results-antimono}, an earlier $n=80$ Haiku run, reported as an auxiliary control and
+entering no table of the six-model record. The second is the entire second source pair
+(\S\ref{sec:results-generality}), measured agentically at $n=40$ and $n=80$. Its role is generality, so
+the regime difference is worth stating plainly: what that pair shows is that incomparability and
+the superset collapse reappear in another domain \emph{under the agentic harness}, not that they
+reappear under the single-shot one. The single-shot evidence for both phenomena is the six-model
+record on the first pair. Transport-level failures (empty or zero-token results) are retried up to three
 times with quadratic backoff; a draw that still fails is scored as a failure, never as a pass. Where a transport-outage window hit a whole arm or a single cell, we re-measured it cleanly in isolation with the retry harness and report only the clean measurement: the Opus $W_{1+}$ arm; the Opus $W_2$/\texttt{trap\_store\_wire} cell, roughly $18$ of whose $40$ first-run draws were outage-scored (inferred from per-draw cost); and the Haiku $W_1$/\texttt{enc\_amount} cell, whose first run predated the retry wrapper. One cell resisted re-measurement for longer than the others: GPT-5.5 $W_2$/\texttt{trap\_store\_wire} returned HTTP~500 after retries during the original run and no GPT-5.5 deployment was available on the resource at first revision, so for one revision cycle its reported $0/40$ was carried with outage-scored draws in it. A GPT-5.5 deployment was subsequently provisioned and all four GPT-5.5 cells were re-run single-shot at $n=40$ per arm with retention and zero transport failures. The re-run reproduces the published grid exactly in all eight $W_1$/$W_2$ entries, the disputed cell included ($W_2$/\texttt{trap\_store\_wire} $0/40$ clean), so every cell in the coverage family is now a valid binomial sample and the reported $n$ is the number of real draws throughout. The GPT-5.5 rows of Table~\ref{tab:remeasure} come from that run.
 
 \begin{sloppypar}
@@ -2641,5 +2672,7 @@ on open weights at zero API cost.
 
 
 % ==========================================================================
+
+\bibliography{blackwell-paper}
 
 \end{document}
