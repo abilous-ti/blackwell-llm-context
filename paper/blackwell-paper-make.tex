@@ -1694,17 +1694,19 @@ The collapse is not a lost-in-the-middle or recency artifact. The character-matc
 (Appendix~\ref{app:record}) puts filler in the same slot $W_2$ occupies inside $W_{1+}$, with $W_1$
 last in both, and leaves $W_1$ at ceiling on \texttt{api\_argorder}; holding position fixed and
 changing only the content is what turns a harmless arm into a harmful one, so the cause is the
-added signal, not where it sits. Order is controlled separately, in an \emph{agentic} Haiku run at
-$n=80$ on the full battery that predates the single-shot regime of the main table
+added signal, not where it sits. Order is controlled separately, in an earlier \emph{agentic}
+Haiku run at $n=80$ that predates the single-shot regime of the main table
 (Appendix~\ref{app:repro}). Reversing the concatenation, $W_{1+}^{\mathrm{rev}} = W_1 \,{+}{+}\,
-W_2$ with $W_1$ first, does not recover $W_1$ there either: \texttt{api\_post\_ok} runs
-$98\%\to1\%$ and \texttt{api\_argorder} $100\%\to44\%$, both clearing $-\tau$ (upper bounds
-$-0.83$ and $-0.38$). Neither ordering restores the single-source arm, so within that run the
-collapse is not a pure primacy or recency effect. Order does move the magnitude, by $-22.5$ and
-$+20$ percentage points between the two orderings, so a positional contribution to the
-\emph{size} of the harm is not excluded, only a positional explanation of its existence. Because
-the run is agentic and the main table is single-shot, we report this as an auxiliary control
-rather than as part of the six-model record.
+W_2$ with $W_1$ first, does not recover $W_1$ there either: on \texttt{api\_post\_ok}, whose
+\texttt{none} arm is $0/80$ in that run, $W_1$ scores $98\%$ and the reversed superset $1\%$, a
+contrast whose upper bound is $-0.83$. Neither ordering restores the single-source arm, so within
+that run the collapse is not a pure primacy or recency effect. Two limits on how far this
+carries. The run is agentic while the main table is single-shot, so we report it as an auxiliary
+control rather than as part of the six-model record. And its \texttt{api\_argorder} arm used an
+earlier, leakier version of that task, with a $40\%$ \texttt{none} baseline against the $1$--$2\%$
+of the hardened version used everywhere else, so we do not read its reversed-order figure as
+comparable and do not rely on it here. What the control establishes is that position does not
+\emph{explain} the collapse; it does not bound how much position contributes to its size.
 
 \paragraph{Runtime fingerprint (a descriptive correlate).}
 The harmful $W_{1+}$ arm consistently emits more output tokens than $W_1$ across models. We report
@@ -2102,8 +2104,10 @@ pairs would be circular.
 
 \paragraph{Scope of the behavioural controls.} The padding, routing-note and structured-context
 arms were each run on single-shot Haiku at $n=40$ on the two collapse cells. The order control is
-a Haiku $n=80$ arm in the earlier \emph{agentic} regime, so it is not directly comparable with the
-single-shot main table and we report it as auxiliary. None of the four is part of the six-model
+a Haiku $n=80$ arm in the earlier \emph{agentic} regime, and its \texttt{api\_argorder} cell used
+an earlier variant of that task with a $40\%$ \texttt{none} baseline; it is therefore not
+comparable with the single-shot main table and we report only its clean \texttt{api\_post\_ok}
+arm, as auxiliary. None of the four is part of the six-model
 record, so what these controls establish is established on one model, not across the roster. The
 padding match is by \emph{characters} ($1108$ against $1095$ at the arm level), not by subword
 tokens, and because $W_2$ is symbol-dense while the filler is plain prose the two arms are not
@@ -2619,7 +2623,10 @@ with its arm-only re-run \texttt{blackwell\_opus\_ss\_W1plus} and the clean sing
 \texttt{blackwell\_deepseek\_n40}, \texttt{blackwell\_kimi\_n40}), and the follow-up controls
 \texttt{blackwell\_pad\_n40b} (character-matched padding, $400$ calls),
 \texttt{blackwell\_n80\_results} (order control, reversed concatenation, $1600$ calls),
-\texttt{blackwell\_pair2\_n80}
+\texttt{blackwell\_argorder\_n80} (an agentic $n=80$ confirmation of the
+\texttt{api\_argorder} collapse on the hardened task, $100\%\to1\%$ with upper bound $-0.91$;
+reported here for completeness, since the manuscript uses the single-shot $n=40$ measurement of
+that cell instead), \texttt{blackwell\_pair2\_n80}
 (second source pair), \texttt{blackwell\_instr\_n40} (routing-instruction ablation),
 \texttt{blackwell\_xml\_n40} / \texttt{blackwell\_xml\_arm\_only} (structured-context ablation),
 \texttt{reranker\_trap\_n30} (LLM listwise reranker probe;
