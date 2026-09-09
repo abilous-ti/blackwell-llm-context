@@ -1,7 +1,6 @@
 % ==========================================================================
-%  Context Selection Is a Partial Order
-%  arXiv article source. All references verified against arXiv/DBLP/publisher
-%  records (see the Reference verification note in the Reproducibility section).
+%  Context selection as a partial order: A Blackwell framework and verified LLM evidence
+%  All references verified against arXiv/DBLP/publisher records.
 % ==========================================================================
 \documentclass[11pt]{article}
 \usepackage[T1]{fontenc}     % scalable Type1 font encoding
@@ -138,8 +137,8 @@ context sources; proving that no single per-source score, relevance or utility, 
 that order across tasks once two sources are incomparable, so that utility re-measured per task by
 running the model is not a shortcut around the theorem but the probe it calls for; and giving a
 finite-sample test that verifies incomparability and superset harm on a live model with both
-sources held correct and the length, position, and routing confounds controlled
-(\S\ref{sec:related}). One gap needs care. Blackwell's theorem is about the \emph{best possible} use
+sources held correct and the length and position confounds controlled, with the effect of an
+explicit routing instruction measured rather than assumed away (\S\ref{sec:related}). One gap needs care. Blackwell's theorem is about the \emph{best possible} use
 of a source, but every number we measure comes from one fixed model: $\PASS_M(W,T) =
 \mathbb{E}[v_T(\delta_M(T,w))]$, the pass rate of a single rule $\delta_M$ that is not optimal. So
 we state the order twice, once for the ideal user and once for the fixed model, and prove a one-way
@@ -171,8 +170,8 @@ and one encoding task; we say so plainly and do not call it a ``distribution.'' 
   degrades the API cells: the harm contrast is verified on at least one cell for all six models,
   as deep as $100\% \to 0\%$ (upper bound $-0.85$) and as mild as Opus's $100\% \to 38\%$
   ($-0.41$); a character-matched padding control shows that irrelevant text of the same length is
-  harmless, and reversing the order collapses just as far, so on the model where these were run
-  neither an equal-length off-topic block nor the reversed order reproduces the collapse
+  harmless, while reversing the order collapses just as far, so on the model where these were run
+  the collapse follows the added signal rather than the added length or its position
   (\S\ref{sec:results-antimono}; scope in \S\ref{sec:limitations}). The
   effect is robust across the capability ladder but not monotone in capability, so we claim no
   capability trend.
@@ -1528,7 +1527,7 @@ either) and DeepSeek's \texttt{api\_argorder}; the mildest verified collapse is 
 \texttt{api\_argorder} at $68\% \to 5\%$ with upper bound $-0.38$, and the one cell that does
 not clear is Haiku's \texttt{api\_post\_ok}, whose $W_1$ arm is depressed by an unrelated import
 slip (\S\ref{sec:results-audit}). All eleven survive a Bonferroni correction across the two cells
-within each model, the tightest being DeepSeek's \texttt{api\_argorder} at $-0.34$. This is a
+within each model, the tightest being DeepSeek's \texttt{api\_argorder} at $-0.33$. This is a
 verified empirical falsification of superset-\emph{monotonicity} for these fixed rules
 (Theorem~\ref{thm:antimono}): strictly-more-informative context can hurt, and the deficiency
 framework detects it precisely where every monotone scalar must miss it.
@@ -1607,8 +1606,8 @@ and the output is a Pareto front, which no scalar top-$1$ rule can represent. Ev
 the right is read off one coverage event, the $3\times 4$ Clopper--Pearson intervals at
 per-interval level $\eta/12$. The \texttt{none} arm appears only on the left: it is not in that
 family, so no relation to it is verified here, and on \texttt{api\_argorder} its $1/40$ against
-$W_2$'s $0/40$ would not support one even as a point estimate. Solid edges are verified by a
-lower bound; the edge from $W_{1+}$ to $W_2$ is dotted because it is only an
+$W_2$'s $0/40$ would not support one even as a point estimate. The dashed edge marks the verified
+incomparable pair; the dotted edge from $W_{1+}$ to $W_2$ is dotted because it is only an
 $\varepsilon$-dominance, $\varepsilon=0.1281$. The right-hand diagram is therefore a verified
 \emph{partial} picture, not an exactly determined Hasse diagram.}
 \label{fig:hasse}
@@ -1963,8 +1962,10 @@ surrogate}, not a Le~Cam deficiency, and the two are not interchangeable for a f
 (Remark~\ref{rem:notlecam}). What is rigorous is the verification, which we regard as the most
 robust part and which stands whether or not the deficiency analogy holds. \textbf{(iii) What the
 verification covers.} It is correct because it pays for picking the worst task with exact intervals
-and a union bound; its support is small (one API task and one encoding task carry the pair-1
-result), each claim is controlled on its own at level $\eta$ rather than all at once
+and a union bound; its support is small (two of the four cells carry each model's result, and
+which two is model-specific: an API cell and the encoding cell on five models, the trap cell
+rather than an API cell on DeepSeek-V4-Pro), each claim is controlled on its own at level $\eta$
+rather than all at once
 (\S\ref{subsec:fwer}), and we call $\Dcal$ a fixed adversarial battery, not a task distribution.
 
 \subsection{Anti-monotonicity is real, verified, but not capability-ordered}
@@ -2623,7 +2624,7 @@ probe, deterministic local scoring of open-weight checkpoints at zero API cost;
 sketches) in \texttt{docs/BLACKWELL.md}.
 \end{sloppypar}
 
-\paragraph{Compute and cost.} Total measured Anthropic spend was approximately \$130: the
+\paragraph{Compute and cost.} Total measured Anthropic spend was approximately \$147: the
 single-shot Haiku, Sonnet, and Opus runs (Opus the costliest, plus its arm-only re-run) and the
 follow-up controls (padding, second pair, routing, structured-context). The non-Anthropic runs
 (GPT-5.5, DeepSeek, Kimi) used Azure quota; the Azure API returns no cost field, so this figure is
