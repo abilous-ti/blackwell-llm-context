@@ -75,7 +75,47 @@ for direction, (X, Y) in (("W_1,W_2", ("W1", "W2")), ("W_2,W_1", ("W2", "W1"))):
             bad.append("L_D(%s) %s printed %+.3f is STRONGER than computed %+.6f"
                        % (direction, lab, printed, best))
 
-print("checked %d printed bounds against the released counts" % checked)
+# --- prose bounds: every 4-decimal figure must be an OUTWARD rounding of a computed endpoint ---
+# Two review rounds found endpoints rounded inward in prose, where no table structure makes the
+# error visible. Build the set of endpoints the controls and the second pair can produce, each
+# tagged with its role, and require every printed 4-decimal value to be a sound rounding of one.
+def endpoints():
+    out = []
+    ctl = json.load(open(os.path.join(RES, "blackwell_controls_api_n40.json"),
+                         encoding="utf-8"))["counts"]
+    p2 = json.load(open(os.path.join(RES, "blackwell_pair2_api_n40.json"),
+                        encoding="utf-8"))["counts"]
+    pairs = []
+    for t in ("api_post_ok", "api_argorder"):
+        for a in ("W1plus", "W1pad", "W1plus_instr", "W1plus_xml", "W1plus_rev"):
+            pairs.append((ctl["%s|%s" % (a, t)], ctl["W1|" + t]))
+        pairs.append((ctl["W1plus|" + t], ctl["W1pad|" + t]))
+    for t in ("cache_put_ok", "key_norm", "trap_cache"):
+        pairs.append((p2["W1plus|" + t], p2["W1|" + t]))
+    for (kA, nA), (kB, nB) in pairs:
+        for lvl in (ETA, ETA / 2, ETA / 3):        # one-sided, two-sided-via-95%, 3-contrast budget
+            out.append((cp(kA, nA, lvl)[0] - cp(kB, nB, lvl)[1], "lower"))
+            out.append((cp(kA, nA, lvl)[1] - cp(kB, nB, lvl)[0], "upper"))
+    return out
+
+
+EPS = 1e-4
+POOL = endpoints()
+prose_checked = 0
+for m in re.finditer(r"\$([-+]\d\.\d{4})\$", src):
+    p = float(m.group(1))
+    prose_checked += 1
+    near = [(e, role) for e, role in POOL if abs(p - e) < EPS]
+    if not near:
+        bad.append("printed %+.4f matches no computed contrast endpoint" % p)
+        continue
+    if not any((p <= e + 1e-12) if role == "lower" else (p >= e - 1e-12) for e, role in near):
+        e, role = min(near, key=lambda x: abs(p - x[0]))
+        bad.append("printed %+.4f is an INWARD rounding of the computed %s bound %+.10f"
+                   % (p, role, e))
+
+print("checked %d table bounds and %d prose bounds against the released counts"
+      % (checked, prose_checked))
 if bad:
     print("UNSOUND (printed bound not implied by the computed one):")
     for b in bad:

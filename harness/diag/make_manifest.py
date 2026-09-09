@@ -62,13 +62,17 @@ MAPPING = [
      + sorted({f + ".json" for f in TABLE["Haiku-4.5"][1].values()})),
     ("Table: ranker spectrum (tab:rankers)", ["reranker_trap_api_n100.json", "dense_trap.json"]),
     ("Explicit-import condition", ["audit/audit_impctl-*.json"]),
-    ("Raw-failure audit (sec:results-audit)", ["diag/"]),
+    # Section 7.4.5 and Table A2 are computed from the RETAINED completions of the API runs by
+    # harness/diag/retained_text_checks.py. The row used to point at diag/, which is the older
+    # command-line diagnostic and not what those numbers come from.
+    ("Raw-failure audit and retained-completions table (sec:results-audit, tab:retained)",
+     ["retain_api/haiku/", "retain_api/sonnet/", "retain_api/opus/",
+      "<computed by harness/diag/retained_text_checks.py>"]),
+    ("Command-line diagnostic record (historical)", ["diag/"]),
     ("Behavioural controls: padding, order reversal, routing note, XML segmentation",
      ["blackwell_controls_api_n40.json"]),
     ("Second source pair", ["blackwell_pair2_api_n40.json"]),
     ("LLM listwise reranker probe", ["reranker_trap_api_n100.json"]),
-    ("Retained completions behind the audit table",
-     ["retain_api/haiku/", "retain_api/sonnet/", "retain_api/opus/"]),
     # The base GPT-5.5 run logged an HTTP 500 on this one cell, so the published trap result is
     # bound to the clean retained re-measurement instead. The percentages are unchanged.
     ("GPT-5.5 trap cell (transport-clean source)",

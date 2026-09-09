@@ -37,11 +37,11 @@ Transport of the six-model record in this manifest: **HTTP API for all six model
 | Figure: Hasse diagram (fig:hasse) | `blackwell_haiku_api_n40.json` |
 | Table: ranker spectrum (tab:rankers) | `reranker_trap_api_n100.json`<br>`dense_trap.json` |
 | Explicit-import condition | `audit/audit_impctl-*.json` |
-| Raw-failure audit (sec:results-audit) | `diag/` |
+| Raw-failure audit and retained-completions table (sec:results-audit, tab:retained) | `retain_api/haiku/`<br>`retain_api/sonnet/`<br>`retain_api/opus/`<br><computed by harness/diag/retained_text_checks.py> |
+| Command-line diagnostic record (historical) | `diag/` |
 | Behavioural controls: padding, order reversal, routing note, XML segmentation | `blackwell_controls_api_n40.json` |
 | Second source pair | `blackwell_pair2_api_n40.json` |
 | LLM listwise reranker probe | `reranker_trap_api_n100.json` |
-| Retained completions behind the audit table | `retain_api/haiku/`<br>`retain_api/sonnet/`<br>`retain_api/opus/` |
 | GPT-5.5 trap cell (transport-clean source) | `audit/audit_gpt55_trap_store_wire_W1.json`<br>`audit/audit_gpt55_trap_store_wire_W2.json`<br>`audit/audit_gpt55_trap_store_wire_summary.json` |
 | BigCodeBench pilot | `bcb/` |
 

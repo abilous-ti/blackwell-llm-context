@@ -572,7 +572,7 @@ Blackwell-equivalence class, and it need not be: a rule keyed to surface form ca
 differently between two experiments that garble each other. The padding arm
 $W_{\mathrm{pad}}$ of Appendix~\ref{app:record} reveals no coordinate any verifier checks, so it
 is Blackwell-equivalent to $W_1$, yet the two do not score alike: $40/40$ against $31/40$ on
-\texttt{api\_argorder}, a difference whose two-sided $90\%$ interval $[+0.0203,+0.3845]$ excludes
+\texttt{api\_argorder}, a difference whose two-sided $90\%$ interval $[+0.0202,+0.3846]$ excludes
 zero, and $40/40$ against $39/40$ on \texttt{api\_post\_ok}, where it does not. One cell therefore
 certifies an instance and the other only illustrates the possibility. Either way the
 $\delta_M$-restricted order of Section~\ref{subsec:bridge} is not read on the quotient.
@@ -1259,10 +1259,12 @@ it.
 \paragraph{Provenance.}
 Every cell of the six-model grid is read from that model's own complete run, so each harm contrast
 compares two arms collected in one window; the same holds for the four behavioural controls, which
-share a single run, and for the second source pair. One substitution remains: the GPT-5.5
-$W_2$/\texttt{trap\_store\_wire} cell is taken from a retained re-measurement because the base run
-logged an HTTP~500 there, so that one contrast is across windows and a shared model name and
-transport do not establish a shared decoder (Appendix~\ref{app:repro}). Raw completions were
+share a single run, and for the second source pair. One substitution remains: both the $W_1$ and
+the $W_2$ conditions of GPT-5.5's \texttt{trap\_store\_wire} task are taken from the retained,
+transport-clean re-measurement, at $40/40$ and $0/40$, because the base run logged an HTTP~500
+there. Those two therefore share a window with each other; what crosses windows is that task
+against GPT-5.5's other cells, where a shared model name and transport do not establish a shared
+decoder (Appendix~\ref{app:repro}). Raw completions were
 retained for three of the six models (Appendix~\ref{app:audit}); for the other three the record is
 aggregate-only. \texttt{results/MANIFEST.md} gives the run, and so the window, behind each number.
 
@@ -1638,10 +1640,10 @@ has a tight prior like the smaller Claude models, while GPT-5.5's prior already 
 convention (\texttt{api\_argorder} $75\%$, \texttt{enc\_amount} $55\%$), so a
 ``stronger-model-knows-more'' account does not fit. Utility-centric retrieval reaches the same
 conclusion from the other side, the same passage carrying different utility for different
-models~\citep{zhang2025llmutility}; what the spectrum adds is the verified per-model floor. Within Anthropic the ordering
-is not by capability either: Sonnet guesses none of \texttt{api\_argorder} while Opus solves all
-of it ($40/40$) with no context at all, which is an observed ceiling on that cell and not
-evidence about what either model was trained on. The verified per-model claims rest on cells unguessable \emph{for the model under test}
+models~\citep{zhang2025llmutility}; what the spectrum adds is the verified per-model floor. Within
+Anthropic, no-context PASS on \texttt{api\_argorder} runs from $0/40$ for Haiku and Sonnet to
+$40/40$ for Opus. These observations do not identify how guessability relates to general model
+capability or to training data; no independent capability scale is measured here. The verified per-model claims rest on cells unguessable \emph{for the model under test}
 (e.g.\ GPT-5.5 \texttt{api\_post\_ok} \texttt{none} $= 5\%$, trap $= 0\%$).
 
 \subsubsection{What the failing replies contain}
@@ -1650,14 +1652,13 @@ evidence about what either model was trained on. The verified per-model claims r
 
 Raw completions were retained for the three Anthropic models' rows of the interference table,
 $40$ per arm and cell; the other three models' rows are aggregate-only, so what follows is read
-off half the table (Appendix~\ref{app:diag}). Three text screens bear on the collapse, and all
-three come back negative on the $480$ replies of the $W_1$ and $W_{1+}$ arms there. The extractor
-returned a non-empty code block on every one of them; the \texttt{import ledger} line the task
-needs is present in $239/240$ of the superset replies and $233/240$ of the $W_1$ replies, the
-absences concentrated in the arm that passes; and a refusal screen over an explicit phrase list
-matches none. Each screen excludes what it tests---an empty extraction, a missing import, refusal
-language---rather than every packaging or declining behaviour, and none was run on the three
-models whose draws were not retained. \emph{The harmful arm is verbose}: on Haiku the mean reply runs $105$
+off half the table (Appendix~\ref{app:diag}). Three text screens bear on the collapse, over the
+$480$ replies of the $W_1$ and $W_{1+}$ arms there. The empty-extraction and explicit-refusal
+screens return no matches at all. The import screen detects one omission among the $240$ superset
+replies and seven among the $240$ $W_1$ replies, the latter concentrated in the arm that passes,
+so those omissions cannot explain the superset arm's collapse. Each screen bears only on what it
+tests---an empty extraction, a missing import, refusal language---rather than on every packaging
+or declining behaviour, and none was run on the three models whose draws were not retained. \emph{The harmful arm is verbose}: on Haiku the mean reply runs $105$
 characters against $477$ on \texttt{api\_post\_ok} and $459$ against $633$ on
 \texttt{api\_argorder}, the same inflation reported in Section~\ref{sec:disc-mechanism}.
 
@@ -1956,8 +1957,8 @@ Clopper--Pearson lower bound $\underline{p}$ on the verified fraction over the s
 $\pi \ge \max\{0,\,(\underline{p}-\eta)/(1-\eta)\}$ at confidence $1-\alpha$: the correction
 applies to one marginal probability, not once per pair, because nothing here asserts that each
 individual verified pair is a true positive. Three conditions bind. The pairs and the procedure's
-outcomes must be i.i.d.\ draws from the stated frame, which sharing documents across pairs or
-selecting them adaptively would break. The property $I$ is whatever the certificate actually
+outcomes must be i.i.d.\ draws from the stated frame; adaptive selection breaks that, and
+sharing documents across pairs may introduce dependence. The property $I$ is whatever the certificate actually
 verifies---PASS-incomparability for a named model on a named task battery, not unconditional
 Blackwell incomparability of the underlying sources. And a joint claim, ``incomparable
 \emph{and} harmful,'' needs $I$, $V$ and the one-sided error $\eta$ redefined for that conjunction
@@ -2089,9 +2090,11 @@ implementation assistance, consistency and artifact audits, manuscript organizat
 \LaTeX{} formatting. OpenAI's Codex was used separately to audit the manuscript against the
 released records; several errors it found, including a diagnostic rule that under-reported what
 it was testing for, are corrected in this version, and each correction was checked by re-running
-the released scripts. The authors inspected code changes, executed the experiments, verified
-outputs against frozen manifests and source files, checked cited sources, and take full
-responsibility for the study design, results, interpretations, and manuscript.
+the released scripts. The work spans many sessions and the assistant version in use was not
+logged throughout, so we identify the tools by family rather than assert version strings we did
+not record. The authors inspected code changes, executed the experiments, verified outputs
+against frozen manifests and source files, checked cited sources, and take full responsibility
+for the study design, results, interpretations, and manuscript.
 
 \section*{Use of Generative Artificial Intelligence}
 Language models appear in this work in two distinct roles, and we separate them because only one
@@ -2367,10 +2370,10 @@ confound, and whether the anti-monotonicity collapse is curable by cheap prompti
 \emph{How the bounds below are to be read.} A bound on a two-arm difference is assembled from the
 two proportions' exact intervals. Each endpoint quoted here is a \emph{separate one-sided} $90\%$
 bound, which is the form Proposition~\ref{prop:interference} uses and the form in which each harm
-claim is made; the two endpoints together carry only $80\%$ joint coverage, so where a two-sided
-statement is wanted we assemble it from individual $95\%$ Clopper--Pearson regions and say so.
-Endpoints are printed rather than rounded, because rounding the non-claimed end of an interval
-inward strengthens it.
+claim is made; the two endpoints together carry a guaranteed joint coverage of at least $80\%$
+under this union-bound argument, so where a two-sided statement is wanted we assemble it from
+individual $95\%$ Clopper--Pearson regions and say so. Decisions use unrounded endpoints;
+displayed confidence bounds are rounded outward, lower bounds downward and upper bounds upward.
 
 \paragraph{A second incomparable pair, different domain.}
 We repeated the protocol with a second hand-built pair on a private \texttt{cache} module: $V_1$, the
@@ -2384,7 +2387,7 @@ collapse on the contract cell: the superset takes \texttt{cache\_put\_ok} from $
 $\Delta_T=-0.87$ with an upper bound of $-0.62$ once the budget is spread over the pair's three
 contrasts, clearing the margin $\tau=0.30$ fixed for the whole programme. The other two cells do
 not: the superset lifts key-normalization from $0/40$ to $40/40$, and on the trap cell it moves
-$29/40$ to $26/40$, $\Delta_T=-0.075$, one-sided $90\%$ bounds $-0.3294$ and $+0.1883$. The upper
+$29/40$ to $26/40$, $\Delta_T=-0.075$, one-sided $90\%$ bounds $-0.3295$ and $+0.1884$. The upper
 bound is positive, so this contrast verifies neither the sign of the harm nor the margin. The
 dominance control on the same run returns $U_{\Dcal}(W_{1+},W_2)=0.113$, inside the $0.15$
 tolerance, with a strict win the other way ($0.65$), so it covers the three-cell battery rather
@@ -2407,10 +2410,10 @@ equal-length dominated signal is catastrophic: on \texttt{api\_argorder}, $W_1$ 
 $W_{\mathrm{pad}}$ $40/40$, $W_{1+}$ $0/40$; on \texttt{api\_post\_ok}, $W_1$ $39/40$,
 $W_{\mathrm{pad}}$ $40/40$, $W_{1+}$ $0/40$. The padded arm is never verified below $W_1$ alone:
 on \texttt{api\_argorder} $\Delta_T=+0.225$ with a two-sided $90\%$ interval of
-$[+0.0203,+0.3845]$, clear of zero, and on \texttt{api\_post\_ok} $\Delta_T=+0.025$ with
+$[+0.0202,+0.3846]$, clear of zero, and on \texttt{api\_post\_ok} $\Delta_T=+0.025$ with
 $[-0.0875,+0.1316]$, consistent with no difference. Against the superset the same-run harm
-verification clears on both cells ($\Delta_T=-0.775$, one-sided $90\%$ upper bound $-0.5681$;
-and $-0.975$, upper bound $-0.8147$). In the tested configuration the
+verification clears on both cells ($\Delta_T=-0.775$, one-sided $90\%$ upper bound $-0.5680$;
+and $-0.975$, upper bound $-0.8146$). In the tested configuration the
 collapse therefore does not follow from added length alone. The match is by characters, not
 subword tokens, and the filler is plain prose while $W_2$ is symbol-dense, so gross length is
 constrained but token count and processing difficulty are not. One residual axis is not
@@ -2432,7 +2435,7 @@ proportions. Against $W_1$ alone the picture is cell-dependent and much weaker. 
 $\Delta_T=+0.200$, with a one-sided $90\%$ lower bound of $+0.0095$; that separate one-sided
 statement clears zero, but the two-sided $90\%$ interval assembled from individual $95\%$ regions
 is $[-0.0232,+0.3839]$ and does not. On \texttt{api\_post\_ok} it scores $33/40$ against $39/40$,
-$\Delta_T=-0.150$, one-sided bounds $-0.3024$ and $+0.0281$, so neither superiority nor
+$\Delta_T=-0.150$, one-sided bounds $-0.3025$ and $+0.0281$, so neither superiority nor
 inferiority to $W_1$ is verified. The record shows that the instruction removes the collapse; it
 does not show whether the instructed superset matches $W_1$ alone. We pre-commit to the two readings jointly. First, the harm is substantially mediated by
 convention interference that explicit routing knowledge prevents, so pipelines that can attach
@@ -2515,11 +2518,11 @@ Opus-4.8   & \texttt{api\_post\_ok}  & $W_1$     & $93$  & $40/40$ & $0/40$  & $
 \end{tabular}
 \end{table}
 
-Three screens follow and one thing is withheld. \emph{The packaging screens come back negative}:
-no draw produced an empty extraction, and the \texttt{import} line is present in $39$ or $40$ of
-$40$ replies everywhere except Haiku's $W_1$ arm on \texttt{api\_argorder} ($33/40$), which is the
-arm that passes, so those omissions depress the comparison arm and understate the harm rather than
-producing it. What this excludes is an empty extraction and a missing import, not every packaging
+Three screens follow and one thing is withheld. \emph{The packaging screens}: no draw produced an
+empty extraction, and the \texttt{import} line is present in $39$ or $40$ of $40$ replies
+everywhere except Haiku's $W_1$ arm on \texttt{api\_argorder} ($33/40$), which is the arm that
+passes, so those omissions depress the comparison arm and understate the harm rather than producing
+it. What this bears on is an empty extraction and a missing import, not every packaging
 explanation. \emph{The harmful arm inflates output on every model}: $105\to477$ and
 $459\to633$ characters on Haiku, $94\to383$ and $180\to253$ on Sonnet, $93\to286$ and
 $100\to252$ on Opus. \emph{The refusal screen comes back negative}: the phrase list below matches
@@ -2651,11 +2654,12 @@ of the same cell months apart shifts by more than the nominal interval width. Tr
 times with quadratic backoff; a draw that still fails is scored as a failure, never as a pass. Where a transport-outage window hit a whole arm or a single cell, we re-measured it cleanly in isolation with the retry harness and report only the clean measurement: the Opus $W_{1+}$ arm; the Opus $W_2$/\texttt{trap\_store\_wire} cell, roughly $18$ of whose $40$ first-run draws were outage-scored (inferred from per-draw cost); and the Haiku $W_1$/\texttt{enc\_amount} cell, whose first run predated the retry wrapper. One cell resisted re-measurement for longer than the others: GPT-5.5 $W_2$/\texttt{trap\_store\_wire} returned HTTP~500 after retries during the original run and no GPT-5.5 deployment was available on the resource at first revision, so for one revision cycle its reported $0/40$ was carried with outage-scored draws in it. A GPT-5.5 deployment was subsequently provisioned and all four GPT-5.5 cells were re-run single-shot at $n=40$ per arm with retention and zero transport failures. The re-run reproduces the published grid exactly in all eight $W_1$/$W_2$ entries, the disputed cell included ($W_2$/\texttt{trap\_store\_wire} $0/40$ clean), so every cell in the coverage family is now a valid binomial sample and the reported $n$ is the number of real draws throughout.
 
 One cell is sourced separately. The base GPT-5.5 run logged an HTTP $500$ on
-\texttt{W2}/\texttt{trap\_store\_wire}, so the published figure for that cell is taken from a
-retained re-measurement with zero transport errors
-(\texttt{audit/audit\_gpt55\_trap\_store\_wire\_*}), which returns the same $40/40$ and $0/40$
-from $80$ recorded replies. The reported percentages are unchanged; what changes is which run
-they are read from.
+\texttt{W2}/\texttt{trap\_store\_wire}, so \emph{both} conditions of that task, $W_1$ and $W_2$,
+are read from the retained re-measurement with zero transport errors
+(\texttt{audit/audit\_gpt55\_trap\_store\_wire\_*}), which returns $40/40$ and $0/40$ from $80$
+recorded replies. The two conditions therefore share a measurement window; comparisons involving
+GPT-5.5's other tasks remain subject to the between-window stationarity assumption. The reported
+percentages are unchanged; what changes is which run they are read from.
 
 \begin{sloppypar}
 \paragraph{Artifacts.} Per-model run logs and result JSONs are in the artifact repository
