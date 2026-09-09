@@ -71,20 +71,20 @@ A Blackwell framework and verified LLM evidence}
 
 % ==========================================================================
 \begin{abstract}
-What goes into a language model's prompt is usually chosen by scoring each source with one number
-and keeping the top few. We argue this is the wrong abstraction. Two sources can be
-\emph{incomparable} in Blackwell's 1953 sense, and when they are, no per-source score, relevance or
-utility, can rank them correctly for every task. We test this by running each source through a
-battery of pass/fail tasks and comparing pass rates with exact confidence intervals. On six
-models from four vendors we verify ($\geq 90\%$ confidence, both directions) that two hand-built
-sources are incomparable. On a designed trap, a
-lexical score, two dense retrievers and a cross-encoder prefer the wrong source, while a listwise
-LLM reranker that reads the deciding detail gets it right. Adding
-a larger source can also hurt: a strict superset verifiably lowers pass rates on eleven of twelve
-cells, falling as far as $100\%$ to $0\%$; on one model, a length-matched padding control and a
-reversed-order control leave the collapse unexplained by either. Treat context selection as a partial
-order and compare sources by a verified pass-rate test, not a relevance number. Scaling the
-implied rule to large corpora is the main open problem.
+Prompt context is usually chosen by scoring each source with one number and keeping the top few.
+We study the limits of task-independent scalar rankings for context
+sources. Two sources can be \emph{incomparable} in Blackwell's sense; we prove that when they
+are, no single per-source score ranks them correctly for every task. That concerns the ideal user
+of a source; what a fixed model does with one is separate, and we measure it. Running each source
+through a battery of pass/fail tasks and comparing pass rates with exact confidence intervals, on
+six models from four vendors we verify at $\ge 90\%$ in both directions that two hand-built
+sources cross in realized pass rate. On a designed trap a lexical
+score, two dense retrievers and a cross-encoder prefer the wrong source, while a listwise LLM
+reranker reading the deciding detail does not. A strict superset of a sufficient source also
+lowers pass rates, verifiably on eleven of twelve cells and as far as $100\%$ to $0\%$; a
+character-matched padding arm and a reversed-order arm leave that collapse unexplained. Results
+hold for the evaluated snapshots, prompts and decoders on a hand-built battery; scaling the
+implied rule to large corpora remains open.
 \end{abstract}
 
 \vspace{0.6em}
@@ -381,7 +381,11 @@ modeling)~\citep{akdemir2025}, comparison-of-experiments ideas in loss
 design~\citep{vanrooyen2014}, and a survey of Blackwell's theorems for AI~\citep{blackwellrep2026}.
 The one use of the order for language models at inference time that we know of sits on the
 other side of the model: \citet{zhang2026blackwellagents} rank the information structures induced
-by multi-agent protocols (voting, debate) and prove a pooled-posterior upper bound, a dominance
+by multi-agent protocols. They show that voting and debate are no more informative than the
+pooled private information of all agents, and identify Bayesian pooled-posterior maximisation as
+the Blackwell upper bound on any such protocol. That is a dominance statement about how several
+models' signals combine; ours is an incomparability statement about which single source one model
+is given, so the two orders are taken over different objects and neither implies the other.
 \subsection{The design space: which selectors the two results reach}
 \label{sec:related-designspace}
 
@@ -1236,7 +1240,7 @@ four-cell battery, not a sampled task distribution, and we state the effective s
 deficiency surrogate accordingly (\S\ref{sec:results-incomp}).
 
 \paragraph{The relevance trap.}
-The trap \texttt{trap\_store\_wire} is the confound-proof form of Proposition~\ref{prop:trap-constrained}. Its
+The trap \texttt{trap\_store\_wire} is a constructed test of the topicality condition in Proposition~\ref{prop:trap-constrained}. Its
 prompt is lexically saturated with encoding vocabulary, so a \emph{query-conditioned} lexical
 relevance score ranks $W_2 > W_1$; but its graded requirement is the $W_1$ call contract (it must
 post an already-encoded wire string through \texttt{post}), so realized PASS ranks $W_1 > W_2$. This
@@ -1357,7 +1361,8 @@ one cell to the prompt naming the call as \texttt{ledger.post}, an effect an ord
 wider than any interval here, and each cell has exactly one prompt, so this component is not
 modelled at all. Every verified quantity is therefore an inference about a
 (model snapshot, prompt, default decoder) triple, indexed by $\theta$ (\S\ref{subsec:theta}), and
-not a property of a vendor's model line. We regard this as the honest reading rather than a
+not a property of a vendor's model line. The estimates apply to the evaluated model snapshot,
+prompt and decoder configuration, and we read them as a
 weakness: the re-measurement bounds the drift component empirically, and the direction of every
 verdict survived it.
 
@@ -1443,7 +1448,7 @@ opposition replicated across six models.
 On the trap, query-conditioned lexical relevance ranks $\varphi_{\mathrm{lex}}(W_1) = 0.36 <
 \varphi_{\mathrm{lex}}(W_2) = 0.44$, so it prefers $W_2$; yet realized PASS ranks $W_1 \gg W_2$ on all
 six models (Haiku $90\%$ vs.\ $0\%$; Sonnet, Opus, GPT-5.5, and Kimi $100\%$ vs.\ $0\%$;
-DeepSeek $98\%$ vs.\ $0\%$). On the honest cells relevance \emph{agrees}
+DeepSeek $98\%$ vs.\ $0\%$). On the two non-trap cells relevance \emph{agrees}
 with PASS, on the API cells relevance ranks $W_1 > W_2$ and so does PASS, and on the encoding cell
 relevance ranks $W_2 > W_1$ and so does PASS, so the score fails \emph{only} where utility diverges
 from topicality, exactly the regime Theorem~\ref{thm:incomparable} and
@@ -1460,9 +1465,9 @@ probe tasks with representative open-weight rankers, two dense bi-encoders
 single-shot, seeing the task and \emph{both} sources; both presentation orders; $n=30$ judgments
 per task). Table~\ref{tab:rankers} reports the induced rankings. \textbf{Every feature-based
 ranker we tested mis-ranks the trap}: both dense bi-encoders prefer $W_2$ on the trap while
-ranking both honest cells correctly, textbook topical behaviour, and the cross-encoder prefers
+ranking both non-trap cells correctly, textbook topical behaviour, and the cross-encoder prefers
 $W_2$ on the trap with maximal confidence (logits $-5.63$ for $W_1$ vs $+3.24$ for $W_2$) while
-being near-tied (and narrowly wrong) on the honest encoding cell. The LLM listwise reranker,
+being near-tied (and narrowly wrong) on the encoding cell. The LLM listwise reranker,
 which can read the verifier-decisive coordinate rather than match surface features, tracks
 realized PASS everywhere ($30/30$ per task, both orders). This sits on the boundary
 Proposition~\ref{prop:trap-constrained} draws: its hypothesis is \emph{topicality}, invariance to
@@ -1580,24 +1585,20 @@ reading, since $W_1$ and $W_{1+}$ are in $F$ regardless.
   \node[src, thick] (eW1p) at (2.7, 2.7) {$W_{1+}$};
   \node[src] (eW2)  at (1.5, 1.5) {$W_2$};
   \draw[dotted, thick] (eW1p) -- node[right, lab, xshift=2pt] {$\varepsilon$} (eW2);
-  \draw[dashed, black!50] (eW1) -- node[below, lab] {incomp.} (eW1p);
+  \draw[dashed, black!50] (eW1) -- node[below, lab, yshift=-3pt] {incomp.} (eW1p);
   \node[lab] at (1.5, -0.45) {$\{W_1,W_{1+}\} \subseteq F \subseteq \{W_1,W_{1+},W_2\}$};
 \end{scope}
 \end{tikzpicture}
-\caption{The paper's thesis in one picture, on the measured $\mathcal{C}=\{W_1,W_2,W_{1+}\}$ with
-$W_{1+}=W_2 \,{+}{+}\, W_1$. \textbf{Left:} the idealized Blackwell order for the optimal user;
-$W_{1+}$ reveals both coordinates, so ``more signal is better'' collapses the choice to the superset.
-\textbf{Right:} the verified empirical order for the fixed model rule (Haiku, $n{=}40$): $W_1$ beats
-$W_{1+}$ on \texttt{api\_argorder} ($100\%$ vs.\ $5\%$, anti-monotonicity, Table~\ref{tab:interference})
-while $W_{1+}$ beats $W_1$ on the encoding cell, so the two are empirically incomparable (dashed)
-and the output is a Pareto front, which no scalar top-$1$ rule can represent. Every relation on
-the right is read off one coverage event, the $3\times 4$ Clopper--Pearson intervals at
-per-interval level $\eta/12$. The \texttt{none} arm appears only on the left: it is not in that
-family, so no relation to it is verified here, and on \texttt{api\_argorder} its $1/40$ against
-$W_2$'s $0/40$ would not support one even as a point estimate. The dashed edge marks the verified
-incomparable pair; the dotted edge from $W_{1+}$ to $W_2$ is dotted because it is only an
-$\varepsilon$-dominance, $\varepsilon=0.1281$. The right-hand diagram is therefore a verified
-\emph{partial} picture, not an exactly determined Hasse diagram.}
+\caption{Two orders over the same three sources, $\mathcal{C}=\{W_1,W_2,W_{1+}\}$ with
+$W_{1+}=W_2 \,{+}{+}\, W_1$. \textbf{Left:} the Blackwell order for the optimal user, where the
+superset reveals both coordinates and dominates. \textbf{Right:} the order realized by the fixed
+model rule, on Haiku at $n=40$, read off a single coverage event over the $3\times4$
+Clopper--Pearson intervals (text above). A dashed edge is a verified incomparable pair; a dotted
+edge is an $\varepsilon$-dominance only, at $\varepsilon=0.1281$, so $W_2$ cannot be excluded
+exactly. The \texttt{none} arm is drawn only on the left, since it is outside that coverage family
+and no relation to it is verified. The right-hand panel is therefore a verified \emph{partial}
+picture rather than a determined Hasse diagram: what it establishes is
+$\{W_1,W_{1+}\}\subseteq F\subseteq\{W_1,W_{1+},W_2\}$.}
 \label{fig:hasse}
 \end{figure}
 
@@ -1991,7 +1992,7 @@ DeepSeek ($68$--$75\%$
 band) it is the model's own capability limit; for Haiku the apparent $52\%$ ceiling on
 \texttt{api\_post\_ok} is not even that. A raw-failure audit (\S\ref{sec:results-audit}) shows
 every Haiku reply on that cell calls the private contract correctly and the deficit is an omitted
-\texttt{import} line; with the import neutralized, $W_1$ scores $40/40$. One honest caveat: the four
+\texttt{import} line; with the import neutralized, $W_1$ scores $40/40$. One limit on reading these magnitudes: the four
 cells were constructed to exhibit the phenomenon, so the aggregate magnitudes are diagnostic of the
 failure structure, not an estimate of production-traffic gains; what transfers is the structure,
 each of the two scalar policies measured here forfeits an entire cell class, and no single task-independent ranking keeps all four.
@@ -2126,7 +2127,7 @@ scores, which is exactly what makes the selection safe under anti-monotonicity.
 
 \paragraph{Source-pair generality.} Incomparability and dominance hold for two hand-built pairs
 in two domains; the cross-vendor record is single-pair. Pair-2 harm is verified at the margin
-($\overline\Delta_T=-0.33$ at $n=80$); pair-2's relevance trap was an honest null (its prompt was not lexically
+($\overline\Delta_T=-0.33$ at $n=80$); the second pair did not reproduce the relevance-trap effect (its prompt was not lexically
 $V_2$-leaning). A third domain and a vendor-general strong mis-rank remain inexpensive next
 steps.
 
