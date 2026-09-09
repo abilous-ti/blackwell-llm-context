@@ -2637,7 +2637,16 @@ entering no table of the six-model record. The second is the entire second sourc
 the regime difference is worth stating plainly: what that pair shows is that incomparability and
 the superset collapse reappear in another domain \emph{under the agentic harness}, not that they
 reappear under the single-shot one. The single-shot evidence for both phenomena is the six-model
-record on the first pair. Transport-level failures (empty or zero-token results) are retried up to three
+record on the first pair.
+
+One reproducibility gap is worth stating rather than leaving to be discovered. Four cited result
+files are arm-only re-measurements produced by ad-hoc scripts that were not kept in the
+repository: the Opus $W_{1+}$ arm, the Opus $W_2$/\texttt{trap\_store\_wire} cell, the Haiku
+$W_1$/\texttt{enc\_amount} cell and the structured-context arm. Their raw records and counts are
+released and every number we report is computed from them, but their regime is asserted here
+rather than recoverable from a run log, so a reader can check the numbers and not the invocation.
+\texttt{harness/diag/check\_regimes.py} lists the regime of every cited run with the evidence for
+each, and flags exactly these four. Transport-level failures (empty or zero-token results) are retried up to three
 times with quadratic backoff; a draw that still fails is scored as a failure, never as a pass. Where a transport-outage window hit a whole arm or a single cell, we re-measured it cleanly in isolation with the retry harness and report only the clean measurement: the Opus $W_{1+}$ arm; the Opus $W_2$/\texttt{trap\_store\_wire} cell, roughly $18$ of whose $40$ first-run draws were outage-scored (inferred from per-draw cost); and the Haiku $W_1$/\texttt{enc\_amount} cell, whose first run predated the retry wrapper. One cell resisted re-measurement for longer than the others: GPT-5.5 $W_2$/\texttt{trap\_store\_wire} returned HTTP~500 after retries during the original run and no GPT-5.5 deployment was available on the resource at first revision, so for one revision cycle its reported $0/40$ was carried with outage-scored draws in it. A GPT-5.5 deployment was subsequently provisioned and all four GPT-5.5 cells were re-run single-shot at $n=40$ per arm with retention and zero transport failures. The re-run reproduces the published grid exactly in all eight $W_1$/$W_2$ entries, the disputed cell included ($W_2$/\texttt{trap\_store\_wire} $0/40$ clean), so every cell in the coverage family is now a valid binomial sample and the reported $n$ is the number of real draws throughout. The GPT-5.5 rows of Table~\ref{tab:remeasure} come from that run.
 
 \begin{sloppypar}
@@ -2652,7 +2661,7 @@ with its arm-only re-run \texttt{blackwell\_opus\_ss\_W1plus} and the clean sing
 \texttt{blackwell\_argorder\_n80} (an agentic $n=80$ confirmation of the
 \texttt{api\_argorder} collapse on the hardened task, $100\%\to1\%$ with upper bound $-0.91$;
 reported here for completeness, since the manuscript uses the single-shot $n=40$ measurement of
-that cell instead), \texttt{blackwell\_pair2\_n80}
+that cell instead), \texttt{blackwell\_pair2\_n40} (second source pair; the reported $L_{\Dcal}$, $U_{\Dcal}$ and $\Delta_T$ all come from this file) and \texttt{blackwell\_pair2\_n80}
 (second source pair), \texttt{blackwell\_instr\_n40} (routing-instruction ablation),
 \texttt{blackwell\_xml\_n40} / \texttt{blackwell\_xml\_arm\_only} (structured-context ablation),
 \texttt{reranker\_trap\_n30} (LLM listwise reranker probe;
