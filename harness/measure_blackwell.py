@@ -235,7 +235,13 @@ def _azure_complete(prompt, model):
     import urllib.request
     endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
     key = os.environ["AZURE_OPENAI_KEY"]
-    if "responses" in endpoint:
+    if "anthropic" in endpoint:   # Anthropic Messages API (also served by Azure AI Foundry)
+        url = endpoint
+        headers = {"Content-Type": "application/json", "x-api-key": key, "api-key": key,
+                   "anthropic-version": "2023-06-01"}
+        body = {"model": model, "max_tokens": 8000,
+                "messages": [{"role": "user", "content": prompt}]}
+    elif "responses" in endpoint:
         url, headers = endpoint, {"Content-Type": "application/json", "api-key": key}
         body = {"model": model, "input": prompt, "max_output_tokens": 8000}
     else:  # OpenAI-compatible chat completions (e.g. Azure AI Foundry /openai/v1/)
@@ -257,7 +263,10 @@ def _azure_complete(prompt, model):
                 raise
             import time
             time.sleep(2 * (attempt + 1))
-    if "output" in out:                                # Responses API
+    if isinstance(out.get("content"), list):           # Anthropic Messages API
+        text = "".join(c.get("text", "") for c in out["content"] if c.get("type") == "text")
+        otoks = (out.get("usage", {}) or {}).get("output_tokens", 0)
+    elif "output" in out:                              # Responses API
         text = ""
         for item in out.get("output", []):
             if item.get("type") == "message":

@@ -748,6 +748,10 @@ hypothesis.
     and a fixed sub-optimal $\delta_M$ may fail to realize the optimal-value crossover on $\Dcal$.
     It holds under the value-attainment hypothesis (Assumption~\ref{ass:attain}).
 \end{enumerate}
+\end{lemma}
+
+\begin{remark}[What the caps buy, and what they do not]
+\label{rem:capsrole}
 Neither hypothesis of \textup{(a)}, separation or the caps, can be dropped \emph{from this
 criterion}. They are not preconditions of structural incomparability as such: for the sources
 this paper measures, Lemma~\ref{lem:noref} already separates $W_1$ from $W_2$ by coordinate
@@ -772,7 +776,7 @@ coordinate any verifier reads (Remark~\ref{rem:partial}). That a representation-
 difference certifies. Nor is the projection construction \emph{necessary} for
 incomparability: it is the cleanest sufficient condition we know, and the one our sources
 realize.
-\end{lemma}
+\end{remark}
 
 Intuitively: a fixed-rule crossover proves structural incomparability only when each winning
 source reveals a coordinate the losing source lacks; otherwise the crossover may
@@ -1383,8 +1387,9 @@ underlying quantities.
 
 \begin{table}[t]
 \centering
-\caption{Consolidated 6-model / 4-vendor verdict. All six models are run the same way, a single
-API call per attempt at $n=40$ per cell (\S\ref{sec:methodology}). ``Anti-mono.\ verified'' counts, of the two
+\caption{Consolidated 6-model / 4-vendor verdict. Every model gets one completion per attempt at
+$n=40$ per cell; the transport differs between the Anthropic models and the rest, so cross-vendor
+magnitudes are (model, transport) pairs (\S\ref{sec:methodology}). ``Anti-mono.\ verified'' counts, of the two
 API cells tested per model, those on which the harm contrast's upper bound clears $-\tau = -0.30$
 at $\eta=0.10$. ``Argorder
 \texttt{none}'' is the no-context baseline PASS on \texttt{api\_argorder}, the model-relative-value
@@ -1412,6 +1417,8 @@ Anti-mono.\ verified (\# cells, of 2) & 1 & 2 & 2 & 2 & 2 & 2 \\
 
 \subsubsection{Incomparability verified on all six models}
 \label{sec:results-incomp}
+
+\emph{Question: do the two sources cross in realized pass rate, and does the crossing survive the multiplicity of choosing which cell carries it?}
 
 On every model the empirical deficiency is mutually positive, $\dhat_{\Dcal}(W_1,W_2) > 0$ and
 $\dhat_{\Dcal}(W_2,W_1) > 0$, and the uniform lower bounds $L_{\Dcal}$ in both directions clear zero,
@@ -1444,6 +1451,8 @@ opposition replicated across six models.
 
 \subsubsection{The relevance score mis-ranks the sources}
 \label{sec:results-misrank}
+
+\emph{Question: on a task whose vocabulary points the wrong way, which source do deployed relevance scorers put first, and does any of them recover the one that passes?}
 
 On the trap, query-conditioned lexical relevance ranks $\varphi_{\mathrm{lex}}(W_1) = 0.36 <
 \varphi_{\mathrm{lex}}(W_2) = 0.44$, so it prefers $W_2$; yet realized PASS ranks $W_1 \gg W_2$ on all
@@ -1504,6 +1513,8 @@ Haiku listwise ($n{=}30$) & LLM listwise & $W_1$ & $W_1$ & $W_2$ \\
 
 \subsubsection{Anti-monotonicity: a verified superset that hurts}
 \label{sec:results-antimono}
+
+\emph{Question: does adding a second correct source to a working prompt lower the pass rate, and is the drop larger than the margin $\tau$ we fixed in advance?}
 
 The superset $W_{1+}$, which literally \emph{contains} $W_1$'s signal, sharply degrades the API cells
 relative to $W_1$ alone. The per-task harm contrast $\Delta_T = \PASS(W_{1+},T) - \PASS(W_1,T)$ is
@@ -1722,6 +1733,8 @@ rather than ordered. What survives is the negative claim, not the ranking that m
 \subsubsection{The model-relative value of private context}
 \label{sec:results-moat}
 
+\emph{Question: how much of each private convention can a model supply on its own, and does that quantity order with capability?}
+
 The ``private'' conventions are genuinely unguessable for some vendors and partially known to others,
 and this varies continuously. The \texttt{none}-arm baseline on \texttt{api\_argorder} forms a clean
 spectrum: Sonnet $0\%$, Haiku and DeepSeek $2\%$, Opus $40\%$, Kimi $45\%$, GPT-5.5 $75\%$
@@ -1766,6 +1779,8 @@ convention-to-task routing rather than in convention segmentation.
 
 \subsubsection{Raw-failure audit: what Haiku's \texttt{api\_post\_ok} cell measures}
 \label{sec:results-audit}
+
+\emph{Question: when a cell fails, what does the reply actually get wrong, and is the failure the mechanism this paper describes or an artifact of packaging?}
 
 One cell in Table~\ref{tab:percell} is anomalous: Haiku's $W_1$ arm scores $52\%$ on
 \texttt{api\_post\_ok} while scoring $100\%$ on the harder \texttt{api\_argorder} under the same
@@ -2125,8 +2140,18 @@ set selectors optimize evidence sets end to end~\citep{optiset2026,rank4gen2026}
 order adds is the object the set is taken over, verified task value rather than heuristic per-item
 scores, which is exactly what makes the selection safe under anti-monotonicity.
 
-\paragraph{Source-pair generality.} Incomparability and dominance hold for two hand-built pairs
-in two domains; the cross-vendor record is single-pair. Pair-2 harm is verified at the margin
+\paragraph{Source-pair generality, and its regime dependence.} Incomparability and dominance hold
+for two hand-built pairs in two domains, but not in the same measurement regime: the second pair
+was measured agentically. Re-measured single-shot at $n=40$, the regime of the six-model record,
+it does not reproduce. $V_1$'s ceiling falls from $80\%$ to $25\%$ on the contract cell and from
+$75\%$ to $20\%$ on the trap, the incomparability verification loses one direction
+($L_{\Dcal}=+0.774/-0.005$), and the superset \emph{helps} rather than harms on the contract cell
+($25\%\to55\%$, $\Delta_T=+0.30$). Without the agentic retries the model does not reliably satisfy
+the \texttt{cache.put} contract at all, so the pair stops exhibiting the structure it was built
+to exhibit. We report this rather than select the regime that works: second-domain generality is
+established under the agentic harness only, and the single-shot evidence for both phenomena is
+the six-model record on the first pair. The cross-vendor record is single-pair. Pair-2 harm, in
+the agentic regime, is verified at the margin
 ($\overline\Delta_T=-0.33$ at $n=80$); the second pair did not reproduce the relevance-trap effect (its prompt was not lexically
 $V_2$-leaning). A third domain and a vendor-general strong mis-rank remain inexpensive next
 steps.
@@ -2191,33 +2216,33 @@ task-disjoint, so a complementary pair would be needed to test whether a superse
 \label{sec:conclusion}
 % ==========================================================================
 
-Bringing Blackwell and Le~Cam to inference-time context is not ours to claim: concurrent work
-reached the same apparatus from the admission side (\S\ref{sec:related-deficiency}). What we add
-follows from taking \emph{incomparability}, not deficiency-minimization, as the object.
+Context selection is a partial-order problem, not a scalar one. When two sources are incomparable,
+no single per-source score ranks them correctly for all tasks
+(Theorem~\ref{thm:incomparable}), which gives the field's ``relevance does not transfer'' folklore
+a formal boundary. Making that testable is what this paper does: a value-deficiency surrogate and
+a finite-sample verification turn the order into something one can measure on a live model. On
+six models across four vendors we verify at $\ge 90\%$ that two private sources cross in realized
+pass rate; on each of them a deployed relevance score ranks the pair the wrong way on a designed
+trap; and on eleven of twelve cells adding a strictly larger source lowers the pass rate, as far
+as $100\%\to0\%$, which no ``more-is-better'' scalar predicts. How much a private source is worth
+depends on the model: guessability runs from $0\%$ to $75\%$ and is not ordered by capability,
+with the three Anthropic models alone spanning $0\%$, $2\%$ and $40\%$, so it is not a vendor
+effect either. What it does track these runs cannot identify.
 
-Context selection is, at bottom, a partial-order problem, not a scalar one. When two sources are
-incomparable, no single per-source score, relevance or utility, can rank them correctly for all
-tasks (Theorem~\ref{thm:incomparable}),
-which explains the field's ``relevance does not transfer'' folklore and gives utility-centric
-retrieval its formal boundary. We made the order measurable
-with a value-deficiency surrogate $\dhat_{\Dcal}$ and a distribution-free verification, and we ran
-the theory on six models across four vendors. On every model we verify ($\ge 90\%$) that two
-private sources are incomparable; on every model a real relevance score ranks them the wrong way;
-and on all six we verify that adding a strictly larger source sharply lowers the pass rate (as
-deep as $100\%\to 0\%$), which no ``more-is-better'' scalar can predict. How much a private source
-is worth turns out to depend on the model: guessability runs from $0\%$ to $75\%$ across vendors
-and is not ordered by capability; the three Anthropic models alone span $0\%$, $2\%$ and $40\%$, so
-it is not a vendor effect either, and what it does track these runs cannot identify.
+Bringing Blackwell and Le~Cam to inference-time context is not ours to claim; concurrent work
+reached the same apparatus from the admission side (\S\ref{sec:related-deficiency}). What follows
+from taking \emph{incomparability} rather than deficiency-minimization as the object is the
+impossibility, and the instrument that tests it.
 
 On scope: the theorems concern the idealized Bayes-optimal user of a source; the
 realized crossover, anti-monotonicity, and value-of-private-context are properties of \emph{fixed} models
 measured directly, bridged to the structural claim by Lemma~\ref{lem:bridge}. The estimator is a
-regret-gap surrogate, not a Le~Cam deficiency; the verification, which we regard as the most robust
-contribution, is correct and survives that re-labeling. All six models are run the same way
-(single-shot, $n=40$), and the evidence spans two hand-built source pairs in two domains plus a
-character-matched padding control that attributes the anti-monotonicity collapse to signal content
-rather than added tokens; the cross-vendor record remains single-pair, cross-vendor magnitudes are
-only suggestive, and synergy is untested. The practical reading is modest and actionable:
+regret-gap surrogate, not a Le~Cam deficiency, and the verification is correct under that
+re-labeling. All six models get one completion per attempt at $n=40$, though not over the same
+transport (\S\ref{sec:methodology}), so cross-vendor magnitudes are read as (model, transport)
+pairs rather than as properties of the models; the verified claims are within-model contrasts,
+where the transport is held fixed. The cross-vendor record is single-pair, and synergy is
+untested. The practical reading is modest and actionable:
 selection should be treated as partial-order-aware rather than scalar top-$k$, the right operational
 object is a verified deficiency surrogate rather than a relevance scalar, and ``the best context''
 should be expected to be model-relative and only partially ordered. Stated at its sharpest, the
@@ -2232,9 +2257,10 @@ fall for the trap, while an LLM listwise reranker, which pays per-candidate comp
 the decisive content, escapes it. That is a measured contrast between named checkpoints, not a
 proved separation between complexity classes: what the theory establishes is that a single
 task-independent number cannot represent a partial order, and what the probe shows is that
-reading content suffices to measure it on this battery. The remaining
-strengthenings, a vendor-general strong mis-rank, larger reranker checkpoints, and a third
-domain, are the natural next steps, and the experimental record indicates each is cheap to run.
+reading content suffices to measure it on this battery. The decisive next test is prevalence:
+draw source pairs from a natural corpus rather than building them, run the same verification
+unchanged, and report how often a deployed retrieval stream produces a pair that verifies
+incomparable (\S\ref{sec:limitations}).
 
 % ==========================================================================
 \section*{Author Contributions}
