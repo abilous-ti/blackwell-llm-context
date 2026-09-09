@@ -602,10 +602,12 @@ def required_n_stark(eta=0.10, D=6):
 # ============================================================================================
 # (4) INTERFERENCE CERTIFICATE (lead A) -- certify a HARMFUL non-monotone interaction:
 #     I_T = PASS(W1plus) - PASS(W1) - PASS(W2) + PASS(none).
-# I_T < 0 means the superset W1plus is WORSE than the sum of its parts predict -> the
-# anti-monotonicity the program measured (W1plus collapsed API PASS). A negative, CI-separated
-# I_T is the algebraic signature NO monotone-submodular scalar (relevance/MI/V-info/moat) can
-# carry. To CERTIFY I_T <= -tau we need an UPPER confidence bound on I_T <= -tau. The upper bound
+# I_T < 0 means the superset W1plus returns less than the sum of its parts predicts. NOTE: this
+# is NOT evidence of harm and NOT something a monotone submodular set function rules out --
+# I_T <= 0 is exactly the submodularity inequality for {W1,W2}. An earlier version of this
+# comment claimed the opposite. Harm is the two-arm contrast Delta_T computed by certify_harm;
+# I_T is retained as a descriptive interaction term only.
+# To bound I_T <= -tau we need an UPPER confidence bound on I_T. The upper bound
 # uses CPhi for the + terms (W1plus, none) and CPlo for the - terms (W1, W2), all at a Bonferroni
 # level alpha=eta/4 (4 proportions/task) so the per-task claim holds at >= 1-eta.
 # ============================================================================================
@@ -624,7 +626,13 @@ def certify_harm(counts, by_task, eta=0.10, tau=0.30, selected_post_hoc=False):
     exactly that; calling it at eta/2 (as an earlier version did) spends eta/4 per tail,
     delivers 1-eta/2 rather than 1-eta, and widens the bound for nothing.
     """
-    alpha = eta / (2.0 * len(by_task)) if selected_post_hoc else eta
+    # clopper_pearson takes a TWO-SIDED level and puts half of it in each tail, so the
+    # two-sided argument must be twice the noncoverage we want on each endpoint. Marginal
+    # case: eta/2 per endpoint -> pass eta. Post-hoc selection from |D| candidate cells:
+    # eta/(2|D|) per endpoint over the 2|D| endpoints -> pass eta/|D|. Passing eta/(2|D|)
+    # here, as this branch previously did, spends eta/(4|D|) per tail and is twice as
+    # conservative as Proposition 4 specifies.
+    alpha = eta / float(len(by_task)) if selected_post_hoc else eta
     out, certified = {}, []
     for tid in by_task:
         k1, n1 = counts["W1"][tid]
@@ -640,7 +648,8 @@ def certify_harm(counts, by_task, eta=0.10, tau=0.30, selected_post_hoc=False):
                     "W1": counts["W1"][tid], "W1plus": counts["W1plus"][tid],
                     "certified_harmful": ok}
     out["certified"] = certified
-    out["alpha_per_endpoint"] = alpha
+    out["alpha_two_sided"] = alpha
+    out["alpha_per_endpoint"] = alpha / 2.0
     return out
 
 

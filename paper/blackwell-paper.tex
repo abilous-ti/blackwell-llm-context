@@ -1341,8 +1341,9 @@ $100\%$), giving $L_{\Dcal} = +0.762 / +0.762$, far clear of zero.
 \paragraph{The six-model claim, made jointly.} Proposition~\ref{prop:certificate} controls the
 $2|\Dcal|$ intervals of \emph{one} model's run, so the per-model verifications above are each at
 $\ge 1-\eta$ and their conjunction across the roster is not. Rather than leave the six-model
-statement marginal we pay for it: allocating $\eta$ across the six runs, i.e.\ per-endpoint level
-$\eta/(2|\Dcal|\cdot 6)=\eta/48$, every one of the twelve directions remains strictly positive,
+statement marginal we pay for it: allocating $\eta$ across the six runs, i.e.\ per-\emph{interval}
+level $\eta/(2|\Dcal|\cdot 6)=\eta/48$, which places $\eta/96$ in each tail, every one of the
+twelve directions remains strictly positive,
 binding at DeepSeek-V4-Pro's $L_{\Dcal}(W_1,W_2)=+0.263$ and reaching $+0.685$ on the stark cells.
 The claim ``all six models are empirically incomparable'' therefore holds \emph{simultaneously} at
 $\ge 90\%$, not merely model by model. Table~\ref{tab:consolidated} reports the per-model bounds;
@@ -1419,7 +1420,15 @@ Haiku listwise ($n{=}30$) & LLM listwise & $W_1$ & $W_1$ & $W_2$ \\
 The superset $W_{1+}$, which literally \emph{contains} $W_1$'s signal, sharply degrades the API cells
 relative to $W_1$ alone. The per-task harm contrast $\Delta_T = \PASS(W_{1+},T) - \PASS(W_1,T)$ is
 verified negative ($\Delta_T \le -\tau$, $\tau=0.30$) on eleven of the twelve API cells, two per
-model, and so on at least one cell for all six models (Table~\ref{tab:interference}); the mildest
+model, and so on at least one cell for all six models (Table~\ref{tab:interference}). Those
+eleven are \emph{marginal} verifications, each at $\ge 1-\eta$ for its own cell. The conjunction
+can be bought from the same records: allocating $\eta$ across all twelve contrasts, i.e.\ a
+per-interval level of $\eta/12$ over the $24$ endpoints, nine of the twelve still clear $-\tau$,
+and every one of the six models keeps at least one cell that does. The roster-level statement
+``on each of these six models some strict superset verifiably harms some cell'' therefore holds
+\emph{simultaneously} at $\ge 90\%$, not merely model by model. The three cells that drop out
+under the joint budget are Haiku's \texttt{api\_post\_ok} (which does not clear marginally
+either), Opus's \texttt{api\_post\_ok} and DeepSeek's \texttt{api\_argorder}; the mildest
 verified collapse is Opus at $100\% \to 38\%$ with upper bound $-0.41$, and the one cell that does
 not clear is Haiku's \texttt{api\_post\_ok}, whose $W_1$ arm is depressed by an unrelated import
 slip (\S\ref{sec:results-audit}). All eleven survive a Bonferroni correction across the two cells
@@ -1436,12 +1445,20 @@ on \texttt{api\_argorder}, $100\%\to5\%$.
 The idealized Blackwell order on $\mathcal{C}=\{W_1,W_2,W_{1+}\}$ collapses the choice to the
 superset: $W_{1+}$ reveals both coordinates, so $W_{1+}\Bord W_1$ and $W_{1+}\Bord W_2$, and
 ``more signal is better'' keeps $\{W_{1+}\}$ alone. The verified empirical relation for the
-fixed rule is the opposite shape: $W_1$ beats $W_{1+}$ on the API cells, $W_{1+}$ beats $W_1$ on the encoding cell, $W_{1+}$ dominates $W_2$ (while $W_1$ and $W_2$
-are the verified incomparable pair), so the correct empirical summary is the two-element
-Pareto front $\{W_1, W_{1+}\}$, an object no scalar top-$1$ rule can represent
-(Figure~\ref{fig:hasse}). This reads directly off the verified $n{=}40$ Haiku cells; the
-selection rule it implies, keep the verified non-dominated set rather than force the superset,
-follows directly.
+fixed rule is the opposite shape: $W_1$ beats $W_{1+}$ on the API cells, $W_{1+}$ beats $W_1$ on
+the encoding cell, and $W_1$ and $W_2$ are the verified incomparable pair, so the empirical
+summary is the two-element Pareto front $\{W_1, W_{1+}\}$, an object no scalar top-$1$ rule can
+represent (Figure~\ref{fig:hasse}). Three sources over four cells need \emph{one} coverage event,
+so we take all $3\times 4$ Clopper--Pearson intervals at per-interval level $\eta/12$; they then
+hold jointly at $\ge 1-\eta$ and every relation in the figure is read off that single event. On
+the $n{=}40$ Haiku record this gives $L_{\Dcal}(W_1,W_2)=L_{\Dcal}(W_2,W_1)=+0.74$, so the
+incomparable pair is verified; $U_{\Dcal}(W_{1+},W_1)=1.00$, so $W_{1+}$ verifiably fails to
+dominate $W_1$, which is the anti-monotone edge; and $U_{\Dcal}(W_{1+},W_2)=0.13$. That last
+number is an $\varepsilon$-dominance, not an exact one: what is verified is that $W_2$ can beat
+$W_{1+}$ by at most $0.13$ on some cell, so excluding $W_2$ from the front is licensed only up to
+that margin, and at $n=40$ a three-element front cannot be ruled out. The selection rule the
+figure implies, keep the non-dominated set rather than force the superset, does not depend on
+which of the two readings holds, since $W_1$ and $W_{1+}$ are in the front either way.
 
 \begin{figure}[t]
 \centering
@@ -1482,8 +1499,10 @@ $W_{1+}=W_2 \,{+}{+}\, W_1$. \textbf{Left:} the idealized Blackwell order for th
 $W_{1+}$ reveals both coordinates, so ``more signal is better'' collapses the choice to the superset.
 \textbf{Right:} the verified empirical order for the fixed model rule (Haiku, $n{=}40$): $W_1$ beats
 $W_{1+}$ on \texttt{api\_argorder} ($100\%$ vs.\ $5\%$, anti-monotonicity, Table~\ref{tab:interference})
-while $W_{1+}$ beats $W_1$ on the encoding cell, so the two are empirically incomparable (dashed) and
-the correct output is the two-element Pareto front, which no scalar top-$1$ rule can represent.}
+while $W_{1+}$ beats $W_1$ on the encoding cell, so the two are empirically incomparable (dashed)
+and the output is a Pareto front, which no scalar top-$1$ rule can represent. All relations shown
+are read off one coverage event (the $3\times 4$ intervals at per-interval level $\eta/12$); the
+edge from $W_{1+}$ to $W_2$ is an $\varepsilon$-dominance at $\varepsilon=0.13$, not an exact one.}
 \label{fig:hasse}
 \end{figure}
 
@@ -1640,8 +1659,10 @@ These are fresh draws months after the original runs, not a re-scoring, so they 
 
 Three things follow. \textbf{(i) The collapse reproduces in every cell}, with $\Delta_T$ from
 $-0.425$ to $-1.000$; no cell failed to reproduce. \textbf{(ii) Packaging is never the cause}: across
-all $880$ retained draws of these eleven cells the extractor returned code every time, so no failure is an artifact of
-fences or prose. \textbf{(iii) The import artifact suppressed the measured harm rather than
+all $880$ retained draws of these eleven cells the extractor returned a non-empty code block every
+time, so no failure is an artifact of an empty extraction or of fencing. That is weaker than a
+guarantee that every reply was well-formed Python; it rules out the packaging explanation, not
+every formatting one. \textbf{(iii) The import artifact suppressed the measured harm rather than
 manufacturing it.} It falls on the $W_1$ arm, not the superset arm, so neutralizing it deepens every
 contrast it touches: DeepSeek's \texttt{api\_post\_ok} moves from $-0.425$ to $-0.975$ and its
 \texttt{api\_argorder} from $-0.625$ to $-0.950$.
@@ -1673,9 +1694,12 @@ published cells were measured or whether the behaviour arrived with a model upda
 \footnotesize
 \caption{Re-measurement with raw-completion retention, $n=40$ per arm, fresh draws. $\Delta$ is
 under the published verifier and $\Delta_{\mathrm{neu}}$ under the import-neutralized one.
-``Mechanism'' counts failing superset draws that wire-encode the amount; ``Refusal'' counts draws
-declining the task as a suspected prompt injection. Every row is a single-shot re-measurement in
-the published regime.}
+``Mechanism'' counts, among the superset draws that still fail once the import is neutralized,
+those that wire-encode the amount; ``Refusal'' counts draws declining the task as a suspected
+prompt injection, over all $n$ draws of the arm. The two denominators therefore differ, and the
+labels are not mutually exclusive: on Sonnet's \texttt{api\_argorder} one draw carries both flags,
+and on its \texttt{api\_post\_ok} one refusal-flagged draw nonetheless passed. Every row is a
+single-shot re-measurement in the published regime.}
 \label{tab:remeasure}
 \begin{tabular}{@{}llccccc@{}}
 \toprule
@@ -1686,7 +1710,7 @@ Sonnet-4.6      & \texttt{api\_post\_ok}  & $100\% \to 3\%$  & $-0.98$ & $-0.98$
 Sonnet-4.6      & \texttt{api\_argorder} & $100\% \to 0\%$  & $-1.00$ & $-1.00$ & $1/40$  & $40$ \\
 Opus-4.8        & \texttt{api\_post\_ok}  & $100\% \to 3\%$  & $-0.98$ & $-0.98$ & $38/39$ & $0$ \\
 Opus-4.8        & \texttt{api\_argorder} & $100\% \to 3\%$  & $-0.98$ & $-0.98$ & $39/39$ & $0$ \\
-DeepSeek-V4-Pro & \texttt{api\_post\_ok}  & $43\% \to 0\%$   & $-0.43$ & $-0.98$ & $39/40$ & $0$ \\
+DeepSeek-V4-Pro & \texttt{api\_post\_ok}  & $43\% \to 0\%$   & $-0.43$ & $-0.98$ & $39/39$ & $0$ \\
 DeepSeek-V4-Pro & \texttt{api\_argorder} & $68\% \to 5\%$   & $-0.63$ & $-0.95$ & $38/38$ & $0$ \\
 Kimi-K2.6       & \texttt{api\_post\_ok}  & $100\% \to 0\%$  & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
 Kimi-K2.6       & \texttt{api\_argorder} & $100\% \to 0\%$  & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
@@ -1708,16 +1732,19 @@ oracle-best source ($W_1$ for every model). \emph{Topical top-1} re-scores per t
 relevance, choosing $W_1$ on the API cells and $W_2$ on encoding, but also $W_2$ on the trap,
 where every measured topical ranker puts the wrong source first
 (\S\ref{sec:results-misrank}). \emph{Concatenate both} refuses to choose and submits $W_{1+}$.
-\emph{Front $+$ routing} keeps the verified non-dominated set $\{W_1, W_2\}$ and routes by task
-family, attaining the per-cell maximum of the two sources; this is what the partial order licenses,
-and its price is exactly one probe's worth of knowledge, namely which source is decisive for which
-family.
+\emph{Oracle over $\{W_1,W_2\}$} keeps the non-dominated pair and takes the per-cell maximum of
+the two. It is the benchmark the partial order licenses one to aim at, and its price is exactly
+one probe's worth of knowledge, namely which source is decisive for which family. We report it as
+an oracle rather than as an achieved result because the per-cell maximum is read off the same
+outcomes it is scored on; a deployable router would have to be fixed before testing and evaluated
+on held-out tasks, against matched latency and token budgets. This paper does not do that, and
+the number below should not be read as a measured gain from a shipped selector.
 
 \begin{table}[t]
 \centering
 \begin{tabular}{@{}lcccc@{}}
 \toprule
-Model & Best fixed source & Topical top-1 & Concatenate ($W_{1+}$) & Front $+$ routing \\
+Model & Best fixed source & Topical top-1 & Concatenate ($W_{1+}$) & Oracle over $\{W_1,W_2\}$ \\
 \midrule
 Haiku-4.5       & 60.6 & 63.1 & 53.1 & \textbf{85.6} \\
 Sonnet-4.6      & 75.0 & 74.4 & 36.9 & \textbf{99.4} \\
@@ -1731,9 +1758,12 @@ Mean            & 70.1 & 68.9 & 48.2 & \textbf{93.3} \\
 \end{tabular}
 \caption{Mean PASS (\%) over the four verified cells under four selection policies, per model,
 computed from the per-cell PASS counts behind Table~\ref{tab:percell} (averaging the rounded
-percentages instead would shift a column by up to $0.4$). The front-and-routing column
-is the per-cell maximum of $W_1$ and $W_2$ and is therefore the ceiling of \emph{any} selection
-policy on these cells; its remaining gap to $100\%$ is model capability, not selection error.}
+percentages instead would shift a column by up to $0.4$). The last column is the per-cell maximum
+of $W_1$ and $W_2$ \emph{read off the test outcomes}: an empirical oracle over the pair, not a
+router fixed in advance and then evaluated, and not a confidence bound on any policy's population
+quality. It is also not a ceiling over all selection policies, since it excludes $W_{1+}$ as a
+candidate: admitting it raises the Haiku oracle from $85.6$ to $86.25$, because $W_{1+}$ edges
+$W_1$ on the trap cell.}
 \label{tab:policies}
 \end{table}
 
@@ -1743,8 +1773,10 @@ yet land within about one point of the same aggregate: the cap is the policy \em
 any total order must abandon at least one cell, not the choice of scorer
 (Theorem~\ref{thm:incomparable}, Proposition~\ref{prop:trap-constrained}). Second, the policy that
 refuses to choose is the \emph{worst} of the four: anti-monotonicity is the dominant cost, not a
-tie-breaking subtlety (\S\ref{sec:results-antimono}). Third, the front column shows what selection
-alone can recover: its shortfall from $100\%$ is not selection error. For DeepSeek ($68$--$75\%$
+tie-breaking subtlety (\S\ref{sec:results-antimono}). Third, the oracle column shows what
+selection over the pair could have recovered had the deciding source been chosen on every cell;
+its shortfall from $100\%$ is not selection error, though neither is it all capability. For
+DeepSeek ($68$--$75\%$
 band) it is the model's own capability limit; for Haiku the apparent $52\%$ ceiling on
 \texttt{api\_post\_ok} is not even that. A raw-failure audit (\S\ref{sec:results-audit}) shows
 every Haiku reply on that cell calls the private contract correctly and the deficit is an omitted
@@ -2164,8 +2196,10 @@ precisely what the exact Clopper--Pearson construction provides.
 \label{subsec:power}
 
 Both verifications are driven by how close the arms sit to an endpoint. For a stark cell with
-empirical proportion at an endpoint ($\hat p\in\{0,1\}$) the Clopper--Pearson interval collapses to
-a one-sided bound that clears $0$ even at small $n$, and the incomparability verification
+empirical proportion at an endpoint ($\hat p\in\{0,1\}$) the Clopper--Pearson interval becomes
+one-sided and clears $0$ even at small $n$. It does not become a point: at $n=40$ and two-sided
+level $\eta/8$, $0/40$ gives $[0,\,0.119]$ and $40/40$ gives $[0.881,\,1]$, and it is that
+$0.119$ the crossing has to beat. The incomparability verification
 \eqref{eq:LD} is carried by exactly such cells ($W_1$ at $\approx100\%$, $W_2$ at $0\%$ and vice
 versa). The harm contrast \eqref{eq:deltaupper} needs the gap between two arms to exceed $\tau$
 after both intervals are paid for, so a mild collapse from a non-endpoint arm, as in the
@@ -2237,8 +2271,9 @@ is stable ($80\%\!\to\!29\%$, $\Delta_T=-0.51$) with Clopper--Pearson upper boun
 clears the pre-registered margin $\tau=0.30$. The binding constraint is the $V_1$ ceiling itself
 ($80\%$, versus pair-1's ${\sim}100\%$), so the margin is met with little to spare; at $n=40$ the
 same collapse gives $-0.25$ and does not clear, which is why the cell was re-run at $n=80$. The
-$n=80$ run also strengthens the dominance control to a fully verified one-directional dominance
-($U_{\Dcal}=0.000$ with a verified strict win). The relevance trap for this pair was a
+$n=80$ re-run covers the \texttt{cache\_put\_ok} cell alone, so its dominance control
+($U_{\Dcal}=0.000$ with a verified strict win) is a statement about that cell rather than about
+the three-cell battery; the battery-wide control remains the $n=40$ one. The relevance trap for this pair was a
 null, its prompt vocabulary leaned toward $V_1$ ($\varphi(V_1)=0.39 > \varphi(V_2)=0.25$), so
 relevance \emph{agreed} with PASS, so the strong mis-rank remains a pair-1 result. The contribution of
 the second pair is therefore \emph{generality of the incomparability and dominance results to a new
