@@ -98,15 +98,11 @@ note says how to \emph{call} its main function: the order of the arguments, a ke
 mandatory, and the error it raises on failure. The second note says how the module \emph{encodes}
 numbers: a digit format ending in a checksum. For a task that calls the function the first note is
 decisive and the second is useless; for a task that encodes a number it is the reverse; and
-neither note can be reconstructed from the other. This everyday situation is the entire paper in
-miniature. It has a precise name, the two notes are \emph{incomparable} in the sense of Blackwell's
-comparison of experiments~\citep{blackwell1953}, and a precise consequence: no single relevance
-score can rank the two notes so that the ranking is right for every task, because a score must crown
-one winner and here neither note wins outright. The body makes this exact, gives a statistical test
-that \emph{verifies} it from ordinary pass/fail runs on a live model, and finds that six production
-language models across four vendors all exhibit it. A reader who keeps these two notes in mind can
-read every symbol below as a statement about the first note versus the second (in the body they are
-the sources $W_1$ and $W_2$).
+neither note can be reconstructed from the other. The two notes are \emph{incomparable} in the
+sense of Blackwell's comparison of experiments~\citep{blackwell1953}, and the consequence is
+immediate: no single relevance score ranks them correctly for every task, because a score must
+crown one winner and here neither wins outright. In the body these are the sources $W_1$ and
+$W_2$.
 
 Production language-model systems spend much of their budget deciding
 \emph{what context to place in the prompt}. Retrieval-augmented generation ranks
@@ -115,39 +111,23 @@ choose which files and conventions to surface. Across all of these, the
 operative tool is a \textbf{scalar score}, lexical or embedding relevance,
 mutual information, $\Vcal$-usable information~\citep{ethayarajh2022},
 expected information gain, used to impose a total order and retain the top
-candidates. The scalar is convenient: it sorts, thresholds, and composes. We
-argue it is also the wrong abstraction, and that a classical apparatus from
-statistical decision theory says precisely why.
+candidates. The scalar is convenient: it sorts, thresholds, and composes. This paper asks what a
+task-independent scalar ranking can and cannot represent, and answers it with a classical
+apparatus from statistical decision theory.
 
 \paragraph{What is and is not new.}
 The mathematics is classical: the garbling order, the Blackwell--Sherman--Stein equivalence,
-Le~Cam's deficiency. Several of the \emph{phenomena} are also known, each in its own literature,
-and we say so up front. Each of the following is established elsewhere:
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item topical relevance is the wrong target and downstream utility the right
-    one~\citep{zhang2026utility};
-  \item the same passage is worth different amounts to different
-    models~\citep{zhang2025llmutility};
-  \item adding sources can lower accuracy while coverage saturates, shown for data integration over
-    a decade ago~\citep{dong2013lessismore};
-  \item rerankers are steered by lexical similarity in the wild~\citep{hagstrom2025lexical};
-  \item keeping a non-dominated set rather than a top-$k$ prefix already exists as an operator over
-    heuristic scores~\citep{skylinerag2026};
-  \item the Blackwell and Le~Cam apparatus was brought to inference-time context selection against a
-    frozen decoder concurrently with this work, and we claim no priority over
-    it~\citep{alpila2026}.
-\end{itemize}
-What is new is the
-\emph{form} that ties them together:
-\begin{itemize}\setlength{\itemsep}{2pt}
-  \item reading cross-task non-transfer as a partial order over context sources;
-  \item proving that no single per-source score, relevance or utility, can be faithful to that order
-    across tasks once two sources are incomparable. Utility re-measured per task by running the
-    model is therefore not a shortcut around the theorem but the probe it calls for;
-  \item giving a finite-sample test that verifies incomparability and superset harm on a live model,
-    with both sources held correct, the length and position confounds controlled, and the effect of
-    an explicit routing instruction measured rather than assumed away (\S\ref{sec:related}).
-\end{itemize}
+Le~Cam's deficiency. So are several of the phenomena, each in its own literature: that utility
+rather than topical relevance is the right target~\citep{zhang2026utility} and is
+model-dependent~\citep{zhang2025llmutility}; that adding sources can lower accuracy while coverage
+saturates~\citep{dong2013lessismore}; that rerankers are steered by lexical
+similarity~\citep{hagstrom2025lexical}; that keeping a non-dominated set is already an operator
+over heuristic scores~\citep{skylinerag2026}; and that the Blackwell and Le~Cam apparatus was
+brought to inference-time context selection concurrently with this work, over which we claim no
+priority~\citep{alpila2026}. \S\ref{sec:related} treats each in turn. The gap is that none of them
+gives the order itself an object or a test: cross-task non-transfer is described as a nuisance
+rather than read as a partial order, and no finite-sample procedure decides on a live model
+whether two particular sources are incomparable. That is what C1--C3 below supply.
 
 One gap needs care. Blackwell's theorem is about the \emph{best possible} use
 of a source, but every number we measure comes from one fixed model: $\PASS_M(W,T) =
@@ -155,7 +135,6 @@ of a source, but every number we measure comes from one fixed model: $\PASS_M(W,
 we state the order twice, once for the ideal user and once for the fixed model, and prove a one-way
 bridge from what we measure to what the theorem is about (\S\ref{sec:order}); and we call our
 estimator a \emph{value-deficiency surrogate}, not a Le~Cam deficiency (\S\ref{sec:estimator}).
-
 \paragraph{Contributions.} The paper makes one claim, that the order over context sources is
 \emph{partial} rather than total, and contributes the three pieces that claim needs: what follows
 from it, the instrument that makes it testable, and the evidence that it holds.
@@ -199,14 +178,12 @@ from it, the instrument that makes it testable, and the evidence that it holds.
 
 \paragraph{How to read the formal terms, and where things are.}
 Table~\ref{tab:glossary} gives the engineering reading of each recurring term, and a reader who
-wants the measured result first can go straight to \S\ref{sec:experiments}. The rest is arranged
-as follows. \S\ref{sec:related} places the contribution against prior work;
-\S\S\ref{sec:order}--\ref{sec:incomparability} build the order and prove the two impossibility
-results; \S\ref{sec:estimator} defines the verification and its confidence accounting;
-\S\ref{sec:experiments} reports the six-model measurement and the controls;
-\S\ref{sec:discussion} discusses scope and \S\ref{sec:conclusion} concludes. Every proof is in
-Appendix~\ref{app:proofs}, the extended per-cell record in Appendix~\ref{app:record}, and the
-protocol in Appendix~\ref{app:repro}.
+wants the measured result first can go straight to \S\ref{sec:experiments}. Otherwise the order is
+prior work (\S\ref{sec:related}), the partial order and the two impossibility results
+(\S\S\ref{sec:order}--\ref{sec:incomparability}), the verification
+(\S\ref{sec:estimator}), the six-model measurement (\S\ref{sec:experiments}), scope and
+conclusions (\S\S\ref{sec:discussion}--\ref{sec:conclusion}), with proofs, the per-cell record,
+the diagnostics and the protocol in Appendices~\ref{app:proofs}--\ref{app:repro}.
 
 \begin{table}[t]
 \centering
@@ -1860,39 +1837,29 @@ cells were constructed to exhibit the phenomenon, so the aggregate magnitudes ar
 failure structure, not an estimate of production-traffic gains; what transfers is the structure,
 each of the two scalar policies measured here forfeits an entire cell class, and no single task-independent ranking keeps all four.
 
-\paragraph{What follows for practice.} Five statements survive the caveats above and can be acted
-on directly. (i) One number per source is structurally lossy: when two sources each carry a
-decisive fact, any single task-independent ranking drops one of them
-(Theorem~\ref{thm:incomparable}). A threshold that instead \emph{concatenates} both is not
-forbidden by the theorem, but on this pair it is the worst of the four policies measured
-(Table~\ref{tab:policies}). (ii) Do not cache a source's \emph{value} across task families;
-cache retrieval representations instead, because the value is model- and task-relative
-(\S\ref{sec:results-moat}). (iii) Adding correct, on-topic text to a working prompt can break it, by
-as much as $100\% \to 0\%$, so a regression after enlarging the context is a candidate
-anti-monotonicity collapse before it is a model failure (\S\ref{sec:results-antimono}).
-(iv) When two candidates win on different tasks, keep both and route by task rather than forcing a
-global top-$1$. Keeping both is what makes the per-cell maximum reachable; it does not by itself
-route correctly on a new task, and concatenating the two instead is the worst policy measured
-(Table~\ref{tab:policies}). (v) A cheap topical ranker fails exactly where the surface lexicon
-points at the wrong source, which is where a listwise reader earns its cost
-(Proposition~\ref{prop:trap-constrained}). Each is measurable on any stack with the released
-harness.
-
-% ==========================================================================
+\paragraph{What follows for practice.} Four statements survive the caveats above.
+(i) One number per source is structurally lossy: when two sources each carry a decisive fact, any
+single task-independent ranking drops one of them (Theorem~\ref{thm:incomparable}). Keep both and
+route by task instead; that is what makes the per-cell maximum reachable, though it does not by
+itself route correctly on a new task. Concatenating them is not forbidden by the theorem, but on
+this pair it is the worst of the four policies measured (Table~\ref{tab:policies}).
+(ii) Do not cache a source's \emph{value} across task families; cache retrieval representations
+instead, because the value is model- and task-relative (\S\ref{sec:results-moat}).
+(iii) Adding correct, on-topic text to a working prompt can break it, by as much as
+$100\%\to0\%$, so a regression after enlarging the context is a candidate anti-monotonicity
+collapse before it is a model failure (\S\ref{sec:results-antimono}).
+(iv) A cheap topical ranker fails exactly where the surface lexicon points at the wrong source,
+which is where a listwise reader earns its cost (Proposition~\ref{prop:trap-constrained}).
+Each is measurable on any stack with the released harness.
 \section{Discussion}
 \label{sec:discussion}
 % ==========================================================================
 
-With the evidence in hand, we step back to what it licenses. Our results recast a piece of
-practitioner folklore, ``relevance does not transfer across
-tasks'', as a structural fact about context sources. When two sources are Blackwell-incomparable, the
-order over them is partial, and any scalar score, by imposing a total order, must mis-rank
-them on some task. The empirical program does not merely illustrate this; it instantiates a single
-hand-built incomparable pair (a private API-call contract $W_1$ versus a private wire-encoding
-invariant $W_2$ on the same \texttt{ledger} module) and shows that the resulting double crossover, the
-relevance mis-rank, and an anti-monotonicity collapse all reproduce across six models and four
-vendors. We discuss what the evidence does and does not license, and where the
-formalization is a model rather than a proof of the realized object.
+The results recast a piece of practitioner folklore, ``relevance does not transfer across tasks'',
+as a structural fact: when two sources are Blackwell-incomparable the order over them is partial,
+and any scalar score, by imposing a total order, must mis-rank them on some task. What follows
+concerns what that evidence does and does not license, and where the formalization is a model of
+the realized object rather than a proof about it.
 
 \subsection{Scope of the claims}
 \label{sec:disc-bridge}\label{sec:disc-deficiency}\label{sec:disc-certificate}
