@@ -386,64 +386,17 @@ pooled private information of all agents, and identify Bayesian pooled-posterior
 the Blackwell upper bound on any such protocol. That is a dominance statement about how several
 models' signals combine; ours is an incomparability statement about which single source one model
 is given, so the two orders are taken over different objects and neither implies the other.
-\subsection{The design space: which selectors the two results reach}
+\subsection{Where the two results land in the design space}
 \label{sec:related-designspace}
 
-Table~\ref{tab:designspace} places the methods above on three axes: whether the method is
-\emph{cheap} (precomputable, or amortizable to a near-retrieval query-time cost), whether it models
-\emph{interaction between sources} rather than scoring each in isolation, and whether it can
-represent \emph{incomparability}. The pattern is uniform. Every method cheap enough to run at
-retrieval scale emits a final per-item number, however that number is produced, and therefore lives
-in a total order; every method that genuinely models interaction is either symmetric redundancy
-over embedding geometry, carries no dominance guarantee, or is as costly as direct probing. No prior
-row is both cheap and partial-order-faithful; that empty cell is the open problem this paper
-isolates, and we occupy the last row, paying probe cost for the guarantee.
-
-\begin{table}[t]
-\caption{The design space of context selection.
-\checkmark~= yes, $\times$~= no, $\sim$~= partial.
-$^{a}$amortized: trained once on the model's signal, cheap at query time, but still a scalar.
-$^{b}$symmetric redundancy over embedding geometry, not directional anti-monotonicity.
-$^{c}$query-conditioned and interaction-aware, but per-query (not precomputable) and with no
-dominance guarantee. $^{d}$positive complementarity only, a passage made useful by another, not
-directional harm. $^{e}$keeps the non-dominated set, but over heuristic per-item scores rather than
-task value. $^{f}$genuinely \emph{directional}, but the relation is redundancy between chunks
-(does $i$ predict $j$ to within $\gamma$ bits?), computed offline and query-agnostically, not harm
-to a task's verified value. Only the last row represents incomparability over task value, at the cost of direct probing;
-the ``cheap \emph{and} partial-order-faithful'' cell is empty, which is this paper's central open
-problem.}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{5pt}
-\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
-\begin{tabular}{@{}lccc@{}}
-\toprule
-Method family (representative) & Cheap? & Interaction? & Incomparability? \\
-\midrule
-Scalar dense / PRP retrieval~\citep{robertson1977}               & \checkmark        & $\times$   & $\times$ \\
-Late interaction, multi-vector~\citep{khattab2020colbert}        & \checkmark        & $\times$   & $\times$ \\
-$\Vcal$-usable information~\citep{ethayarajh2022}                & \checkmark        & $\times$   & $\times$ \\
-LM-supervised retriever~\citep{shi2023replug,guu2020realm}       & \checkmark$^{a}$  & $\times$   & $\times$ \\
-MMR diversity~\citep{carbonell1998}                              & \checkmark        & $\sim^{b}$ & $\times$ \\
-DPP / submodular coverage~\citep{ye2023ceil,pacms2026}           & \checkmark        & $\sim^{b}$ & $\times$ \\
-Directed-information covering~\citep{huang2025gammacover}        & \checkmark        & $\sim^{f}$ & $\times$ \\
-Shapley / influence valuation~\citep{demoshapley2024}            & $\times$          & \checkmark & $\times$ \\
-Expected information gain / BED~\citep{bedllm2026}               & $\times$          & $\sim$     & $\times$ \\
-Listwise LLM reranker~\citep{sun2023rankgpt}                     & $\sim^{c}$        & \checkmark & $\times^{c}$ \\
-Utility scores, learned or LLM-specific~\citep{zhang2025llmutility,dai2025seper} & \checkmark$^{a}$ & $\times$ & $\times$ \\
-Conditional passage utility~\citep{jain2025contextualutility}   & \checkmark$^{a}$  & $\sim^{d}$ & $\times$ \\
-Conformal context filtering~\citep{chakraborty2026conformal}    & \checkmark        & $\times$   & $\times$ \\
-Learned set selection~\citep{optiset2026,rank4gen2026}          & $\sim^{c}$        & \checkmark & $\times^{c}$ \\
-Skyline over heuristic scores~\citep{skylinerag2026}            & \checkmark        & $\times$   & $\sim^{e}$ \\
-\midrule
-\textbf{Verified non-dominated set (this paper)}                & $\times$          & \checkmark & \checkmark \\
-\bottomrule
-\end{tabular}
-}
-\label{tab:designspace}
-\end{table}
-
-% ==========================================================================
+Appendix~\ref{app:designspace} places the methods above on three axes: whether the method is cheap
+enough to run at retrieval scale, whether it conditions on the task, and whether it can represent
+a non-dominated \emph{set} rather than a ranking. Two things come out of that grid. Every method
+cheap enough to precompute emits one number per item and so falls under
+Theorem~\ref{thm:incomparable} when that number is fixed across tasks; and the methods that escape
+do so either by reading the decisive content per candidate, which costs a model call, or by
+routing on public task metadata, which Proposition~\ref{prop:trap-constrained} does not exclude
+(Remark~\ref{rem:trapscope}).
 \section{Formalization}
 \label{sec:formalization}
 % ==========================================================================
@@ -1751,6 +1704,30 @@ is not by capability either: Sonnet guesses least ($0\%$) while the stronger Opu
 ($40\%$). The verified per-model claims rest on cells unguessable \emph{for the model under test}
 (e.g.\ GPT-5.5 \texttt{api\_post\_ok} \texttt{none} $= 5\%$, trap $= 0\%$).
 
+\subsubsection{What the failing replies contain}
+\label{sec:results-audit}
+
+\emph{Question: when a cell fails, what does the reply actually get wrong, and is the failure the
+mechanism this paper describes or an artifact of packaging?}
+
+Two diagnostics answer it, both reported in full in Appendix~\ref{app:diag}. First, Haiku's
+\texttt{api\_post\_ok} $W_1$ arm reads $52\%$ not because the contract is missed but because about
+half the replies omit the \texttt{import ledger} line; with the import neutralized in the verifier
+that arm scores $40/40$. That cell therefore measures a packaging slip, which is why it is the one
+cell whose harm contrast does not clear $-\tau$. Second, every verified interference cell was
+re-measured with raw completions retained, $n=40$ per arm, and scored under both the published and
+an import-neutralized verifier. The collapse reproduces in all eleven, the extractor returned a
+non-empty code block on all $880$ draws, and the import artifact falls on the $W_1$ arm, so
+neutralizing it \emph{deepens} every contrast it touches. On nine of the eleven cells the failing
+reply applies $W_2$'s wire encoding to a plain-cents amount, in $38$ to $40$ draws per cell.
+
+Sonnet is the exception and it matters for the reading. It declines the task as a suspected prompt
+injection on $36/40$ and $40/40$ of its superset draws, and counting refusals across all of its
+retained arms locates the trigger in a block that does not serve the task rather than in the
+number of blocks (Appendix~\ref{app:diag}). Theorem~\ref{thm:antimono} is indifferent to the
+cause, since it constrains any rule whose PASS falls under a strict superset, and Sonnet's does
+fall; what the exception costs is the mechanistic reading of \S\ref{sec:disc-mechanism}, which
+should be read with it in force.
 \subsection{Generality and controls (summary)}
 \label{sec:results-generality}
 
@@ -1776,131 +1753,6 @@ superset, still far below $W_1$), so segmentation alone does not cure the interf
 operative variable is routing knowledge. The mitigation hierarchy, raw superset $<$ structure $<$
 routing $<$ dropping the dominated signal, is itself a finding: it locates the failure in
 convention-to-task routing rather than in convention segmentation.
-
-\subsubsection{Raw-failure audit: what Haiku's \texttt{api\_post\_ok} cell measures}
-\label{sec:results-audit}
-
-\emph{Question: when a cell fails, what does the reply actually get wrong, and is the failure the mechanism this paper describes or an artifact of packaging?}
-
-One cell in Table~\ref{tab:percell} is anomalous: Haiku's $W_1$ arm scores $52\%$ on
-\texttt{api\_post\_ok} while scoring $100\%$ on the harder \texttt{api\_argorder} under the same
-source, and the pattern is stable across the five distinct single-shot Haiku runs that measure
-this cell ($42$--$58\%$; a sixth result file, \texttt{blackwell\_haiku\_singleshot\_n40}, is
-byte-identical to \texttt{blackwell\_haiku\_ss\_n40} and is the same run, not a further
-replicate). Because the
-published harness does not retain raw completions, we re-drew the cell keeping every reply, the
-extracted code, and the verifier's stderr (\texttt{results/diag/}, \texttt{harness/diag/}). The
-failures are uniform. In $12/12$ draws the reply calls the private contract exactly as $W_1$
-specifies, \texttt{ledger.post(acct, cents, memo=note)}, and every failure is the single omitted line
-\texttt{import ledger}: PASS coincides with the presence of that line ($5/5$ against $7/7$), and on
-the control cell \texttt{api\_argorder} the same model writes the import in $8/8$. The cause is prompt
-wording, not the contract: this task's prompt names the call as \texttt{ledger.post}, which Haiku
-reads as already in scope. An import-neutralized control then re-measures all four arms at $n{=}40$
-with a verifier that binds \texttt{ledger} into the solution's namespace when the reply omitted the
-import and is otherwise identical: \texttt{none} $0/40$ and $W_2$ $0/40$ under both verifiers
-(neutralization leaks nothing), $W_1$ rises from $23/40$ to $40/40$, and $W_{1+}$ from $8/40$ to
-$21/40$. The superset collapse on this cell is therefore real and has the mechanism the paper
-describes: in the retained $W_{1+}$ replies the model applies $W_2$'s wire encoding to a plain-cents
-amount and posts \texttt{'+500\#5'} in place of \texttt{500}. With the import neutralized the
-harm contrast is $\Delta_T = -0.47$ with upper bound $-0.26$, verified in sign but not at the $\tau=0.30$ margin
-(Table~\ref{tab:interference}). We keep the original-protocol numbers in every table, since the
-verifier is identical across models and the other five models include the import; the audit changes
-the reading of one cell, not its measurement. Haiku's verified claims rest on \texttt{api\_argorder}
-and are unaffected.
-
-\paragraph{Packaging is not the confound.} The same retained draws answer a second question, and
-it is the one a reader should ask of any executable-verifier result: did the harness ever fail a
-reply that in fact contained the right call? On this cell it did not. Across the $32$ failing
-$W_{1+}$ draws the extractor returned code every time (zero empty extractions), all $32$ contain
-\texttt{ledger.post} with an explicit \texttt{memo=}, and none begins with prose. Code fences are
-if anything commoner among the \emph{passing} draws ($5/8$ passes against $17/32$ failures on
-$W_{1+}$; $13/23$ against $8/17$ on $W_1$), so fencing does not predict failure: the extractor
-strips it. What the audit does show is that the import slip carries more of this cell than the
-mechanism does, $13$ of the $32$ failures being the missing import alone against $19$ carrying the
-wire-encoded amount. The two separate cleanly: under the neutralized verifier exactly $19$ draws
-still fail, and they are exactly the $19$ that applied $W_2$'s convention to a plain-cents amount,
-with no exception in either direction. Removing the artifact therefore leaves a residual harm
-($\Delta_T = -0.475$) that is attributable to the described mechanism in every single draw.
-\subsubsection{Re-measurement with retention across the roster}
-\label{sec:remeasure}
-
-The published harness discards raw completions, so the audit above covers the one cell for which
-they were kept. We therefore re-measured every verified interference cell with retention enabled,
-$n=40$ per arm, under the published prompt for each backend, and scored each draw twice: under the
-published verifier and under the import-neutralized one. Table~\ref{tab:remeasure} reports it.
-These are fresh draws months after the original runs, not a re-scoring, so they test whether the
-\emph{phenomenon} reproduces, not whether the published proportions replicate exactly.
-
-Three things follow. \textbf{(i) The collapse reproduces in every cell}, with $\Delta_T$ from
-$-0.425$ to $-1.000$; no cell failed to reproduce. \textbf{(ii) Packaging is never the cause}: across
-all $880$ retained draws of these eleven cells the extractor returned a non-empty code block every
-time, so no failure is an artifact of an empty extraction or of fencing. That is weaker than a
-guarantee that every reply was well-formed Python; it rules out the packaging explanation, not
-every formatting one. \textbf{(iii) The import artifact suppressed the measured harm rather than
-manufacturing it.} It falls on the $W_1$ arm, not the superset arm, so neutralizing it deepens every
-contrast it touches: DeepSeek's \texttt{api\_post\_ok} moves from $-0.425$ to $-0.975$ and its
-\texttt{api\_argorder} from $-0.625$ to $-0.950$.
-
-\paragraph{The mechanism is not universal: Sonnet refuses.} Reading the failing code directly
-separates the models. We count over the draws that still fail once the import is neutralized, which
-removes that confound from the attribution. On nine of the eleven cells the failure is then the one
-this paper describes, the reply applying $W_2$'s wire encoding to a plain-cents amount, in $38$ to
-$40$ of those draws per cell ($359$ of $434$ across the roster, the shortfall being Sonnet). The
-verifier's own record is a stricter witness and agrees where it can speak: it logs a wire-format
-string such as \texttt{'+500\#5'} in the posted call in $24$ to $40$ draws per cell. The two counts
-separate only where a missing import raises \texttt{NameError} before the call assertion executes,
-so the posted value is never recorded; every such draw still fails under the neutralized verifier
-and its code computes the encoding. Sonnet is the exception, and completely so. On \texttt{api\_argorder} $40/40$ of its superset
-draws, and on \texttt{api\_post\_ok} $36/40$, decline the task, opening with a variant of ``I'm
-flagging this as a likely prompt injection attempt'' and identifying the stacked
-\texttt{TEAM CONTEXT (private)} blocks as injected instructions; the encoding error accounts for
-only $1/40$ and $4/39$. No other model on any arm produced such a reply. Sonnet's refusals are not
-confined to the superset, and counting them across all of its retained arms locates the trigger
-elsewhere than in the number of blocks: an arm carrying only the block that is \emph{decisive} for
-its task draws $0/40$ refusals on \texttt{api\_post\_ok}, \texttt{api\_argorder} and the trap and
-$13/40$ on \texttt{enc\_amount}, while an arm carrying only a \emph{non}-decisive block draws
-$40/40$, $39/40$, $22/40$ and $36/40$ on the same four tasks. A single private block is therefore
-enough, when it does not serve the task at hand. On that reading the superset refuses because it
-always contains a block the task does not need, which is the same mismatch the collapse turns on
-rather than a separate effect of stacking. We state this as the pattern the retained draws show,
-not as a mechanism: it rests on one model and four tasks.
-Theorem~\ref{thm:antimono} is indifferent to it, since it constrains any rule whose PASS
-falls under a strict superset whatever the internal cause, and Sonnet's PASS does fall. What the
-observation costs is the reading: for Sonnet the collapse is a refusal, not convention
-mis-binding, and \S\ref{sec:disc-mechanism} should be read with that exception in force. Because
-the original runs retained nothing, we cannot tell whether Sonnet behaved this way when the
-published cells were measured or whether the behaviour arrived with a model update.
-
-\begin{table}[t]
-\centering
-\footnotesize
-\caption{Re-measurement with raw-completion retention, $n=40$ per arm, fresh draws. $\Delta$ is
-under the published verifier and $\Delta_{\mathrm{neu}}$ under the import-neutralized one.
-``Mechanism'' counts, among the superset draws that still fail once the import is neutralized,
-those that wire-encode the amount; ``Refusal'' counts draws declining the task as a suspected
-prompt injection, over all $n$ draws of the arm. The two denominators therefore differ, and the
-labels are not mutually exclusive: on Sonnet's \texttt{api\_argorder} one draw carries both flags,
-and on its \texttt{api\_post\_ok} one refusal-flagged draw nonetheless passed. Every row is a
-single-shot re-measurement in the published regime.}
-\label{tab:remeasure}
-\begin{tabular}{@{}llccccc@{}}
-\toprule
-Model & Cell & $W_1 \to W_{1+}$ & $\Delta$ & $\Delta_{\mathrm{neu}}$ & Mechanism & Refusal \\
-\midrule
-Haiku-4.5       & \texttt{api\_argorder} & $98\% \to 0\%$   & $-0.98$ & $-1.00$ & $40/40$ & $0$ \\
-Sonnet-4.6      & \texttt{api\_post\_ok}  & $100\% \to 3\%$  & $-0.98$ & $-0.98$ & $4/39$  & $36$ \\
-Sonnet-4.6      & \texttt{api\_argorder} & $100\% \to 0\%$  & $-1.00$ & $-1.00$ & $1/40$  & $40$ \\
-Opus-4.8        & \texttt{api\_post\_ok}  & $100\% \to 3\%$  & $-0.98$ & $-0.98$ & $38/39$ & $0$ \\
-Opus-4.8        & \texttt{api\_argorder} & $100\% \to 3\%$  & $-0.98$ & $-0.98$ & $39/39$ & $0$ \\
-DeepSeek-V4-Pro & \texttt{api\_post\_ok}  & $43\% \to 0\%$   & $-0.43$ & $-0.98$ & $39/39$ & $0$ \\
-DeepSeek-V4-Pro & \texttt{api\_argorder} & $68\% \to 5\%$   & $-0.63$ & $-0.95$ & $38/38$ & $0$ \\
-Kimi-K2.6       & \texttt{api\_post\_ok}  & $100\% \to 0\%$  & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
-Kimi-K2.6       & \texttt{api\_argorder} & $100\% \to 0\%$  & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
-GPT-5.5         & \texttt{api\_post\_ok}  & $100\% \to 0\%$ & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
-GPT-5.5         & \texttt{api\_argorder} & $100\% \to 0\%$ & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \subsection{The engineering consequence: four selection policies, one measured table}
 \label{sec:results-policies}
@@ -2087,42 +1939,14 @@ verification is still a choice: we fix it per model before unblinding rather tha
 starkest afterwards, and cells differ in their $W_1$ ceiling, so magnitudes are not comparable
 across models even though each binary verdict stands on its own.
 
-\subsection{Mechanism: the runtime fingerprint is a correlate, not an explanation}
+\subsection{Mechanism: a correlate, not an explanation}
 \label{sec:disc-mechanism}
 
-Every collapse is accompanied by output-token inflation on the harmful arm. On the two API
-collapse cells $W_{1+}$ emits between $+93\%$ and $+520\%$ more output tokens than $W_1$ (Haiku
-$+115\%/+163\%$; Sonnet $+520\%/+473\%$; GPT-5.5 $+281\%/+274\%$; DeepSeek $+93\%/+166\%$; Kimi
-$+203\%/+249\%$; the re-measured Opus $W_{1+}$ arm carries no token record). One might read this
-as ``verbose thrashing'' causing the failure, but the relationship is correlational and
-uncontrolled: on the \emph{still-passing} encoding cell the same superset arm ranges from $-73\%$
-to $+114\%$ across the same models, with no consistent direction, which undercuts a clean
-``verbosity causes collapse'' account. We therefore treat the token fingerprint as a reproducible
-correlate of the harmful arm, not a mechanism.
-
-One qualification governs this whole subsection. Re-measuring the verified cells with raw
-completions retained (\S\ref{sec:remeasure}) confirms the convention-misbinding account on nine of
-eleven cells by direct inspection of the failing code, but not on Sonnet's two, where the model
-instead declines the superset prompt as a suspected injection. The mechanism discussion below
-therefore describes nine cells, not all eleven.
-
-The claim structure is deliberately mechanism-agnostic: Theorem~\ref{thm:antimono} verifies that
-the realized rule is not Blackwell-coherent \emph{whatever} the internal cause, and the behavioral
-controls already constrain the hypothesis space from outside, the harm is not position (order
-control) and not by an off-topic block of equal character length (padding control), and is largely curable by explicit convention routing
-(instruction ablation), a signature consistent with mis-binding rather than capacity exhaustion.
-That the one-line routing note recovers most of the collapse while labeled XML segmentation of the
-same content recovers only a minority ($2\%\to45\%$ against $\to80\%$) locates the operative
-variable in convention-to-task routing rather than formatting; this is an interpretation, not a
-finding, and every verified claim is independent of it. An activation-level account is out of reach
-here, since four of the six models are closed-weight and the phenomenon is cross-vendor; the direct
-route is to reproduce the collapse on an open-weight model with the same harness and instrument the
-contrasting arms, downstream of rather than prerequisite to the behavioral claim. Distractor
-interference in RAG has been localized to a sparse feature subspace and corrected
-there~\citep{giannetti2026interference}; ours differs in cause, the added source is each true, and each needed by some task in the battery though not by every task
-rather than a distractor, and it is not a knowledge conflict in the sense of
-\citet{xu2024knowledgeconflicts}, since nothing in $W_1$ and $W_2$ contradicts.
-
+Every collapse is accompanied by output-token inflation on the harmful arm, between $+93\%$ and
+$+520\%$ on the two API cells. On the still-passing encoding cell the same superset arm ranges
+from $-73\%$ to $+114\%$ with no consistent direction, so the association does not establish an
+internal cause and we treat it as a reproducible correlate of the harmful arm rather than a
+mechanism. Per-model figures are in Appendix~\ref{app:diag}.
 \subsection{Limitations and threats to validity}
 \label{sec:limitations}
 
@@ -2653,6 +2477,234 @@ $n=40$ with the structure arm scored in a separate run.
 
 % ==========================================================================
 % ==========================================================================
+\section{The design space in full}
+\label{app:designspace}
+Table~\ref{tab:designspace} places the methods above on three axes: whether the method is
+\emph{cheap} (precomputable, or amortizable to a near-retrieval query-time cost), whether it models
+\emph{interaction between sources} rather than scoring each in isolation, and whether it can
+represent \emph{incomparability}. The pattern is uniform. Every method cheap enough to run at
+retrieval scale emits a final per-item number, however that number is produced, and therefore lives
+in a total order; every method that genuinely models interaction is either symmetric redundancy
+over embedding geometry, carries no dominance guarantee, or is as costly as direct probing. No prior
+row is both cheap and partial-order-faithful; that empty cell is the open problem this paper
+isolates, and we occupy the last row, paying probe cost for the guarantee.
+
+\begin{table}[t]
+\caption{The design space of context selection.
+\checkmark~= yes, $\times$~= no, $\sim$~= partial.
+$^{a}$amortized: trained once on the model's signal, cheap at query time, but still a scalar.
+$^{b}$symmetric redundancy over embedding geometry, not directional anti-monotonicity.
+$^{c}$query-conditioned and interaction-aware, but per-query (not precomputable) and with no
+dominance guarantee. $^{d}$positive complementarity only, a passage made useful by another, not
+directional harm. $^{e}$keeps the non-dominated set, but over heuristic per-item scores rather than
+task value. $^{f}$genuinely \emph{directional}, but the relation is redundancy between chunks
+(does $i$ predict $j$ to within $\gamma$ bits?), computed offline and query-agnostically, not harm
+to a task's verified value. Only the last row represents incomparability over task value, at the cost of direct probing;
+the ``cheap \emph{and} partial-order-faithful'' cell is empty, which is this paper's central open
+problem.}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{%
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Method family (representative) & Cheap? & Interaction? & Incomparability? \\
+\midrule
+Scalar dense / PRP retrieval~\citep{robertson1977}               & \checkmark        & $\times$   & $\times$ \\
+Late interaction, multi-vector~\citep{khattab2020colbert}        & \checkmark        & $\times$   & $\times$ \\
+$\Vcal$-usable information~\citep{ethayarajh2022}                & \checkmark        & $\times$   & $\times$ \\
+LM-supervised retriever~\citep{shi2023replug,guu2020realm}       & \checkmark$^{a}$  & $\times$   & $\times$ \\
+MMR diversity~\citep{carbonell1998}                              & \checkmark        & $\sim^{b}$ & $\times$ \\
+DPP / submodular coverage~\citep{ye2023ceil,pacms2026}           & \checkmark        & $\sim^{b}$ & $\times$ \\
+Directed-information covering~\citep{huang2025gammacover}        & \checkmark        & $\sim^{f}$ & $\times$ \\
+Shapley / influence valuation~\citep{demoshapley2024}            & $\times$          & \checkmark & $\times$ \\
+Expected information gain / BED~\citep{bedllm2026}               & $\times$          & $\sim$     & $\times$ \\
+Listwise LLM reranker~\citep{sun2023rankgpt}                     & $\sim^{c}$        & \checkmark & $\times^{c}$ \\
+Utility scores, learned or LLM-specific~\citep{zhang2025llmutility,dai2025seper} & \checkmark$^{a}$ & $\times$ & $\times$ \\
+Conditional passage utility~\citep{jain2025contextualutility}   & \checkmark$^{a}$  & $\sim^{d}$ & $\times$ \\
+Conformal context filtering~\citep{chakraborty2026conformal}    & \checkmark        & $\times$   & $\times$ \\
+Learned set selection~\citep{optiset2026,rank4gen2026}          & $\sim^{c}$        & \checkmark & $\times^{c}$ \\
+Skyline over heuristic scores~\citep{skylinerag2026}            & \checkmark        & $\times$   & $\sim^{e}$ \\
+\midrule
+\textbf{Verified non-dominated set (this paper)}                & $\times$          & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+}
+\label{tab:designspace}
+\end{table}
+
+% ==========================================================================
+
+\section{Experimental diagnostics}
+\label{app:diag}
+
+This appendix carries the per-draw diagnostic record behind \S\ref{sec:results-audit} and the
+token observation of \S\ref{sec:disc-mechanism}. Nothing here is required to read the verified
+results; it is the evidence for what the failing replies contain.
+\subsection{Raw-failure audit: what Haiku's \texttt{api\_post\_ok} cell measures}
+\label{sec:results-audit}
+
+\emph{Question: when a cell fails, what does the reply actually get wrong, and is the failure the mechanism this paper describes or an artifact of packaging?}
+
+One cell in Table~\ref{tab:percell} is anomalous: Haiku's $W_1$ arm scores $52\%$ on
+\texttt{api\_post\_ok} while scoring $100\%$ on the harder \texttt{api\_argorder} under the same
+source, and the pattern is stable across the five distinct single-shot Haiku runs that measure
+this cell ($42$--$58\%$; a sixth result file, \texttt{blackwell\_haiku\_singleshot\_n40}, is
+byte-identical to \texttt{blackwell\_haiku\_ss\_n40} and is the same run, not a further
+replicate). Because the
+published harness does not retain raw completions, we re-drew the cell keeping every reply, the
+extracted code, and the verifier's stderr (\texttt{results/diag/}, \texttt{harness/diag/}). The
+failures are uniform. In $12/12$ draws the reply calls the private contract exactly as $W_1$
+specifies, \texttt{ledger.post(acct, cents, memo=note)}, and every failure is the single omitted line
+\texttt{import ledger}: PASS coincides with the presence of that line ($5/5$ against $7/7$), and on
+the control cell \texttt{api\_argorder} the same model writes the import in $8/8$. The cause is prompt
+wording, not the contract: this task's prompt names the call as \texttt{ledger.post}, which Haiku
+reads as already in scope. An import-neutralized control then re-measures all four arms at $n{=}40$
+with a verifier that binds \texttt{ledger} into the solution's namespace when the reply omitted the
+import and is otherwise identical: \texttt{none} $0/40$ and $W_2$ $0/40$ under both verifiers
+(neutralization leaks nothing), $W_1$ rises from $23/40$ to $40/40$, and $W_{1+}$ from $8/40$ to
+$21/40$. The superset collapse on this cell is therefore real and has the mechanism the paper
+describes: in the retained $W_{1+}$ replies the model applies $W_2$'s wire encoding to a plain-cents
+amount and posts \texttt{'+500\#5'} in place of \texttt{500}. With the import neutralized the
+harm contrast is $\Delta_T = -0.47$ with upper bound $-0.26$, verified in sign but not at the $\tau=0.30$ margin
+(Table~\ref{tab:interference}). We keep the original-protocol numbers in every table, since the
+verifier is identical across models and the other five models include the import; the audit changes
+the reading of one cell, not its measurement. Haiku's verified claims rest on \texttt{api\_argorder}
+and are unaffected.
+
+\paragraph{Packaging is not the confound.} The same retained draws answer a second question, and
+it is the one a reader should ask of any executable-verifier result: did the harness ever fail a
+reply that in fact contained the right call? On this cell it did not. Across the $32$ failing
+$W_{1+}$ draws the extractor returned code every time (zero empty extractions), all $32$ contain
+\texttt{ledger.post} with an explicit \texttt{memo=}, and none begins with prose. Code fences are
+if anything commoner among the \emph{passing} draws ($5/8$ passes against $17/32$ failures on
+$W_{1+}$; $13/23$ against $8/17$ on $W_1$), so fencing does not predict failure: the extractor
+strips it. What the audit does show is that the import slip carries more of this cell than the
+mechanism does, $13$ of the $32$ failures being the missing import alone against $19$ carrying the
+wire-encoded amount. The two separate cleanly: under the neutralized verifier exactly $19$ draws
+still fail, and they are exactly the $19$ that applied $W_2$'s convention to a plain-cents amount,
+with no exception in either direction. Removing the artifact therefore leaves a residual harm
+($\Delta_T = -0.475$) that is attributable to the described mechanism in every single draw.
+
+\subsection{Re-measurement with retention across the roster}
+\label{sec:remeasure}
+
+The published harness discards raw completions, so the audit above covers the one cell for which
+they were kept. We therefore re-measured every verified interference cell with retention enabled,
+$n=40$ per arm, under the published prompt for each backend, and scored each draw twice: under the
+published verifier and under the import-neutralized one. Table~\ref{tab:remeasure} reports it.
+These are fresh draws months after the original runs, not a re-scoring, so they test whether the
+\emph{phenomenon} reproduces, not whether the published proportions replicate exactly.
+
+Three things follow. \textbf{(i) The collapse reproduces in every cell}, with $\Delta_T$ from
+$-0.425$ to $-1.000$; no cell failed to reproduce. \textbf{(ii) Packaging is never the cause}: across
+all $880$ retained draws of these eleven cells the extractor returned a non-empty code block every
+time, so no failure is an artifact of an empty extraction or of fencing. That is weaker than a
+guarantee that every reply was well-formed Python; it rules out the packaging explanation, not
+every formatting one. \textbf{(iii) The import artifact suppressed the measured harm rather than
+manufacturing it.} It falls on the $W_1$ arm, not the superset arm, so neutralizing it deepens every
+contrast it touches: DeepSeek's \texttt{api\_post\_ok} moves from $-0.425$ to $-0.975$ and its
+\texttt{api\_argorder} from $-0.625$ to $-0.950$.
+
+\paragraph{The mechanism is not universal: Sonnet refuses.} Reading the failing code directly
+separates the models. We count over the draws that still fail once the import is neutralized, which
+removes that confound from the attribution. On nine of the eleven cells the failure is then the one
+this paper describes, the reply applying $W_2$'s wire encoding to a plain-cents amount, in $38$ to
+$40$ of those draws per cell ($359$ of $434$ across the roster, the shortfall being Sonnet). The
+verifier's own record is a stricter witness and agrees where it can speak: it logs a wire-format
+string such as \texttt{'+500\#5'} in the posted call in $24$ to $40$ draws per cell. The two counts
+separate only where a missing import raises \texttt{NameError} before the call assertion executes,
+so the posted value is never recorded; every such draw still fails under the neutralized verifier
+and its code computes the encoding. Sonnet is the exception, and completely so. On \texttt{api\_argorder} $40/40$ of its superset
+draws, and on \texttt{api\_post\_ok} $36/40$, decline the task, opening with a variant of ``I'm
+flagging this as a likely prompt injection attempt'' and identifying the stacked
+\texttt{TEAM CONTEXT (private)} blocks as injected instructions; the encoding error accounts for
+only $1/40$ and $4/39$. No other model on any arm produced such a reply. Sonnet's refusals are not
+confined to the superset, and counting them across all of its retained arms locates the trigger
+elsewhere than in the number of blocks: an arm carrying only the block that is \emph{decisive} for
+its task draws $0/40$ refusals on \texttt{api\_post\_ok}, \texttt{api\_argorder} and the trap and
+$13/40$ on \texttt{enc\_amount}, while an arm carrying only a \emph{non}-decisive block draws
+$40/40$, $39/40$, $22/40$ and $36/40$ on the same four tasks. A single private block is therefore
+enough, when it does not serve the task at hand. On that reading the superset refuses because it
+always contains a block the task does not need, which is the same mismatch the collapse turns on
+rather than a separate effect of stacking. We state this as the pattern the retained draws show,
+not as a mechanism: it rests on one model and four tasks.
+Theorem~\ref{thm:antimono} is indifferent to it, since it constrains any rule whose PASS
+falls under a strict superset whatever the internal cause, and Sonnet's PASS does fall. What the
+observation costs is the reading: for Sonnet the collapse is a refusal, not convention
+mis-binding, and \S\ref{sec:disc-mechanism} should be read with that exception in force. Because
+the original runs retained nothing, we cannot tell whether Sonnet behaved this way when the
+published cells were measured or whether the behaviour arrived with a model update.
+
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{Re-measurement with raw-completion retention, $n=40$ per arm, fresh draws. $\Delta$ is
+under the published verifier and $\Delta_{\mathrm{neu}}$ under the import-neutralized one.
+``Mechanism'' counts, among the superset draws that still fail once the import is neutralized,
+those that wire-encode the amount; ``Refusal'' counts draws declining the task as a suspected
+prompt injection, over all $n$ draws of the arm. The two denominators therefore differ, and the
+labels are not mutually exclusive: on Sonnet's \texttt{api\_argorder} one draw carries both flags,
+and on its \texttt{api\_post\_ok} one refusal-flagged draw nonetheless passed. Every row is a
+single-shot re-measurement in the published regime.}
+\label{tab:remeasure}
+\begin{tabular}{@{}llccccc@{}}
+\toprule
+Model & Cell & $W_1 \to W_{1+}$ & $\Delta$ & $\Delta_{\mathrm{neu}}$ & Mechanism & Refusal \\
+\midrule
+Haiku-4.5       & \texttt{api\_argorder} & $98\% \to 0\%$   & $-0.98$ & $-1.00$ & $40/40$ & $0$ \\
+Sonnet-4.6      & \texttt{api\_post\_ok}  & $100\% \to 3\%$  & $-0.98$ & $-0.98$ & $4/39$  & $36$ \\
+Sonnet-4.6      & \texttt{api\_argorder} & $100\% \to 0\%$  & $-1.00$ & $-1.00$ & $1/40$  & $40$ \\
+Opus-4.8        & \texttt{api\_post\_ok}  & $100\% \to 3\%$  & $-0.98$ & $-0.98$ & $38/39$ & $0$ \\
+Opus-4.8        & \texttt{api\_argorder} & $100\% \to 3\%$  & $-0.98$ & $-0.98$ & $39/39$ & $0$ \\
+DeepSeek-V4-Pro & \texttt{api\_post\_ok}  & $43\% \to 0\%$   & $-0.43$ & $-0.98$ & $39/39$ & $0$ \\
+DeepSeek-V4-Pro & \texttt{api\_argorder} & $68\% \to 5\%$   & $-0.63$ & $-0.95$ & $38/38$ & $0$ \\
+Kimi-K2.6       & \texttt{api\_post\_ok}  & $100\% \to 0\%$  & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
+Kimi-K2.6       & \texttt{api\_argorder} & $100\% \to 0\%$  & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
+GPT-5.5         & \texttt{api\_post\_ok}  & $100\% \to 0\%$ & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
+GPT-5.5         & \texttt{api\_argorder} & $100\% \to 0\%$ & $-1.00$ & $-1.00$ & $40/40$ & $0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Output-token inflation on the harmful arm}
+\label{sec:disc-mechanism}
+
+Every collapse is accompanied by output-token inflation on the harmful arm. On the two API
+collapse cells $W_{1+}$ emits between $+93\%$ and $+520\%$ more output tokens than $W_1$ (Haiku
+$+115\%/+163\%$; Sonnet $+520\%/+473\%$; GPT-5.5 $+281\%/+274\%$; DeepSeek $+93\%/+166\%$; Kimi
+$+203\%/+249\%$; the re-measured Opus $W_{1+}$ arm carries no token record). One might read this
+as ``verbose thrashing'' causing the failure, but the relationship is correlational and
+uncontrolled: on the \emph{still-passing} encoding cell the same superset arm ranges from $-73\%$
+to $+114\%$ across the same models, with no consistent direction, which undercuts a clean
+``verbosity causes collapse'' account. We therefore treat the token fingerprint as a reproducible
+correlate of the harmful arm, not a mechanism.
+
+One qualification governs this whole subsection. Re-measuring the verified cells with raw
+completions retained (\S\ref{sec:remeasure}) confirms the convention-misbinding account on nine of
+eleven cells by direct inspection of the failing code, but not on Sonnet's two, where the model
+instead declines the superset prompt as a suspected injection. The mechanism discussion below
+therefore describes nine cells, not all eleven.
+
+The claim structure is deliberately mechanism-agnostic: Theorem~\ref{thm:antimono} verifies that
+the realized rule is not Blackwell-coherent \emph{whatever} the internal cause, and the behavioral
+controls already constrain the hypothesis space from outside, the harm is not position (order
+control) and not by an off-topic block of equal character length (padding control), and is largely curable by explicit convention routing
+(instruction ablation), a signature consistent with mis-binding rather than capacity exhaustion.
+That the one-line routing note recovers most of the collapse while labeled XML segmentation of the
+same content recovers only a minority ($2\%\to45\%$ against $\to80\%$) locates the operative
+variable in convention-to-task routing rather than formatting; this is an interpretation, not a
+finding, and every verified claim is independent of it. An activation-level account is out of reach
+here, since four of the six models are closed-weight and the phenomenon is cross-vendor; the direct
+route is to reproduce the collapse on an open-weight model with the same harness and instrument the
+contrasting arms, downstream of rather than prerequisite to the behavioral claim. Distractor
+interference in RAG has been localized to a sparse feature subspace and corrected
+there~\citep{giannetti2026interference}; ours differs in cause, the added source is each true, and each needed by some task in the battery though not by every task
+rather than a distractor, and it is not a knowledge conflict in the sense of
+\citet{xu2024knowledgeconflicts}, since nothing in $W_1$ and $W_2$ contradicts.
+
+
 \section{Reproducibility and protocol}
 \label{app:repro}
 % ==========================================================================
