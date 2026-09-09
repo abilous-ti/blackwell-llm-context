@@ -46,7 +46,8 @@ Names, affiliations and ORCIDs were verified against the ORCID public API.
 | Informed Consent Statement | present (not applicable) |
 | Data Availability Statement | present, points at the artifact repository |
 | Acknowledgments | present |
-| Use of Generative AI disclosure | present (MDPI / COPE research-integrity policy) |
+| Use of Generative AI disclosure | present, in Acknowledgments and a dedicated section |
+| Frozen manifest of the records | `results/MANIFEST.md`, 3313 files pinned by SHA-256 |
 | Conflicts of Interest | present |
 | Abbreviations table | present |
 | Numbered reference style | `natbib[numbers]` + `unsrtnat` |

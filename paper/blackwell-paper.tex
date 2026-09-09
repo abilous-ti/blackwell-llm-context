@@ -2125,24 +2125,31 @@ All data and code supporting the reported results are openly available at
 \url{https://github.com/abilous-ti/blackwell-llm-context}. The repository contains the measurement
 harness (Python standard library only), every per-model run log and result file cited in
 Appendix~\ref{app:record}, and the raw-completion diagnostic records of
-\S\ref{sec:results-audit}. No data were withheld; every reported figure is computed from those
-files by the released scripts.
+\S\ref{sec:results-audit}. \texttt{results/MANIFEST.md} pins every record by SHA-256 and maps each
+table and figure to the files it is computed from. No data were withheld; every reported figure is
+computed from those files by the released scripts.
 
 \section*{Acknowledgments}
 The authors thank the Department of Information Systems and Networks, Lviv Polytechnic National
 University, for institutional support. No third party contributed to the design, execution or
 analysis of the reported measurements beyond the listed authors.
 
+Anthropic's Claude models were used for code scaffolding, experimental-plan review,
+implementation assistance, consistency and artifact audits, manuscript organization, and
+\LaTeX{} formatting. The authors inspected code changes, executed the experiments, verified
+outputs against frozen manifests and source files, checked cited sources, and take full
+responsibility for the study design, results, interpretations, and manuscript.
+
 \section*{Use of Generative Artificial Intelligence}
-Generative AI was used in two distinct roles, which we separate because only one of them bears on
-the results. \emph{As the object of study:} every number reported here is a pass rate obtained by
-querying commercial language models through their public APIs, as described in
-\S\ref{sec:methodology}; the models are the measured subject, not a tool. \emph{As a tool:} an
-AI coding assistant was used while writing the measurement harness, the analysis scripts and
-parts of the manuscript text. No result, table or figure was produced by a language model acting
-as an author or an analyst: every reported quantity is computed from the released raw run
-records by the released scripts, and the authors verified each against those records. The authors
-take full responsibility for the content of the manuscript.
+Language models appear in this work in two distinct roles, and we separate them because only one
+bears on the results. \emph{As the object of study:} every number reported here is a pass rate
+obtained by querying commercial language models through their public APIs
+(\S\ref{sec:methodology}); those systems are the measured subject. \emph{As a tool:} the
+assistance described in the Acknowledgments. No result, table or figure was produced by a language
+model acting as an author or an analyst. Every reported quantity is computed from the released raw
+run records by the released scripts, and each was checked against the frozen manifest of those
+records (\texttt{results/MANIFEST.md}, which pins every file by SHA-256 and maps each table and
+figure to the files it is computed from).
 
 \section*{Conflicts of Interest}
 The authors declare no conflict of interest.
