@@ -79,9 +79,14 @@ def counts_for(model, spec):
             arm = (od["arms"] or {}).get(a)
             if arm and "pass_original" in arm and "n" in arm:
                 kn = [arm["pass_original"], arm["n"]]
-        if kn is None:  # arm-only files store a single cell
+        if kn is None:
+            # An arm-only re-measurement stores a single cell, but matching on the task suffix
+            # alone ignored the arm: a file holding only W1|trap_store_wire satisfied a request
+            # for W2|trap_store_wire and returned W1's counts as W2's. The arm must match too, so
+            # the only thing this branch now tolerates is a file that stores exactly one cell and
+            # stores it for the arm we asked about.
             for k2, v2 in (od.get("counts") or {}).items():
-                if k2.endswith("|" + t):
+                if k2 == "%s|%s" % (a, t):
                     kn = v2
         # An override that exists but does not carry the declared cell is the same failure as a
         # missing file: the base value stays and nothing says so. Require the entry, and require

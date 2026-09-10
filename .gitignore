@@ -44,3 +44,6 @@ results/reproduce/
 # The manuscript is submitted to the journal, not published here. This repository is the
 # artifact record: code, verifiers, results, manifest and reproduction instructions.
 paper/
+
+# Artefact of a tar-based export test that resolved a Windows path variable literally.
+%SystemDrive%/

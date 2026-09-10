@@ -96,14 +96,16 @@ def main():
     out = {"counts": counts, "model": a.model,
            "regime": "http-api",
            "prompt": "published", "n_per_cell": a.runs,
-           "transport_errors": errs, "total_cost_usd": round(cost, 6)}
-    if _short:
-        # The published record is n valid draws per cell. A thinned cell is a different
-        # sample, so it is written but not presented as the measurement that was asked for.
-        print("INCOMPLETE: " + "; ".join(_short))
+           "transport_errors": errs, "total_cost_usd": round(cost, 6),
+           "complete": not _short}
+    # Save first, then report the outcome in the exit status: an automated caller should
+    # not have to parse stdout to learn that the sample it asked for was not obtained.
     with open(a.out, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=1)
     print("wrote %s   errors=%d   cost=$%.4f" % (a.out, errs, cost))
+    if _short:
+        print("INCOMPLETE: " + "; ".join(_short))
+        return 2
     return 0
 
 

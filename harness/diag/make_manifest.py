@@ -100,22 +100,30 @@ if missing:
 # working directories too (results/raw_transcripts/ alone is ~3,100 files), so the manifest
 # promised reviewers digests for files they cannot obtain. Ask git what is tracked instead.
 import subprocess
-_tracked = subprocess.run(["git", "ls-files", "results"], cwd=ROOT,
-                          capture_output=True, text=True).stdout.split(NL_CH)
-_tracked = sorted(p[len("results/"):] for p in _tracked if p.startswith("results/"))
+try:
+    _out = subprocess.run(["git", "ls-files", "results"], cwd=ROOT,
+                          capture_output=True, text=True).stdout
+except (FileNotFoundError, OSError):
+    # git may not be installed at all. The README promises the standard library is enough, so a
+    # missing executable must fall through to the filesystem inventory below, not raise.
+    _out = ""
+_tracked = sorted(p[len("results/"):] for p in _out.split(NL_CH) if p.startswith("results/"))
 if not _tracked:
-    # Outside a git checkout -- an exported tree, an unpacked archive, what a reviewer may
-    # actually receive -- git has nothing to report. Fall back to walking results/, skipping the
-    # working directories that are deliberately unpublished, so the manifest still describes
-    # exactly what shipped rather than refusing to run.
-    _skip = ("raw_transcripts", "reproduce", "__pycache__")
+    # Outside a git checkout -- an exported tree, an unpacked archive, or a machine without git
+    # installed -- git has nothing to report. Fall back to walking results/. The exclusions here
+    # must match .gitignore, or the manifest would depend on whether git happens to be present:
+    # an earlier version of this fallback listed 3288 files where git listed 3256, because it
+    # picked up other papers' records that are on disk but deliberately unpublished.
+    _skip_dirs = ("raw_transcripts", "reproduce", "__pycache__", "bcb", "invalid")
+    _skip_prefixes = ("prevalence_", "prev_seq", "probe_select_", "README_prev")
     _tracked = []
     for _dp, _dns, _fns in os.walk(RES):
-        _dns[:] = [d for d in _dns if d not in _skip]
+        _dns[:] = [d for d in _dns if d not in _skip_dirs]
         for _fn in _fns:
             _rel = os.path.relpath(os.path.join(_dp, _fn), RES).replace(os.sep, "/")
-            if _rel != "MANIFEST.md":
-                _tracked.append(_rel)
+            if _rel == "MANIFEST.md" or _rel.startswith(_skip_prefixes):
+                continue
+            _tracked.append(_rel)
     _tracked.sort()
     print("git unavailable here; inventorying results/ directly (%d files)" % len(_tracked))
 

@@ -160,12 +160,20 @@ def main():
         json.dump(rows, open(out / ("audit_%s_%s_%s.json" % (label, a.task, arm)), "w",
                              encoding="utf-8"), indent=1)
 
+    # `n` here is the number of VALID responses per arm, which may be short of --n when
+    # transport failures were dropped. Record both, and say so in the exit status.
+    short = {k: v for k, v in summary.items() if v.get("n", 0) != a.n}
     json.dump({"model": a.model, "label": label, "task": a.task, "kind": a.kind,
-               "n": a.n, "arms": summary},
+               "n_requested": a.n, "complete": not short, "arms": summary},
               open(out / ("audit_%s_%s_summary.json" % (label, a.task)), "w",
                    encoding="utf-8"), indent=1)
     print(json.dumps(summary, indent=1))
+    if short:
+        print("INCOMPLETE: %s (requested n=%d)"
+              % (", ".join("%s=%d valid" % (k, v.get("n", 0)) for k, v in short.items()), a.n))
+        return 2
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())   # the return code carries sample completeness

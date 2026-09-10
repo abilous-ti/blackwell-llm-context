@@ -147,8 +147,15 @@ conditions are read from that clean re-measurement, which reproduces the publish
 (`results/audit/audit_gpt55_*`).
 
 The verifier runs model-generated code in a subprocess with a minimal environment carrying no
-provider credentials, and grades on a sentinel printed after the last assertion rather than on the
-exit status alone, so code that exits early cannot pass unchecked.
+provider credentials. It does not grade on the exit status: the checks run inside a
+`BaseException` handler, and completion is signalled by writing a per-run random token to a file
+the parent names, so a `SystemExit` during import fails and a printed marker cannot be forged.
+
+This is not a sandbox, and the harness is not a safe place to run untrusted code. The subprocess
+still has the filesystem and the network, and a candidate that deliberately read the token from
+its environment and wrote the marker file would pass. Ruling that out needs OS-level isolation —
+a separate user, a read-only filesystem — which this harness does not provide. What the design
+does rule out is the accidental case: generated code that exits before the assertions run.
 
 The intervals carry sampling error only. The re-measurement in `results/audit/` shows between-run
 shifts wider than the nominal intervals, and the raw-failure audit shows prompt wording moving one
