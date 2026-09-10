@@ -71,20 +71,20 @@ A Blackwell framework and verified LLM evidence}
 
 % ==========================================================================
 \begin{abstract}
-Prompt context is usually chosen by scoring each source with one number and keeping the top few.
-We study the limits of task-independent scalar rankings for context
-sources. Two sources can be \emph{incomparable} in Blackwell's sense; we prove that when they
-are, no single per-source score ranks them correctly for every task. That concerns the ideal user
-of a source; what a fixed model does with one is separate, and we measure it. Running each source
-through a battery of pass/fail tasks and comparing pass rates with exact confidence intervals, on
-six models from four vendors we verify at $\ge 90\%$ in both directions that two hand-built
-sources cross in realized pass rate. On a designed trap a lexical
-score, two dense retrievers and a cross-encoder prefer the wrong source, while a listwise LLM
-reranker reading the deciding detail does not. A strict superset of a sufficient source also
-lowers pass rates, verifiably on all twelve cells and as far as $100\%$ to $0\%$; a
-character-matched padding arm and a reversed-order arm leave that collapse unexplained. Results
-hold for the evaluated snapshots, prompts and decoders on a hand-built battery; scaling the
-implied rule to large corpora remains open.
+Context selection for large language models (LLMs) commonly relies on scalar relevance scores. We
+examine rankings that assign each source a score fixed across tasks. Using Blackwell's comparison
+of experiments, we show that incomparable sources cannot be ranked correctly by such a score
+across all decision problems. We distinguish this structural statement from fixed-model behavior,
+measured using executable verifiers, exact binomial confidence bounds, and multiplicity
+correction. We evaluate four coding tasks with 40 completions per condition. Across six models
+from four vendors, two constructed sources exhibit crossing pass rates under a joint 90\%
+guarantee. On a designed relevance trap, a lexical score, two dense retrievers, and a
+cross-encoder prefer the less useful source, whereas a listwise LLM reranker selects correctly.
+Adding a second correct source produces observed collapses from 100\% to 0\%; eleven of twelve
+tested contrasts exceed a 30-percentage-point harm margin under joint 90\% confidence control. On
+one model, reversal and character-matched padding constrain positional and gross-length
+explanations. These findings establish existence on constructed coding tasks; prevalence in
+natural corpora and scalable context selection remain open.
 \end{abstract}
 
 \vspace{0.6em}
@@ -118,20 +118,6 @@ expected information gain, used to impose a total order and retain the top
 candidates. The scalar is convenient: it sorts, thresholds, and composes. This paper asks what a
 task-independent scalar ranking can and cannot represent, and answers it with a classical
 apparatus from statistical decision theory.
-
-\paragraph{What is and is not new.}
-The mathematics is classical: the garbling order, the Blackwell--Sherman--Stein equivalence,
-Le~Cam's deficiency. So are several of the phenomena, each in its own literature: that utility
-rather than topical relevance is the right target~\citep{zhang2026utility} and is
-model-dependent~\citep{zhang2025llmutility}; that adding sources can lower accuracy while coverage
-saturates~\citep{dong2013lessismore}; that rerankers are steered by lexical
-similarity~\citep{hagstrom2025lexical}; that keeping a non-dominated set is already an operator
-over heuristic scores~\citep{skylinerag2026}; and that the Blackwell and Le~Cam apparatus was
-brought to inference-time context selection concurrently with this work, over which we claim no
-priority~\citep{alpila2026}. Section~\ref{sec:related} treats each in turn. The gap is that none of them
-gives the order itself an object or a test: cross-task non-transfer is described as a nuisance
-rather than read as a partial order, and no finite-sample procedure decides on a live model
-whether two particular sources are incomparable. That is what C1--C3 below supply.
 
 One gap needs care. Blackwell's theorem is about the \emph{best possible} use
 of a source, but every number we measure comes from one fixed model: $\PASS_M(W,T) =
@@ -1272,6 +1258,16 @@ decoder (Appendix~\ref{app:repro}). Raw completions were
 retained for three of the six models (Appendix~\ref{app:audit}); for the other three the record is
 aggregate-only. \texttt{results/MANIFEST.md} gives the run, and so the window, behind each number.
 
+\paragraph{Use of generative AI in this study.} Language models enter this work in two roles that
+must not be confused. \emph{As the object of study}, they produce the completions whose pass rates
+are the measured quantities, through the interfaces described above. \emph{As a tool}, they
+assisted the authors with code scaffolding, implementation, experimental-plan review, consistency
+and artifact audits, analysis and interpretation, manuscript organization and \LaTeX{} formatting,
+and with an independent audit of the manuscript against the released records. No quantity reported
+here was produced by a language model: every number is computed by the released scripts from the
+released records, which \texttt{results/MANIFEST.md} pins by SHA-256. The Acknowledgments name the
+tools.
+
 \subsection{Results}
 \label{sec:results}
 
@@ -2089,28 +2085,18 @@ full commit history is published with it, so the provenance of every artifact is
 data were withheld; every reported figure is computed from those files by the released scripts.
 
 \section*{Acknowledgments}
-Anthropic's Claude models were used for code scaffolding, experimental-plan review,
-implementation assistance, consistency and artifact audits, manuscript organization, and
-\LaTeX{} formatting. OpenAI's Codex was used separately to audit the manuscript against the
-released records; several errors it found, including a diagnostic rule that under-reported what
-it was testing for, are corrected in this version, and each correction was checked by re-running
-the released scripts. The work spans many sessions and the assistant version in use was not
-logged throughout, so we identify the tools by family rather than assert version strings we did
-not record. The authors inspected code changes, executed the experiments, verified outputs
-against frozen manifests and source files, checked cited sources, and take full responsibility
-for the study design, results, interpretations, and manuscript.
-
-\section*{Use of Generative Artificial Intelligence}
-Language models appear in this work in two distinct roles, and we separate them because only one
-bears on the results. \emph{As the object of study:} the measured quantities are pass rates of
-commercial language models, obtained through the interfaces described in
-Section~\ref{sec:methodology}; everything else we report, the confidence bounds, the ranker scores, the
-token and cost figures, is computed from those runs. \emph{As a tool:} generative-AI tools assisted
-with the tasks disclosed in the Acknowledgments, analysis and interpretation among them. Every
-numerical result was computed by the released scripts from the released records, which
-\texttt{results/MANIFEST.md} pins by SHA-256 and maps to the table or figure that uses it, and was
-checked by the authors, who retain responsibility for the analysis and the conclusions. The Data Availability Statement says which records are aggregate-only and
-which retain raw completions.
+During the preparation of this manuscript and the study it reports, the authors used Anthropic's
+Claude models, through the Claude Code interface, and OpenAI's Codex, for the purposes of code
+scaffolding, experimental-plan review, implementation assistance, consistency and artifact audits,
+analysis and interpretation, manuscript organization, \LaTeX{} formatting, and an independent audit
+of the manuscript against the released measurement records. The authors have reviewed and edited
+the output and take full responsibility for the content of this publication. The work spans many
+sessions and the assistant version in use was not logged throughout, so we identify the tools by
+family rather than assert version strings we did not record. Several errors found by the
+independent audit, including a diagnostic rule that under-reported what it was testing for, are
+corrected in this version, and each correction was checked by re-running the released scripts. The
+authors inspected code changes, executed the experiments, verified outputs against frozen
+manifests and source files, and checked cited sources.
 
 \section*{Conflicts of Interest}
 The authors declare no conflict of interest.
