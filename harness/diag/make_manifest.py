@@ -17,6 +17,7 @@ import sys, io, os, json, hashlib, importlib.util
 # same buffer twice closes it when the first wrapper is collected, so do not wrap here.
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+NL_CH = chr(10)
 RES = os.path.join(ROOT, "results")
 MODE = (sys.argv[1] if len(sys.argv) > 1 else "cli").lower()
 
@@ -78,7 +79,6 @@ MAPPING = [
     ("GPT-5.5 trap cell (transport-clean source)",
      ["audit/audit_gpt55_trap_store_wire_W1.json", "audit/audit_gpt55_trap_store_wire_W2.json",
       "audit/audit_gpt55_trap_store_wire_summary.json"]),
-    ("BigCodeBench pilot", ["bcb/"]),
 ]
 
 # --- guard: every concrete path in the mapping must exist --------------------------------
@@ -96,15 +96,26 @@ if missing:
     sys.exit(1)
 
 # --- inventory ---------------------------------------------------------------------------
+# Only files that are actually PUBLISHED belong here. Walking the disk listed gitignored
+# working directories too (results/raw_transcripts/ alone is ~3,100 files), so the manifest
+# promised reviewers digests for files they cannot obtain. Ask git what is tracked instead.
+import subprocess
+_tracked = subprocess.run(["git", "ls-files", "results"], cwd=ROOT,
+                          capture_output=True, text=True).stdout.split(NL_CH)
+_tracked = sorted(p[len("results/"):] for p in _tracked if p.startswith("results/"))
+if not _tracked:
+    print("NOT WRITTEN - git reported no tracked files under results/")
+    sys.exit(1)
+
 rows, total = [], 0
-for dp, dns, fns in os.walk(RES):
-    dns[:] = [d for d in dns if d != "__pycache__"]
-    for fn in sorted(fns):
+for rel_ in _tracked:
+    if True:
+        fn = os.path.basename(rel_)
         if fn == "MANIFEST.md":
             continue
-        p = os.path.join(dp, fn)
+        p = os.path.join(RES, rel_.replace("/", os.sep))
         b = open(p, "rb").read()
-        rel = os.path.relpath(p, RES).replace(os.sep, "/")
+        rel = rel_
         rows.append((rel, len(b), hashlib.sha256(b).hexdigest()))
         total += len(b)
 rows.sort()

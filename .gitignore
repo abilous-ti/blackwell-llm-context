@@ -15,3 +15,19 @@ paper/*.toc
 
 # MDPI template files: licensed for peer-review submission only, not for posting online.
 paper/_mdpi/
+
+# Material belonging to other papers, kept locally but out of this artifact repo.
+harness/prevalence_*
+harness/prevalence_corpora/
+harness/sequential/
+harness/probe_select.py
+harness/measure_prevalence.py
+harness/diag/bcb_*.py
+harness/diag/reconstruct_seq_from_transcripts.py
+paper/probe-select-paper.*
+results/bcb/
+results/invalid/
+results/prevalence_*
+results/prev_seq*
+results/probe_select_results.json
+results/README_prev_seq24.md
