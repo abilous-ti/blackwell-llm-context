@@ -224,4 +224,7 @@ if errs or not pages:
 d = subprocess.run([sys.executable, os.path.join(HERE, "check_mdpi_drift.py")],
                    capture_output=True, text=True)
 print(d.stdout.rstrip())
-sys.exit(d.returncode)
+r2 = subprocess.run([sys.executable, os.path.join(HERE, "check_mdpi_requirements.py")],
+                   capture_output=True, text=True)
+print(r2.stdout.rstrip())
+sys.exit(d.returncode or r2.returncode)
