@@ -2,11 +2,27 @@
 
 Measurement harness, executable verifiers, and complete run records for
 **"Context selection as a partial order: A Blackwell framework and verified LLM evidence"**
-(Andriy Bilous, Petro Pukach, Vasyl Lytvyn, Zoriana Rybchak — Lviv Polytechnic National University).
+(Andriy Bilous, Vasyl Lytvyn, Petro Pukach, Zoriana Rybchak — Lviv Polytechnic National University).
 
 Every number in the paper is an empirical PASS rate from live model calls graded by executable
-verifiers (return code 0 = PASS). This repository holds the code that produced them and the raw
-per-run records from which every verification can be recomputed.
+verifiers. This repository holds the code that produced them and the raw per-run records from
+which every verification can be recomputed.
+
+## Verify the paper without spending anything
+
+Every published table, bound and figure is recomputed from the released counts by the scripts
+below. None of these makes a model call, and they need nothing but the Python standard library.
+
+```bash
+python harness/diag/recompute.py            # every per-cell rate, harm bound and verdict
+python harness/diag/check_printed_bounds.py # each printed bound is implied by the computed one
+python harness/diag/check_regimes.py        # each cited run's transport, derived from its log
+python harness/diag/retained_text_checks.py # the textual screens, each rule beside its result
+python harness/diag/make_manifest.py api    # regenerate the SHA-256 manifest
+```
+
+`recompute.py` reads the published HTTP record by default; pass `cli` for the superseded
+command-line grid, which the manuscript discusses only as history.
 
 ## What the paper claims
 
@@ -44,7 +60,10 @@ widened every bound.
 | `results/` | raw result JSONs and run logs |
 | `results/audit/` | re-measurement with raw completions retained |
 | `docs/` | `EXPERIMENT-BLACKWELL.md` (per-cell record), `BLACKWELL.md` (formalization and proof sketches) |
-| `paper/` | manuscript source, compiled PDF, the MAKE submission build, and the two scripts that generate it |
+| `paper/` | manuscript source, compiled PDF, the submission bundle, and the scripts that build and check it |
+
+All six models are queried the same way: one HTTP request per draw, one turn, no tools. The
+harness has no command-line launcher.
 
 ### Harness
 
@@ -58,14 +77,21 @@ widened every bound.
 - `diag/audit_any.py` — re-runs any cell keeping every raw completion, scoring each draw under both
   the published and an import-neutralized verifier, and recording the packaging signals.
   `--import-instruction` removes the import confound at source instead of post hoc.
-- `diag/recompute_LD.py` — recomputes the incomparability certificate from retained draws using the
-  harness's own `certify_incomparable`, so the arithmetic cannot drift from the published path.
+- `diag/recompute.py` — recomputes every published per-cell rate, harm contrast and verdict from
+  the released counts using the harness's own `certify_harm` and `clopper_pearson`. Aborts rather
+  than fall back to a different record if a declared source file is missing.
 - `diag/retained_text_checks.py` — the textual screens over retained completions, each rule
   printed beside its result.
 - `diag/check_regimes.py` — derives each cited run's transport from its log and fails if a
   run's recorded regime disagrees.
 - `diag/check_printed_bounds.py` — verifies every confidence bound printed in the manuscript is
   implied by the one computed from the released counts.
+- `diag/make_manifest.py` — regenerates `results/MANIFEST.md` from the tracked files; refuses to
+  write if it names a file that is not present.
+
+Historical diagnostics, kept because the manuscript's provenance appendix refers to the record
+they produced, not because they feed a published number: `diag/recompute_LD.py` (prints values
+from the superseded command-line grid), `diag/recompute_delta.py`, `diag/cell_rerun.py`.
 
 ## File → paper mapping
 
@@ -107,12 +133,17 @@ pip install sentence-transformers && python harness/measure_dense_trap.py
 ## Scope of the numbers
 
 Verification parameters match the paper: η = 0.10, exact Clopper–Pearson intervals at union-bound
-level over the battery, τ = 0.30 for harm. Transport-level failures are retried and never scored as
-passes; where an outage hit a whole arm it was re-measured in isolation and only the clean
-measurement is reported. The one cell that resisted re-measurement for a while, GPT-5.5's
-`W2`/`trap_store_wire`, was re-run after a GPT-5.5 deployment became available: all four GPT-5.5
-cells now have clean single-shot runs at n=40 that reproduce the published grid exactly
+level over the battery, τ = 0.30 for harm. A transport failure is not a model answer: failed draws
+are retried, and any that still fail are excluded from the sample rather than scored as PASS = 0,
+with the harness refusing to certify a cell left below the requested n. Every published run records
+zero transport errors. The one cell that resisted re-measurement for a while, GPT-5.5's
+`trap_store_wire`, was re-run after a GPT-5.5 deployment became available; both its `W1` and `W2`
+conditions are read from that clean re-measurement, which reproduces the published grid exactly
 (`results/audit/audit_gpt55_*`).
+
+The verifier runs model-generated code in a subprocess with a minimal environment carrying no
+provider credentials, and grades on a sentinel printed after the last assertion rather than on the
+exit status alone, so code that exits early cannot pass unchecked.
 
 The intervals carry sampling error only. The re-measurement in `results/audit/` shows between-run
 shifts wider than the nominal intervals, and the raw-failure audit shows prompt wording moving one
