@@ -108,7 +108,7 @@ Production language-model systems spend much of their budget deciding
 \emph{what context to place in the prompt}. Retrieval-augmented generation ranks
 passages, in-context learning selects demonstrations, and agentic coding tools
 choose which files and conventions to surface. Across all of these, the
-operative tool is a \textbf{scalar score}, lexical or embedding relevance,
+operative tool is a scalar score, lexical or embedding relevance,
 mutual information, $\Vcal$-usable information~\citep{ethayarajh2022},
 expected information gain, used to impose a total order and retain the top
 candidates. The scalar is convenient: it sorts, thresholds, and composes. This paper asks what a
@@ -912,7 +912,7 @@ probability at least $1-\eta$. On that event,
 L_{\Dcal}(W_1,W_2) \;:=\; \max_{T\in \Dcal}\big[\,L_{W_2,T} - U_{W_1,T}\,\big]
 \end{equation}
 is a $(1-\eta)$ lower confidence bound on $\sup_{T\in \Dcal}[p_{W_2,T}-p_{W_1,T}]$. Hence
-$L_{\Dcal}(W_1,W_2) > 0$ \textbf{verifies} the \emph{population} statement
+$L_{\Dcal}(W_1,W_2) > 0$ verifies the \emph{population} statement
 $d_{M,\Dcal}(W_1,W_2)>0$ at confidence $\ge 1-\eta$.
 Both directions $L_{\Dcal}(W_1,W_2)$ and $L_{\Dcal}(W_2,W_1)$ read off the \emph{same} $2|\Dcal|$
 intervals and so are valid on the same coverage event. Consequently, \emph{if both observed bounds
@@ -1258,7 +1258,7 @@ aggregate-only. \texttt{results/MANIFEST.md} gives the run, and so the window, b
 must not be confused. \emph{As the object of study}, they produce the completions whose pass rates
 are the measured quantities, through the interfaces described above. \emph{As a tool}, they
 assisted the authors with code scaffolding, implementation, experimental-plan review, consistency
-and artifact audits, analysis and interpretation, manuscript organization and \LaTeX{} formatting,
+and artifact audits, analysis and interpretation, manuscript organization and LaTeX formatting,
 with drafting and revising the manuscript, and with additional Codex-assisted consistency checks
 of the manuscript against the released records. Reported estimates and confidence bounds were
 calculated by the released scripts from recorded model responses, which
@@ -2095,7 +2095,7 @@ data were withheld; every reported figure is computed from those files by the re
 During the preparation of this manuscript and the study it reports, the authors used Anthropic's
 Claude models, through the Claude Code interface, and OpenAI's Codex, for the purposes of code
 scaffolding, experimental-plan review, implementation assistance, analysis and interpretation,
-drafting and revising the manuscript, \LaTeX{} formatting, and additional Codex-assisted
+drafting and revising the manuscript, LaTeX formatting, and additional Codex-assisted
 consistency checks of the manuscript against the released measurement records. The authors have
 reviewed and edited the output and take full responsibility for the content of this publication.
 The work spans many sessions and the assistant version in use was not logged throughout, so we
