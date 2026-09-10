@@ -34,3 +34,6 @@ results/README_prev_seq24.md
 
 harness/diag/haiku_ctrl.py
 harness/diag/haiku_diag.py
+
+# Local build output for the paper deliverables.
+paper/_build/

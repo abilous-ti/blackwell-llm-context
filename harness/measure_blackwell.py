@@ -238,7 +238,11 @@ def _azure_complete(prompt, model):
         url, headers = endpoint, {"Content-Type": "application/json", "api-key": key}
         body = {"model": model, "input": prompt, "max_output_tokens": 8000}
     else:  # OpenAI-compatible chat completions (e.g. Azure AI Foundry /openai/v1/)
-        url = endpoint + ("" if endpoint.endswith("/") else "/") + "chat/completions"
+        # Accept either a base URL or a full endpoint. Appending unconditionally turned a
+        # full .../chat/completions into .../chat/completions/chat/completions, and the
+        # resulting 404 was then scored as a failed draw.
+        _e = endpoint.rstrip("/")
+        url = _e if _e.endswith("/chat/completions") else _e + "/chat/completions"
         headers = {"Content-Type": "application/json",
                    "Authorization": "Bearer " + key, "api-key": key}
         body = {"model": model, "messages": [{"role": "user", "content": prompt}],
@@ -282,12 +286,34 @@ def _extract_code(text):
     return (m.group(1) if m else text).strip() + "\n"
 
 
+# The verifier prints this only after its last assertion has run. Grading on the return code
+# alone let generated code raising SystemExit(0) pass before reaching a failing assertion.
+VERIFY_SENTINEL = "__verify_ok__"
+
+
+def _child_env():
+    """A minimal environment for running model-generated code.
+
+    The verifier imports untrusted generated Python. Handing it the parent environment gave it
+    the provider credentials this harness authenticates with; nothing in a solution needs them.
+    """
+    keep = ("PATH", "PATHEXT", "SYSTEMROOT", "COMSPEC", "TEMP", "TMP", "HOME", "LANG")
+    env = {k: v for k, v in os.environ.items() if k in keep}
+    env["PYTHONIOENCODING"] = "utf-8"
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    return env
+
+
 def verify_in(wd: Path, snippet: str) -> bool:
     (wd / "_v.py").write_text("import sys;sys.path.insert(0,'.')\n" + snippet +
-                              "\nprint('ok')", encoding="utf-8")
+                              "\nprint('" + VERIFY_SENTINEL + "')", encoding="utf-8")
     try:
-        return subprocess.run([sys.executable, str(wd / "_v.py")], cwd=str(wd),
-                              capture_output=True, timeout=30).returncode == 0
+        r = subprocess.run([sys.executable, str(wd / "_v.py")], cwd=str(wd),
+                           capture_output=True, timeout=30, env=_child_env())
+        if r.returncode != 0:
+            return False
+        # PASS requires the sentinel: the process must have reached the end of the checks.
+        return VERIFY_SENTINEL in (r.stdout or b"").decode("utf-8", "replace")
     except Exception:
         return False
 
@@ -653,15 +679,22 @@ def measure(arms, mock, runs, tasks=None, workers=1, model="claude-haiku-4-5-202
             else:
                 rows = [run_one(t, a, mock, i, model, http, retain)
                     for i in range(runs)]
-            k = sum(1 for r in rows if r["solved"])
-            counts[a][t["id"]] = (k, runs)
-            draws[a][t["id"]] = [1 if r["solved"] else 0 for r in rows]
+            # A transport failure is not a model answer. Scoring it as PASS=0 meant an arm of
+            # outages could certify as a collapse, so errored draws leave the sample entirely and
+            # the shortfall is reported; main() then refuses to certify an incomplete cell.
+            good = [r for r in rows if not r.get("error")]
+            k = sum(1 for r in good if r["solved"])
+            counts[a][t["id"]] = (k, len(good))
+            draws[a][t["id"]] = [1 if r["solved"] else 0 for r in good]
             errs[a][t["id"]] = [1 if r.get("error") else 0 for r in rows]
             cost[a][t["id"]] = statistics.mean(r["cost"] for r in rows)
             toks[a][t["id"]] = statistics.mean(r.get("out_tokens", 0) for r in rows)
             err = next((r.get("error") for r in rows if r.get("error")), "")
-            print(f"  arm={a:<6} {t['id']:<16} PASS {k}/{runs}={k/runs:.0%}"
-                  f"  ${cost[a][t['id']]:.4f}" + (f"  ERR:{err}" if err else ""))
+            _n = len(good)
+            print(f"  arm={a:<6} {t['id']:<16} PASS {k}/{_n}={(k / _n if _n else 0):.0%}"
+                  f"  ${cost[a][t['id']]:.4f}"
+                  + (f"  DROPPED {runs - _n} transport failures" if _n != runs else "")
+                  + (f"  ERR:{err}" if err else ""))
     return counts, cost, toks, draws, errs
 
 
@@ -709,6 +742,8 @@ def main():
     ap.add_argument("--http", action="store_true", default=True,
                     help="accepted and ignored: every draw is one HTTP request, for every model")
     ap.add_argument("--retain", default="", help="directory to write every raw completion to")
+    ap.add_argument("--allow-incomplete", action="store_true",
+                    help="certify even if transport failures thinned a cell below --runs")
 
     a = ap.parse_args()
     # INTEGRITY GUARD: never let a --mock run clobber the REAL results file. (A smoke-test mock
@@ -734,6 +769,22 @@ def main():
     counts, cost, toks, draws, errs = measure(arms, a.mock, a.runs, tasks=sel_tasks, workers=a.workers,
                                  model=a.model,
                                  http=True, retain=(a.retain or None))
+    # A certificate is a statement about n valid draws. If transport failures thinned any cell,
+    # the sample is not the one the design asked for, and the run must not be certified silently.
+    _short = {f"{a_}|{t}": (a.runs - counts[a_][t][1])
+              for a_ in arms for t in by_task if counts[a_][t][1] != a.runs}
+    if _short:
+        print("\n" + "=" * 78)
+        print("INCOMPLETE SAMPLE - transport failures reduced these cells below n=%d:" % a.runs)
+        for cell, missing in sorted(_short.items()):
+            print("   %-28s %d draw(s) lost" % (cell, missing))
+        if not a.allow_incomplete:
+            print("Refusing to certify. Re-measure the affected cells, or pass")
+            print("--allow-incomplete to write the run with its reduced denominators.")
+            sys.exit(2)
+        print("--allow-incomplete given: certifying on the reduced denominators.")
+        print("=" * 78)
+
     total_cost = sum(cost[a_][t] for a_ in arms for t in by_task) * a.runs
     print(f"\ntotal measured spend = ${total_cost:.4f}  (n={a.runs}/cell, "
           f"{total_n_runs} runs)\n" + "=" * 78)

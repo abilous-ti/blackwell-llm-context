@@ -15,9 +15,12 @@ import os, shutil, subprocess, sys, io, zipfile, tempfile
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
-OUTDIR = r"C:\Users\AndriyBilous\Documents\GitHub\tokenguard\research\out"
+# The built variant lives inside this repository; it used to be taken from another checkout,
+# so the ZIP could carry a document nobody could rebuild from what is published here.
+OUTDIR = os.environ.get("BLACKWELL_BUILD_DIR", os.path.join(HERE, "_build"))
 SUB = os.path.join(HERE, "submission")
-MIKTEX = r"C:\Users\AndriyBilous\AppData\Local\Programs\MiKTeX\miktex\bin\x64"
+MIKTEX = os.environ.get("MIKTEX_BIN", os.path.expanduser(
+    r"~\AppData\Local\Programs\MiKTeX\miktex\bin\x64"))
 os.environ["PATH"] = os.environ.get("PATH", "") + os.pathsep + MIKTEX
 
 os.makedirs(SUB, exist_ok=True)

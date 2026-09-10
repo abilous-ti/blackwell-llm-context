@@ -16,7 +16,8 @@ import json, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from tokenbench.measure_blackwell import W1, W2, TASKS  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from measure_blackwell import W1, W2, TASKS  # noqa: E402
 
 PROBE = {"trap_store_wire": "W1", "api_post_ok": "W1", "enc_amount": "W2"}  # PASS truth
 
@@ -63,9 +64,10 @@ def main():
         print("  All dense/cross-encoder rankers get the trap RIGHT -> honest null; "
               "the topical class boundary sits below this family on these probes.",
               flush=True)
-    Path("tokenbench/dense_trap.json").write_text(json.dumps(out, indent=1),
-                                                  encoding="utf-8")
-    print("wrote tokenbench/dense_trap.json", flush=True)
+    _out = Path(__file__).resolve().parent.parent / "results" / "dense_trap.json"
+    _out.parent.mkdir(parents=True, exist_ok=True)
+    _out.write_text(json.dumps(out, indent=1), encoding="utf-8")
+    print("wrote %s" % _out, flush=True)
 
 
 if __name__ == "__main__":

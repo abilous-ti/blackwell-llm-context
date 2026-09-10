@@ -4,7 +4,8 @@
     so it cannot drift from the master."""
 import sys, io, os
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-D = r"C:\Users\AndriyBilous\Documents\GitHub\tokenguard\research\out"
+D = os.environ.get("BLACKWELL_BUILD_DIR",
+                   os.path.join(os.path.dirname(os.path.abspath(__file__)), "_build"))
 P = os.path.join(D, "blackwell-paper.tex")
 M = os.path.join(D, "blackwell-paper-make.tex")
 NL, BS = chr(10), chr(92)

@@ -6,10 +6,16 @@
 # Usage:  sh paper/build_deliverables.sh
 set -e
 
-REPO=/c/Users/AndriyBilous/Documents/GitHub/blackwell-llm-context
-OUT=/c/Users/AndriyBilous/Documents/GitHub/tokenguard/research/out
-PATH="$PATH:/c/Users/AndriyBilous/AppData/Local/Programs/MiKTeX/miktex/bin/x64"
-PANDOC=/c/Users/AndriyBilous/AppData/Local/Pandoc/pandoc
+# Everything is relative to this script and the output stays inside the repository.
+# It used to be assembled in a different checkout, which no reviewer has.
+REPO=$(cd "$(dirname "$0")/.." && pwd)
+OUT="${BLACKWELL_BUILD_DIR:-$REPO/paper/_build}"
+mkdir -p "$OUT"
+# Tool locations are overridable; the defaults are the usual per-user install paths.
+[ -n "$MIKTEX_BIN" ] && PATH="$PATH:$MIKTEX_BIN"
+PATH="$PATH:$HOME/AppData/Local/Programs/MiKTeX/miktex/bin/x64"
+PANDOC="${PANDOC:-$HOME/AppData/Local/Pandoc/pandoc}"
+command -v pdflatex >/dev/null || { echo "pdflatex not found; set MIKTEX_BIN"; exit 1; }
 
 cd "$REPO/paper"
 
@@ -67,8 +73,14 @@ print("   variant matches the master")
 EOF
 
 echo "== verification"
-python harness/diag/check_regimes.py | tail -1
+# `cmd | tail -1` reports tail's status, so under /bin/sh a failing check reached the
+# success message with exit 0. Run each check on its own and test its status.
+run_check() {
+  out=$("$@") || { echo "CHECK FAILED: $*"; echo "$out" | tail -20; exit 1; }
+  echo "$out" | tail -1
+}
+run_check python harness/diag/check_regimes.py
 # A bound printed tighter than the one computed asserts more than the data support. Two rounds
 # of review found instances of it, so it is checked here rather than by eye.
-python harness/diag/check_printed_bounds.py | tail -1
+run_check python harness/diag/check_printed_bounds.py
 echo "ALL DELIVERABLES BUILT"

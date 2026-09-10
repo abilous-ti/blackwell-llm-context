@@ -68,7 +68,11 @@ def counts_for(model, spec):
     for (a, t), stem in over.items():
         od = load(stem)
         if od is None:
-            continue
+            # Silently keeping the base counts here would substitute a different record
+            # for the one the declaration names, with no warning anywhere.
+            raise SystemExit(
+                "declared override missing: %s for %s|%s (model %s). Refusing to "
+                "recompute from the base file." % (stem, a, t, model))
         kn = od["counts"].get("%s|%s" % (a, t)) if "counts" in od else None
         if kn is None and "arms" in od:
             # retained-audit summary: {arms: {W1: {n, pass_original, ...}, ...}}
@@ -218,4 +222,6 @@ def main(mode):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else "cli")
+    # Default to the record the paper publishes. The historical command-line grid is
+    # still reachable with an explicit "cli" argument.
+    main(sys.argv[1] if len(sys.argv) > 1 else "api")

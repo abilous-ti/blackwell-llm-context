@@ -1,0 +1,8 @@
+# The manifest hashes the bytes Git stores, which are LF. Without this, a clone with
+# core.autocrlf=true checks out CRLF and every text digest in results/MANIFEST.md mismatches
+# for a reason that has nothing to do with the measurements.
+* text=auto eol=lf
+*.png binary
+*.pdf binary
+*.docx binary
+*.gz binary

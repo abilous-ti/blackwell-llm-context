@@ -53,8 +53,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=10, help="judgments per (task, order)")
     ap.add_argument("--model", default="claude-haiku-4-5-20251001")
-    ap.add_argument("--out", default="tokenbench/reranker_trap.json")
+    ap.add_argument("--out", default=str(Path(__file__).resolve().parent.parent / "results" / "reranker_trap.json"))
     a = ap.parse_args()
+    # Resolve and create the destination BEFORE any request: the previous default pointed
+    # at a directory that does not exist, so a completed run lost every judgment on write.
+    _dest = Path(a.out).resolve()
+    _dest.parent.mkdir(parents=True, exist_ok=True)
+    a.out = str(_dest)
 
     tasks = {t["id"]: t for t in TASKS}
     results = {}
