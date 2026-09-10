@@ -104,8 +104,20 @@ _tracked = subprocess.run(["git", "ls-files", "results"], cwd=ROOT,
                           capture_output=True, text=True).stdout.split(NL_CH)
 _tracked = sorted(p[len("results/"):] for p in _tracked if p.startswith("results/"))
 if not _tracked:
-    print("NOT WRITTEN - git reported no tracked files under results/")
-    sys.exit(1)
+    # Outside a git checkout -- an exported tree, an unpacked archive, what a reviewer may
+    # actually receive -- git has nothing to report. Fall back to walking results/, skipping the
+    # working directories that are deliberately unpublished, so the manifest still describes
+    # exactly what shipped rather than refusing to run.
+    _skip = ("raw_transcripts", "reproduce", "__pycache__")
+    _tracked = []
+    for _dp, _dns, _fns in os.walk(RES):
+        _dns[:] = [d for d in _dns if d not in _skip]
+        for _fn in _fns:
+            _rel = os.path.relpath(os.path.join(_dp, _fn), RES).replace(os.sep, "/")
+            if _rel != "MANIFEST.md":
+                _tracked.append(_rel)
+    _tracked.sort()
+    print("git unavailable here; inventorying results/ directly (%d files)" % len(_tracked))
 
 rows, total = [], 0
 for rel_ in _tracked:

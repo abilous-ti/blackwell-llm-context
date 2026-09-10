@@ -83,8 +83,19 @@ def counts_for(model, spec):
             for k2, v2 in (od.get("counts") or {}).items():
                 if k2.endswith("|" + t):
                     kn = v2
-        if kn:
-            c[a][t] = tuple(kn)
+        # An override that exists but does not carry the declared cell is the same failure as a
+        # missing file: the base value stays and nothing says so. Require the entry, and require
+        # it to be a usable pair.
+        if kn is None:
+            raise SystemExit(
+                "declared override %s has no entry for %s|%s (model %s). Refusing to fall back "
+                "to the base file." % (stem, a, t, model))
+        if not (isinstance(kn, (list, tuple)) and len(kn) == 2):
+            raise SystemExit("override %s: %s|%s is not a [k, n] pair: %r" % (stem, a, t, kn))
+        k_, n_ = kn
+        if not (isinstance(k_, int) and isinstance(n_, int) and n_ > 0 and 0 <= k_ <= n_):
+            raise SystemExit("override %s: %s|%s has invalid counts %r" % (stem, a, t, kn))
+        c[a][t] = (k_, n_)
     return c, None
 
 

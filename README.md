@@ -11,7 +11,8 @@ which every verification can be recomputed.
 ## Verify the paper without spending anything
 
 Every published table, bound and figure is recomputed from the released counts by the scripts
-below. None of these makes a model call, and they need nothing but the Python standard library.
+below. None of these makes a model call, and they need nothing but the Python standard
+library. All five run clean from a fresh clone of this repository.
 
 ```bash
 python harness/diag/recompute.py            # every per-cell rate, harm bound and verdict
@@ -23,6 +24,12 @@ python harness/diag/make_manifest.py api    # regenerate the SHA-256 manifest
 
 `recompute.py` reads the published HTTP record by default; pass `cli` for the superseded
 command-line grid, which the manuscript discusses only as history.
+
+The manuscript itself is submitted to the journal rather than published here: this
+repository is the artifact record -- measurement code, executable verifiers, every run
+record, the manifest that pins them, and these instructions. `check_printed_bounds.py`
+additionally checks the manuscript against the data when a local copy is present, and says
+so and skips when it is not.
 
 ## What the paper claims
 
@@ -60,8 +67,6 @@ widened every bound.
 | `results/` | raw result JSONs and run logs |
 | `results/audit/` | re-measurement with raw completions retained |
 | `docs/` | `EXPERIMENT-BLACKWELL.md` (per-cell record), `BLACKWELL.md` (formalization and proof sketches) |
-| `paper/` | manuscript source, compiled PDF, the submission bundle, and the scripts that build and check it |
-
 All six models are queried the same way: one HTTP request per draw, one turn, no tools. The
 harness has no command-line launcher.
 

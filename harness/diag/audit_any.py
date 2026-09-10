@@ -75,12 +75,9 @@ def one(kind, model, task, neutral, arm, i, import_instruction=False):
                 (wd / "solution.py").write_text(code, encoding="utf-8")
 
                 def run_verify(snippet):
-                    (wd / "_v.py").write_text(
-                        "import sys;sys.path.insert(0,'.')\n" + snippet + "\nprint('ok')",
-                        encoding="utf-8")
-                    v = subprocess.run([sys.executable, str(wd / "_v.py")], cwd=str(wd),
-                                       capture_output=True, text=True, timeout=30)
-                    return v.returncode == 0, (v.stderr or "")[-400:]
+                    # One verifier for every runner: this file used to carry its own copy,
+                    # which inherited the parent environment and graded on the return code.
+                    return mb.verify_in(wd, snippet), ""
 
                 rec["pass_original"], rec["stderr_original"] = run_verify(task["verify"])
                 rec["pass_neutral"], rec["stderr_neutral"] = run_verify(neutral)
@@ -136,10 +133,13 @@ def main():
             rows = list(ex.map(
                 lambda i: one(a.kind, a.model, task, neutral, arm, i, a.import_instruction),
                 range(a.n)))
+        # A transport failure is not a model answer; it leaves the sample rather than
+        # entering it as a zero. `n` is the number of valid responses, not of attempts.
+        errs = sum(1 for r in rows if r.get("error"))
+        rows = [r for r in rows if not r.get("error")]
         n = len(rows)
         ko = sum(bool(r.get("pass_original")) for r in rows)
         kn = sum(bool(r.get("pass_neutral")) for r in rows)
-        errs = sum(1 for r in rows if r.get("error"))
         fails = [r for r in rows if not r.get("pass_original") and not r.get("error")]
         summary[arm] = {
             "n": n, "pass_original": ko, "pass_neutral": kn, "errs": errs,

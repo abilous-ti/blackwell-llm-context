@@ -65,6 +65,7 @@ def main():
     sys.stdout.flush()
 
     counts, cost, errs = {}, 0.0, 0
+    _short = []
     for t in tasks:
         t0 = time.time()
         with cf.ThreadPoolExecutor(max_workers=a.workers) as ex:
@@ -74,20 +75,32 @@ def main():
             for f in cf.as_completed(futs):
                 try:
                     rows.append(f.result())
-                except Exception:
-                    errs += 1
-                    rows.append({"solved": False, "cost": 0.0})
-        k = sum(1 for r in rows if r.get("solved"))
+                except Exception as e:
+                    rows.append({"solved": False, "cost": 0.0, "error": str(e)[:80]})
+        # run_one reports a transport failure inside the dict, so counting only escaped
+        # exceptions missed every one of them and scored the outage as PASS=0.
+        errs += sum(1 for r in rows if r.get("error"))
+        good = [r for r in rows if not r.get("error")]
+        k = sum(1 for r in good if r.get("solved"))
         cost += sum(r.get("cost", 0.0) or 0.0 for r in rows)
-        counts["%s|%s" % (a.arm, t["id"])] = [k, len(rows)]
-        print("  arm=%-6s %-18s PASS %d/%d=%d%%   (%.0fs)"
-              % (a.arm, t["id"], k, len(rows), round(100 * k / len(rows)), time.time() - t0))
+        counts["%s|%s" % (a.arm, t["id"])] = [k, len(good)]
+        _n = len(good)
+        print("  arm=%-6s %-18s PASS %d/%d=%d%%%s   (%.0fs)"
+              % (a.arm, t["id"], k, _n, round(100 * k / _n) if _n else 0,
+                 ("  DROPPED %d transport failures" % (len(rows) - _n)) if _n != len(rows) else "",
+                 time.time() - t0))
+        if _n != a.runs:
+            _short.append("%s|%s: %d/%d valid" % (a.arm, t["id"], _n, a.runs))
         sys.stdout.flush()
 
     out = {"counts": counts, "model": a.model,
            "regime": "http-api",
            "prompt": "published", "n_per_cell": a.runs,
            "transport_errors": errs, "total_cost_usd": round(cost, 6)}
+    if _short:
+        # The published record is n valid draws per cell. A thinned cell is a different
+        # sample, so it is written but not presented as the measurement that was asked for.
+        print("INCOMPLETE: " + "; ".join(_short))
     with open(a.out, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=1)
     print("wrote %s   errors=%d   cost=$%.4f" % (a.out, errs, cost))

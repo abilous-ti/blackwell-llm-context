@@ -64,10 +64,21 @@ def main():
         print("  All dense/cross-encoder rankers get the trap RIGHT -> honest null; "
               "the topical class boundary sits below this family on these probes.",
               flush=True)
-    _out = Path(__file__).resolve().parent.parent / "results" / "dense_trap.json"
+    # results/dense_trap.json is the frozen published record, pinned in MANIFEST.md.
+    # Writing there by default would replace the paper's evidence before a reviewer could
+    # compare against it, so reproductions land beside it and overwriting is explicit.
+    import argparse as _ap
+    _p = _ap.ArgumentParser()
+    _p.add_argument("--out", default=None,
+                    help="output path (default: results/reproduce/dense_trap.json)")
+    _a, _ = _p.parse_known_args()
+    _root = Path(__file__).resolve().parent.parent
+    _out = Path(_a.out) if _a.out else _root / "results" / "reproduce" / "dense_trap.json"
     _out.parent.mkdir(parents=True, exist_ok=True)
     _out.write_text(json.dumps(out, indent=1), encoding="utf-8")
     print("wrote %s" % _out, flush=True)
+    if _out.resolve() != (_root / "results" / "dense_trap.json").resolve():
+        print("   (the published record at results/dense_trap.json is untouched)", flush=True)
 
 
 if __name__ == "__main__":

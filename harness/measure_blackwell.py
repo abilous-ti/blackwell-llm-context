@@ -33,7 +33,7 @@ Run (auth claude):  python tokenbench/measure_blackwell.py --runs 5
        pipeline:     python tokenbench/measure_blackwell.py --mock
 """
 from __future__ import annotations
-import argparse, json, math, os, shutil, statistics, subprocess, sys, tempfile
+import argparse, json, math, os, secrets, shutil, statistics, subprocess, sys, tempfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
@@ -286,9 +286,16 @@ def _extract_code(text):
     return (m.group(1) if m else text).strip() + "\n"
 
 
-# The verifier prints this only after its last assertion has run. Grading on the return code
-# alone let generated code raising SystemExit(0) pass before reaching a failing assertion.
-VERIFY_SENTINEL = "__verify_ok__"
+# Completion is signalled by writing a per-run random token to a file the PARENT names, not by
+# printing to a stream the candidate controls: a stdout sentinel was forgeable with
+# print(sentinel); raise SystemExit(0). The checks also run inside a BaseException handler, so a
+# SystemExit raised while importing the candidate fails instead of passing silently.
+#
+# Residual, stated plainly rather than papered over: a candidate that deliberately reads the token
+# from its environment and writes the marker file before exiting would still pass. Closing that
+# needs OS-level isolation (separate user, read-only filesystem), which this harness does not
+# provide. Generated code should be run somewhere it cannot reach anything that matters.
+VERIFY_MARKER = "_verify_done"
 
 
 def _child_env():
@@ -297,7 +304,11 @@ def _child_env():
     The verifier imports untrusted generated Python. Handing it the parent environment gave it
     the provider credentials this harness authenticates with; nothing in a solution needs them.
     """
-    keep = ("PATH", "PATHEXT", "SYSTEMROOT", "COMSPEC", "TEMP", "TMP", "HOME", "LANG")
+    # USERPROFILE/HOMEDRIVE/HOMEPATH are paths, not secrets, and several libraries a solution may
+    # import fail at construction without a resolvable home directory. Dropping them silently
+    # turned one retained draw from PASS to FAIL, which is a grading change, not a security gain.
+    keep = ("PATH", "PATHEXT", "SYSTEMROOT", "COMSPEC", "TEMP", "TMP", "TMPDIR",
+            "HOME", "USERPROFILE", "HOMEDRIVE", "HOMEPATH", "LANG", "LC_ALL")
     env = {k: v for k, v in os.environ.items() if k in keep}
     env["PYTHONIOENCODING"] = "utf-8"
     env["PYTHONDONTWRITEBYTECODE"] = "1"
@@ -305,15 +316,30 @@ def _child_env():
 
 
 def verify_in(wd: Path, snippet: str) -> bool:
-    (wd / "_v.py").write_text("import sys;sys.path.insert(0,'.')\n" + snippet +
-                              "\nprint('" + VERIFY_SENTINEL + "')", encoding="utf-8")
+    token = secrets.token_hex(16)
+    marker = wd / VERIFY_MARKER
+    if marker.exists():
+        marker.unlink()
+    indented = "\n".join("    " + ln for ln in snippet.split("\n"))
+    src = ("import sys, os\n"
+           "sys.path.insert(0, '.')\n"
+           "_ok = False\n"
+           "try:\n"
+           + indented + "\n"
+           "    _ok = True\n"
+           "except BaseException:\n"          # SystemExit included: an early exit is not a pass
+           "    _ok = False\n"
+           "if _ok:\n"
+           "    open(os.environ['VERIFY_MARKER_PATH'], 'w').write(os.environ['VERIFY_TOKEN'])\n")
+    (wd / "_v.py").write_text(src, encoding="utf-8")
+    env = _child_env()
+    env["VERIFY_TOKEN"] = token
+    env["VERIFY_MARKER_PATH"] = str(marker)
     try:
-        r = subprocess.run([sys.executable, str(wd / "_v.py")], cwd=str(wd),
-                           capture_output=True, timeout=30, env=_child_env())
-        if r.returncode != 0:
-            return False
-        # PASS requires the sentinel: the process must have reached the end of the checks.
-        return VERIFY_SENTINEL in (r.stdout or b"").decode("utf-8", "replace")
+        subprocess.run([sys.executable, str(wd / "_v.py")], cwd=str(wd),
+                       capture_output=True, timeout=30, env=env)
+        # PASS requires the marker the parent named, carrying the token the parent generated.
+        return marker.exists() and marker.read_text(encoding="utf-8").strip() == token
     except Exception:
         return False
 
@@ -779,6 +805,24 @@ def main():
         for cell, missing in sorted(_short.items()):
             print("   %-28s %d draw(s) lost" % (cell, missing))
         if not a.allow_incomplete:
+            # Save the work before refusing. An outage late in a paid run should not force the
+            # completed draws to be reconstructed from stdout; refusing to CERTIFY is the point,
+            # discarding observations is not. This record is deliberately marked uncertified.
+            salvage = os.path.splitext(a.out)[0] + ".incomplete.json"
+            try:
+                with open(salvage, "w", encoding="utf-8") as f:
+                    json.dump({"certified": False,
+                               "reason": "transport failures reduced cells below n",
+                               "requested_n_per_cell": a.runs,
+                               "short_cells": _short,
+                               "counts": {f"{a_}|{t}": list(counts[a_][t])
+                                          for a_ in arms for t in by_task},
+                               "draws": {f"{a_}|{t}": draws[a_][t] for a_ in arms for t in by_task},
+                               "errs": {f"{a_}|{t}": errs[a_][t] for a_ in arms for t in by_task},
+                               "model": a.model}, f, indent=1)
+                print("Valid observations saved to %s (uncertified)." % salvage)
+            except Exception as e:                       # saving must never mask the refusal
+                print("Could not save the partial record: %s" % e)
             print("Refusing to certify. Re-measure the affected cells, or pass")
             print("--allow-incomplete to write the run with its reduced denominators.")
             sys.exit(2)

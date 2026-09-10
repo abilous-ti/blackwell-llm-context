@@ -37,6 +37,13 @@ if os.path.exists(GPT_TRAP):
     for a, v in arms.items():
         counts["GPT-5.5"]["%s|trap_store_wire" % a] = (v["pass_original"], v["n"])
 
+# The manuscript is submitted to the journal rather than published here, so this check is
+# available when the source is present locally and skips cleanly when it is not. It checks
+# manuscript-to-data consistency; the research itself reproduces without it.
+if not os.path.exists(TEX):
+    print("manuscript not present at %s - skipping the printed-bound check." % TEX)
+    print("(this verifies the paper against the data; the data recomputation is recompute.py)")
+    sys.exit(0)
 src = open(TEX, encoding="utf-8").read()
 bad, checked = [], 0
 
