@@ -12,3 +12,6 @@ paper/*.log
 paper/*.out
 paper/*.blg
 paper/*.toc
+
+# MDPI template files: licensed for peer-review submission only, not for posting online.
+paper/_mdpi/
