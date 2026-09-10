@@ -56,7 +56,11 @@ app = src[src.index("\n\\appendix") + 1:src.index(r"\end{document}")]
 app = app.replace(r"\appendix", "", 1)
 for line in (r"\renewcommand{\thetable}{A\arabic{table}}",
              r"\renewcommand{\thefigure}{A\arabic{figure}}",
-             r"\setcounter{table}{0}", r"\setcounter{figure}{0}"):
+             r"\setcounter{table}{0}", r"\setcounter{figure}{0}",
+             # The master calls \bibliography at the very end, i.e. INSIDE this slice. Leaving it
+             # in printed the whole reference list twice -- 144 entries for 72 sources, with every
+             # citation number in the second half wrong.
+             r"\bibliography{blackwell-paper}"):
     app = app.replace(line, "")
 
 # Abbreviations is a \section* in the master and a macro in the class.
@@ -212,4 +216,12 @@ for u in undef[:8]:
     print("        undefined: " + u)
 if pages:
     print("      " + pages[0].strip())
-sys.exit(1 if (errs or not pages) else 0)
+if errs or not pages:
+    sys.exit(1)
+
+# A clean compile is not evidence the variant says the same thing: the duplicated bibliography
+# compiled without a single error and printed 144 entries for 72 sources. Check content too.
+d = subprocess.run([sys.executable, os.path.join(HERE, "check_mdpi_drift.py")],
+                   capture_output=True, text=True)
+print(d.stdout.rstrip())
+sys.exit(d.returncode)
