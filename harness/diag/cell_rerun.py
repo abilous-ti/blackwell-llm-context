@@ -1,13 +1,13 @@
 """Clean re-measurement of ONE cell (model, task, arm) with the retry harness; re-draws any
 draw that still ends in a transport error so the reported n contains no outage-scored zeros.
 Usage: cell_rerun.py MODEL TASK ARM N OUT.json"""
-import sys, json
+import os, sys, json
 from concurrent.futures import ThreadPoolExecutor
-sys.path.insert(0, r"C:\Users\AndriyBilous\Documents\GitHub\tokenguard\tokenbench")
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))   # the harness/ directory of this repo
 import measure_blackwell as mb
 model, tid, arm, n, out = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4]), sys.argv[5]
 task = next(t for t in mb.TASKS if t["id"] == tid)
-def draw(i): return mb.run_one(task, arm, False, i, model, singleshot=True)
+def draw(i): return mb.run_one(task, arm, False, i, model)
 with ThreadPoolExecutor(max_workers=3) as ex: rows = list(ex.map(draw, range(n)))
 for extra in range(2):                       # re-draw residual transport failures
     bad = [i for i, r in enumerate(rows) if r.get("error")]

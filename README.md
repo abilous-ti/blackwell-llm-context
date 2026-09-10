@@ -88,7 +88,7 @@ which refuses to write if it names a file that is not present.
 
 ```bash
 # pair-1 over HTTP, core arms (endpoint and key are read from the environment)
-python harness/measure_blackwell.py --runs 40 --http --retain results/retain_api/haiku \
+python harness/measure_blackwell.py --runs 40 --retain results/retain_api/haiku \
   --tasks api_post_ok,api_argorder --arms none,W1,W2,W1plus --workers 2 --out out.json
 ```
 

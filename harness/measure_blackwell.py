@@ -3,7 +3,7 @@
 real LLM, with measured HTTP-API PASS rates and a CORRECT uniform certificate.
 
 This is the ESTIMATOR + CERTIFICATE component. It extends tokenbench/measure_moat.py:
-same claude_cmd / verify_in / fresh-temp-dir / total_cost_usd parsing / flattened-prompt
+same verify_in / fresh-temp-dir / flattened-prompt
 mechanics, stdlib only, cross-OS, utf-8 pinned.
 
 It measures, for two fixed Blackwell-INCOMPARABLE context sources W1, W2 and a task set D:
@@ -217,17 +217,6 @@ ARMS = {"none": None, "W1": W1, "W2": W2, "W1plus": W1plus, "W1plus_rev": W1plus
 # ============================================================================================
 # Harness mechanics (carried over from measure_moat.py).
 # ============================================================================================
-def claude_cmd(args):
-    """LEGACY path. The six-model record is measured over HTTP; this launcher is retained
-    only so the released harness can still reproduce the runs that were measured through it
-    and are disclosed as such in the paper: the four behavioural controls, the second source
-    pair, and the retention audit. Do not use it for new measurements."""
-    exe = shutil.which("claude") or "claude"
-    if os.name == "nt" and exe.lower().endswith((".cmd", ".bat")):
-        return [os.environ.get("COMSPEC", "cmd.exe"), "/c", exe] + args
-    return [exe] + args
-
-
 def _azure_complete(prompt, model):
     """Single-shot completion via an Azure OpenAI-style endpoint (stdlib urllib only; NO third-
     party deps). Reads AZURE_OPENAI_ENDPOINT + AZURE_OPENAI_KEY from env -- the key is NEVER
@@ -235,7 +224,7 @@ def _azure_complete(prompt, model):
       * '.../responses...'  -> Responses API   (input / output[]),     auth: api-key header
       * '.../v1/' or chat   -> Chat Completions (messages / choices[]), auth: Bearer + api-key
     Returns (assistant_text, output_tokens). Used for non-Anthropic, cross-vendor models. NB:
-    single-shot completion, not an agentic loop like `claude -p` -- a cleaner context-use probe."""
+    single-shot completion, not an agentic loop -- a cleaner context-use probe."""
     import urllib.request
     endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
     key = os.environ["AZURE_OPENAI_KEY"]
@@ -303,13 +292,11 @@ def verify_in(wd: Path, snippet: str) -> bool:
         return False
 
 
-def run_one(task, arm, mock, i, model="claude-haiku-4-5-20251001", singleshot=False,
-             http=False, retain=None):
-    """One real claude -p run for (task, arm). Returns {'solved':bool,'cost':float}.
-    singleshot=True forces a Claude model into single-shot COMPLETION mode (max-turns 1, no tools;
-    we extract the code from the returned text) — the SAME regime as the non-Anthropic models. This
-    breaks the vendor/harness confound (Anthropic=agentic vs others=single-shot) for a chosen Claude
-    model, letting one model be measured under both harnesses."""
+def run_one(task, arm, mock, i, model="claude-haiku-4-5-20251001",
+             http=True, retain=None):
+    """One HTTP draw for (task, arm): one request, one turn, no tools, for every model.
+    Returns {'solved': bool, 'cost': float, 'out_tokens': int}. `http` is accepted and ignored;
+    it remains only so callers written against the older signature keep working."""
     if mock:
         # Planted ground truth matching the mechanism: api tasks need W1; enc tasks need W2.
         # W1plus contains both -> solves both families. 'none' fails idiosyncratic tasks.
@@ -342,9 +329,8 @@ def run_one(task, arm, mock, i, model="claude-haiku-4-5-20251001", singleshot=Fa
     try:
         ctx = ARMS[arm]
         prompt = ((ctx + "\n\n") if ctx else "") + task["prompt"]
-        if http or not model.startswith("claude"):
-            # One HTTP request, one turn, no tools. `http` forces this path for Anthropic
-            # models too; without it a claude* model would fall through to the command line.
+        if True:
+            # One HTTP request, one turn, no tools. This is the only measurement path.
             text, toks = _azure_complete(
                 " ".join((prompt + " Return ONLY the raw Python file content, no markdown "
                           "fences, no prose.").split()), model)
@@ -356,56 +342,6 @@ def run_one(task, arm, mock, i, model="claude-haiku-4-5-20251001", singleshot=Fa
                     text or "", encoding="utf-8")
             (wd / "solution.py").write_text(_extract_code(text), encoding="utf-8")
             return {"solved": verify_in(wd, task["verify"]), "cost": 0.0, "out_tokens": toks}
-        if singleshot:
-            # Claude in single-shot COMPLETION mode (max-turns 1, no tools): treat the returned
-            # text as the completion, extract code, write the file ourselves -> same regime as Azure.
-            # Retry (3 attempts, backoff): the 2026-07-03 n=40 padding run lost 3 whole arms to a
-            # transient API failure window; a zero-token/empty result is a transport error, not a
-            # model answer, and must not be scored as PASS=0.
-            sp = (prompt + " Return ONLY the raw Python file content, no markdown fences, no prose, "
-                  "and do NOT use any tools or write any files.")
-            cmd = claude_cmd(["-p", " ".join(sp.split()), "--model", model,
-                              "--output-format", "json", "--max-turns", "1",
-                              "--dangerously-skip-permissions"])
-            last_err = None
-            for attempt in range(3):
-                try:
-                    r = subprocess.run(cmd, cwd=str(wd), capture_output=True, text=True,
-                                       encoding="utf-8", timeout=200)
-                    out = json.loads((r.stdout or "").strip().splitlines()[-1])
-                    toks = (out.get("usage", {}) or {}).get("output_tokens", 0)
-                    if out.get("is_error") or (not out.get("result") and toks == 0):
-                        raise RuntimeError(f"empty/error result: {str(out)[:120]}")
-                    (wd / "solution.py").write_text(_extract_code(out.get("result", "") or ""),
-                                                    encoding="utf-8")
-                    return {"solved": verify_in(wd, task["verify"]),
-                            "cost": out.get("total_cost_usd", 0.0), "out_tokens": toks}
-                except Exception as e:
-                    last_err = e
-                    import time as _time
-                    _time.sleep(5 * (attempt + 1) ** 2)
-            raise RuntimeError(f"singleshot failed after 3 attempts: {last_err}")
-        cmd = claude_cmd(["-p", " ".join(prompt.split()), "--model", model,
-                          "--output-format", "json",
-                          "--max-turns", "6", "--dangerously-skip-permissions"])
-        last_err = None
-        for attempt in range(3):  # same transient-failure retry as the singleshot path
-            try:
-                r = subprocess.run(cmd, cwd=str(wd), capture_output=True, text=True,
-                                   encoding="utf-8", timeout=200)
-                out = json.loads((r.stdout or "").strip().splitlines()[-1])
-                # lead D: persist output_tokens (the $9 run discarded this). num_turns is dead on this
-                # single-shot codegen harness, so only output_tokens can move -> capture just that.
-                toks = (out.get("usage", {}) or {}).get("output_tokens", 0)
-                if out.get("is_error") or (not out.get("result") and toks == 0):
-                    raise RuntimeError(f"empty/error result: {str(out)[:120]}")
-                return {"solved": verify_in(wd, task["verify"]),
-                        "cost": out.get("total_cost_usd", 0.0), "out_tokens": toks}
-            except Exception as e:
-                last_err = e
-                import time as _time
-                _time.sleep(5 * (attempt + 1) ** 2)
-        raise RuntimeError(f"agentic run failed after 3 attempts: {last_err}")
     except Exception as e:
         return {"solved": False, "cost": 0.0, "out_tokens": 0, "error": str(e)[:80]}
     finally:
@@ -696,7 +632,7 @@ def certify_interference(counts, by_task, eta=0.10, tau=0.30):
 # Driver: measure all arms x tasks, compute estimator + run all three certificates.
 # ============================================================================================
 def measure(arms, mock, runs, tasks=None, workers=1, model="claude-haiku-4-5-20251001",
-            singleshot=False, http=False, retain=None):
+            http=True, retain=None):
     """Returns counts[arm][tid]=(k,n), cost[arm][tid]=mean cost, toks[arm][tid]=mean out_tokens,
     draws[arm][tid]=ordered list of 0/1 PASS outcomes (draw i = index i; needed for sequential replay).
     workers>1 runs the n calls of each cell concurrently (calls are subprocess+network bound and
@@ -712,10 +648,10 @@ def measure(arms, mock, runs, tasks=None, workers=1, model="claude-haiku-4-5-202
         for t in tasks:
             if workers > 1 and not mock:
                 with ThreadPoolExecutor(max_workers=workers) as ex:
-                    rows = list(ex.map(lambda i, _t=t, _a=a: run_one(_t, _a, mock, i, model, singleshot,
+                    rows = list(ex.map(lambda i, _t=t, _a=a: run_one(_t, _a, mock, i, model,
                                                              http, retain), range(runs)))
             else:
-                rows = [run_one(t, a, mock, i, model, singleshot, http, retain)
+                rows = [run_one(t, a, mock, i, model, http, retain)
                     for i in range(runs)]
             k = sum(1 for r in rows if r["solved"])
             counts[a][t["id"]] = (k, runs)
@@ -762,20 +698,18 @@ def lexical_relevance(ctx_text, prompt):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs", type=int, default=5, help="claude -p runs per (arm,task) = n")
+    ap.add_argument("--runs", type=int, default=5, help="draws per (arm,task) = n")
     ap.add_argument("--eta", type=float, default=0.10, help="certificate failure budget")
     ap.add_argument("--mock", action="store_true")
     ap.add_argument("--tasks", default="", help="comma list of task ids to measure (default all)")
     ap.add_argument("--arms", default="", help="comma list of arms to measure (default all 4)")
     ap.add_argument("--out", default="blackwell_results.json", help="results filename")
-    ap.add_argument("--workers", type=int, default=1, help="concurrent claude calls per cell")
-    ap.add_argument("--model", default="claude-haiku-4-5-20251001", help="model id for claude -p")
-    ap.add_argument("--http", action="store_true",
-                    help="force one HTTP request per draw for ANY model, including claude*; without this a claude* model is driven through the command line")
+    ap.add_argument("--workers", type=int, default=1, help="concurrent requests per cell")
+    ap.add_argument("--model", default="claude-haiku-4-5-20251001", help="model id to query")
+    ap.add_argument("--http", action="store_true", default=True,
+                    help="accepted and ignored: every draw is one HTTP request, for every model")
     ap.add_argument("--retain", default="", help="directory to write every raw completion to")
-    ap.add_argument("--singleshot", action="store_true",
-                    help="run a Claude model in single-shot completion mode (breaks the agentic/"
-                         "single-shot vendor confound)")
+
     a = ap.parse_args()
     # INTEGRITY GUARD: never let a --mock run clobber the REAL results file. (A smoke-test mock
     # run silently overwrote blackwell_results.json once, leaving the real anomaly only in the
@@ -794,12 +728,12 @@ def main():
         ap.error(f"--arms must include none,W1,W2 (the core A/B analysis); got {arms}")
     total_n_runs = len(arms) * len(sel_tasks) * a.runs
     print(f"BLACKWELL S6 anchor {'MOCK' if a.mock else 'REAL'} | n={a.runs}/cell | "
-          f"arms={arms} tasks={by_task} | {total_n_runs} claude runs | eta={a.eta}\n")
+          f"arms={arms} tasks={by_task} | {total_n_runs} draws | eta={a.eta}\n")
 
-    print(f"  model = {a.model}{'  [SINGLE-SHOT]' if a.singleshot else ''}{'  [HTTP-API]' if a.http else ''}{'  [RETAIN]' if a.retain else ''}")
+    print(f"  model = {a.model}  [HTTP-API]{'  [RETAIN]' if a.retain else ''}")
     counts, cost, toks, draws, errs = measure(arms, a.mock, a.runs, tasks=sel_tasks, workers=a.workers,
-                                 model=a.model, singleshot=a.singleshot,
-                                 http=a.http, retain=(a.retain or None))
+                                 model=a.model,
+                                 http=True, retain=(a.retain or None))
     total_cost = sum(cost[a_][t] for a_ in arms for t in by_task) * a.runs
     print(f"\ntotal measured spend = ${total_cost:.4f}  (n={a.runs}/cell, "
           f"{total_n_runs} runs)\n" + "=" * 78)

@@ -44,11 +44,9 @@ def main():
     ap.add_argument("--runs", type=int, default=40)
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--agentic", action="store_true",
-                    help="run the multi-turn CLI path instead (default is single-shot)")
+
     a = ap.parse_args()
 
-    singleshot = not a.agentic
     if a.arm not in mb.ARMS:
         ap.error("unknown arm %r; known: %s" % (a.arm, ",".join(sorted(mb.ARMS))))
     by_id = {t["id"]: t for t in mb.TASKS}
@@ -62,7 +60,7 @@ def main():
     # The header is the regime record. harness/diag/check_regimes.py reads it.
     print("BLACKWELL arm re-measurement | arm=%s | tasks=%s | n=%d/cell | %d calls"
           % (a.arm, [t["id"] for t in tasks], a.runs, len(tasks) * a.runs))
-    print("  model = %s%s" % (a.model, "  [SINGLE-SHOT]" if singleshot else ""))
+    print("  model = %s  [HTTP-API]" % a.model)
     print("  prompt = published (measure_blackwell.run_one), no added instruction suffix")
     sys.stdout.flush()
 
@@ -70,7 +68,7 @@ def main():
     for t in tasks:
         t0 = time.time()
         with cf.ThreadPoolExecutor(max_workers=a.workers) as ex:
-            futs = [ex.submit(mb.run_one, t, a.arm, False, i, a.model, singleshot)
+            futs = [ex.submit(mb.run_one, t, a.arm, False, i, a.model)
                     for i in range(a.runs)]
             rows = []
             for f in cf.as_completed(futs):
@@ -87,7 +85,7 @@ def main():
         sys.stdout.flush()
 
     out = {"counts": counts, "model": a.model,
-           "regime": "cli-singleshot" if singleshot else "cli-agentic",
+           "regime": "http-api",
            "prompt": "published", "n_per_cell": a.runs,
            "transport_errors": errs, "total_cost_usd": round(cost, 6)}
     with open(a.out, "w", encoding="utf-8") as f:

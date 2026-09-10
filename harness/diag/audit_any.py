@@ -44,11 +44,6 @@ def build_neutral(task):
 SUFFIX = {
     # measure_blackwell.run_one, non-Anthropic branch
     "azure": " Return ONLY the raw Python file content, no markdown fences, no prose.",
-    # measure_blackwell.run_one, singleshot branch
-    "cli": (" Return ONLY the raw Python file content, no markdown fences, no prose, "
-            "and do NOT use any tools or write any files."),
-    # NOT a paper-1 regime: paper 1 ran GPT-5.5 as a single-shot Azure completion
-    "codex": " Return ONLY the raw Python file content, no markdown fences, no prose.",
 }
 
 
@@ -58,54 +53,10 @@ IMPORT_CLAUSE = (" Write a standalone module that begins with an absolute `impor
 
 def complete(kind, model, prompt, wd):
     """Return (raw_text, out_tokens). Raises on a transport failure."""
-    if kind == "cli":
-        cmd = mb.claude_cmd(["-p", " ".join(prompt.split()), "--model", model,
-                             "--output-format", "json", "--max-turns", "1",
-                             "--dangerously-skip-permissions"])
-        r = subprocess.run(cmd, cwd=str(wd), capture_output=True, text=True,
-                           encoding="utf-8", timeout=240)
-        lines = (r.stdout or "").strip().splitlines()
-        if not lines:
-            raise RuntimeError("empty cli stdout")
-        out = json.loads(lines[-1])
-        toks = (out.get("usage", {}) or {}).get("output_tokens", 0)
-        if out.get("is_error") or (not out.get("result") and toks == 0):
-            raise RuntimeError("cli error/empty result")
-        served = ",".join((out.get("modelUsage") or {}).keys()) or model
-        return out.get("result", "") or "", toks, served
     if kind == "azure":
         text, toks = mb._azure_complete(prompt, model)
         return text, toks, model      # Azure echoes the deployment name we asked for
-    if kind == "codex":
-        exe = shutil.which("codex") or "codex"
-        argv = [exe, "exec", "--skip-git-repo-check"]
-        if model and model != "default":
-            argv += ["--model", model]        # never rely on the CLI default
-        argv += [" ".join(prompt.split())]
-        if os.name == "nt" and exe.lower().endswith((".cmd", ".bat")):
-            argv = [os.environ.get("COMSPEC", "cmd.exe"), "/c"] + argv
-        # Popen + tree kill: a plain subprocess.run timeout only reaps cmd.exe and
-        # leaves codex/node holding the pipe, which wedges the worker indefinitely.
-        pr = subprocess.Popen(argv, cwd=str(wd), stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE, text=True, encoding="utf-8")
-        try:
-            txt, err = pr.communicate(timeout=300)
-        except subprocess.TimeoutExpired:
-            if os.name == "nt":
-                subprocess.run(["taskkill", "/PID", str(pr.pid), "/T", "/F"],
-                               capture_output=True)
-            else:
-                pr.kill()
-            try:
-                pr.communicate(timeout=15)
-            except Exception:
-                pass
-            raise RuntimeError("codex timed out after 300s; process tree killed")
-        if not (txt or "").strip():
-            raise RuntimeError("empty codex stdout: " + (err or "")[:120])
-        return txt, 0, model
-    raise ValueError("unknown kind " + kind)
-
+    raise RuntimeError("unknown kind %r; only azure is supported" % kind)
 
 def one(kind, model, task, neutral, arm, i, import_instruction=False):
     wd = Path(tempfile.mkdtemp(prefix="bwaudit_"))
@@ -160,7 +111,8 @@ def one(kind, model, task, neutral, arm, i, import_instruction=False):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--kind", required=True, choices=["cli", "azure", "codex"])
+    ap.add_argument("--kind", default="azure", choices=["azure"],
+                    help="HTTP completion; the only supported transport")
     ap.add_argument("--model", required=True)
     ap.add_argument("--label", default=None, help="file-safe name for outputs")
     ap.add_argument("--task", required=True)

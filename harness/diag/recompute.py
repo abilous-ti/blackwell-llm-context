@@ -12,7 +12,7 @@ import sys, io, json, os
 # it is collected -- a bug this cost three separate debugging rounds.
 if __name__ == "__main__":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-ROOT = r"C:\Users\AndriyBilous\Documents\GitHub\blackwell-llm-context"
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "harness"))
 from measure_blackwell import clopper_pearson, certify_harm  # noqa: E402
 
