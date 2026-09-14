@@ -137,6 +137,17 @@ pip install sentence-transformers && python harness/measure_dense_trap.py
 
 ## Scope of the numbers
 
+**Which fields are the analysis inputs.** Every published number is computed from the `counts`
+field of the run files named in the manifest mapping, with the one declared substitution (both
+GPT-5.5 `trap_store_wire` conditions from `audit/audit_gpt55_trap_store_wire_summary.json`),
+by `harness/diag/recompute.py`. The run files also carry derived fields written at measurement
+time -- `interference`, `estimator`, `dominance`, `certificate_incomparable` -- some of which
+use the older four-term statistic (see the note on Psi above) or a per-model rather than
+joint confidence budget. Those are historical outputs of the harness at the time of the run,
+not inputs to the manuscript, and a matching manifest hash certifies a file's integrity, not
+that every derived field in it belongs to the current analysis. `recompute.py` is the
+authoritative path from `counts` to what is printed.
+
 Verification parameters match the paper: η = 0.10, exact Clopper–Pearson intervals at union-bound
 level over the battery, τ = 0.30 for harm. A transport failure is not a model answer: failed draws
 are retried, and any that still fail are excluded from the sample rather than scored as PASS = 0,
