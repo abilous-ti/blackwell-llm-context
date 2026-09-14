@@ -149,13 +149,17 @@ that every derived field in it belongs to the current analysis. `recompute.py` i
 authoritative path from `counts` to what is printed.
 
 Verification parameters match the paper: η = 0.10, exact Clopper–Pearson intervals at union-bound
-level over the battery, τ = 0.30 for harm. A transport failure is not a model answer: failed draws
-are retried, and any that still fail are excluded from the sample rather than scored as PASS = 0,
-with the harness refusing to certify a cell left below the requested n. Every published run records
-zero transport errors. The one cell that resisted re-measurement for a while, GPT-5.5's
-`trap_store_wire`, was re-run after a GPT-5.5 deployment became available; both its `W1` and `W2`
-conditions are read from that clean re-measurement, which reproduces the published grid exactly
-(`results/audit/audit_gpt55_*`).
+level over the battery, τ = 0.30 for harm. A transport failure is not a model answer: the HTTP
+client makes up to three attempts (180-second timeout per attempt, delays of 2 s and 4 s) when the
+request or response parsing raises, and a draw whose attempts are exhausted is marked with an error
+and excluded from the sample rather than scored as PASS = 0. A returned payload is not retried on
+content: empty text goes to extraction and verification like any other reply. By default the
+driver refuses to certify a cell left below the requested n; `--allow-incomplete` overrides that
+and certifies on the reduced denominators. Every published number is computed from transport-clean
+draws. The one base-run cell that logged an outage, GPT-5.5 `W2|trap_store_wire` (HTTP 500 after
+retries), resisted re-measurement until a GPT-5.5 deployment became available; both its `W1` and
+`W2` conditions are then read from that clean re-measurement, which reproduces the published grid
+exactly (`results/audit/audit_gpt55_*`), and the manifest records the substitution.
 
 The verifier runs model-generated code in a subprocess with a minimal environment carrying no
 provider credentials. It does not grade on the exit status: the checks run inside a
