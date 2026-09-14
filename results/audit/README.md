@@ -15,9 +15,10 @@ the phenomenon reproduces, not whether the published proportions replicate exact
 
 | Label | Backend | Note |
 |---|---|---|
-| `haiku`, `sonnet`, `opus` | Anthropic CLI, single-shot | same regime as the paper |
-| `deepseek`, `kimi` | Azure chat completions | same regime as the paper |
-| `gpt55-codex` | Codex CLI (`--model gpt-5.5`) | **agentic**, not the paper's single-shot Azure regime; no GPT deployment was available |
+| `haiku`, `sonnet`, `opus` | Anthropic CLI, single-shot | superseded command-line regime; the paper's Anthropic rows are read from the HTTP runs with retention in `results/retain_api/`, and these files enter only the drift comparison |
+| `deepseek`, `kimi` | Azure chat completions | same HTTP regime as the paper; fresh draws used for the drift comparison, not for any published number |
+| `gpt55` | Azure Responses (`gpt-5.5`), `kind: azure` | same HTTP regime as the paper; the source of the published GPT-5.5 `trap_store_wire` cells (both arms) and of the eight-entry reproduction check in the paper's Appendix D |
+| `gpt55-codex` | Codex CLI (`--model gpt-5.5`) | **agentic**, not the paper's single-shot Azure regime; recorded before a GPT deployment was available; not used by the paper |
 | `gpt-6-astra-codex` | Codex CLI default model | **not in the paper roster**; generality evidence only |
 | `gpt54mini-codex` | Codex CLI (`--model gpt-5.4-mini`) | **not in the paper roster**; generality evidence only |
 

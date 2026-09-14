@@ -54,7 +54,7 @@ why each cell was re-measured.
 
 | File | Bytes | SHA-256 |
 |---|---|---|
-| `audit/README.md` | 1503 | `9982ca3379a28e0988b255bc33625e3bc553202c8c8545a5b136b1cf99ed553f` |
+| `audit/README.md` | 2000 | `adfd65fc7d787712530c40c21df4a3ab9bc8e0b1fa13cf45fd441328023a8516` |
 | `audit/audit_deepseek_api_argorder_W1.json` | 27942 | `d81a1e1f4eb15a81e478e819a717f36b599a9a744fa45eb59e002dd315d93900` |
 | `audit/audit_deepseek_api_argorder_W1plus.json` | 72336 | `61da35095023c48d39da0cf016568cb911cb64c88a153eb08af57f2caa5c3591` |
 | `audit/audit_deepseek_api_argorder_W2.json` | 73977 | `037bc4489a5a15714258539f8671dbc0e5d399e4bec5b081dd450cb9eba72c64` |
