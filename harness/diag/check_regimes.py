@@ -35,6 +35,14 @@ REGIME = {
     "blackwell_sonnet_ss_n40":       ("cli-singleshot", "SUPERSEDED by the API run"),
     "blackwell_opus_ss_n40":         ("cli-singleshot", "SUPERSEDED by the API run"),
     "blackwell_gpt55_n40":           ("http-api", "azure responses launcher"),
+    # controls, second pair and the reranker probe, all over the same HTTP path
+    "blackwell_controls_api_n40":    ("http-api", "anthropic messages launcher"),
+    "blackwell_pair2_api_n40":       ("http-api", "anthropic messages launcher"),
+    "reranker_trap_api_n100":        ("http-api", "measure_reranker_trap.py via _azure_complete"),
+    # retention re-measurements under results/audit/: the summary file records the backend
+    "audit_gpt55_*":                 ("http-api", "audit summaries, kind azure"),
+    "audit_opus_api_post_ok_W1plus": ("cli-singleshot", "audit summary, kind cli"),
+    "audit_deepseek_api_post_ok_W1": ("http-api", "audit summary, kind azure"),
     "blackwell_deepseek_n40":        ("http-api", "azure chat launcher"),
     "blackwell_kimi_n40":            ("http-api", "openai-compatible chat launcher"),
     # arm-only re-measurements, re-run by harness/diag/rerun_arm.py with run logs
@@ -80,6 +88,19 @@ def derive_regime(stem):
         return "local", "scored offline from open weights; no run log by design"
     if stem.startswith("reranker_trap"):
         return claimed, REGIME[stem][1]   # driven by its own script; its invocation is the evidence
+    if stem.startswith("audit_"):
+        # results/audit/<label>_<task>_summary.json carries the backend the draws came through
+        import glob, json
+        base = stem[:-1] if stem.endswith("*") else re.sub(r"_(W1plus|W1|W2)$", "", stem)
+        files = sorted(glob.glob(os.path.join(RESULTS, "audit", base + "*_summary.json")))
+        if not files:
+            return None, "no summary file under results/audit/ for %s" % stem
+        kinds = {json.load(open(f, encoding="utf-8")).get("kind") for f in files}
+        if kinds == {"azure"}:
+            return "http-api", "%d audit summaries record kind=azure" % len(files)
+        if kinds == {"cli"}:
+            return "cli-singleshot", "audit summary records kind=cli"
+        return None, "audit summaries disagree or lack kind: %s" % sorted(map(str, kinds))
     p = os.path.join(RESULTS, stem + ".log")
     if not os.path.exists(p):
         return None, "no log at results/%s.log" % stem
