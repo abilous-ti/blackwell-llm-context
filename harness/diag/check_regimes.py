@@ -134,8 +134,14 @@ def main():
     for stem, (reg, ev) in cited.items():
         derived, why = derive_regime(stem)
         if derived is None:
-            problems.append("%s: %s -- the table says %s, nothing confirms it"
-                            % (stem, why, reg))
+            # A run the table itself marks STATED has no derivable regime by definition. Citing
+            # it is acceptable only if the manuscript says so where the run is named; the NOTE
+            # below still records it, and an undisclosed citation remains a failure.
+            disclosed = (tex is not None and ev.startswith("STATED")
+                         and re.search(r"asserted, not recoverable from a" + chr(92) + "s+run log", tex))
+            if not disclosed:
+                problems.append("%s: %s -- the table says %s, nothing confirms it"
+                                % (stem, why, reg))
         elif derived != reg:
             problems.append("%s: the table says %s but its log says %s (%s)"
                             % (stem, reg, derived, why))

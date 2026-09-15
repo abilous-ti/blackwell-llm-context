@@ -103,6 +103,14 @@ def endpoints():
         for lvl in (ETA, ETA / 2, ETA / 3):        # one-sided, two-sided-via-95%, 3-contrast budget
             out.append((cp(kA, nA, lvl)[0] - cp(kB, nB, lvl)[1], "lower"))
             out.append((cp(kA, nA, lvl)[1] - cp(kB, nB, lvl)[0], "upper"))
+    # the six-model harm contrasts are quoted in prose at the marginal level and under the joint
+    # twelve-contrast budget (the DeepSeek argument-order bound is the one that misses -tau there)
+    for lab in counts:
+        for t in ("api_post_ok", "api_argorder"):
+            (kA, nA), (kB, nB) = counts[lab]["W1plus|" + t], counts[lab]["W1|" + t]
+            for lvl in (ETA, ETA / 12):
+                out.append((cp(kA, nA, lvl)[0] - cp(kB, nB, lvl)[1], "lower"))
+                out.append((cp(kA, nA, lvl)[1] - cp(kB, nB, lvl)[0], "upper"))
     return out
 
 
