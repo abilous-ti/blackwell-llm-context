@@ -1,0 +1,296 @@
+{
+ "versions_by_commit": {
+  "65e6843": {
+   "TASKS": "80f3abb562",
+   "_LEDGER_STUB": "adb32ca3c1",
+   "W1": "9b94e64820",
+   "W2": "d4ead9d17e",
+   "W1plus": "a5fe43fd44",
+   "_extract_code": "020b10d3ac",
+   "verify_in": "5187cc1591",
+   "run_one HTTP prompt": "d313e4e8ed"
+  },
+  "5a5dbcc": {
+   "TASKS": "80f3abb562",
+   "_LEDGER_STUB": "adb32ca3c1",
+   "W1": "9b94e64820",
+   "W2": "d4ead9d17e",
+   "W1plus": "a5fe43fd44",
+   "_extract_code": "020b10d3ac",
+   "verify_in": "5187cc1591",
+   "run_one HTTP prompt": "d313e4e8ed"
+  },
+  "HEAD": {
+   "TASKS": "80f3abb562",
+   "_LEDGER_STUB": "adb32ca3c1",
+   "W1": "9b94e64820",
+   "W2": "d4ead9d17e",
+   "W1plus": "a5fe43fd44",
+   "_extract_code": "020b10d3ac",
+   "verify_in": "5339252099",
+   "run_one HTTP prompt": "d313e4e8ed"
+  }
+ },
+ "records": [
+  {
+   "record": "Haiku-4.5 grid",
+   "file": "results/blackwell_haiku_api_n40.json",
+   "requested_model": "claude-haiku-4-5",
+   "interface": "Anthropic Messages API (HTTP)",
+   "harness_commit": "5a5dbcc",
+   "request_settings": "one user message; max tokens 8000; temperature, top-p and seed not set (provider defaults); prompt suffix 'Return ONLY the raw Python file content, no markdown fences, no prose.'",
+   "log_markers": [
+    "[HTTP-API]",
+    "[RETAIN]"
+   ],
+   "execution_order_recorded": "cell completion order printed in the log (16 cells); arm-major: True",
+   "execution_order_inferred": "all draws of one arm-task cell before the next (driver loop); within a cell, one after another (--workers 1, the default) or concurrently (--workers > 1)",
+   "concurrency": "not established: the worker count was not recorded",
+   "collection_time": "not recorded; record existed by 5a5dbcc 2026-09-09 21:50:14 +0300 (first added 97fc399 2026-09-09 17:54:08 +0300)",
+   "retained": [
+    "per-cell counts",
+    "per-draw PASS by draw index (not by time)",
+    "per-draw transport-error flags",
+    "mean output tokens per cell",
+    "raw reply text of all 640 draws (results/retain_api/haiku)"
+   ],
+   "unavailable": [
+    "request start and end times",
+    "order of draws inside a cell",
+    "worker count",
+    "served model identifier or snapshot",
+    "provider request identifiers",
+    "input token counts",
+    "sampling seed (none was set)"
+   ]
+  },
+  {
+   "record": "Sonnet-4.6 grid",
+   "file": "results/blackwell_sonnet_api_n40.json",
+   "requested_model": "claude-sonnet-4-6",
+   "interface": "Anthropic Messages API (HTTP)",
+   "harness_commit": "5a5dbcc",
+   "request_settings": "one user message; max tokens 8000; temperature, top-p and seed not set (provider defaults); prompt suffix 'Return ONLY the raw Python file content, no markdown fences, no prose.'",
+   "log_markers": [
+    "[HTTP-API]",
+    "[RETAIN]"
+   ],
+   "execution_order_recorded": "cell completion order printed in the log (16 cells); arm-major: True",
+   "execution_order_inferred": "all draws of one arm-task cell before the next (driver loop); within a cell, one after another (--workers 1, the default) or concurrently (--workers > 1)",
+   "concurrency": "not established: the worker count was not recorded",
+   "collection_time": "not recorded; record existed by 5a5dbcc 2026-09-09 21:50:14 +0300 (first added 97fc399 2026-09-09 17:54:08 +0300)",
+   "retained": [
+    "per-cell counts",
+    "per-draw PASS by draw index (not by time)",
+    "per-draw transport-error flags",
+    "mean output tokens per cell",
+    "raw reply text of all 640 draws (results/retain_api/sonnet)"
+   ],
+   "unavailable": [
+    "request start and end times",
+    "order of draws inside a cell",
+    "worker count",
+    "served model identifier or snapshot",
+    "provider request identifiers",
+    "input token counts",
+    "sampling seed (none was set)"
+   ]
+  },
+  {
+   "record": "Opus-4.8 grid",
+   "file": "results/blackwell_opus_api_n40.json",
+   "requested_model": "claude-opus-4-8",
+   "interface": "Anthropic Messages API (HTTP)",
+   "harness_commit": "5a5dbcc",
+   "request_settings": "one user message; max tokens 8000; temperature, top-p and seed not set (provider defaults); prompt suffix 'Return ONLY the raw Python file content, no markdown fences, no prose.'",
+   "log_markers": [
+    "[HTTP-API]",
+    "[RETAIN]"
+   ],
+   "execution_order_recorded": "cell completion order printed in the log (16 cells); arm-major: True",
+   "execution_order_inferred": "all draws of one arm-task cell before the next (driver loop); within a cell, one after another (--workers 1, the default) or concurrently (--workers > 1)",
+   "concurrency": "not established: the worker count was not recorded",
+   "collection_time": "not recorded; record existed by 5a5dbcc 2026-09-09 21:50:14 +0300 (first added 97fc399 2026-09-09 17:54:08 +0300)",
+   "retained": [
+    "per-cell counts",
+    "per-draw PASS by draw index (not by time)",
+    "per-draw transport-error flags",
+    "mean output tokens per cell",
+    "raw reply text of all 640 draws (results/retain_api/opus)"
+   ],
+   "unavailable": [
+    "request start and end times",
+    "order of draws inside a cell",
+    "worker count",
+    "served model identifier or snapshot",
+    "provider request identifiers",
+    "input token counts",
+    "sampling seed (none was set)"
+   ]
+  },
+  {
+   "record": "GPT-5.5 grid",
+   "file": "results/blackwell_gpt55_n40.json",
+   "requested_model": "gpt-5.5",
+   "interface": "Azure-hosted endpoint, generic client (URL not logged)",
+   "harness_commit": "65e6843",
+   "request_settings": "one user message; max tokens 8000; temperature, top-p and seed not set (provider defaults); prompt suffix 'Return ONLY the raw Python file content, no markdown fences, no prose.'",
+   "log_markers": [],
+   "execution_order_recorded": "cell completion order printed in the log (16 cells); arm-major: True",
+   "execution_order_inferred": "all draws of one arm-task cell before the next (driver loop); within a cell, one after another (--workers 1, the default) or concurrently (--workers > 1)",
+   "concurrency": "not established: the worker count was not recorded",
+   "collection_time": "not recorded; record existed by 65e6843 2026-07-03 11:34:30 +0300 (first added 65e6843 2026-07-03 11:34:30 +0300)",
+   "retained": [
+    "per-cell counts",
+    "mean output tokens per cell"
+   ],
+   "unavailable": [
+    "request start and end times",
+    "order of draws inside a cell",
+    "worker count",
+    "served model identifier or snapshot",
+    "provider request identifiers",
+    "input token counts",
+    "sampling seed (none was set)"
+   ]
+  },
+  {
+   "record": "DeepSeek-V4-Pro grid",
+   "file": "results/blackwell_deepseek_n40.json",
+   "requested_model": "DeepSeek-V4-Pro",
+   "interface": "Azure-hosted endpoint, generic client (URL not logged)",
+   "harness_commit": "65e6843",
+   "request_settings": "one user message; max tokens 8000; temperature, top-p and seed not set (provider defaults); prompt suffix 'Return ONLY the raw Python file content, no markdown fences, no prose.'",
+   "log_markers": [],
+   "execution_order_recorded": "cell completion order printed in the log (16 cells); arm-major: True",
+   "execution_order_inferred": "all draws of one arm-task cell before the next (driver loop); within a cell, one after another (--workers 1, the default) or concurrently (--workers > 1)",
+   "concurrency": "not established: the worker count was not recorded",
+   "collection_time": "not recorded; record existed by 65e6843 2026-07-03 11:34:30 +0300 (first added 65e6843 2026-07-03 11:34:30 +0300)",
+   "retained": [
+    "per-cell counts",
+    "mean output tokens per cell"
+   ],
+   "unavailable": [
+    "request start and end times",
+    "order of draws inside a cell",
+    "worker count",
+    "served model identifier or snapshot",
+    "provider request identifiers",
+    "input token counts",
+    "sampling seed (none was set)"
+   ]
+  },
+  {
+   "record": "Kimi-K2.6 grid",
+   "file": "results/blackwell_kimi_n40.json",
+   "requested_model": "Kimi-K2.6",
+   "interface": "Azure-hosted endpoint, generic client (URL not logged)",
+   "harness_commit": "65e6843",
+   "request_settings": "one user message; max tokens 8000; temperature, top-p and seed not set (provider defaults); prompt suffix 'Return ONLY the raw Python file content, no markdown fences, no prose.'",
+   "log_markers": [],
+   "execution_order_recorded": "cell completion order printed in the log (16 cells); arm-major: True",
+   "execution_order_inferred": "all draws of one arm-task cell before the next (driver loop); within a cell, one after another (--workers 1, the default) or concurrently (--workers > 1)",
+   "concurrency": "not established: the worker count was not recorded",
+   "collection_time": "not recorded; record existed by 65e6843 2026-07-03 11:34:30 +0300 (first added 65e6843 2026-07-03 11:34:30 +0300)",
+   "retained": [
+    "per-cell counts",
+    "mean output tokens per cell"
+   ],
+   "unavailable": [
+    "request start and end times",
+    "order of draws inside a cell",
+    "worker count",
+    "served model identifier or snapshot",
+    "provider request identifiers",
+    "input token counts",
+    "sampling seed (none was set)"
+   ]
+  },
+  {
+   "record": "Haiku controls",
+   "file": "results/blackwell_controls_api_n40.json",
+   "requested_model": "claude-haiku-4-5",
+   "interface": "Anthropic Messages API (HTTP)",
+   "harness_commit": "5a5dbcc",
+   "request_settings": "one user message; max tokens 8000; temperature, top-p and seed not set (provider defaults); prompt suffix 'Return ONLY the raw Python file content, no markdown fences, no prose.'",
+   "log_markers": [
+    "[HTTP-API]",
+    "[RETAIN]"
+   ],
+   "execution_order_recorded": "cell completion order printed in the log (16 cells); arm-major: True",
+   "execution_order_inferred": "all draws of one arm-task cell before the next (driver loop); within a cell, one after another (--workers 1, the default) or concurrently (--workers > 1)",
+   "concurrency": "not established: the worker count was not recorded",
+   "collection_time": "not recorded; record existed by 5a5dbcc 2026-09-09 21:50:14 +0300 (first added 5a5dbcc 2026-09-09 21:50:14 +0300)",
+   "retained": [
+    "per-cell counts",
+    "per-draw PASS by draw index (not by time)",
+    "per-draw transport-error flags",
+    "mean output tokens per cell"
+   ],
+   "unavailable": [
+    "request start and end times",
+    "order of draws inside a cell",
+    "worker count",
+    "served model identifier or snapshot",
+    "provider request identifiers",
+    "input token counts",
+    "sampling seed (none was set)"
+   ]
+  },
+  {
+   "record": "Haiku second pair",
+   "file": "results/blackwell_pair2_api_n40.json",
+   "requested_model": "claude-haiku-4-5",
+   "interface": "Anthropic Messages API (HTTP)",
+   "harness_commit": "5a5dbcc",
+   "request_settings": "one user message; max tokens 8000; temperature, top-p and seed not set (provider defaults); prompt suffix 'Return ONLY the raw Python file content, no markdown fences, no prose.'",
+   "log_markers": [
+    "[HTTP-API]",
+    "[RETAIN]"
+   ],
+   "execution_order_recorded": "cell completion order printed in the log (12 cells); arm-major: True",
+   "execution_order_inferred": "all draws of one arm-task cell before the next (driver loop); within a cell, one after another (--workers 1, the default) or concurrently (--workers > 1)",
+   "concurrency": "not established: the worker count was not recorded",
+   "collection_time": "not recorded; record existed by 5a5dbcc 2026-09-09 21:50:14 +0300 (first added 5a5dbcc 2026-09-09 21:50:14 +0300)",
+   "retained": [
+    "per-cell counts",
+    "per-draw PASS by draw index (not by time)",
+    "per-draw transport-error flags",
+    "mean output tokens per cell"
+   ],
+   "unavailable": [
+    "request start and end times",
+    "order of draws inside a cell",
+    "worker count",
+    "served model identifier or snapshot",
+    "provider request identifiers",
+    "input token counts",
+    "sampling seed (none was set)"
+   ]
+  },
+  {
+   "record": "GPT-5.5 trap cells (substitution)",
+   "file": "results/audit/audit_gpt55_trap_store_wire_*.json",
+   "requested_model": "gpt-5.5",
+   "interface": "Azure-hosted endpoint, generic client",
+   "harness_commit": "audit driver harness/diag/audit_any.py (Azure path the same in every version up to 2ed070e, which added the record)",
+   "request_settings": "as above, except that the prompt was sent without whitespace normalization: it keeps the blank line between source and task, and the line breaks of the texts, that the grid prompt collapses to spaces",
+   "log_markers": [],
+   "execution_order_recorded": "none",
+   "execution_order_inferred": "one condition after the other; within a condition, up to --workers concurrent requests (default 3)",
+   "concurrency": "not established: the worker count was not recorded",
+   "collection_time": "not recorded; record existed by 2ed070e 2026-09-08 23:00:07 +0300",
+   "retained": [
+    "per-draw raw reply, extracted code and verifier stderr",
+    "a model_served field the audit script filled with the requested deployment name ([('gpt-5.5', 'gpt-5.5')]); it is not a value returned by the endpoint"
+   ],
+   "unavailable": [
+    "request times",
+    "worker count",
+    "any model field returned by the endpoint",
+    "provider request identifiers",
+    "sampling seed (none set)"
+   ]
+  }
+ ]
+}

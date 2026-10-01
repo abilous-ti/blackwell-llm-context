@@ -1,0 +1,138 @@
+{
+  "status": "frozen",
+  "status_note": "freeze.py sets status, frozen_at_utc and harness_commit and writes FREEZE.json with the SHA-256 of this file, of the schedule and of every code file; run_replication.py refuses a live window, and analyze.py a final status, unless freeze.verify passes. It refuses to freeze without window boundaries, interruption rules, a schedule within the call budget, committed code, or if records exist.",
+  "purpose": "Live plumbing check on one model; not part of the replication.",
+  "frozen_at_utc": "2026-10-01T07:39:51+00:00",
+  "harness_commit": "70e33b0f14155e4994b62e5f393ae2b9171868e0",
+  "models": [
+    {
+      "label": "GPT-5.5",
+      "id": "gpt-5.5",
+      "endpoint_env": "BW_ENDPOINT_GPT55",
+      "key_env": "BW_KEY_GPT55"
+    }
+  ],
+  "cells": {
+    "api_post_ok": [
+      "W1",
+      "W2",
+      "W1plus"
+    ],
+    "enc_amount": [
+      "W1",
+      "W2"
+    ],
+    "api_argorder": [
+      "none",
+      "W1",
+      "W1plus"
+    ]
+  },
+  "contrasts": [
+    {
+      "id": "A1",
+      "task": "api_post_ok",
+      "a": "W1",
+      "b": "W2",
+      "direction": 1,
+      "claim": "W1 advantage on the API cell"
+    },
+    {
+      "id": "A2",
+      "task": "enc_amount",
+      "a": "W2",
+      "b": "W1",
+      "direction": 1,
+      "claim": "W2 advantage on the encoding cell"
+    },
+    {
+      "id": "H1",
+      "task": "api_post_ok",
+      "a": "W1plus",
+      "b": "W1",
+      "direction": -1,
+      "claim": "superset harm on api_post_ok"
+    },
+    {
+      "id": "H2",
+      "task": "api_argorder",
+      "a": "W1plus",
+      "b": "W1",
+      "direction": -1,
+      "claim": "superset harm on api_argorder"
+    }
+  ],
+  "windows": [
+    {
+      "id": "smoke",
+      "start": "2026-10-01T07:38:51+00:00",
+      "end": "2026-10-01T08:24:51+00:00"
+    }
+  ],
+  "blocks_per_window": 2,
+  "scheduler_seed": 20260929,
+  "max_in_flight_per_model": 2,
+  "max_in_flight_note": "Lane j of a model takes the blocks whose position in the window is j modulo this number, so the requests of one block stay back to back; the six models run in parallel. Two lanes because the retained re-measurements give Kimi-K2.6 a mean of about 2,550 output tokens per request (median 1,747, maximum 8,000): 320 requests in five hours would need about 45 tokens/s sustained with one lane, about 23 with two.",
+  "budget": {
+    "max_api_calls": 48,
+    "min_retry_headroom_fraction": 0.05,
+    "counts": "every attempt, retries included, across all windows; a request issued without a saved response counts as max_attempts",
+    "note": "Raised from 8,192 to fit 40 blocks per window: 11,520 requests leave 768 calls (6.25%) for retries."
+  },
+  "request": {
+    "max_tokens": 8000,
+    "temperature": null,
+    "top_p": null,
+    "sampling_seed": null,
+    "system_prompt": null,
+    "prompt_suffix": " Return ONLY the raw Python file content, no markdown fences, no prose.",
+    "endpoints": "each model's endpoint and key come from its own environment variables; there is no shared fallback; the endpoint is recorded as its provider domain with the resource name hashed, never with the key",
+    "note": "Identical to the published harness: nothing but the model name, one user message and the output-token limit is sent."
+  },
+  "retry_policy": {
+    "max_attempts": 3,
+    "halt_after_consecutive_failures": 3,
+    "backoff_seconds": [
+      2,
+      4
+    ],
+    "retry_on": [
+      "transport exception",
+      "HTTP error status",
+      "response that cannot be parsed"
+    ],
+    "never_retry_on": [
+      "verifier failure",
+      "refusal",
+      "empty or off-task text"
+    ],
+    "exhausted": "recorded as a missing observation ('failed'), never as a failed draw, and never requested again",
+    "halt": "after 3 consecutive failed requests a model stops for the rest of the run, so a dead endpoint or wrong key cannot spend the budget; the window stays open to be fixed and resumed before its end"
+  },
+  "interruption_rules": [
+    "A window's requests are issued only from its start to its end; no request is issued at or after the end (the retries of a request issued before the end may finish after it), and a run is started or resumed only inside its window.",
+    "Each scheduled request is issued at most once. Its response is saved before it is graded; a saved response is graded on resumption and never requested again.",
+    "A request issued but not saved because the run stopped in flight is 'interrupted', and one whose transport attempts are exhausted is 'failed'; both are missing observations and neither is requested again.",
+    "Requests not issued by the end of their window are 'not collected'; they are never carried into another window, and the window is closed with --close after its end.",
+    "Every attempt, retries included, counts against the global call budget. Once it is spent, no attempt is made in any window, and every remaining window is closed with --close.",
+    "A model whose last 3 requests all failed in transport is halted for the rest of the run; its failed requests are not requested again, and the window stays open so the endpoint can be fixed and the window resumed before its end.",
+    "A window lost as a whole (an outage, missing credentials) is closed, reported as missing and not replaced.",
+    "One run at a time per record directory, guarded by a lock file; after a crash the lock is deleted by hand once no run is active.",
+    "The analysis is final only when every planned window is closed, nothing is pending or ungraded, the records match the schedule and the design, and the freeze holds; until then every result is provisional."
+  ],
+  "grading": {
+    "primary": "published exit-status grader (harness commit 5a5dbcc), run in a credential-stripped environment",
+    "secondary": "current token grader (harness HEAD)",
+    "deviation": "The published grader inherited the parent environment, including provider keys; the replication strips it before running generated code."
+  },
+  "analysis": {
+    "family": "24 one-sided statements: 4 contrasts x 6 models",
+    "family_alpha": 0.05,
+    "per_statement_alpha": 0.0020833333333333333,
+    "harm_margin": 0.3,
+    "nested_harm_claims": "Each harm contrast is tested for any harm and for the 0.30 margin at the same level: the margin null contains the any-harm null, so the pair adds no multiplicity.",
+    "estimand": "window-averaged effect over the planned windows",
+    "primary_bound": "weighted Hoeffding for independent block differences in [-1, 1]: sqrt(2 ln(1/alpha) sum_w 1/B_w) / W over the W windows with complete blocks, B_w blocks in window w; no identical-distribution assumption",
+    "missing": "primary: complete blocks, averaged over the windows that hold them (planned windows without data are listed); sensitivity: every scheduled block of every planned window with each missing outcome imputed against the claim"
+  }
+}

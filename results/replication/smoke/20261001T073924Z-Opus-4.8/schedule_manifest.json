@@ -1,0 +1,12 @@
+{
+ "generated_utc": "2026-10-01T07:39:24+00:00",
+ "design_status": "frozen",
+ "scheduler_seed": 20260929,
+ "design_sha256": "a9b0486645d7b69502d30ac9bb655f268f38d92c238274db84bd1ac25439cf7a",
+ "schedule_file": "schedule.jsonl",
+ "schedule_sha256": "435d5e26b37d811dc2f276064ebbfb2e5b55c8c111249029770fdce15a6eb77d",
+ "n_requests": 16,
+ "n_windows": 1,
+ "n_models": 1,
+ "blocks_per_window": 2
+}

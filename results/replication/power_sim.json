@@ -1,0 +1,397 @@
+{
+ "alpha": 0.0020833333333333333,
+ "margin": 0.3,
+ "windows": 6,
+ "reps": 2000,
+ "blocks_per_window": [
+  24,
+  27,
+  30,
+  32,
+  40
+ ],
+ "call_budget": 12288,
+ "max_requests": 11673,
+ "designs": [
+  {
+   "blocks_per_window": 24,
+   "conditions": 8,
+   "n_per_condition": 144,
+   "requests": 6912,
+   "fits_budget": true
+  },
+  {
+   "blocks_per_window": 24,
+   "conditions": 7,
+   "n_per_condition": 144,
+   "requests": 6048,
+   "fits_budget": true
+  },
+  {
+   "blocks_per_window": 27,
+   "conditions": 8,
+   "n_per_condition": 162,
+   "requests": 7776,
+   "fits_budget": true
+  },
+  {
+   "blocks_per_window": 27,
+   "conditions": 7,
+   "n_per_condition": 162,
+   "requests": 6804,
+   "fits_budget": true
+  },
+  {
+   "blocks_per_window": 30,
+   "conditions": 8,
+   "n_per_condition": 180,
+   "requests": 8640,
+   "fits_budget": true
+  },
+  {
+   "blocks_per_window": 30,
+   "conditions": 7,
+   "n_per_condition": 180,
+   "requests": 7560,
+   "fits_budget": true
+  },
+  {
+   "blocks_per_window": 32,
+   "conditions": 8,
+   "n_per_condition": 192,
+   "requests": 9216,
+   "fits_budget": true
+  },
+  {
+   "blocks_per_window": 32,
+   "conditions": 7,
+   "n_per_condition": 192,
+   "requests": 8064,
+   "fits_budget": true
+  },
+  {
+   "blocks_per_window": 40,
+   "conditions": 8,
+   "n_per_condition": 240,
+   "requests": 11520,
+   "fits_budget": true
+  },
+  {
+   "blocks_per_window": 40,
+   "conditions": 7,
+   "n_per_condition": 240,
+   "requests": 10080,
+   "fits_budget": true
+  }
+ ],
+ "rows": [
+  {
+   "scenario": "harm, stark (1.00 -> 0.00)",
+   "setting": "stable",
+   "power": {
+    "24": 1.0,
+    "27": 1.0,
+    "30": 1.0,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "harm, stark (1.00 -> 0.00)",
+   "setting": "common drift",
+   "power": {
+    "24": 1.0,
+    "27": 1.0,
+    "30": 1.0,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "harm, stark (1.00 -> 0.00)",
+   "setting": "divergent drift",
+   "power": {
+    "24": 1.0,
+    "27": 1.0,
+    "30": 1.0,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "harm, stark (1.00 -> 0.00)",
+   "setting": "divergent, one window lost",
+   "power": {
+    "24": 1.0,
+    "27": 1.0,
+    "30": 1.0,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "harm, DeepSeek api_post_ok (0.75 -> 0.00)",
+   "setting": "stable",
+   "power": {
+    "24": 1.0,
+    "27": 1.0,
+    "30": 1.0,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "harm, DeepSeek api_post_ok (0.75 -> 0.00)",
+   "setting": "common drift",
+   "power": {
+    "24": 0.994,
+    "27": 0.9985,
+    "30": 0.999,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "harm, DeepSeek api_post_ok (0.75 -> 0.00)",
+   "setting": "divergent drift",
+   "power": {
+    "24": 0.9895,
+    "27": 0.994,
+    "30": 0.999,
+    "32": 0.9995,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "harm, DeepSeek api_post_ok (0.75 -> 0.00)",
+   "setting": "divergent, one window lost",
+   "power": {
+    "24": 0.9565,
+    "27": 0.9755,
+    "30": 0.989,
+    "32": 0.996,
+    "40": 0.999
+   }
+  },
+  {
+   "scenario": "harm, DeepSeek api_argorder (0.675 -> 0.05)",
+   "setting": "stable",
+   "power": {
+    "24": 0.775,
+    "27": 0.885,
+    "30": 0.945,
+    "32": 0.969,
+    "40": 0.9995
+   }
+  },
+  {
+   "scenario": "harm, DeepSeek api_argorder (0.675 -> 0.05)",
+   "setting": "common drift",
+   "power": {
+    "24": 0.6305,
+    "27": 0.7535,
+    "30": 0.8175,
+    "32": 0.884,
+    "40": 0.9605
+   }
+  },
+  {
+   "scenario": "harm, DeepSeek api_argorder (0.675 -> 0.05)",
+   "setting": "divergent drift",
+   "power": {
+    "24": 0.5855,
+    "27": 0.691,
+    "30": 0.768,
+    "32": 0.8355,
+    "40": 0.9335
+   }
+  },
+  {
+   "scenario": "harm, DeepSeek api_argorder (0.675 -> 0.05)",
+   "setting": "divergent, one window lost",
+   "power": {
+    "24": 0.42,
+    "27": 0.5175,
+    "30": 0.606,
+    "32": 0.6935,
+    "40": 0.852
+   }
+  },
+  {
+   "scenario": "harm, weaker (0.60 -> 0.10)",
+   "setting": "stable",
+   "power": {
+    "24": 0.023,
+    "27": 0.05,
+    "30": 0.0665,
+    "32": 0.098,
+    "40": 0.228
+   }
+  },
+  {
+   "scenario": "harm, weaker (0.60 -> 0.10)",
+   "setting": "common drift",
+   "power": {
+    "24": 0.022,
+    "27": 0.037,
+    "30": 0.062,
+    "32": 0.0855,
+    "40": 0.1995
+   }
+  },
+  {
+   "scenario": "harm, weaker (0.60 -> 0.10)",
+   "setting": "divergent drift",
+   "power": {
+    "24": 0.0345,
+    "27": 0.0535,
+    "30": 0.0785,
+    "32": 0.105,
+    "40": 0.216
+   }
+  },
+  {
+   "scenario": "harm, weaker (0.60 -> 0.10)",
+   "setting": "divergent, one window lost",
+   "power": {
+    "24": 0.0155,
+    "27": 0.0415,
+    "30": 0.041,
+    "32": 0.056,
+    "40": 0.131
+   }
+  },
+  {
+   "scenario": "advantage, stark (1.00 vs 0.00)",
+   "setting": "stable",
+   "power": {
+    "24": 1.0,
+    "27": 1.0,
+    "30": 1.0,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "advantage, stark (1.00 vs 0.00)",
+   "setting": "common drift",
+   "power": {
+    "24": 1.0,
+    "27": 1.0,
+    "30": 1.0,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "advantage, stark (1.00 vs 0.00)",
+   "setting": "divergent drift",
+   "power": {
+    "24": 1.0,
+    "27": 1.0,
+    "30": 1.0,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "advantage, stark (1.00 vs 0.00)",
+   "setting": "divergent, one window lost",
+   "power": {
+    "24": 1.0,
+    "27": 1.0,
+    "30": 1.0,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "advantage, Haiku encoding (0.55 vs 0.00)",
+   "setting": "stable",
+   "power": {
+    "24": 1.0,
+    "27": 1.0,
+    "30": 1.0,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "advantage, Haiku encoding (0.55 vs 0.00)",
+   "setting": "common drift",
+   "power": {
+    "24": 1.0,
+    "27": 1.0,
+    "30": 1.0,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "advantage, Haiku encoding (0.55 vs 0.00)",
+   "setting": "divergent drift",
+   "power": {
+    "24": 0.9995,
+    "27": 1.0,
+    "30": 1.0,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "advantage, Haiku encoding (0.55 vs 0.00)",
+   "setting": "divergent, one window lost",
+   "power": {
+    "24": 0.9985,
+    "27": 1.0,
+    "30": 0.999,
+    "32": 1.0,
+    "40": 1.0
+   }
+  },
+  {
+   "scenario": "advantage, weaker (0.40 vs 0.05)",
+   "setting": "stable",
+   "power": {
+    "24": 0.901,
+    "27": 0.966,
+    "30": 0.987,
+    "32": 0.9935,
+    "40": 0.9995
+   }
+  },
+  {
+   "scenario": "advantage, weaker (0.40 vs 0.05)",
+   "setting": "common drift",
+   "power": {
+    "24": 0.8255,
+    "27": 0.915,
+    "30": 0.9535,
+    "32": 0.9705,
+    "40": 0.9975
+   }
+  },
+  {
+   "scenario": "advantage, weaker (0.40 vs 0.05)",
+   "setting": "divergent drift",
+   "power": {
+    "24": 0.7985,
+    "27": 0.901,
+    "30": 0.924,
+    "32": 0.9525,
+    "40": 0.9885
+   }
+  },
+  {
+   "scenario": "advantage, weaker (0.40 vs 0.05)",
+   "setting": "divergent, one window lost",
+   "power": {
+    "24": 0.674,
+    "27": 0.773,
+    "30": 0.82,
+    "32": 0.8555,
+    "40": 0.9515
+   }
+  }
+ ]
+}

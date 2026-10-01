@@ -47,3 +47,6 @@ paper/
 
 # Artefact of a tar-based export test that resolved a Windows path variable literally.
 %SystemDrive%/
+
+# First replication pilot (30 Sep 2026): recorded before endpoint hashing, it names the Azure resource.
+results/replication/smoke/20260930T080346Z/

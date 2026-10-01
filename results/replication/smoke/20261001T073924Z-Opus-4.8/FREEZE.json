@@ -1,0 +1,21 @@
+{
+ "frozen_at_utc": "2026-10-01T07:39:24+00:00",
+ "harness_commit": "70e33b0f14155e4994b62e5f393ae2b9171868e0",
+ "design_file": "results/replication/smoke/20261001T073924Z-Opus-4.8/design.json",
+ "design_sha256": "a9b0486645d7b69502d30ac9bb655f268f38d92c238274db84bd1ac25439cf7a",
+ "schedule_file": "schedule.jsonl",
+ "schedule_sha256": "435d5e26b37d811dc2f276064ebbfb2e5b55c8c111249029770fdce15a6eb77d",
+ "n_requests": 16,
+ "call_budget": 48,
+ "code_sha256": {
+  "harness/measure_blackwell.py": "2c8502ccb22f0c896987870bd288e2f0f45de9c9a72c958f1e370a75388d98a8",
+  "harness/replication/transport.py": "caa2c1b7fb9174f4483ee1f80e2b1c4ea6e23e4f164215db1af96cf35646ec5c",
+  "harness/replication/grading.py": "54f40062b339f90f5e85b73098211e4def521a34a04c7890d683a8fd1b2503ce",
+  "harness/replication/records.py": "d25c8a2f6d58453f8a577483028b770a48064de37279f83272f457fe4dc044a8",
+  "harness/replication/run_replication.py": "f6ba8ac85ba9c3a16ea7626f6be6e733cf751c12f510b2170d495fc8c26e492e",
+  "harness/replication/make_schedule.py": "b322efaa1774180f276b4bbac87fb938b2de0a9f901775684a275ed65577aa26",
+  "harness/replication/stats.py": "0ebc41ddc7fdec9e5e894a27d1ec90987d746082b328b097c37c6107aed7fb4e",
+  "harness/replication/analyze.py": "92955294d7f955b2970c5e34cb127b9808f91e812180ca43d0bcfd14535d9dee",
+  "harness/replication/freeze.py": "ae305080f9517b9a1ea7f48b3c8a6591df4bdba396cddf07a36f9cc3e48260d2"
+ }
+}

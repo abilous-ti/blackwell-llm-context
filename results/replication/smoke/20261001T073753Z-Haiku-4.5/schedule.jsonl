@@ -1,0 +1,16 @@
+{"block": 0, "block_seq": 0, "condition": "W1plus", "model": "Haiku-4.5", "position": 0, "schedule_id": "smoke|Haiku-4.5|api_post_ok|000|W1plus", "seq_in_window": 0, "task": "api_post_ok", "window": "smoke"}
+{"block": 0, "block_seq": 0, "condition": "W2", "model": "Haiku-4.5", "position": 1, "schedule_id": "smoke|Haiku-4.5|api_post_ok|000|W2", "seq_in_window": 1, "task": "api_post_ok", "window": "smoke"}
+{"block": 0, "block_seq": 0, "condition": "W1", "model": "Haiku-4.5", "position": 2, "schedule_id": "smoke|Haiku-4.5|api_post_ok|000|W1", "seq_in_window": 2, "task": "api_post_ok", "window": "smoke"}
+{"block": 1, "block_seq": 1, "condition": "W1plus", "model": "Haiku-4.5", "position": 0, "schedule_id": "smoke|Haiku-4.5|api_post_ok|001|W1plus", "seq_in_window": 3, "task": "api_post_ok", "window": "smoke"}
+{"block": 1, "block_seq": 1, "condition": "W2", "model": "Haiku-4.5", "position": 1, "schedule_id": "smoke|Haiku-4.5|api_post_ok|001|W2", "seq_in_window": 4, "task": "api_post_ok", "window": "smoke"}
+{"block": 1, "block_seq": 1, "condition": "W1", "model": "Haiku-4.5", "position": 2, "schedule_id": "smoke|Haiku-4.5|api_post_ok|001|W1", "seq_in_window": 5, "task": "api_post_ok", "window": "smoke"}
+{"block": 1, "block_seq": 2, "condition": "W1plus", "model": "Haiku-4.5", "position": 0, "schedule_id": "smoke|Haiku-4.5|api_argorder|001|W1plus", "seq_in_window": 6, "task": "api_argorder", "window": "smoke"}
+{"block": 1, "block_seq": 2, "condition": "none", "model": "Haiku-4.5", "position": 1, "schedule_id": "smoke|Haiku-4.5|api_argorder|001|none", "seq_in_window": 7, "task": "api_argorder", "window": "smoke"}
+{"block": 1, "block_seq": 2, "condition": "W1", "model": "Haiku-4.5", "position": 2, "schedule_id": "smoke|Haiku-4.5|api_argorder|001|W1", "seq_in_window": 8, "task": "api_argorder", "window": "smoke"}
+{"block": 0, "block_seq": 3, "condition": "W2", "model": "Haiku-4.5", "position": 0, "schedule_id": "smoke|Haiku-4.5|enc_amount|000|W2", "seq_in_window": 9, "task": "enc_amount", "window": "smoke"}
+{"block": 0, "block_seq": 3, "condition": "W1", "model": "Haiku-4.5", "position": 1, "schedule_id": "smoke|Haiku-4.5|enc_amount|000|W1", "seq_in_window": 10, "task": "enc_amount", "window": "smoke"}
+{"block": 0, "block_seq": 4, "condition": "none", "model": "Haiku-4.5", "position": 0, "schedule_id": "smoke|Haiku-4.5|api_argorder|000|none", "seq_in_window": 11, "task": "api_argorder", "window": "smoke"}
+{"block": 0, "block_seq": 4, "condition": "W1plus", "model": "Haiku-4.5", "position": 1, "schedule_id": "smoke|Haiku-4.5|api_argorder|000|W1plus", "seq_in_window": 12, "task": "api_argorder", "window": "smoke"}
+{"block": 0, "block_seq": 4, "condition": "W1", "model": "Haiku-4.5", "position": 2, "schedule_id": "smoke|Haiku-4.5|api_argorder|000|W1", "seq_in_window": 13, "task": "api_argorder", "window": "smoke"}
+{"block": 1, "block_seq": 5, "condition": "W1", "model": "Haiku-4.5", "position": 0, "schedule_id": "smoke|Haiku-4.5|enc_amount|001|W1", "seq_in_window": 14, "task": "enc_amount", "window": "smoke"}
+{"block": 1, "block_seq": 5, "condition": "W2", "model": "Haiku-4.5", "position": 1, "schedule_id": "smoke|Haiku-4.5|enc_amount|001|W2", "seq_in_window": 15, "task": "enc_amount", "window": "smoke"}
