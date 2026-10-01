@@ -1,36 +1,130 @@
 {
-  "status": "draft",
+  "status": "frozen",
   "status_note": "freeze.py sets status, frozen_at_utc and harness_commit and writes FREEZE.json with the SHA-256 of this file, of the schedule and of every code file; run_replication.py refuses a live window, and analyze.py a final status, unless freeze.verify passes. It refuses to freeze without window boundaries, interruption rules, a schedule within the call budget, committed code, or if records exist.",
   "purpose": "Prospective confirmation of previously identified effects (PASS crossing and superset harm), collected in randomized blocks across predefined time windows. The tasks and contrasts are those of the published record; none is newly discovered.",
-  "frozen_at_utc": null,
-  "harness_commit": null,
+  "frozen_at_utc": "2026-10-01T11:14:51+00:00",
+  "harness_commit": "eb47f9d66f28d8fd44455150b8d89d74c432fd6c",
   "models": [
-    {"label": "Haiku-4.5",       "id": "claude-haiku-4-5",  "endpoint_env": "BW_ENDPOINT_HAIKU",    "key_env": "BW_KEY_HAIKU"},
-    {"label": "Sonnet-4.6",      "id": "claude-sonnet-4-6", "endpoint_env": "BW_ENDPOINT_SONNET",   "key_env": "BW_KEY_SONNET"},
-    {"label": "Opus-4.8",        "id": "claude-opus-4-8",   "endpoint_env": "BW_ENDPOINT_OPUS",     "key_env": "BW_KEY_OPUS"},
-    {"label": "GPT-5.5",         "id": "gpt-5.5",           "endpoint_env": "BW_ENDPOINT_GPT55",    "key_env": "BW_KEY_GPT55"},
-    {"label": "DeepSeek-V4-Pro", "id": "DeepSeek-V4-Pro",   "endpoint_env": "BW_ENDPOINT_DEEPSEEK", "key_env": "BW_KEY_DEEPSEEK"},
-    {"label": "Kimi-K2.6",       "id": "Kimi-K2.6",         "endpoint_env": "BW_ENDPOINT_KIMI",     "key_env": "BW_KEY_KIMI"}
+    {
+      "label": "Haiku-4.5",
+      "id": "claude-haiku-4-5",
+      "endpoint_env": "BW_ENDPOINT_HAIKU",
+      "key_env": "BW_KEY_HAIKU"
+    },
+    {
+      "label": "Sonnet-4.6",
+      "id": "claude-sonnet-4-6",
+      "endpoint_env": "BW_ENDPOINT_SONNET",
+      "key_env": "BW_KEY_SONNET"
+    },
+    {
+      "label": "Opus-4.8",
+      "id": "claude-opus-4-8",
+      "endpoint_env": "BW_ENDPOINT_OPUS",
+      "key_env": "BW_KEY_OPUS"
+    },
+    {
+      "label": "GPT-5.5",
+      "id": "gpt-5.5",
+      "endpoint_env": "BW_ENDPOINT_GPT55",
+      "key_env": "BW_KEY_GPT55"
+    },
+    {
+      "label": "DeepSeek-V4-Pro",
+      "id": "DeepSeek-V4-Pro",
+      "endpoint_env": "BW_ENDPOINT_DEEPSEEK",
+      "key_env": "BW_KEY_DEEPSEEK"
+    },
+    {
+      "label": "Kimi-K2.6",
+      "id": "Kimi-K2.6",
+      "endpoint_env": "BW_ENDPOINT_KIMI",
+      "key_env": "BW_KEY_KIMI"
+    }
   ],
   "cells": {
-    "api_post_ok":  ["W1", "W2", "W1plus"],
-    "enc_amount":   ["W1", "W2"],
-    "api_argorder": ["none", "W1", "W1plus"]
+    "api_post_ok": [
+      "W1",
+      "W2",
+      "W1plus"
+    ],
+    "enc_amount": [
+      "W1",
+      "W2"
+    ],
+    "api_argorder": [
+      "none",
+      "W1",
+      "W1plus"
+    ]
   },
   "contrasts": [
-    {"id": "A1", "task": "api_post_ok",  "a": "W1",     "b": "W2", "direction":  1, "claim": "W1 advantage on the API cell"},
-    {"id": "A2", "task": "enc_amount",   "a": "W2",     "b": "W1", "direction":  1, "claim": "W2 advantage on the encoding cell"},
-    {"id": "H1", "task": "api_post_ok",  "a": "W1plus", "b": "W1", "direction": -1, "claim": "superset harm on api_post_ok"},
-    {"id": "H2", "task": "api_argorder", "a": "W1plus", "b": "W1", "direction": -1, "claim": "superset harm on api_argorder"}
+    {
+      "id": "A1",
+      "task": "api_post_ok",
+      "a": "W1",
+      "b": "W2",
+      "direction": 1,
+      "claim": "W1 advantage on the API cell"
+    },
+    {
+      "id": "A2",
+      "task": "enc_amount",
+      "a": "W2",
+      "b": "W1",
+      "direction": 1,
+      "claim": "W2 advantage on the encoding cell"
+    },
+    {
+      "id": "H1",
+      "task": "api_post_ok",
+      "a": "W1plus",
+      "b": "W1",
+      "direction": -1,
+      "claim": "superset harm on api_post_ok"
+    },
+    {
+      "id": "H2",
+      "task": "api_argorder",
+      "a": "W1plus",
+      "b": "W1",
+      "direction": -1,
+      "claim": "superset harm on api_argorder"
+    }
   ],
   "windows": [
-    {"id": "d1-pm", "start": "2026-10-01T16:00:00+03:00", "end": "2026-10-01T21:00:00+03:00"},
-    {"id": "d2-am", "start": "2026-10-02T10:00:00+03:00", "end": "2026-10-02T15:00:00+03:00"},
-    {"id": "d2-pm", "start": "2026-10-02T16:00:00+03:00", "end": "2026-10-02T21:00:00+03:00"},
-    {"id": "d3-am", "start": "2026-10-03T10:00:00+03:00", "end": "2026-10-03T15:00:00+03:00"},
-    {"id": "d3-pm", "start": "2026-10-03T16:00:00+03:00", "end": "2026-10-03T21:00:00+03:00"},
-    {"id": "d4-am", "start": "2026-10-04T10:00:00+03:00", "end": "2026-10-04T15:00:00+03:00"}
-  ], "windows_note": "Thursday 1 October 16:00 to Sunday 4 October 15:00, 2026, Europe/Kyiv (UTC+03:00): six five-hour windows, 10:00-15:00 and 16:00-21:00. At 40 blocks per window a model receives 320 requests per window; with two lanes that leaves about 112 s per request per lane, grading included.",
+    {
+      "id": "d1-pm",
+      "start": "2026-10-01T16:00:00+03:00",
+      "end": "2026-10-01T21:00:00+03:00"
+    },
+    {
+      "id": "d2-am",
+      "start": "2026-10-02T10:00:00+03:00",
+      "end": "2026-10-02T15:00:00+03:00"
+    },
+    {
+      "id": "d2-pm",
+      "start": "2026-10-02T16:00:00+03:00",
+      "end": "2026-10-02T21:00:00+03:00"
+    },
+    {
+      "id": "d3-am",
+      "start": "2026-10-03T10:00:00+03:00",
+      "end": "2026-10-03T15:00:00+03:00"
+    },
+    {
+      "id": "d3-pm",
+      "start": "2026-10-03T16:00:00+03:00",
+      "end": "2026-10-03T21:00:00+03:00"
+    },
+    {
+      "id": "d4-am",
+      "start": "2026-10-04T10:00:00+03:00",
+      "end": "2026-10-04T15:00:00+03:00"
+    }
+  ],
+  "windows_note": "Thursday 1 October 16:00 to Sunday 4 October 15:00, 2026, Europe/Kyiv (UTC+03:00): six five-hour windows, 10:00-15:00 and 16:00-21:00. At 40 blocks per window a model receives 320 requests per window; with two lanes that leaves about 112 s per request per lane, grading included.",
   "blocks_per_window": 40,
   "blocks_per_window_note": "Chosen for the drift and sampling analysis: 6 windows x 6 models x 8 conditions x 40 = 11,520 requests, n = 240 blocks per condition. Power for the weakest observed margin claim (DeepSeek api_argorder) 1.00 stable, 0.96 common drift, 0.93 divergent drift, 0.85 with one window lost (results/replication/power_sim.json).",
   "scheduler_seed": 20260929,
@@ -55,9 +149,20 @@
   "retry_policy": {
     "max_attempts": 3,
     "halt_after_consecutive_failures": 3,
-    "backoff_seconds": [2, 4],
-    "retry_on": ["transport exception", "HTTP error status", "response that cannot be parsed"],
-    "never_retry_on": ["verifier failure", "refusal", "empty or off-task text"],
+    "backoff_seconds": [
+      2,
+      4
+    ],
+    "retry_on": [
+      "transport exception",
+      "HTTP error status",
+      "response that cannot be parsed"
+    ],
+    "never_retry_on": [
+      "verifier failure",
+      "refusal",
+      "empty or off-task text"
+    ],
     "exhausted": "recorded as a missing observation ('failed'), never as a failed draw, and never requested again",
     "halt": "after 3 consecutive failed requests a model stops for the rest of the run, so a dead endpoint or wrong key cannot spend the budget; the window stays open to be fixed and resumed before its end"
   },
@@ -81,7 +186,7 @@
     "family": "24 one-sided statements: 4 contrasts x 6 models",
     "family_alpha": 0.05,
     "per_statement_alpha": 0.0020833333333333333,
-    "harm_margin": 0.30,
+    "harm_margin": 0.3,
     "nested_harm_claims": "Each harm contrast is tested for any harm and for the 0.30 margin at the same level: the margin null contains the any-harm null, so the pair adds no multiplicity.",
     "estimand": "window-averaged effect over the planned windows",
     "primary_bound": "weighted Hoeffding for independent block differences in [-1, 1]: sqrt(2 ln(1/alpha) sum_w 1/B_w) / W over the W windows with complete blocks, B_w blocks in window w; no identical-distribution assumption",
