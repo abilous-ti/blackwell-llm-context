@@ -2,7 +2,7 @@
  "frozen_at_utc": "2026-10-01T11:14:51+00:00",
  "harness_commit": "eb47f9d66f28d8fd44455150b8d89d74c432fd6c",
  "design_file": "harness/replication/design.json",
- "design_sha256": "ba5254c8a06746c6c11c4146fc6b2b1de3ed8483d8b6f5964d151987eeafa49d",
+ "design_sha256": "c26a0245664932ed0d0f32028468b37b9c3068aea61cfec70859f67638568ea7",
  "schedule_file": "schedule.jsonl",
  "schedule_sha256": "2eeca486f2f944abe2c65bbe1c4ced47bb985e3a81e2aa53d9e90dbba9b932d8",
  "n_requests": 11520,
@@ -17,5 +17,15 @@
   "harness/replication/stats.py": "0ebc41ddc7fdec9e5e894a27d1ec90987d746082b328b097c37c6107aed7fb4e",
   "harness/replication/analyze.py": "92955294d7f955b2970c5e34cb127b9808f91e812180ca43d0bcfd14535d9dee",
   "harness/replication/freeze.py": "ae305080f9517b9a1ea7f48b3c8a6591df4bdba396cddf07a36f9cc3e48260d2"
- }
+ },
+ "amendments": [
+  {
+   "utc": "2026-10-02T19:40:08+00:00",
+   "previous_design_sha256": "ba5254c8a06746c6c11c4146fc6b2b1de3ed8483d8b6f5964d151987eeafa49d",
+   "design_sha256": "c26a0245664932ed0d0f32028468b37b9c3068aea61cfec70859f67638568ea7",
+   "change": "window d2-pm rescheduled from 2026-10-02 16:00-21:00 to 2026-10-02 23:00 - 2026-10-03 04:00 (+03:00)",
+   "reason": "the operator missed the 16:00-21:00 slot; no d2-pm request had been issued, so no d2-pm outcome was seen",
+   "unchanged": "schedule (same window id and rows), code, models, budget, analysis"
+  }
+ ]
 }
