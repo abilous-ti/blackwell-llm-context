@@ -60,7 +60,7 @@ with its hash before any request.
 
 **Windows:** six windows of five hours, Europe/Kyiv (UTC+03:00): Thursday 1 October 16:00–21:00;
 Friday 2 and Saturday 3 October 10:00–15:00 and 16:00–21:00; Sunday 4 October 10:00–15:00. Each
-window is stored with its start and end as ISO 8601 times with the offset; windows may not overlap. *Deviation (2 October 2026):* d2-pm, missed with no request issued, was rescheduled to 23:00-04:00; see `results/replication/DEVIATIONS.md`.
+window is stored with its start and end as ISO 8601 times with the offset; windows may not overlap. *Deviation (2 October 2026):* d2-pm, missed with no request issued, had its end extended from 21:00 to 23:00; see `results/replication/DEVIATIONS.md`.
 
 **Concurrency.** Each model has at most `max_in_flight_per_model` = 2 requests in flight: lane *j*
 takes the blocks whose position in the window is *j* modulo 2, so a block's requests stay back to

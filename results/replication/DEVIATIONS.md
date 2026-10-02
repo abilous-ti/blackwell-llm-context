@@ -14,3 +14,12 @@
 - **Integrity record:** FREEZE.json now holds the amended design hash and, under "amendments", the
   previous hash (ba5254c8a06746c6c11c4146fc6b2b1de3ed8483d8b6f5964d151987eeafa49d), the change and its reason.
 - **Reporting:** the manuscript reports this deviation with the replication results.
+
+## 2. Window d2-pm: end extended instead (recorded 2026-10-02T19:44:09+00:00 UTC; supersedes entry 1)
+
+- **Now:** Friday 2 October 2026, 16:00-23:00 (+03:00): the planned afternoon slot with its end moved
+  from 21:00 to 23:00. The 23:00-04:00 schedule of entry 1 was never used.
+- **Why:** to keep d2-pm an afternoon/evening window, as planned. Still no d2-pm request had been
+  issued when this was decided.
+- **Consequence:** collection starts after 22:40, so the window is shorter in practice; requests not
+  issued by 23:00 are recorded as not collected, as the frozen rules require.
