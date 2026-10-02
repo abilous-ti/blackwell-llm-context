@@ -106,7 +106,7 @@
     {
       "id": "d2-pm",
       "start": "2026-10-02T16:00:00+03:00",
-      "end": "2026-10-02T23:00:00+03:00"
+      "end": "2026-10-03T00:00:00+03:00"
     },
     {
       "id": "d3-am",
@@ -124,7 +124,7 @@
       "end": "2026-10-04T15:00:00+03:00"
     }
   ],
-  "windows_note": "Thursday 1 October 16:00 to Sunday 4 October 15:00, 2026, Europe/Kyiv (UTC+03:00): six five-hour windows, 10:00-15:00 and 16:00-21:00. Amended 2 October 2026: d2-pm extended to 16:00-23:00 after its 21:00 end passed with no request issued (results/replication/DEVIATIONS.md). At 40 blocks per window a model receives 320 requests per window; with two lanes that leaves about 112 s per request per lane, grading included.",
+  "windows_note": "Thursday 1 October 16:00 to Sunday 4 October 15:00, 2026, Europe/Kyiv (UTC+03:00): six five-hour windows, 10:00-15:00 and 16:00-21:00. Amended 2 October 2026: d2-pm extended to 16:00-24:00 after its 21:00 end passed with no request issued (results/replication/DEVIATIONS.md). At 40 blocks per window a model receives 320 requests per window; with two lanes that leaves about 112 s per request per lane, grading included.",
   "blocks_per_window": 40,
   "blocks_per_window_note": "Chosen for the drift and sampling analysis: 6 windows x 6 models x 8 conditions x 40 = 11,520 requests, n = 240 blocks per condition. Power for the weakest observed margin claim (DeepSeek api_argorder) 1.00 stable, 0.96 common drift, 0.93 divergent drift, 0.85 with one window lost (results/replication/power_sim.json).",
   "scheduler_seed": 20260929,

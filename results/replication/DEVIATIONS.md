@@ -23,3 +23,9 @@
   issued when this was decided.
 - **Consequence:** collection starts after 22:40, so the window is shorter in practice; requests not
   issued by 23:00 are recorded as not collected, as the frozen rules require.
+
+## 3. Window d2-pm: end moved to midnight (recorded 2026-10-02T19:45:22+00:00 UTC; supersedes entry 2)
+
+- **Now:** Friday 2 October 2026, 16:00, to Saturday 3 October, 00:00 (+03:00).
+- **Why:** an end at 23:00 left about fifteen minutes, too little for the two slowest models to
+  complete the window. When this was decided, 169 d2-pm requests had been issued.
