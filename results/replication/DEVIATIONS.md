@@ -29,3 +29,10 @@
 - **Now:** Friday 2 October 2026, 16:00, to Saturday 3 October, 00:00 (+03:00).
 - **Why:** an end at 23:00 left about fifteen minutes, too little for the two slowest models to
   complete the window. When this was decided, 169 d2-pm requests had been issued.
+
+## Correction to the commit message of 67da9c1
+
+That message says no d2-pm request had been issued. In fact the window was already running: 169
+d2-pm requests had been issued when the end was moved to midnight, as entry 3 and FREEZE.json record.
+The run in progress had loaded the 23:00 end, so it is restarted before 23:00 to load the midnight end;
+requests in flight at the restart are recorded as interrupted and are not sent again.
