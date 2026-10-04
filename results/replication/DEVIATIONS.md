@@ -36,3 +36,18 @@ That message says no d2-pm request had been issued. In fact the window was alrea
 d2-pm requests had been issued when the end was moved to midnight, as entry 3 and FREEZE.json record.
 The run in progress had loaded the 23:00 end, so it is restarted before 23:00 to load the midnight end;
 requests in flight at the restart are recorded as interrupted and are not sent again.
+
+## 4. Window d4-am: start moved to 09:00 (recorded 2026-10-04T06:28:41+00:00 UTC)
+
+- **Planned:** Sunday 4 October 2026, 10:00-15:00 Europe/Kyiv (+03:00).
+- **Now:** Sunday 4 October 2026, 09:00-15:00 (+03:00): the start is one hour earlier; the end is unchanged.
+- **Why:** at the operator's request, so that the last window could start before 10:00. When this was
+  decided (09:28 Kyiv), no d4-am request had been issued, so the decision could not depend on any d4-am
+  outcome. The d4-am record file existed but was empty: a start attempt at about 09:26 was refused
+  because the window had not opened (the runner creates the file before it checks the time). Windows
+  d1-pm, d2-am, d2-pm, d3-am and d3-pm were closed.
+- **What changes:** d4-am may begin an hour earlier than the other morning windows; it remains a morning
+  window and keeps its identifier, its 1,920 scheduled requests and their randomized order. Nothing else
+  in the design, schedule, code or analysis changes.
+- **Integrity record:** FREEZE.json now holds the amended design hash and, under "amendments", the
+  previous hash (01fc061b0c7fa12d6b4ec3319abd3035c7b7554d67d53dc551e9497e866aacc3), the change and its reason.
