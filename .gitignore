@@ -61,3 +61,6 @@ harness/package2/run_states.py
 harness/package2/analyze_states.py
 harness/package2/freeze_states.py
 harness/package2/PROTOCOL_STATES.md
+
+# fullwiki freeze lists HotpotQA candidate titles; kept by the authors (SHA-256 in results/package3/confirm_fullwiki_textfree/provenance.json)
+results/package3/FREEZE_fullwiki.json

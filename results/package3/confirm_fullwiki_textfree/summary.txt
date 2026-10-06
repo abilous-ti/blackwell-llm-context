@@ -1,0 +1,11 @@
+confirm: 300 questions; records natural_data/package3/confirm_fullwiki/records.jsonl
+ranking requests: planned 600, issued 600, received 600
+answer requests: planned up to 7200, issued 7200, received 7200
+transport failures: 13 (HTTP 400 on every attempt 13, other 0); interrupted (issued, no receipt) 0
+RankGPT complete parses 588/600
+mean F1 (n) by answer model and condition; intervals and contrasts: analyze_fullwiki.py
+                           none         full         bm25          mmr          bge           e5       minilm      rankgpt
+  Haiku-4.5          0.46 (300)   0.41 (300)   0.39 (300)   0.34 (300)   0.39 (300)   0.36 (300)   0.41 (300)   0.43 (300)
+  GPT-5.5            0.67 (300)   0.70 (299)   0.69 (299)   0.69 (299)   0.68 (299)   0.69 (298)   0.72 (298)   0.69 (299)
+  DeepSeek-V4-Pro    0.58 (300)   0.53 (298)   0.49 (300)   0.47 (300)   0.50 (300)   0.50 (299)   0.52 (299)   0.54 (300)
+answer-line compliance: DeepSeek-V4-Pro 2396/2396; GPT-5.5 2387/2391; Haiku-4.5 2400/2400

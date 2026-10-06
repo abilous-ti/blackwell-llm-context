@@ -1,0 +1,129 @@
+{
+ "freeze": {
+  "file": "results/package3/FREEZE_fullwiki.json",
+  "public": false,
+  "sha256": "2097df870e2b1a4803188f9647797dbc626a2c4699d6350231dbf3d5d5457d97",
+  "frozen_at_utc": "2026-10-06T07:43:08+00:00",
+  "files": 18,
+  "verified": true,
+  "frozen_sha256": {
+   "harness/package3/PROTOCOL_FULLWIKI.md": "0e743e60af3ec0b01d8671794601bea341a4e6abe7050533a88c4e2182dfac58",
+   "harness/package3/fullwiki_data.py": "3f9520c579dfb746a18e8f6e1f5451fc8ad6a6af60504e51d4c962af7c114ab0",
+   "harness/package3/run_fullwiki.py": "24bdf25dfffb8d770b3977d8801323c2d15de5ba8e6d26cc3ba766aff16dcef5",
+   "harness/package3/analyze_fullwiki.py": "8c0c3a6cf0f62fd348716f20a00f0bd6cfef5adfef3d35e99335138d0507b28c",
+   "harness/package3/freeze_fullwiki.py": "14abe277b56acf807bbc478111a924333c11dc945e972b41e8de80146342b127",
+   "harness/package2/run_qa.py": "c2d38888d019b2b42edd2dae0f3a58bac748f0a0e71b0f0144e250a1b45e93de",
+   "harness/package2/analyze_qa.py": "f8871b833964feff94fdd689f952d92dfc5d18c31cb6df80823c33be08ae6abd",
+   "harness/package2/rank_local.py": "93d4087b8a4909f0624e1b10f9026ba4ac716c01176758e02c704ea205fdb0d1",
+   "harness/replication/transport.py": "ea45ffcb46fc891893ae369c5916a6165522a28ca74027d22f276abcfe4106a6",
+   "harness/replication/design.json": "0b79e6acec5a8db86a614673207cdb8e5cb32a629ec08ecf4f3ad260e28134c6",
+   "natural_data/hotpot_dev_fullwiki.parquet": "78933c0a31a5f7b420d4effdf4cd4eed573b28c6a3da6179dcf7a02b39e51d03",
+   "natural_data/package3/sample.json": "f2b8a7bbf4a1a5be7ce93dbb20cda15931af6b4b55d27aa0a8757a720187cf87",
+   "natural_data/package3/items_confirm.jsonl": "42d5c34b60d3cfbb87b5ba4a6dabc94fdf1c7c75998b3bffd540bf907b856c46",
+   "natural_data/package3/items_smoke.jsonl": "62a43ecbce4b011fd35b66f803d3e843f05d610fc610d717e1558077497a3e6e",
+   "natural_data/package3/idf_fullwiki.json": "5dbbe8249216eba3ffb37c938da464ac63d06f80f33a6b64c2ee2faf47b5cfc6",
+   "natural_data/package3/rankings_local_confirm.jsonl": "b9fb8e3ec47426836213d131846bbc67947a3dc750b6ed59487a0035265e2662",
+   "natural_data/package3/rankings_local_smoke.jsonl": "131fc75ee897963ce02b90711273817c1a7a80094fb511ee6b9f42c06aad0a30",
+   "natural_data/package3/local_models.json": "82db21363bb3cb5d4f403a5682f5386299b670bf3c0c30a19c4068bf89d3f8d6"
+  }
+ },
+ "frozen_inputs_match_FREEZE_fullwiki_json": [
+  "natural_data/package3/items_confirm.jsonl",
+  "natural_data/package3/sample.json",
+  "natural_data/package3/rankings_local_confirm.jsonl",
+  "natural_data/package3/local_models.json",
+  "natural_data/package3/idf_fullwiki.json"
+ ],
+ "inputs_sha256": {
+  "natural_data/package3/items_confirm.jsonl": "42d5c34b60d3cfbb87b5ba4a6dabc94fdf1c7c75998b3bffd540bf907b856c46",
+  "natural_data/package3/sample.json": "f2b8a7bbf4a1a5be7ce93dbb20cda15931af6b4b55d27aa0a8757a720187cf87",
+  "natural_data/package3/rankings_local_confirm.jsonl": "b9fb8e3ec47426836213d131846bbc67947a3dc750b6ed59487a0035265e2662",
+  "natural_data/package3/local_models.json": "82db21363bb3cb5d4f403a5682f5386299b670bf3c0c30a19c4068bf89d3f8d6",
+  "natural_data/package3/idf_fullwiki.json": "5dbbe8249216eba3ffb37c938da464ac63d06f80f33a6b64c2ee2faf47b5cfc6",
+  "natural_data/package3/confirm_fullwiki/records.jsonl": "e1a6a6087a633447f71a1ef20b7c89f142114b804d09062af6f89a748d612158",
+  "natural_data/package3/confirm_fullwiki/summary.txt": "4f6117eab9d463f850644a9f63489f000f46341cfc8a2a078fab82720db318c9"
+ },
+ "analysis_sha256": {
+  "results/package3/analysis_fullwiki.json": "d8329eb05c186b7595827894f409a1a66b7ecfb6fc2bd09c5d65f92951fdf462",
+  "results/package3/analysis_fullwiki.md": "c143577f88c7e92efae733bde9a6b198a738e981d7c67d413f8c06196a562f45"
+ },
+ "code_sha256": {
+  "harness/package3/PROTOCOL_FULLWIKI.md": "0e743e60af3ec0b01d8671794601bea341a4e6abe7050533a88c4e2182dfac58",
+  "harness/package3/fullwiki_data.py": "3f9520c579dfb746a18e8f6e1f5451fc8ad6a6af60504e51d4c962af7c114ab0",
+  "harness/package3/run_fullwiki.py": "24bdf25dfffb8d770b3977d8801323c2d15de5ba8e6d26cc3ba766aff16dcef5",
+  "harness/package3/analyze_fullwiki.py": "8c0c3a6cf0f62fd348716f20a00f0bd6cfef5adfef3d35e99335138d0507b28c",
+  "harness/package3/freeze_fullwiki.py": "14abe277b56acf807bbc478111a924333c11dc945e972b41e8de80146342b127",
+  "harness/package3/export_fullwiki_textfree.py": "539d23874129ba8e84b5bac95911a061fe51a00eeacabbc8c5e80404b93fe241",
+  "harness/package2/run_qa.py": "c2d38888d019b2b42edd2dae0f3a58bac748f0a0e71b0f0144e250a1b45e93de",
+  "harness/package2/analyze_qa.py": "f8871b833964feff94fdd689f952d92dfc5d18c31cb6df80823c33be08ae6abd",
+  "harness/package2/rank_local.py": "93d4087b8a4909f0624e1b10f9026ba4ac716c01176758e02c704ea205fdb0d1",
+  "harness/package2/export_qa_textfree.py": "b6f2b0e5c0d31624c85891f7966a959be9b062353e9eeeebc31f33d8c528dddb",
+  "harness/replication/transport.py": "ea45ffcb46fc891893ae369c5916a6165522a28ca74027d22f276abcfe4106a6"
+ },
+ "local_models": {
+  "offline": true,
+  "models": {
+   "BAAI/bge-small-en-v1.5": {
+    "revision": "5c38ec7c405ec4b44b94cc5a9bb96e735b38267a",
+    "sha256": {
+     "1_Pooling/config.json": "d1caf60c96f5fba2157c0c26b76d80818fad6cf0b8eb5e73ec372ff9818eba5c",
+     "config.json": "094f8e891b932f2000c92cfc663bac4c62069f5d8af5b5278c4306aef3084750",
+     "config_sentence_transformers.json": "940d5f50db195fa6e5e6a4f122c095f77880de259d74b14a65779ed48bdd7c56",
+     "model.safetensors": "3c9f31665447c8911517620762200d2245a2518d6e7208acc78cd9db317e21ad",
+     "modules.json": "84e40c8e006c9b1d6c122e02cba9b02458120b5fb0c87b746c41e0207cf642cf",
+     "README.md": "ddb964361a55c6e5dfca6361615854b260c9c960205d04c7520151aaa1d75837",
+     "sentence_bert_config.json": "84e39fda68ccbff05bfa723ae9c0e70e23e2ec373b76e0f8c6e71af72a693cbf",
+     "special_tokens_map.json": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3",
+     "tokenizer.json": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+     "tokenizer_config.json": "9261e7d79b44c8195c1cada2b453e55b00aeb81e907a6664974b4d7776172ab3",
+     "vocab.txt": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3"
+    }
+   },
+   "intfloat/e5-small-v2": {
+    "revision": "ffb93f3bd4047442299a41ebb6fa998a38507c52",
+    "sha256": {
+     "1_Pooling/config.json": "987f7a67a38fa564c849bb5d277c52ab9088a84368fc0be31a354125aebb12a0",
+     "config.json": "5dfb0363cd0243be179c03bcaafd1542d0fbb95e8cbcf575fff3e229342adc2f",
+     "model.safetensors": "45bfa60070649aae2244fbc9d508537779b93b6f353c17b0f95ceccb1c5116c1",
+     "modules.json": "c6e29747481e8b5dd2b58401966aeac910de39092f90cda9a704b1545f902b04",
+     "README.md": "0d57eda4766cc7ac045f2bf7e700286ea5a8360bb9b57278f67f9b8ef60b0b24",
+     "sentence_bert_config.json": "948201d8329907aae938fa62f9ceeed53f5694dacc2b87b9f3b78b37ee986529",
+     "special_tokens_map.json": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3",
+     "tokenizer.json": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+     "tokenizer_config.json": "ae83fa6ca0333117ff12606020af925d648667ef70d92ff7f27d781ba0ca4544",
+     "vocab.txt": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3"
+    }
+   },
+   "cross-encoder/ms-marco-MiniLM-L-6-v2": {
+    "revision": "c5ee24cb16019beea0893ab7796b1df96625c6b8",
+    "sha256": {
+     "config.json": "380e02c93f431831be65d99a4e7e5f67c133985bf2e77d9d4eba46847190bacc",
+     "model.safetensors": "821d1aa69520101d6e0737f78a042ae25b19e5cb9160701909d10434f4aeb0ae",
+     "special_tokens_map.json": "3c3507f36dff57bce437223db3b3081d1e2b52ec3e56ee55438193ecb2c94dd6",
+     "tokenizer.json": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+     "tokenizer_config.json": "a5c2e5a7b1a29a0702cd28c08a399b5ecc110c263009d17f7e3b415f25905fd8",
+     "vocab.txt": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3"
+    }
+   }
+  }
+ },
+ "counts": {
+  "items": 300,
+  "groups": {
+   "complement": 210,
+   "sufficient": 90
+  },
+  "local_rankings": 1500,
+  "requests": 7800,
+  "requests_by_kind": {
+   "answer": 7200,
+   "rank": 600
+  },
+  "status": {
+   "failed_http400": 13,
+   "received": 7787
+  },
+  "transport_failed": 13,
+  "prompts_rebuilt_and_matched": 7800
+ }
+}

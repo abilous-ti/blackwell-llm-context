@@ -128,6 +128,22 @@ MAPPING = [
     ("Listwise reranking overhead (tab:overhead, sec:results-natural)",
      ["package2/confirm_qa_textfree/overhead.jsonl", "package2/confirm_qa_textfree/analysis_qa.json",
       "<computed by harness/package2/analyze_qa.py; recomputed by harness/package2/verify_qa_textfree.py>"]),
+    # Package 3, collected 6 October 2026: the same rankers on HotpotQA's retrieved (fullwiki)
+    # candidates. Its records also stay local; the text-free export carries every number
+    # (harness/package3/export_fullwiki_textfree.py writes it, verify_fullwiki_textfree.py recomputes
+    # the analysis from it, check_fullwiki_leaks.py checks it for text). Its freeze lists the candidate
+    # titles, so the authors keep it; the export's provenance.json records its digest and every digest
+    # it lists.
+    ("Reranking on retrieved candidates, HotpotQA fullwiki (tab:fullwiki, sec:natural, sec:results-natural)",
+     ["<freeze kept by the authors (lists candidate titles); SHA-256 "
+      "2097df870e2b1a4803188f9647797dbc626a2c4699d6350231dbf3d5d5457d97, recorded in "
+      "package3/confirm_fullwiki_textfree/provenance.json>",
+      "package3/analysis_fullwiki.json", "package3/analysis_fullwiki.md",
+      "package3/confirm_fullwiki_textfree/items.jsonl", "package3/confirm_fullwiki_textfree/sample.json",
+      "package3/confirm_fullwiki_textfree/rankings.jsonl", "package3/confirm_fullwiki_textfree/answers.jsonl",
+      "<computed by harness/package3/analyze_fullwiki.py from the full records (protocol "
+      "harness/package3/PROTOCOL_FULLWIKI.md); recomputed from the text-free files by "
+      "harness/package3/verify_fullwiki_textfree.py; fields in package3/confirm_fullwiki_textfree/README.md>"]),
     ("Exploratory natural-data pilot of 2 October, development data (sec:natural, sec:limitations)",
      ["natural_pilot_textfree/",
       "<harness/natural/; text-free export by harness/package2/export_qa_textfree.py>"]),

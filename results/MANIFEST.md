@@ -54,6 +54,7 @@ Transport of the six-model record in this manifest: **HTTP API for all six model
 | Clarified-contract run (sec:pairs, tab:clarify, sec:results-generality) | `package2/FREEZE_clarify.json`<br>`package2/confirm_clarify/schedule.jsonl`<br>`package2/confirm_clarify/records.jsonl`<br>`package2/smoke_clarify/`<br><analysis_clarify.json and .md computed by harness/package2/analyze_clarify.py; protocol in harness/package2/PROTOCOL_CLARIFY.md> |
 | Natural-data benchmarks: evidence retrieval and answer quality (sec:natural, tab:natural, sec:results-natural) | `package2/confirm_qa_textfree/items.jsonl`<br>`package2/confirm_qa_textfree/splits.json`<br>`package2/confirm_qa_textfree/rankings.jsonl`<br>`package2/confirm_qa_textfree/answers.jsonl`<br>`package2/confirm_qa_textfree/augmentation.jsonl`<br>`package2/confirm_qa_textfree/analysis_qa.json`<br><computed by harness/package2/analyze_qa.py from the full records; recomputed from the text-free files by harness/package2/verify_qa_textfree.py; fields in package2/confirm_qa_textfree/README.md> |
 | Listwise reranking overhead (tab:overhead, sec:results-natural) | `package2/confirm_qa_textfree/overhead.jsonl`<br>`package2/confirm_qa_textfree/analysis_qa.json`<br><computed by harness/package2/analyze_qa.py; recomputed by harness/package2/verify_qa_textfree.py> |
+| Reranking on retrieved candidates, HotpotQA fullwiki (tab:fullwiki, sec:natural, sec:results-natural) | <freeze kept by the authors (lists candidate titles); SHA-256 2097df870e2b1a4803188f9647797dbc626a2c4699d6350231dbf3d5d5457d97, recorded in package3/confirm_fullwiki_textfree/provenance.json><br>`package3/analysis_fullwiki.json`<br>`package3/analysis_fullwiki.md`<br>`package3/confirm_fullwiki_textfree/items.jsonl`<br>`package3/confirm_fullwiki_textfree/sample.json`<br>`package3/confirm_fullwiki_textfree/rankings.jsonl`<br>`package3/confirm_fullwiki_textfree/answers.jsonl`<br><computed by harness/package3/analyze_fullwiki.py from the full records (protocol harness/package3/PROTOCOL_FULLWIKI.md); recomputed from the text-free files by harness/package3/verify_fullwiki_textfree.py; fields in package3/confirm_fullwiki_textfree/README.md> |
 | Exploratory natural-data pilot of 2 October, development data (sec:natural, sec:limitations) | `natural_pilot_textfree/`<br><harness/natural/; text-free export by harness/package2/export_qa_textfree.py> |
 | GPT-5.5 trap cell (transport-clean source) | `audit/audit_gpt55_trap_store_wire_W1.json`<br>`audit/audit_gpt55_trap_store_wire_W2.json`<br>`audit/audit_gpt55_trap_store_wire_summary.json` |
 
@@ -63,7 +64,7 @@ why each cell was re-measured.
 
 ## Inventory
 
-3433 files, 175.3 MB total.
+3444 files, 182.7 MB total.
 
 | File | Bytes | SHA-256 |
 |---|---|---|
@@ -332,6 +333,17 @@ why each cell was re-measured.
 | `package2/smoke_labels/analysis_labels_amended.md` | 3650 | `ea73deee865ad8e808ca41d6dc717d4d81a142ed34e9b8ccc13993c21dc0e221` |
 | `package2/smoke_labels/records.jsonl` | 425408 | `5525fe919e80162f8a13ab806fe65e26a2f8a7f1af263f3fa0aea93e45b2c65c` |
 | `package2/smoke_labels/schedule.jsonl` | 29646 | `3ff544f83c3a58ceaa663dfabde677b96abd6d1f3378b5552037844fc509931b` |
+| `package3/analysis_fullwiki.json` | 38797 | `d8329eb05c186b7595827894f409a1a66b7ecfb6fc2bd09c5d65f92951fdf462` |
+| `package3/analysis_fullwiki.md` | 14903 | `c143577f88c7e92efae733bde9a6b198a738e981d7c67d413f8c06196a562f45` |
+| `package3/confirm_fullwiki_textfree/README.md` | 21475 | `51fa75722889dd3b110004af15798ab29a30f0bb35982d9d814c0235a6450f4b` |
+| `package3/confirm_fullwiki_textfree/analysis_fullwiki.json` | 38797 | `d8329eb05c186b7595827894f409a1a66b7ecfb6fc2bd09c5d65f92951fdf462` |
+| `package3/confirm_fullwiki_textfree/analysis_fullwiki.md` | 14903 | `c143577f88c7e92efae733bde9a6b198a738e981d7c67d413f8c06196a562f45` |
+| `package3/confirm_fullwiki_textfree/answers.jsonl` | 5704058 | `27558eb743f60cdbf3b0365da6672106f1aa819f69d9f847c9432a63c791231d` |
+| `package3/confirm_fullwiki_textfree/items.jsonl` | 566784 | `16a1760d20bb47744a03e379d0b9effdf4dc3b248bb8e3d411adca0fd449691c` |
+| `package3/confirm_fullwiki_textfree/provenance.json` | 8149 | `8ea07c094153c970ca282a834e2e53550cfea37c4c1be4ada1094623ca4a9049` |
+| `package3/confirm_fullwiki_textfree/rankings.jsonl` | 971127 | `ea671c461b9c48abf9ce142386d8ec6691a505e6367a81cb57476521ccf316a2` |
+| `package3/confirm_fullwiki_textfree/sample.json` | 48739 | `294f594627d16de82b886546b10322a3e2ca1c4c08119830b18266d8dcbdaca5` |
+| `package3/confirm_fullwiki_textfree/summary.txt` | 1006 | `4f6117eab9d463f850644a9f63489f000f46341cfc8a2a078fab82720db318c9` |
 | `replication/DEVIATIONS.md` | 3781 | `d0a82e6ab5470950a8d3843d7c1e5a90097773a4e80f8b0b6352e2826ee90a91` |
 | `replication/FREEZE.json` | 3781 | `090929900dfacde721f7c8b7f03617be9d0e31953ae5630a92ca8e6a6cb1ac0c` |
 | `replication/analysis.json` | 79010 | `70ca3045b89b2a6466143d0aff9446997a702757f52536bb77e9ddced34a8b2f` |
