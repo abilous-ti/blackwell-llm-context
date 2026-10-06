@@ -52,7 +52,9 @@ Transport of the six-model record in this manifest: **HTTP API for all six model
 | Channel-matrix certificate: exact Le Cam deficiencies of the declared pair families (sec:pairs) | `package2/channel_certificate.json`<br><computed by harness/package2/channel_certificate.py> |
 | Reply checks behind sec:results-generality and the verifier-enforcement limitation | `package2/failure_checks.json`<br><computed by harness/package2/failure_checks.py> |
 | Clarified-contract run (sec:pairs, tab:clarify, sec:results-generality) | `package2/FREEZE_clarify.json`<br>`package2/confirm_clarify/schedule.jsonl`<br>`package2/confirm_clarify/records.jsonl`<br>`package2/smoke_clarify/`<br><analysis_clarify.json and .md computed by harness/package2/analyze_clarify.py; protocol in harness/package2/PROTOCOL_CLARIFY.md> |
-| Natural-data benchmarks (sec:natural, tab:natural, tab:overhead, sec:results-natural) | <natural_data/package2/confirm_qa/: records.jsonl, analysis_qa.json, analysis_qa.md; items, splits and local rankings in natural_data/package2/; computed by harness/package2/analyze_qa.py> |
+| Natural-data benchmarks: evidence retrieval and answer quality (sec:natural, tab:natural, sec:results-natural) | `package2/confirm_qa_textfree/items.jsonl`<br>`package2/confirm_qa_textfree/splits.json`<br>`package2/confirm_qa_textfree/rankings.jsonl`<br>`package2/confirm_qa_textfree/answers.jsonl`<br>`package2/confirm_qa_textfree/augmentation.jsonl`<br>`package2/confirm_qa_textfree/analysis_qa.json`<br><computed by harness/package2/analyze_qa.py from the full records; recomputed from the text-free files by harness/package2/verify_qa_textfree.py; fields in package2/confirm_qa_textfree/README.md> |
+| Listwise reranking overhead (tab:overhead, sec:results-natural) | `package2/confirm_qa_textfree/overhead.jsonl`<br>`package2/confirm_qa_textfree/analysis_qa.json`<br><computed by harness/package2/analyze_qa.py; recomputed by harness/package2/verify_qa_textfree.py> |
+| Exploratory natural-data pilot of 2 October, development data (sec:natural, sec:limitations) | `natural_pilot_textfree/`<br><harness/natural/; text-free export by harness/package2/export_qa_textfree.py> |
 | GPT-5.5 trap cell (transport-clean source) | `audit/audit_gpt55_trap_store_wire_W1.json`<br>`audit/audit_gpt55_trap_store_wire_W2.json`<br>`audit/audit_gpt55_trap_store_wire_summary.json` |
 
 Arm-only re-runs supersede the corresponding cells of the base file. The verification
@@ -61,7 +63,7 @@ why each cell was re-measured.
 
 ## Inventory
 
-3415 files, 164.3 MB total.
+3433 files, 175.3 MB total.
 
 | File | Bytes | SHA-256 |
 |---|---|---|
@@ -277,6 +279,11 @@ why each cell was re-measured.
 | `diag/ctrl_api_post_ok_summary.json` | 675 | `7dbd1d147ef37c656558be9e93f22f57d255dabed8428f51f83990f0becb03c3` |
 | `incomparability_results.json` | 7509 | `3e00913dd01ad8e1346330df50d30b3527695680853262d5c03f9ec712f6883c` |
 | `moat_results.json` | 206 | `320b96ee4d07b6dd2dda80d3dd80f88a241d4ef7a8be799db803455a633e8ece` |
+| `natural_pilot_textfree/README.md` | 8407 | `7c88ff5cc37c5a92238e1d59e2fd7d2c465d46f342bbf565b22514439be9706d` |
+| `natural_pilot_textfree/items.jsonl` | 44853 | `1a08d1026a04b361c8e8ede0f5d87f76cf09227efa043c376d7b40149e0274e4` |
+| `natural_pilot_textfree/provenance.json` | 1616 | `2e50700772b8ba70232474dece14f6d1fd29029c98d0cff192ed79354c71266c` |
+| `natural_pilot_textfree/requests.jsonl` | 1770003 | `4658574137108f01aa30b2ab808541f844ad74eaa7e0c77f3f700e2afcabe924` |
+| `natural_pilot_textfree/stage1_audit.jsonl` | 17030 | `6b0eac6e94f59c44898f149828ff00dd496a7fbc3df8cdfd895ea77ca50c2f2d` |
 | `package2/FREEZE.json` | 2045 | `4afda16d32a9ebbcd0efeed65d0d3dcc93e523461dfb72d5060222449166d77e` |
 | `package2/FREEZE_clarify.json` | 1469 | `0d877bc28f2bf202c609577ab6f3f9e311713630c65af91bfa3777bda382f4e8` |
 | `package2/FREEZE_labels.json` | 1583 | `2b7915e922d8061d5c291e09646e7f941fbde643bc8ff65a91325c56878def70` |
@@ -298,6 +305,19 @@ why each cell was re-measured.
 | `package2/confirm_pairs/records.jsonl` | 44582212 | `d972bb7421560416cd741c2bd1bde00c17fa9fb11a16cb2dd66eda2dfad1c15b` |
 | `package2/confirm_pairs/schedule.jsonl` | 1677622 | `6409598281fb0ca8a21b4df5f5ada7f09a0e196e1e7595413a0552b62ce2fd49` |
 | `package2/confirm_pairs/summary.txt` | 5361 | `7150c93216bb92a1962e590777a528a3818fe65df5234a1a19b1159bde8983dd` |
+| `package2/confirm_qa_textfree/README.md` | 19147 | `a43ca3ab518b3c8774afb90fcced617db0c1057a611884402194d57692e863fa` |
+| `package2/confirm_qa_textfree/analysis_qa.json` | 26261 | `d38343771d2c1453fccdd8e246698f8ca692ab3933fc42e14c5ce2a14c4bc357` |
+| `package2/confirm_qa_textfree/analysis_qa.md` | 10840 | `378238b7078d36f3a527ed34a610d5a7914eb74cc535f7d3d3308a92ffc000d2` |
+| `package2/confirm_qa_textfree/answers.jsonl` | 6365930 | `785e93246aaacd5dc6eab6f2ab92823b93e6c24c1e5b8d25258a95e207ddcd8e` |
+| `package2/confirm_qa_textfree/augmentation.jsonl` | 23238 | `90b68f2050e17aeee020193dd9ed8470155cb1688c7c488737376a5c9bf3ebdd` |
+| `package2/confirm_qa_textfree/confirmation_hotpotqa.txt` | 179625 | `18b264c1bd814a8161e2858934bb3a59cc5c49fcc8d594b013a922452066cc42` |
+| `package2/confirm_qa_textfree/confirmation_musique.txt` | 54586 | `c664cbb076df187fada538219f3b56aebf29738ccb9d7403eecc6aaaff16b049` |
+| `package2/confirm_qa_textfree/items.jsonl` | 847786 | `84cfea1958baf2795587d91815f36cdb04f66f3f900dc6d4182f6b74059d42fa` |
+| `package2/confirm_qa_textfree/overhead.jsonl` | 210249 | `5434be42e9f08b6c9b98320e7ee29162297a51c5a25dfed01dae2f57ae677139` |
+| `package2/confirm_qa_textfree/provenance.json` | 1679 | `ffd220930c63510c2222dbc56dd993ec9f216b46fd68b16d505cf5a60687ddb4` |
+| `package2/confirm_qa_textfree/rankings.jsonl` | 1293806 | `d2dc586a9cc707ce86d0b541357341e587dcd1b243aef8b2b468b2066f6fddd2` |
+| `package2/confirm_qa_textfree/splits.json` | 50388 | `4ba15f6c98efac8b6ea7bd1b0df1fe472cd23dd01c785e9c862625c9e10308bb` |
+| `package2/confirm_qa_textfree/summary.txt` | 2933 | `4ddb590b00059e91ce6baa353d5b92a4dde88d33375ae05bf278164ee61d5170` |
 | `package2/failure_checks.json` | 1221 | `054d322233ea70c60335724e993bb94ac29d2a9c8c8b306a7b0185a5ebbd7af7` |
 | `package2/pilot_pairs/analysis_pairs.json` | 60964 | `4681cac919cad5996c49cd41fad91bf322a310845fb5557e41c3e1e0f474bc22` |
 | `package2/pilot_pairs/analysis_pairs.md` | 10476 | `388f73f6070b95123bb88e77b46528b4bd5f4d629e59271fed713468de1ca3e2` |

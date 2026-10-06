@@ -1,0 +1,34 @@
+{
+ "frozen_inputs_match_FREEZE_json": [
+  "natural_data/package2/items_confirm.jsonl",
+  "natural_data/package2/rankings_local_confirm.jsonl",
+  "natural_data/package2/splits.json"
+ ],
+ "inputs_sha256": {
+  "natural_data/package2/items_confirm.jsonl": "27f7b1dbcdc3dbcc2790495b0175e24f7081ba687dba184f0821b4f5b21054ae",
+  "natural_data/package2/rankings_local_confirm.jsonl": "7707ca3046838a642391c9755da0aadcc3b3802c27a1c1b705b5a0ec31253d21",
+  "natural_data/package2/splits.json": "47534c6bc80df65c1cd44df87635a98b829365faae85060c2b134a6b613475d6",
+  "natural_data/package2/items_pilot.jsonl": "6a94887205b718304caafddbf6ada37c2d1059ed4da99e0d5eb56c221838e674",
+  "natural_data/package2/confirm_qa/records.jsonl": "ac9bf9b9aed99d765c6a24d925324f1ae46989f80dadb7ccf521798e46082589",
+  "natural_data/package2/confirm_qa/analysis_qa.json": "f53aa3f6a04824c8d146ef1ec962a8eb1c29fe2bfd786a593bc465a063c382f2"
+ },
+ "code_sha256": {
+  "harness/package2/qa_data.py": "e7763a2dd4dd0999a909df2162f94f0671704d165d0ff06cfd7735bf858eae4f",
+  "harness/package2/rank_local.py": "93d4087b8a4909f0624e1b10f9026ba4ac716c01176758e02c704ea205fdb0d1",
+  "harness/package2/run_qa.py": "c2d38888d019b2b42edd2dae0f3a58bac748f0a0e71b0f0144e250a1b45e93de",
+  "harness/package2/analyze_qa.py": "f8871b833964feff94fdd689f952d92dfc5d18c31cb6df80823c33be08ae6abd",
+  "harness/package2/export_qa_textfree.py": "b6f2b0e5c0d31624c85891f7966a959be9b062353e9eeeebc31f33d8c528dddb"
+ },
+ "counts": {
+  "items": 420,
+  "local_rankings": 2100,
+  "requests": 9240,
+  "requests_by_kind": {
+   "answer": 8400,
+   "overhead": 240,
+   "rank": 600
+  },
+  "transport_failed": 13,
+  "prompts_rebuilt_and_matched": 9240
+ }
+}

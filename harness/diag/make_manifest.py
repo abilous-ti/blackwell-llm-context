@@ -114,10 +114,23 @@ MAPPING = [
       "package2/confirm_clarify/records.jsonl", "package2/smoke_clarify/",
       "<analysis_clarify.json and .md computed by harness/package2/analyze_clarify.py; protocol in "
       "harness/package2/PROTOCOL_CLARIFY.md>"]),
-    ("Natural-data benchmarks (sec:natural, tab:natural, tab:overhead, sec:results-natural)",
-     ["<natural_data/package2/confirm_qa/: records.jsonl, analysis_qa.json, analysis_qa.md; "
-      "items, splits and local rankings in natural_data/package2/; computed by "
-      "harness/package2/analyze_qa.py>"]),
+    # Natural-data benchmarks (Sections 4.7 and 5.9). The full records hold benchmark text and
+    # replies and stay local (natural_data/, gitignored); these text-free exports carry every number
+    # (harness/package2/export_qa_textfree.py writes them, verify_qa_textfree.py recomputes the
+    # tables from them, check_textfree_leaks.py checks them for text).
+    ("Natural-data benchmarks: evidence retrieval and answer quality (sec:natural, tab:natural, sec:results-natural)",
+     ["package2/confirm_qa_textfree/items.jsonl", "package2/confirm_qa_textfree/splits.json",
+      "package2/confirm_qa_textfree/rankings.jsonl", "package2/confirm_qa_textfree/answers.jsonl",
+      "package2/confirm_qa_textfree/augmentation.jsonl", "package2/confirm_qa_textfree/analysis_qa.json",
+      "<computed by harness/package2/analyze_qa.py from the full records; recomputed from the "
+      "text-free files by harness/package2/verify_qa_textfree.py; fields in "
+      "package2/confirm_qa_textfree/README.md>"]),
+    ("Listwise reranking overhead (tab:overhead, sec:results-natural)",
+     ["package2/confirm_qa_textfree/overhead.jsonl", "package2/confirm_qa_textfree/analysis_qa.json",
+      "<computed by harness/package2/analyze_qa.py; recomputed by harness/package2/verify_qa_textfree.py>"]),
+    ("Exploratory natural-data pilot of 2 October, development data (sec:natural, sec:limitations)",
+     ["natural_pilot_textfree/",
+      "<harness/natural/; text-free export by harness/package2/export_qa_textfree.py>"]),
     ("GPT-5.5 trap cell (transport-clean source)",
      ["audit/audit_gpt55_trap_store_wire_W1.json", "audit/audit_gpt55_trap_store_wire_W2.json",
       "audit/audit_gpt55_trap_store_wire_summary.json"]),

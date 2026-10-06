@@ -1,0 +1,29 @@
+{
+ "inputs_sha256": {
+  "natural_data/stage1/sample.json": "1b6685acdc28ae99bee1e96ed89f14fdcce097be491a17505686a0f10ef7f589",
+  "natural_data/stage1/audit.json": "fc0e790cda2def11f497791692b9c65d6adbd69c115cfe7a9a0df343840b62e2",
+  "natural_data/stage2/items.json": "be48ab9572472f08d9953cfa1ee64968a2bbec119edc40ad3b908a5c1a82b552",
+  "natural_data/stage2/schedule.jsonl": "139fead834ac3e8ddbfb53bb8ef30f5a943c73e0f6ccc32048fcc8e48bd63710",
+  "natural_data/stage2/records/pilot.jsonl": "eef4febf2aa140655103e39ed7720a23d6901a25867729cfb23c1726b75ae386",
+  "natural_data/stage2/scored.json": "0038296b1258d1e3db1c8c45a35f17825f46c7645627b550a656e82aa140b02f"
+ },
+ "code_sha256": {
+  "harness/natural/stage1_sample.py": "3e35f7b182a5e69bfe5ac4437530680c0687f065856017c99e28a9c0efa51dea",
+  "harness/natural/stage1_annotate.py": "084e7624cdac41e5730263466f23d1841b7f06a98eb6d414cbd39eaca9687487",
+  "harness/natural/stage2_pilot.py": "9ebbc7e3a3fa1bd05ccbc841a2bea79831220607eb7ba2ae0e9132697d52b084",
+  "harness/natural/scoring.py": "1a3d80609ed27a52a2968a2aa8533e477fa26f958ba331a2c83ffeeaa02c383d",
+  "harness/package2/export_qa_textfree.py": "b6f2b0e5c0d31624c85891f7966a959be9b062353e9eeeebc31f33d8c528dddb"
+ },
+ "sources_sha256": {
+  "hotpot_dev_distractor.parquet": "c20b638ca82b21d04fe12e14ff417ad05153d4d215a65de54497fca4e972f7c6",
+  "tatqa_dataset_dev.json": "8da095a819af6db3c14877c6df2d4d29960e41d1a63dd1fa853507bd2a616af5"
+ },
+ "counts": {
+  "stage1_items": 40,
+  "items": 81,
+  "requests": 2430,
+  "transport_failed": 0,
+  "prompts_rebuilt_and_matched": 2430,
+  "scores_matching_scored_json": 2430
+ }
+}
