@@ -21,7 +21,9 @@ from measure_blackwell import clopper_pearson as cp                  # noqa: E40
 
 RES = os.path.join(ROOT, "results")
 TEX = os.path.join(ROOT, "paper", "blackwell-paper.tex")
-ETA, TAU = 0.10, 0.30
+# The manuscript reports every family at 95% (eta = 0.05); the harness default of eta = 0.10
+# appears only as its sensitivity check, and no 90% bound is printed with four decimals.
+ETA, TAU = 0.05, 0.30
 TASKS = ["api_post_ok", "api_argorder", "enc_amount", "trap_store_wire"]
 FILES = [("Haiku-4.5", "blackwell_haiku_api_n40"), ("Sonnet-4.6", "blackwell_sonnet_api_n40"),
          ("Opus-4.8", "blackwell_opus_api_n40"), ("GPT-5.5", "blackwell_gpt55_n40"),
@@ -47,12 +49,27 @@ if not os.path.exists(TEX):
 src = open(TEX, encoding="utf-8").read()
 bad, checked = [], 0
 
-# --- interference table: "Model & \texttt{cell} & $A\% \to B\%$ & $D$ & $U$ & \checkmark" ----
+# --- interference table ------------------------------------------------------------------------
+#   "Model & \texttt{cell} & $k_1 \to k_+$ & $D$ & $U$\,\checkmark & $J$\,\checkmark \\"
+# U is the marginal upper bound (eta/2 per endpoint, one family per cell) and J the joint one (a
+# single eta spread over all the table's contrasts, per-interval level eta/K). The success counts,
+# the joint column and the verdict marks are optional, so the older layout still parses; whatever
+# is printed is checked, and a mark must agree with the unrounded bound it stands next to.
+K = 2 * len(FILES)                                 # two API cells per model
+MARK = r"(?:\\,)?\s*(\\checkmark|\$\\times\$)?"
 row = re.compile(r"^([\w.\-]+(?:-[\w.]+)*)\s*&\s*\\texttt\{(api\\_post\\_ok|api\\_argorder)\}"
-                 r".*?&\s*\$([-+]?\d*\.?\d+)\$\s*&\s*\$([-+]?\d*\.?\d+)\$", re.M)
+                 r"(?:\s*&\s*\$(\d+)\s*\\to\s*(\d+)\$)?"
+                 r".*?&\s*\$([-+]?\d*\.?\d+)\$\s*&\s*\$([-+]?\d*\.?\d+)\$" + MARK +
+                 r"(?:\s*&\s*\$([-+]?\d*\.?\d+)\$" + MARK + r")?", re.M)
+
+
+def mark_ok(mark, bound):
+    return mark is None or (mark == "\\checkmark") == (bound <= -TAU)
+
+
 for m in row.finditer(src):
     lab, cell = m.group(1), m.group(2).replace("\\_", "_")
-    printed_d, printed_u = float(m.group(3)), float(m.group(4))
+    printed_d, printed_u = float(m.group(5)), float(m.group(6))
     if lab not in counts:
         continue
     kA, nA = counts[lab]["W1plus|" + cell]
@@ -60,6 +77,11 @@ for m in row.finditer(src):
     d = kA / nA - kB / nB
     u = cp(kA, nA, ETA)[1] - cp(kB, nB, ETA)[0]
     checked += 2
+    if m.group(3) is not None:
+        checked += 1
+        if (int(m.group(3)), int(m.group(4))) != (kB, kA):
+            bad.append("%s/%s successes printed %s -> %s, released %d -> %d"
+                       % (lab, cell, m.group(3), m.group(4), kB, kA))
     # Delta is a point estimate, not a bound: any correct 2-decimal rounding is within half a
     # unit, and an exact half (-0.625 -> -0.62) is correct either way. Bounds are the strict case.
     if abs(printed_d - d) > 5e-3 + 1e-9:
@@ -67,6 +89,16 @@ for m in row.finditer(src):
     if printed_u < u - 1e-9:                      # printed upper must be >= computed upper
         bad.append("%s/%s upper printed %+.3f is STRONGER than computed %+.6f"
                    % (lab, cell, printed_u, u))
+    if not mark_ok(m.group(7), u):
+        bad.append("%s/%s marginal verdict mark disagrees with the bound %+.6f" % (lab, cell, u))
+    if m.group(8) is not None:
+        uj = cp(kA, nA, ETA / K)[1] - cp(kB, nB, ETA / K)[0]
+        checked += 1
+        if float(m.group(8)) < uj - 1e-9:
+            bad.append("%s/%s joint upper printed %+.3f is STRONGER than computed %+.6f"
+                       % (lab, cell, float(m.group(8)), uj))
+        if not mark_ok(m.group(9), uj):
+            bad.append("%s/%s joint verdict mark disagrees with the bound %+.6f" % (lab, cell, uj))
 
 # --- consolidated table: L_D rows are LOWER bounds, printed must be <= computed --------------
 for direction, (X, Y) in (("W_1,W_2", ("W1", "W2")), ("W_2,W_1", ("W2", "W1"))):

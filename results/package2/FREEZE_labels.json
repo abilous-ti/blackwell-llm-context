@@ -1,0 +1,32 @@
+{
+ "frozen_at_utc": "2026-10-05T17:41:31+00:00",
+ "parameters": {
+  "requests": 2880,
+  "blocks_per_cell": 40,
+  "models": [
+   "DeepSeek-V4-Pro",
+   "GPT-5.5",
+   "Haiku-4.5",
+   "Kimi-K2.6",
+   "Opus-4.8",
+   "Sonnet-4.6"
+  ],
+  "lanes": 4,
+  "alpha_primary": "0.05/24",
+  "alpha_diagnostics": "0.05/48",
+  "state_draws": "operating-system entropy (random.SystemRandom), recorded in the schedule"
+ },
+ "sha256": {
+  "harness/package2/labels.py": "67ccf8ba1cd2d2535e79f2acdc40ed292e5f280d13cd5b8391f983bf7289d85c",
+  "harness/package2/run_labels.py": "1740316ed661123bf9ef1d9848392b1d461e9fbb59daf44c3614efdec65ede94",
+  "harness/package2/analyze_labels.py": "02bfb1b6a7b3a3f2d399fa38e2c73a0194e088586967fdb4486255b0e95778ca",
+  "harness/package2/freeze_labels.py": "ecbe1df53da16f8911cfbbbe536a3be78795e100d6da3d6f9d04a5559447cca4",
+  "harness/package2/PROTOCOL_LABELS.md": "13992be78e511e126c194a4ebb928bd3f584e01f6577f8ee7480e40f1d1da8fd",
+  "harness/package2/pairs.py": "6292ab88ed70ce484e5ecac705d596ad6d1cb209ed06e4c0dcb2724bcabaffd0",
+  "harness/package2/run_pairs.py": "f5f11aa15465f24e4488236a1f671da4d52a493dcb7c66cd45a6233ccf7fb81a",
+  "harness/replication/transport.py": "ea45ffcb46fc891893ae369c5916a6165522a28ca74027d22f276abcfe4106a6",
+  "harness/replication/design.json": "0b79e6acec5a8db86a614673207cdb8e5cb32a629ec08ecf4f3ad260e28134c6",
+  "harness/measure_blackwell.py": "2c8502ccb22f0c896987870bd288e2f0f45de9c9a72c958f1e370a75388d98a8",
+  "results/package2/confirm_labels/schedule.jsonl": "e94cd6c97ad8b1d3256d2debf257eebb52032d925d59eba79d3675f51eb15943"
+ }
+}

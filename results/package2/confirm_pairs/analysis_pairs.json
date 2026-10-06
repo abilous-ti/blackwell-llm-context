@@ -1,0 +1,3187 @@
+{
+ "primary": [
+  {
+   "pair": "cache",
+   "model": "Haiku-4.5",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 0.975,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.40144742124151767,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 0.975,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.40144742124151767,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 0.975,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.40144742124151767,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       39,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.617208499320347
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "cache",
+   "model": "Sonnet-4.6",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "cache",
+   "model": "Opus-4.8",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "cache",
+   "model": "GPT-5.5",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "cache",
+   "model": "DeepSeek-V4-Pro",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 0.575,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.0014474212415176435,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 0.575,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.0014474212415176435,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 0.575,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.0014474212415176435,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       23,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.15166721515903098
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "cache",
+   "model": "Kimi-K2.6",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "inventory",
+   "model": "Haiku-4.5",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "inventory",
+   "model": "Sonnet-4.6",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "inventory",
+   "model": "Opus-4.8",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "inventory",
+   "model": "GPT-5.5",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "inventory",
+   "model": "DeepSeek-V4-Pro",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 0.275,
+    "halfwidth": 0.5735525787584823,
+    "bound": -0.2985525787584823,
+    "verified": false,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 0.275,
+     "halfwidth": 0.5735525787584823,
+     "bound": -0.2985525787584823,
+     "verified": false
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 0.275,
+     "halfwidth": 0.5735525787584823,
+     "bound": -0.2985525787584823,
+     "verified": false
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       11,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": -0.07489455330730557
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": false
+  },
+  {
+   "pair": "inventory",
+   "model": "Kimi-K2.6",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "audit",
+   "model": "Haiku-4.5",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 0.525,
+    "halfwidth": 0.5735525787584823,
+    "bound": -0.04855257875848229,
+    "verified": false,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 0.525,
+     "halfwidth": 0.5735525787584823,
+     "bound": -0.04855257875848229,
+     "verified": false
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 0.525,
+     "halfwidth": 0.5735525787584823,
+     "bound": -0.04855257875848229,
+     "verified": false
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       21,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.10818711498436911
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 0.975,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.40144742124151767,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 0.975,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.40144742124151767,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 0.975,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.40144742124151767,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       39,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.617208499320347
+    }
+   },
+   "pass_incomparable": false
+  },
+  {
+   "pair": "audit",
+   "model": "Sonnet-4.6",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "audit",
+   "model": "Opus-4.8",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "audit",
+   "model": "GPT-5.5",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "audit",
+   "model": "DeepSeek-V4-Pro",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  },
+  {
+   "pair": "audit",
+   "model": "Kimi-K2.6",
+   "A_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "A": [
+       40,
+       40
+      ],
+      "B": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "B_adv": {
+    "blocks": 40,
+    "estimate": 1.0,
+    "halfwidth": 0.5735525787584823,
+    "bound": 0.4264474212415177,
+    "verified": true,
+    "worst_case": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "published": {
+     "blocks": 40,
+     "estimate": 1.0,
+     "halfwidth": 0.5735525787584823,
+     "bound": 0.4264474212415177,
+     "verified": true
+    },
+    "pooled_cp": {
+     "counts": {
+      "B": [
+       40,
+       40
+      ],
+      "A": [
+       0,
+       40
+      ]
+     },
+     "bound": 0.6675195464462658
+    }
+   },
+   "pass_incomparable": true
+  }
+ ],
+ "augmentation": [
+  {
+   "blocks": 40,
+   "estimate": -0.975,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.37199094564965085,
+   "verified": true,
+   "pair": "cache",
+   "model": "Haiku-4.5",
+   "task": "cache_put_ok",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.975,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.37199094564965085,
+   "verified": true,
+   "pair": "cache",
+   "model": "Haiku-4.5",
+   "task": "cache_put_ok",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "cache",
+   "model": "Haiku-4.5",
+   "task": "key_norm",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "cache",
+   "model": "Haiku-4.5",
+   "task": "key_norm",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "cache",
+   "model": "Sonnet-4.6",
+   "task": "cache_put_ok",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "cache",
+   "model": "Sonnet-4.6",
+   "task": "cache_put_ok",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "cache",
+   "model": "Sonnet-4.6",
+   "task": "key_norm",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "cache",
+   "model": "Sonnet-4.6",
+   "task": "key_norm",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "cache",
+   "model": "Opus-4.8",
+   "task": "cache_put_ok",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.15,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.4530090543503491,
+   "verified": false,
+   "pair": "cache",
+   "model": "Opus-4.8",
+   "task": "cache_put_ok",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "cache",
+   "model": "Opus-4.8",
+   "task": "key_norm",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "cache",
+   "model": "Opus-4.8",
+   "task": "key_norm",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "cache",
+   "model": "GPT-5.5",
+   "task": "cache_put_ok",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "cache",
+   "model": "GPT-5.5",
+   "task": "cache_put_ok",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "cache",
+   "model": "GPT-5.5",
+   "task": "key_norm",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "cache",
+   "model": "GPT-5.5",
+   "task": "key_norm",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.45,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.15300905435034912,
+   "verified": false,
+   "pair": "cache",
+   "model": "DeepSeek-V4-Pro",
+   "task": "cache_put_ok",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.35,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.25300905435034915,
+   "verified": false,
+   "pair": "cache",
+   "model": "DeepSeek-V4-Pro",
+   "task": "cache_put_ok",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "cache",
+   "model": "DeepSeek-V4-Pro",
+   "task": "key_norm",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "cache",
+   "model": "DeepSeek-V4-Pro",
+   "task": "key_norm",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "cache",
+   "model": "Kimi-K2.6",
+   "task": "cache_put_ok",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "cache",
+   "model": "Kimi-K2.6",
+   "task": "cache_put_ok",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "cache",
+   "model": "Kimi-K2.6",
+   "task": "key_norm",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "cache",
+   "model": "Kimi-K2.6",
+   "task": "key_norm",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.025,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.5780090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "Haiku-4.5",
+   "task": "inv_book",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "Haiku-4.5",
+   "task": "inv_book",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "Haiku-4.5",
+   "task": "inv_sku",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "Haiku-4.5",
+   "task": "inv_sku",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "inventory",
+   "model": "Sonnet-4.6",
+   "task": "inv_book",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "inventory",
+   "model": "Sonnet-4.6",
+   "task": "inv_book",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "Sonnet-4.6",
+   "task": "inv_sku",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "Sonnet-4.6",
+   "task": "inv_sku",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "inventory",
+   "model": "Opus-4.8",
+   "task": "inv_book",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "inventory",
+   "model": "Opus-4.8",
+   "task": "inv_book",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "Opus-4.8",
+   "task": "inv_sku",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "Opus-4.8",
+   "task": "inv_sku",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "inventory",
+   "model": "GPT-5.5",
+   "task": "inv_book",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "inventory",
+   "model": "GPT-5.5",
+   "task": "inv_book",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "GPT-5.5",
+   "task": "inv_sku",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "GPT-5.5",
+   "task": "inv_sku",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.25,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.3530090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_book",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.275,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.3280090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_book",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.025,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.5780090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "inventory",
+   "model": "Kimi-K2.6",
+   "task": "inv_book",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": -0.3969909456496509,
+   "verified": true,
+   "pair": "inventory",
+   "model": "Kimi-K2.6",
+   "task": "inv_book",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "Kimi-K2.6",
+   "task": "inv_sku",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "inventory",
+   "model": "Kimi-K2.6",
+   "task": "inv_sku",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.175,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.7780090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Haiku-4.5",
+   "task": "audit_code",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.325,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.9280090543503492,
+   "verified": false,
+   "pair": "audit",
+   "model": "Haiku-4.5",
+   "task": "audit_code",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.025,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6280090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Haiku-4.5",
+   "task": "audit_line",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.125,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.4780090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Haiku-4.5",
+   "task": "audit_line",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Sonnet-4.6",
+   "task": "audit_code",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Sonnet-4.6",
+   "task": "audit_code",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Sonnet-4.6",
+   "task": "audit_line",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Sonnet-4.6",
+   "task": "audit_line",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Opus-4.8",
+   "task": "audit_code",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Opus-4.8",
+   "task": "audit_code",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Opus-4.8",
+   "task": "audit_line",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Opus-4.8",
+   "task": "audit_line",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "GPT-5.5",
+   "task": "audit_code",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "GPT-5.5",
+   "task": "audit_code",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "GPT-5.5",
+   "task": "audit_line",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "GPT-5.5",
+   "task": "audit_line",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.075,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.5280090543503492,
+   "verified": false,
+   "pair": "audit",
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line",
+   "contrast": "BA - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Kimi-K2.6",
+   "task": "audit_code",
+   "contrast": "AB - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Kimi-K2.6",
+   "task": "audit_code",
+   "contrast": "BA - A"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Kimi-K2.6",
+   "task": "audit_line",
+   "contrast": "AB - B"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "bound": 0.6030090543503491,
+   "verified": false,
+   "pair": "audit",
+   "model": "Kimi-K2.6",
+   "task": "audit_line",
+   "contrast": "BA - B"
+  }
+ ],
+ "controls": [
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Haiku-4.5",
+   "task": "api_post_ok",
+   "contrast": "W1plus - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Haiku-4.5",
+   "task": "api_post_ok",
+   "contrast": "W1plus_rev - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -0.6030090543503491,
+   "upper": 0.6030090543503491,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": 0.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -0.6030090543503491,
+    "upper": 0.6030090543503491,
+    "verified": false
+   },
+   "model": "Haiku-4.5",
+   "task": "api_post_ok",
+   "contrast": "W1pad - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Sonnet-4.6",
+   "task": "api_post_ok",
+   "contrast": "W1plus - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Sonnet-4.6",
+   "task": "api_post_ok",
+   "contrast": "W1plus_rev - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -0.6030090543503491,
+   "upper": 0.6030090543503491,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": 0.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -0.6030090543503491,
+    "upper": 0.6030090543503491,
+    "verified": false
+   },
+   "model": "Sonnet-4.6",
+   "task": "api_post_ok",
+   "contrast": "W1pad - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Opus-4.8",
+   "task": "api_post_ok",
+   "contrast": "W1plus - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Opus-4.8",
+   "task": "api_post_ok",
+   "contrast": "W1plus_rev - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -0.6030090543503491,
+   "upper": 0.6030090543503491,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": 0.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -0.6030090543503491,
+    "upper": 0.6030090543503491,
+    "verified": false
+   },
+   "model": "Opus-4.8",
+   "task": "api_post_ok",
+   "contrast": "W1pad - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "GPT-5.5",
+   "task": "api_post_ok",
+   "contrast": "W1plus - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "GPT-5.5",
+   "task": "api_post_ok",
+   "contrast": "W1plus_rev - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -0.6030090543503491,
+   "upper": 0.6030090543503491,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": 0.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -0.6030090543503491,
+    "upper": 0.6030090543503491,
+    "verified": false
+   },
+   "model": "GPT-5.5",
+   "task": "api_post_ok",
+   "contrast": "W1pad - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.775,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.3780090543503491,
+   "upper": -0.1719909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -0.775,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.3780090543503491,
+    "upper": -0.1719909456496509,
+    "verified": true
+   },
+   "model": "DeepSeek-V4-Pro",
+   "task": "api_post_ok",
+   "contrast": "W1plus - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.65,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.2530090543503491,
+   "upper": -0.046990945649650895,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -0.65,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.2530090543503491,
+    "upper": -0.046990945649650895,
+    "verified": true
+   },
+   "model": "DeepSeek-V4-Pro",
+   "task": "api_post_ok",
+   "contrast": "W1plus_rev - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.125,
+   "halfwidth": 0.6030090543503491,
+   "lower": -0.7280090543503491,
+   "upper": 0.4780090543503491,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": -0.125,
+    "halfwidth": 0.6030090543503491,
+    "lower": -0.7280090543503491,
+    "upper": 0.4780090543503491,
+    "verified": false
+   },
+   "model": "DeepSeek-V4-Pro",
+   "task": "api_post_ok",
+   "contrast": "W1pad - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Kimi-K2.6",
+   "task": "api_post_ok",
+   "contrast": "W1plus - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Kimi-K2.6",
+   "task": "api_post_ok",
+   "contrast": "W1plus_rev - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -0.6030090543503491,
+   "upper": 0.6030090543503491,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": 0.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -0.6030090543503491,
+    "upper": 0.6030090543503491,
+    "verified": false
+   },
+   "model": "Kimi-K2.6",
+   "task": "api_post_ok",
+   "contrast": "W1pad - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.825,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.428009054350349,
+   "upper": -0.22199094564965083,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -0.825,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.428009054350349,
+    "upper": -0.22199094564965083,
+    "verified": true
+   },
+   "model": "Haiku-4.5",
+   "task": "api_argorder",
+   "contrast": "W1plus - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.825,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.428009054350349,
+   "upper": -0.22199094564965083,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -0.825,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.428009054350349,
+    "upper": -0.22199094564965083,
+    "verified": true
+   },
+   "model": "Haiku-4.5",
+   "task": "api_argorder",
+   "contrast": "W1plus_rev - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.175,
+   "halfwidth": 0.6030090543503491,
+   "lower": -0.42800905435034914,
+   "upper": 0.7780090543503491,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": 0.175,
+    "halfwidth": 0.6030090543503491,
+    "lower": -0.42800905435034914,
+    "upper": 0.7780090543503491,
+    "verified": false
+   },
+   "model": "Haiku-4.5",
+   "task": "api_argorder",
+   "contrast": "W1pad - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Sonnet-4.6",
+   "task": "api_argorder",
+   "contrast": "W1plus - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Sonnet-4.6",
+   "task": "api_argorder",
+   "contrast": "W1plus_rev - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -0.6030090543503491,
+   "upper": 0.6030090543503491,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": 0.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -0.6030090543503491,
+    "upper": 0.6030090543503491,
+    "verified": false
+   },
+   "model": "Sonnet-4.6",
+   "task": "api_argorder",
+   "contrast": "W1pad - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Opus-4.8",
+   "task": "api_argorder",
+   "contrast": "W1plus - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Opus-4.8",
+   "task": "api_argorder",
+   "contrast": "W1plus_rev - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -0.6030090543503491,
+   "upper": 0.6030090543503491,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": 0.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -0.6030090543503491,
+    "upper": 0.6030090543503491,
+    "verified": false
+   },
+   "model": "Opus-4.8",
+   "task": "api_argorder",
+   "contrast": "W1pad - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "GPT-5.5",
+   "task": "api_argorder",
+   "contrast": "W1plus - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "GPT-5.5",
+   "task": "api_argorder",
+   "contrast": "W1plus_rev - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -0.6030090543503491,
+   "upper": 0.6030090543503491,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": 0.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -0.6030090543503491,
+    "upper": 0.6030090543503491,
+    "verified": false
+   },
+   "model": "GPT-5.5",
+   "task": "api_argorder",
+   "contrast": "W1pad - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.575,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.178009054350349,
+   "upper": 0.028009054350349172,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": -0.575,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.178009054350349,
+    "upper": 0.028009054350349172,
+    "verified": false
+   },
+   "model": "DeepSeek-V4-Pro",
+   "task": "api_argorder",
+   "contrast": "W1plus - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -0.55,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.153009054350349,
+   "upper": 0.05300905435034908,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": -0.55,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.153009054350349,
+    "upper": 0.05300905435034908,
+    "verified": false
+   },
+   "model": "DeepSeek-V4-Pro",
+   "task": "api_argorder",
+   "contrast": "W1plus_rev - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.05,
+   "halfwidth": 0.6030090543503491,
+   "lower": -0.5530090543503491,
+   "upper": 0.6530090543503492,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": 0.05,
+    "halfwidth": 0.6030090543503491,
+    "lower": -0.5530090543503491,
+    "upper": 0.6530090543503492,
+    "verified": false
+   },
+   "model": "DeepSeek-V4-Pro",
+   "task": "api_argorder",
+   "contrast": "W1pad - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Kimi-K2.6",
+   "task": "api_argorder",
+   "contrast": "W1plus - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": -1.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -1.6030090543503492,
+   "upper": -0.3969909456496509,
+   "verified": true,
+   "published": {
+    "blocks": 40,
+    "estimate": -1.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -1.6030090543503492,
+    "upper": -0.3969909456496509,
+    "verified": true
+   },
+   "model": "Kimi-K2.6",
+   "task": "api_argorder",
+   "contrast": "W1plus_rev - W1"
+  },
+  {
+   "blocks": 40,
+   "estimate": 0.0,
+   "halfwidth": 0.6030090543503491,
+   "lower": -0.6030090543503491,
+   "upper": 0.6030090543503491,
+   "verified": false,
+   "published": {
+    "blocks": 40,
+    "estimate": 0.0,
+    "halfwidth": 0.6030090543503491,
+    "lower": -0.6030090543503491,
+    "upper": 0.6030090543503491,
+    "verified": false
+   },
+   "model": "Kimi-K2.6",
+   "task": "api_argorder",
+   "contrast": "W1pad - W1"
+  }
+ ],
+ "baselines": [
+  {
+   "pair": "cache",
+   "model": "Haiku-4.5",
+   "task": "cache_put_ok",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "cache",
+   "model": "Haiku-4.5",
+   "task": "key_norm",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "cache",
+   "model": "Sonnet-4.6",
+   "task": "cache_put_ok",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "cache",
+   "model": "Sonnet-4.6",
+   "task": "key_norm",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "cache",
+   "model": "Opus-4.8",
+   "task": "cache_put_ok",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "cache",
+   "model": "Opus-4.8",
+   "task": "key_norm",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "cache",
+   "model": "GPT-5.5",
+   "task": "cache_put_ok",
+   "none": [
+    1,
+    40
+   ]
+  },
+  {
+   "pair": "cache",
+   "model": "GPT-5.5",
+   "task": "key_norm",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "cache",
+   "model": "DeepSeek-V4-Pro",
+   "task": "cache_put_ok",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "cache",
+   "model": "DeepSeek-V4-Pro",
+   "task": "key_norm",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "cache",
+   "model": "Kimi-K2.6",
+   "task": "cache_put_ok",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "cache",
+   "model": "Kimi-K2.6",
+   "task": "key_norm",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "inventory",
+   "model": "Haiku-4.5",
+   "task": "inv_book",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "inventory",
+   "model": "Haiku-4.5",
+   "task": "inv_sku",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "inventory",
+   "model": "Sonnet-4.6",
+   "task": "inv_book",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "inventory",
+   "model": "Sonnet-4.6",
+   "task": "inv_sku",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "inventory",
+   "model": "Opus-4.8",
+   "task": "inv_book",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "inventory",
+   "model": "Opus-4.8",
+   "task": "inv_sku",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "inventory",
+   "model": "GPT-5.5",
+   "task": "inv_book",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "inventory",
+   "model": "GPT-5.5",
+   "task": "inv_sku",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "inventory",
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_book",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "inventory",
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "inventory",
+   "model": "Kimi-K2.6",
+   "task": "inv_book",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "inventory",
+   "model": "Kimi-K2.6",
+   "task": "inv_sku",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "audit",
+   "model": "Haiku-4.5",
+   "task": "audit_code",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "audit",
+   "model": "Haiku-4.5",
+   "task": "audit_line",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "audit",
+   "model": "Sonnet-4.6",
+   "task": "audit_code",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "audit",
+   "model": "Sonnet-4.6",
+   "task": "audit_line",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "audit",
+   "model": "Opus-4.8",
+   "task": "audit_code",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "audit",
+   "model": "Opus-4.8",
+   "task": "audit_line",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "audit",
+   "model": "GPT-5.5",
+   "task": "audit_code",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "audit",
+   "model": "GPT-5.5",
+   "task": "audit_line",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "audit",
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "audit",
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "audit",
+   "model": "Kimi-K2.6",
+   "task": "audit_code",
+   "none": [
+    0,
+    40
+   ]
+  },
+  {
+   "pair": "audit",
+   "model": "Kimi-K2.6",
+   "task": "audit_line",
+   "none": [
+    0,
+    40
+   ]
+  }
+ ],
+ "grading_differences": [
+  {
+   "id": "GPT-5.5|cache|key_norm|037|none",
+   "published": true,
+   "hardened": false
+  },
+  {
+   "id": "GPT-5.5|cache|key_norm|014|none",
+   "published": true,
+   "hardened": false
+  },
+  {
+   "id": "GPT-5.5|cache|key_norm|009|none",
+   "published": true,
+   "hardened": false
+  },
+  {
+   "id": "GPT-5.5|cache|key_norm|013|none",
+   "published": true,
+   "hardened": false
+  },
+  {
+   "id": "GPT-5.5|cache|key_norm|038|none",
+   "published": true,
+   "hardened": false
+  },
+  {
+   "id": "GPT-5.5|cache|key_norm|016|none",
+   "published": true,
+   "hardened": false
+  },
+  {
+   "id": "GPT-5.5|cache|key_norm|033|none",
+   "published": true,
+   "hardened": false
+  },
+  {
+   "id": "GPT-5.5|cache|key_norm|022|none",
+   "published": true,
+   "hardened": false
+  },
+  {
+   "id": "GPT-5.5|cache|key_norm|025|none",
+   "published": true,
+   "hardened": false
+  },
+  {
+   "id": "GPT-5.5|cache|key_norm|003|none",
+   "published": true,
+   "hardened": false
+  },
+  {
+   "id": "GPT-5.5|cache|key_norm|006|none",
+   "published": true,
+   "hardened": false
+  }
+ ],
+ "n": {
+  "scheduled": 9120,
+  "received": 9120,
+  "graded": 9120,
+  "transport_failed": 0
+ }
+}

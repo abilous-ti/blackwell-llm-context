@@ -1,0 +1,471 @@
+{
+ "windows_kept": [
+  "d1-pm",
+  "d2-am",
+  "d3-am",
+  "d3-pm"
+ ],
+ "windows_excluded": [
+  "d2-pm",
+  "d4-am"
+ ],
+ "decisions_changed": [],
+ "rows": {
+  "Haiku-4.5 A1": {
+   "full": {
+    "blocks": 240,
+    "estimate": 0.9916666666666667,
+    "bound": 0.7648446714093369,
+    "decision": [
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": 0.99375,
+    "bound": 0.7159509245897779,
+    "decision": [
+     true
+    ]
+   }
+  },
+  "Haiku-4.5 A2": {
+   "full": {
+    "blocks": 240,
+    "estimate": 0.7625000000000001,
+    "bound": 0.5356780047426702,
+    "decision": [
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": 0.76875,
+    "bound": 0.490950924589778,
+    "decision": [
+     true
+    ]
+   }
+  },
+  "Haiku-4.5 H1": {
+   "full": {
+    "blocks": 240,
+    "estimate": -0.9916666666666667,
+    "bound": -0.7648446714093369,
+    "decision": [
+     true,
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": -0.99375,
+    "bound": -0.7159509245897779,
+    "decision": [
+     true,
+     true
+    ]
+   }
+  },
+  "Haiku-4.5 H2": {
+   "full": {
+    "blocks": 240,
+    "estimate": -0.8458333333333333,
+    "bound": -0.6190113380760035,
+    "decision": [
+     true,
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": -0.85625,
+    "bound": -0.578450924589778,
+    "decision": [
+     true,
+     true
+    ]
+   }
+  },
+  "Sonnet-4.6 A1": {
+   "full": {
+    "blocks": 240,
+    "estimate": 1.0,
+    "bound": 0.7731780047426702,
+    "decision": [
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": 1.0,
+    "bound": 0.722200924589778,
+    "decision": [
+     true
+    ]
+   }
+  },
+  "Sonnet-4.6 A2": {
+   "full": {
+    "blocks": 240,
+    "estimate": 1.0,
+    "bound": 0.7731780047426702,
+    "decision": [
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": 1.0,
+    "bound": 0.722200924589778,
+    "decision": [
+     true
+    ]
+   }
+  },
+  "Sonnet-4.6 H1": {
+   "full": {
+    "blocks": 240,
+    "estimate": -1.0,
+    "bound": -0.7731780047426702,
+    "decision": [
+     true,
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": -1.0,
+    "bound": -0.722200924589778,
+    "decision": [
+     true,
+     true
+    ]
+   }
+  },
+  "Sonnet-4.6 H2": {
+   "full": {
+    "blocks": 240,
+    "estimate": -1.0,
+    "bound": -0.7731780047426702,
+    "decision": [
+     true,
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": -1.0,
+    "bound": -0.722200924589778,
+    "decision": [
+     true,
+     true
+    ]
+   }
+  },
+  "Opus-4.8 A1": {
+   "full": {
+    "blocks": 240,
+    "estimate": 1.0,
+    "bound": 0.7731780047426702,
+    "decision": [
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": 1.0,
+    "bound": 0.722200924589778,
+    "decision": [
+     true
+    ]
+   }
+  },
+  "Opus-4.8 A2": {
+   "full": {
+    "blocks": 240,
+    "estimate": 1.0,
+    "bound": 0.7731780047426702,
+    "decision": [
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": 1.0,
+    "bound": 0.722200924589778,
+    "decision": [
+     true
+    ]
+   }
+  },
+  "Opus-4.8 H1": {
+   "full": {
+    "blocks": 240,
+    "estimate": -1.0,
+    "bound": -0.7731780047426702,
+    "decision": [
+     true,
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": -1.0,
+    "bound": -0.722200924589778,
+    "decision": [
+     true,
+     true
+    ]
+   }
+  },
+  "Opus-4.8 H2": {
+   "full": {
+    "blocks": 240,
+    "estimate": -1.0,
+    "bound": -0.7731780047426702,
+    "decision": [
+     true,
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": -1.0,
+    "bound": -0.722200924589778,
+    "decision": [
+     true,
+     true
+    ]
+   }
+  },
+  "GPT-5.5 A1": {
+   "full": {
+    "blocks": 240,
+    "estimate": 1.0,
+    "bound": 0.7731780047426702,
+    "decision": [
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": 1.0,
+    "bound": 0.722200924589778,
+    "decision": [
+     true
+    ]
+   }
+  },
+  "GPT-5.5 A2": {
+   "full": {
+    "blocks": 238,
+    "estimate": 0.9916666666666666,
+    "bound": 0.7638520102322963,
+    "decision": [
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": 0.99375,
+    "bound": 0.7159509245897779,
+    "decision": [
+     true
+    ]
+   }
+  },
+  "GPT-5.5 H1": {
+   "full": {
+    "blocks": 240,
+    "estimate": -1.0,
+    "bound": -0.7731780047426702,
+    "decision": [
+     true,
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": -1.0,
+    "bound": -0.722200924589778,
+    "decision": [
+     true,
+     true
+    ]
+   }
+  },
+  "GPT-5.5 H2": {
+   "full": {
+    "blocks": 240,
+    "estimate": -1.0,
+    "bound": -0.7731780047426702,
+    "decision": [
+     true,
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": -1.0,
+    "bound": -0.722200924589778,
+    "decision": [
+     true,
+     true
+    ]
+   }
+  },
+  "DeepSeek-V4-Pro A1": {
+   "full": {
+    "blocks": 240,
+    "estimate": 0.7583333333333333,
+    "bound": 0.5315113380760035,
+    "decision": [
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": 0.7437499999999999,
+    "bound": 0.4659509245897779,
+    "decision": [
+     true
+    ]
+   }
+  },
+  "DeepSeek-V4-Pro A2": {
+   "full": {
+    "blocks": 240,
+    "estimate": 0.7666666666666666,
+    "bound": 0.5398446714093368,
+    "decision": [
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": 0.75625,
+    "bound": 0.47845092458977795,
+    "decision": [
+     true
+    ]
+   }
+  },
+  "DeepSeek-V4-Pro H1": {
+   "full": {
+    "blocks": 240,
+    "estimate": -0.7541666666666665,
+    "bound": -0.5273446714093367,
+    "decision": [
+     true,
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": -0.7375,
+    "bound": -0.459700924589778,
+    "decision": [
+     true,
+     true
+    ]
+   }
+  },
+  "DeepSeek-V4-Pro H2": {
+   "full": {
+    "blocks": 240,
+    "estimate": -0.45416666666666666,
+    "bound": -0.22734467140933687,
+    "decision": [
+     true,
+     false
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": -0.46875,
+    "bound": -0.19095092458977797,
+    "decision": [
+     true,
+     false
+    ]
+   }
+  },
+  "Kimi-K2.6 A1": {
+   "full": {
+    "blocks": 240,
+    "estimate": 1.0,
+    "bound": 0.7731780047426702,
+    "decision": [
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": 1.0,
+    "bound": 0.722200924589778,
+    "decision": [
+     true
+    ]
+   }
+  },
+  "Kimi-K2.6 A2": {
+   "full": {
+    "blocks": 239,
+    "estimate": 0.9455128205128206,
+    "bound": 0.7182066795706861,
+    "decision": [
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": 0.95,
+    "bound": 0.672200924589778,
+    "decision": [
+     true
+    ]
+   }
+  },
+  "Kimi-K2.6 H1": {
+   "full": {
+    "blocks": 240,
+    "estimate": -1.0,
+    "bound": -0.7731780047426702,
+    "decision": [
+     true,
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": -1.0,
+    "bound": -0.722200924589778,
+    "decision": [
+     true,
+     true
+    ]
+   }
+  },
+  "Kimi-K2.6 H2": {
+   "full": {
+    "blocks": 239,
+    "estimate": -1.0,
+    "bound": -0.7726938590578655,
+    "decision": [
+     true,
+     true
+    ]
+   },
+   "four_windows": {
+    "blocks": 160,
+    "estimate": -1.0,
+    "bound": -0.722200924589778,
+    "decision": [
+     true,
+     true
+    ]
+   }
+  }
+ }
+}

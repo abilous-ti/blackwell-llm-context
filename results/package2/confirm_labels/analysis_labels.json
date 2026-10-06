@@ -1,0 +1,2669 @@
+{
+ "n": {
+  "scheduled": 2880,
+  "received": 2880,
+  "graded": 2880,
+  "transport_failed": 0
+ },
+ "caps": {
+  "inv_contract_label": 0.125,
+  "inv_sku_label": 0.125,
+  "audit_code_label": 0.3333333333333333,
+  "audit_line_label": 0.125
+ },
+ "primary": [
+  {
+   "model": "Haiku-4.5",
+   "pair": "inventory",
+   "task": "inv_contract_label",
+   "own": "A",
+   "other": "B",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "pair": "inventory",
+   "task": "inv_sku_label",
+   "own": "B",
+   "other": "A",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "pair": "audit",
+   "task": "audit_code_label",
+   "own": "A",
+   "other": "B",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.3333333333333333,
+   "verified": true,
+   "deficiency_lower_bound": 0.523643277559134,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "pair": "audit",
+   "task": "audit_line_label",
+   "own": "B",
+   "other": "A",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "pair": "inventory",
+   "task": "inv_contract_label",
+   "own": "A",
+   "other": "B",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "pair": "inventory",
+   "task": "inv_sku_label",
+   "own": "B",
+   "other": "A",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "pair": "audit",
+   "task": "audit_code_label",
+   "own": "A",
+   "other": "B",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.3333333333333333,
+   "verified": true,
+   "deficiency_lower_bound": 0.523643277559134,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "pair": "audit",
+   "task": "audit_line_label",
+   "own": "B",
+   "other": "A",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "pair": "inventory",
+   "task": "inv_contract_label",
+   "own": "A",
+   "other": "B",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "pair": "inventory",
+   "task": "inv_sku_label",
+   "own": "B",
+   "other": "A",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "pair": "audit",
+   "task": "audit_code_label",
+   "own": "A",
+   "other": "B",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.3333333333333333,
+   "verified": true,
+   "deficiency_lower_bound": 0.523643277559134,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "pair": "audit",
+   "task": "audit_line_label",
+   "own": "B",
+   "other": "A",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "pair": "inventory",
+   "task": "inv_contract_label",
+   "own": "A",
+   "other": "B",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "pair": "inventory",
+   "task": "inv_sku_label",
+   "own": "B",
+   "other": "A",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "pair": "audit",
+   "task": "audit_code_label",
+   "own": "A",
+   "other": "B",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.3333333333333333,
+   "verified": true,
+   "deficiency_lower_bound": 0.523643277559134,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "pair": "audit",
+   "task": "audit_line_label",
+   "own": "B",
+   "other": "A",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "pair": "inventory",
+   "task": "inv_contract_label",
+   "own": "A",
+   "other": "B",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "pair": "inventory",
+   "task": "inv_sku_label",
+   "own": "B",
+   "other": "A",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "pair": "audit",
+   "task": "audit_code_label",
+   "own": "A",
+   "other": "B",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.3333333333333333,
+   "verified": true,
+   "deficiency_lower_bound": 0.523643277559134,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "pair": "audit",
+   "task": "audit_line_label",
+   "own": "B",
+   "other": "A",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "pair": "inventory",
+   "task": "inv_contract_label",
+   "own": "A",
+   "other": "B",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "pair": "inventory",
+   "task": "inv_sku_label",
+   "own": "B",
+   "other": "A",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "pair": "audit",
+   "task": "audit_code_label",
+   "own": "A",
+   "other": "B",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.3333333333333333,
+   "verified": true,
+   "deficiency_lower_bound": 0.523643277559134,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "pair": "audit",
+   "task": "audit_line_label",
+   "own": "B",
+   "other": "A",
+   "k": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "cp_lower": 0.8569766108924672,
+   "cap": 0.125,
+   "verified": true,
+   "deficiency_lower_bound": 0.7319766108924672,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 40,
+    "n": 40,
+    "cp_lower": 0.8569766108924672,
+    "verified": true
+   }
+  }
+ ],
+ "certified_pairs": [
+  {
+   "model": "Haiku-4.5",
+   "pair": "inventory",
+   "certified_incomparable": true
+  },
+  {
+   "model": "Haiku-4.5",
+   "pair": "audit",
+   "certified_incomparable": true
+  },
+  {
+   "model": "Sonnet-4.6",
+   "pair": "inventory",
+   "certified_incomparable": true
+  },
+  {
+   "model": "Sonnet-4.6",
+   "pair": "audit",
+   "certified_incomparable": true
+  },
+  {
+   "model": "Opus-4.8",
+   "pair": "inventory",
+   "certified_incomparable": true
+  },
+  {
+   "model": "Opus-4.8",
+   "pair": "audit",
+   "certified_incomparable": true
+  },
+  {
+   "model": "GPT-5.5",
+   "pair": "inventory",
+   "certified_incomparable": true
+  },
+  {
+   "model": "GPT-5.5",
+   "pair": "audit",
+   "certified_incomparable": true
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "pair": "inventory",
+   "certified_incomparable": true
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "pair": "audit",
+   "certified_incomparable": true
+  },
+  {
+   "model": "Kimi-K2.6",
+   "pair": "inventory",
+   "certified_incomparable": true
+  },
+  {
+   "model": "Kimi-K2.6",
+   "pair": "audit",
+   "certified_incomparable": true
+  }
+ ],
+ "diagnostics": [
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "arm": "none",
+   "k": 4,
+   "n": 40,
+   "cp_lower": 0.011198058402307576,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "arm": "B",
+   "k": 6,
+   "n": 40,
+   "cp_lower": 0.02935786524578291,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "arm": "none",
+   "k": 3,
+   "n": 40,
+   "cp_lower": 0.004944639991021838,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "arm": "A",
+   "k": 1,
+   "n": 40,
+   "cp_lower": 2.6054900026289402e-05,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_code_label",
+   "arm": "none",
+   "k": 4,
+   "n": 40,
+   "cp_lower": 0.011198058402307576,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_code_label",
+   "arm": "B",
+   "k": 9,
+   "n": 40,
+   "cp_lower": 0.06644143739881359,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "arm": "none",
+   "k": 2,
+   "n": 40,
+   "cp_lower": 0.001172897560082356,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "arm": "A",
+   "k": 2,
+   "n": 40,
+   "cp_lower": 0.001172897560082356,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "arm": "none",
+   "k": 2,
+   "n": 40,
+   "cp_lower": 0.001172897560082356,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "arm": "B",
+   "k": 10,
+   "n": 40,
+   "cp_lower": 0.08076140463241785,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "arm": "none",
+   "k": 4,
+   "n": 40,
+   "cp_lower": 0.011198058402307576,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "arm": "A",
+   "k": 5,
+   "n": 40,
+   "cp_lower": 0.019462247816887553,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_code_label",
+   "arm": "none",
+   "k": 17,
+   "n": 40,
+   "cp_lower": 0.20084921285642088,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_code_label",
+   "arm": "B",
+   "k": 17,
+   "n": 40,
+   "cp_lower": 0.20084921285642088,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "arm": "none",
+   "k": 7,
+   "n": 40,
+   "cp_lower": 0.04061033978433945,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "arm": "A",
+   "k": 4,
+   "n": 40,
+   "cp_lower": 0.011198058402307576,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "arm": "none",
+   "k": 6,
+   "n": 40,
+   "cp_lower": 0.02935786524578291,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "arm": "B",
+   "k": 6,
+   "n": 40,
+   "cp_lower": 0.02935786524578291,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "arm": "none",
+   "k": 4,
+   "n": 40,
+   "cp_lower": 0.011198058402307576,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "arm": "A",
+   "k": 4,
+   "n": 40,
+   "cp_lower": 0.011198058402307576,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_code_label",
+   "arm": "none",
+   "k": 14,
+   "n": 40,
+   "cp_lower": 0.14557100778001097,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_code_label",
+   "arm": "B",
+   "k": 16,
+   "n": 40,
+   "cp_lower": 0.18184554728098584,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "arm": "none",
+   "k": 1,
+   "n": 40,
+   "cp_lower": 2.6054900026289402e-05,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "arm": "A",
+   "k": 2,
+   "n": 40,
+   "cp_lower": 0.001172897560082356,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "arm": "none",
+   "k": 3,
+   "n": 40,
+   "cp_lower": 0.004944639991021838,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "arm": "B",
+   "k": 3,
+   "n": 40,
+   "cp_lower": 0.004944639991021838,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "arm": "none",
+   "k": 4,
+   "n": 40,
+   "cp_lower": 0.011198058402307576,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "arm": "A",
+   "k": 4,
+   "n": 40,
+   "cp_lower": 0.011198058402307576,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_code_label",
+   "arm": "none",
+   "k": 14,
+   "n": 40,
+   "cp_lower": 0.14557100778001097,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_code_label",
+   "arm": "B",
+   "k": 13,
+   "n": 40,
+   "cp_lower": 0.12834706632844617,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "arm": "none",
+   "k": 4,
+   "n": 40,
+   "cp_lower": 0.011198058402307576,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "arm": "A",
+   "k": 6,
+   "n": 40,
+   "cp_lower": 0.02935786524578291,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "arm": "none",
+   "k": 4,
+   "n": 40,
+   "cp_lower": 0.011198058402307576,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "arm": "B",
+   "k": 3,
+   "n": 40,
+   "cp_lower": 0.004944639991021838,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "arm": "none",
+   "k": 3,
+   "n": 40,
+   "cp_lower": 0.004944639991021838,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "arm": "A",
+   "k": 3,
+   "n": 40,
+   "cp_lower": 0.004944639991021838,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code_label",
+   "arm": "none",
+   "k": 15,
+   "n": 40,
+   "cp_lower": 0.16341263814314683,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code_label",
+   "arm": "B",
+   "k": 11,
+   "n": 40,
+   "cp_lower": 0.09589471283293988,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "arm": "none",
+   "k": 4,
+   "n": 40,
+   "cp_lower": 0.011198058402307576,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "arm": "A",
+   "k": 5,
+   "n": 40,
+   "cp_lower": 0.019462247816887553,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "arm": "none",
+   "k": 3,
+   "n": 40,
+   "cp_lower": 0.004944639991021838,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "arm": "B",
+   "k": 3,
+   "n": 40,
+   "cp_lower": 0.004944639991021838,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "arm": "none",
+   "k": 1,
+   "n": 40,
+   "cp_lower": 2.6054900026289402e-05,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "arm": "A",
+   "k": 0,
+   "n": 40,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_code_label",
+   "arm": "none",
+   "k": 6,
+   "n": 40,
+   "cp_lower": 0.02935786524578291,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_code_label",
+   "arm": "B",
+   "k": 1,
+   "n": 40,
+   "cp_lower": 2.6054900026289402e-05,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "arm": "none",
+   "k": 3,
+   "n": 40,
+   "cp_lower": 0.004944639991021838,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "arm": "A",
+   "k": 4,
+   "n": 40,
+   "cp_lower": 0.011198058402307576,
+   "cap": 0.125,
+   "flag": false
+  }
+ ],
+ "secondary": [
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "blocks": 40,
+   "estimate": 0.85,
+   "bound": 0.2944018491795559,
+   "verified": true
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "blocks": 40,
+   "estimate": 0.975,
+   "bound": 0.4194018491795559,
+   "verified": true
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_code_label",
+   "blocks": 40,
+   "estimate": 0.775,
+   "bound": 0.21940184917955596,
+   "verified": true
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "blocks": 40,
+   "estimate": 0.95,
+   "bound": 0.3944018491795559,
+   "verified": true
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "blocks": 40,
+   "estimate": 0.75,
+   "bound": 0.19440184917955594,
+   "verified": true
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "blocks": 40,
+   "estimate": 0.875,
+   "bound": 0.31940184917955594,
+   "verified": true
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_code_label",
+   "blocks": 40,
+   "estimate": 0.575,
+   "bound": 0.019401849179555897,
+   "verified": true
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "blocks": 40,
+   "estimate": 0.9,
+   "bound": 0.34440184917955596,
+   "verified": true
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "blocks": 40,
+   "estimate": 0.85,
+   "bound": 0.2944018491795559,
+   "verified": true
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "blocks": 40,
+   "estimate": 0.9,
+   "bound": 0.34440184917955596,
+   "verified": true
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_code_label",
+   "blocks": 40,
+   "estimate": 0.6,
+   "bound": 0.04440184917955592,
+   "verified": true
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "blocks": 40,
+   "estimate": 0.95,
+   "bound": 0.3944018491795559,
+   "verified": true
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "blocks": 40,
+   "estimate": 0.925,
+   "bound": 0.369401849179556,
+   "verified": true
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "blocks": 40,
+   "estimate": 0.9,
+   "bound": 0.34440184917955596,
+   "verified": true
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_code_label",
+   "blocks": 40,
+   "estimate": 0.675,
+   "bound": 0.11940184917955599,
+   "verified": true
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "blocks": 40,
+   "estimate": 0.85,
+   "bound": 0.2944018491795559,
+   "verified": true
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "blocks": 40,
+   "estimate": 0.925,
+   "bound": 0.369401849179556,
+   "verified": true
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "blocks": 40,
+   "estimate": 0.925,
+   "bound": 0.369401849179556,
+   "verified": true
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code_label",
+   "blocks": 40,
+   "estimate": 0.725,
+   "bound": 0.16940184917955592,
+   "verified": true
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "blocks": 40,
+   "estimate": 0.875,
+   "bound": 0.31940184917955594,
+   "verified": true
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "blocks": 40,
+   "estimate": 0.925,
+   "bound": 0.369401849179556,
+   "verified": true
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "blocks": 40,
+   "estimate": 1.0,
+   "bound": 0.44440184917955594,
+   "verified": true
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_code_label",
+   "blocks": 40,
+   "estimate": 0.975,
+   "bound": 0.4194018491795559,
+   "verified": true
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "blocks": 40,
+   "estimate": 0.9,
+   "bound": 0.34440184917955596,
+   "verified": true
+  }
+ ],
+ "per_state": [
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code_label",
+   "state": "table=t1",
+   "k": 14,
+   "n": 14
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code_label",
+   "state": "table=t2",
+   "k": 13,
+   "n": 13
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code_label",
+   "state": "table=t3",
+   "k": 13,
+   "n": 13
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=lower",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=upper",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=lower",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=upper",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=lower",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=upper",
+   "k": 10,
+   "n": 10
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=~|user=lower",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=~|user=upper",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=hold|order=qty_first",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=hold|order=sku_first",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=lease|order=qty_first",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=lease|order=sku_first",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=qty_first",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=sku_first",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=qty_first",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=sku_first",
+   "k": 11,
+   "n": 11
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=5",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=6",
+   "k": 2,
+   "n": 2
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=5",
+   "k": 8,
+   "n": 8
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=6",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=iv9.|width=5",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=iv9.|width=6",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=sk4-|width=5",
+   "k": 8,
+   "n": 8
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=sk4-|width=6",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_code_label",
+   "state": "table=t1",
+   "k": 12,
+   "n": 12
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_code_label",
+   "state": "table=t2",
+   "k": 12,
+   "n": 12
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_code_label",
+   "state": "table=t3",
+   "k": 16,
+   "n": 16
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=lower",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=upper",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=lower",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=upper",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=lower",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=upper",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=~|user=lower",
+   "k": 2,
+   "n": 2
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=~|user=upper",
+   "k": 8,
+   "n": 8
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=hold|order=qty_first",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=hold|order=sku_first",
+   "k": 2,
+   "n": 2
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=lease|order=qty_first",
+   "k": 2,
+   "n": 2
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=lease|order=sku_first",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=qty_first",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=sku_first",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=qty_first",
+   "k": 9,
+   "n": 9
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=sku_first",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=5",
+   "k": 2,
+   "n": 2
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=6",
+   "k": 12,
+   "n": 12
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=5",
+   "k": 2,
+   "n": 2
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=6",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=iv9.|width=5",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=iv9.|width=6",
+   "k": 9,
+   "n": 9
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=sk4-|width=5",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=sk4-|width=6",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_code_label",
+   "state": "table=t1",
+   "k": 17,
+   "n": 17
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_code_label",
+   "state": "table=t2",
+   "k": 8,
+   "n": 8
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_code_label",
+   "state": "table=t3",
+   "k": 15,
+   "n": 15
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=lower",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=upper",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=lower",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=upper",
+   "k": 2,
+   "n": 2
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=lower",
+   "k": 2,
+   "n": 2
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=upper",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=~|user=lower",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=~|user=upper",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=hold|order=qty_first",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=hold|order=sku_first",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=lease|order=qty_first",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=lease|order=sku_first",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=qty_first",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=sku_first",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=qty_first",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=sku_first",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=5",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=6",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=5",
+   "k": 10,
+   "n": 10
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=6",
+   "k": 9,
+   "n": 9
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=iv9.|width=5",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=iv9.|width=6",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=sk4-|width=5",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=sk4-|width=6",
+   "k": 9,
+   "n": 9
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_code_label",
+   "state": "table=t1",
+   "k": 10,
+   "n": 10
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_code_label",
+   "state": "table=t2",
+   "k": 20,
+   "n": 20
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_code_label",
+   "state": "table=t3",
+   "k": 10,
+   "n": 10
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=lower",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=upper",
+   "k": 2,
+   "n": 2
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=lower",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=upper",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=lower",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=upper",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=~|user=lower",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=~|user=upper",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=hold|order=qty_first",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=hold|order=sku_first",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=lease|order=qty_first",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=lease|order=sku_first",
+   "k": 9,
+   "n": 9
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=qty_first",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=sku_first",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=qty_first",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=sku_first",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=5",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=6",
+   "k": 2,
+   "n": 2
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=5",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=6",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=iv9.|width=5",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=iv9.|width=6",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=sk4-|width=5",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=sk4-|width=6",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_code_label",
+   "state": "table=t1",
+   "k": 14,
+   "n": 14
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_code_label",
+   "state": "table=t2",
+   "k": 14,
+   "n": 14
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_code_label",
+   "state": "table=t3",
+   "k": 12,
+   "n": 12
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=lower",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=upper",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=lower",
+   "k": 2,
+   "n": 2
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=upper",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=lower",
+   "k": 8,
+   "n": 8
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=upper",
+   "k": 8,
+   "n": 8
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=~|user=lower",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=~|user=upper",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=hold|order=qty_first",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=hold|order=sku_first",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=lease|order=qty_first",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=lease|order=sku_first",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=qty_first",
+   "k": 8,
+   "n": 8
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=sku_first",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=qty_first",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=sku_first",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=5",
+   "k": 10,
+   "n": 10
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=6",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=5",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=6",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=iv9.|width=5",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=iv9.|width=6",
+   "k": 2,
+   "n": 2
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=sk4-|width=5",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=sk4-|width=6",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_code_label",
+   "state": "table=t1",
+   "k": 14,
+   "n": 14
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_code_label",
+   "state": "table=t2",
+   "k": 17,
+   "n": 17
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_code_label",
+   "state": "table=t3",
+   "k": 9,
+   "n": 9
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=lower",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=upper",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=lower",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=upper",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=lower",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=upper",
+   "k": 8,
+   "n": 8
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=~|user=lower",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=~|user=upper",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=hold|order=sku_first",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=lease|order=qty_first",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=lease|order=sku_first",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=qty_first",
+   "k": 8,
+   "n": 8
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=sku_first",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=qty_first",
+   "k": 6,
+   "n": 6
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=sku_first",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=5",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=6",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=5",
+   "k": 7,
+   "n": 7
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=6",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=iv9.|width=5",
+   "k": 3,
+   "n": 3
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=iv9.|width=6",
+   "k": 4,
+   "n": 4
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=sk4-|width=5",
+   "k": 5,
+   "n": 5
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "state": "check=mod9:ABCDEFGHJ|prefix=sk4-|width=6",
+   "k": 6,
+   "n": 6
+  }
+ ],
+ "none_choices": [
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code_label",
+   "choices": {
+    "1": 33,
+    "2": 6,
+    "3": 1
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "choices": {
+    "1": 24,
+    "3": 10,
+    "4": 2,
+    "5": 1,
+    "6": 1,
+    "7": 2
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "choices": {
+    "1": 1,
+    "2": 3,
+    "5": 12,
+    "6": 24
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "choices": {
+    "1": 23,
+    "2": 3,
+    "3": 9,
+    "4": 5
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_code_label",
+   "choices": {
+    "2": 38,
+    "3": 2
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "choices": {
+    "1": 16,
+    "3": 24
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "choices": {
+    "5": 40
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "choices": {
+    "1": 6,
+    "2": 1,
+    "5": 7,
+    "6": 2,
+    "7": 17,
+    "8": 7
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_code_label",
+   "choices": {
+    "1": 12,
+    "2": 19,
+    "None": 9
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "choices": {
+    "1": 40
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "choices": {
+    "1": 5,
+    "2": 4,
+    "5": 13,
+    "6": 16,
+    "7": 1,
+    "8": 1
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "choices": {
+    "1": 1,
+    "2": 7,
+    "4": 25,
+    "8": 6,
+    "None": 1
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_code_label",
+   "choices": {
+    "1": 20,
+    "2": 3,
+    "None": 17
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "choices": {
+    "1": 7,
+    "3": 31,
+    "None": 2
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "choices": {
+    "5": 33,
+    "None": 7
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "choices": {
+    "1": 3,
+    "None": 37
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_code_label",
+   "choices": {
+    "1": 28,
+    "2": 12
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "choices": {
+    "1": 5,
+    "3": 34,
+    "7": 1
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "choices": {
+    "5": 39,
+    "6": 1
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "choices": {
+    "1": 3,
+    "4": 8,
+    "6": 2,
+    "7": 6,
+    "8": 21
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_code_label",
+   "choices": {
+    "2": 40
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "choices": {
+    "1": 34,
+    "3": 3,
+    "5": 2,
+    "7": 1
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "choices": {
+    "5": 16,
+    "7": 17,
+    "8": 7
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "choices": {
+    "1": 5,
+    "3": 2,
+    "4": 2,
+    "7": 24,
+    "8": 7
+   }
+  }
+ ],
+ "invalid": [
+  {
+   "model": "Haiku-4.5",
+   "own_source_arm": false,
+   "count": 13
+  },
+  {
+   "model": "Kimi-K2.6",
+   "own_source_arm": false,
+   "count": 156
+  }
+ ],
+ "certificate": {
+  "inv_contract_label": {
+   "pair": "inventory",
+   "source": "A",
+   "states": 8,
+   "max_acceptance_set": 1,
+   "cap_uniform_prior": 0.125,
+   "prompt_none_constant": true,
+   "other_prompt_depends_on_other_coordinate_only": true,
+   "own_rendering_injective": true,
+   "ideal_reader_value": 1.0
+  },
+  "inv_sku_label": {
+   "pair": "inventory",
+   "source": "B",
+   "states": 8,
+   "max_acceptance_set": 1,
+   "cap_uniform_prior": 0.125,
+   "prompt_none_constant": true,
+   "other_prompt_depends_on_other_coordinate_only": true,
+   "own_rendering_injective": true,
+   "ideal_reader_value": 1.0
+  },
+  "audit_code_label": {
+   "pair": "audit",
+   "source": "A",
+   "states": 3,
+   "max_acceptance_set": 1,
+   "cap_uniform_prior": 0.3333333333333333,
+   "prompt_none_constant": true,
+   "other_prompt_depends_on_other_coordinate_only": true,
+   "own_rendering_injective": true,
+   "ideal_reader_value": 1.0
+  },
+  "audit_line_label": {
+   "pair": "audit",
+   "source": "B",
+   "states": 8,
+   "max_acceptance_set": 1,
+   "cap_uniform_prior": 0.125,
+   "prompt_none_constant": true,
+   "other_prompt_depends_on_other_coordinate_only": true,
+   "own_rendering_injective": true,
+   "ideal_reader_value": 1.0
+  }
+ }
+}

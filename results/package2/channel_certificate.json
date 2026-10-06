@@ -1,0 +1,32 @@
+{
+ "cache": {
+  "states": 128,
+  "A_texts": 16,
+  "B_texts": 8,
+  "delta(W_A,W_B)": 0.875,
+  "closed_form_1_minus_1_over_NB": 0.875,
+  "delta(W_B,W_A)": 0.9375,
+  "closed_form_1_minus_1_over_NA": 0.9375,
+  "incomparable": true
+ },
+ "inventory": {
+  "states": 64,
+  "A_texts": 8,
+  "B_texts": 8,
+  "delta(W_A,W_B)": 0.875,
+  "closed_form_1_minus_1_over_NB": 0.875,
+  "delta(W_B,W_A)": 0.875,
+  "closed_form_1_minus_1_over_NA": 0.875,
+  "incomparable": true
+ },
+ "audit": {
+  "states": 24,
+  "A_texts": 3,
+  "B_texts": 8,
+  "delta(W_A,W_B)": 0.875,
+  "closed_form_1_minus_1_over_NB": 0.875,
+  "delta(W_B,W_A)": 0.666667,
+  "closed_form_1_minus_1_over_NA": 0.666667,
+  "incomparable": true
+ }
+}

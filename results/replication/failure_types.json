@@ -1,0 +1,190 @@
+{
+ "n_failing": 6994,
+ "overall": {
+  "refusal": 15,
+  "syntax": 15,
+  "truncated": 102,
+  "no code": 3,
+  "wrong result": 3963,
+  "wrong call": 2328,
+  "import/name": 535,
+  "other runtime": 31,
+  "passes on re-execution": 1,
+  "contract": 1
+ },
+ "exceptions_on_execution": {
+  "AssertionError": 3963,
+  "TypeError": 2328,
+  "NameError": 399,
+  "AttributeError": 26,
+  "ImportError": 119,
+  "ValueError": 3,
+  "ModuleNotFoundError": 17,
+  "IndexError": 1,
+  "ok": 1,
+  "PostError": 1,
+  "NotImplementedError": 1
+ },
+ "by_cell": {
+  "DeepSeek-V4-Pro|api_argorder|W1": {
+   "import/name": 117
+  },
+  "DeepSeek-V4-Pro|api_argorder|W1plus": {
+   "no code": 1,
+   "syntax": 1,
+   "wrong result": 158,
+   "import/name": 65,
+   "other runtime": 1
+  },
+  "DeepSeek-V4-Pro|api_argorder|none": {
+   "syntax": 2,
+   "wrong call": 178,
+   "import/name": 55,
+   "passes on re-execution": 1,
+   "other runtime": 1
+  },
+  "DeepSeek-V4-Pro|api_post_ok|W1": {
+   "syntax": 1,
+   "import/name": 57
+  },
+  "DeepSeek-V4-Pro|api_post_ok|W1plus": {
+   "import/name": 120,
+   "wrong result": 119
+  },
+  "DeepSeek-V4-Pro|api_post_ok|W2": {
+   "import/name": 62,
+   "wrong call": 177,
+   "other runtime": 1
+  },
+  "DeepSeek-V4-Pro|enc_amount|W1": {
+   "no code": 1,
+   "syntax": 3,
+   "wrong result": 232,
+   "other runtime": 2,
+   "import/name": 1,
+   "wrong call": 1
+  },
+  "DeepSeek-V4-Pro|enc_amount|W2": {
+   "wrong result": 55,
+   "other runtime": 1
+  },
+  "GPT-5.5|api_argorder|W1plus": {
+   "wrong result": 240
+  },
+  "GPT-5.5|api_argorder|none": {
+   "wrong call": 38,
+   "import/name": 4
+  },
+  "GPT-5.5|api_post_ok|W1plus": {
+   "wrong result": 240
+  },
+  "GPT-5.5|api_post_ok|W2": {
+   "wrong call": 239,
+   "wrong result": 1
+  },
+  "GPT-5.5|enc_amount|W1": {
+   "truncated": 8,
+   "wrong result": 228,
+   "import/name": 1,
+   "other runtime": 1
+  },
+  "GPT-5.5|enc_amount|W2": {
+   "wrong result": 1
+  },
+  "Haiku-4.5|api_argorder|W1": {
+   "import/name": 25,
+   "wrong call": 11,
+   "contract": 1
+  },
+  "Haiku-4.5|api_argorder|W1plus": {
+   "wrong result": 235,
+   "import/name": 2,
+   "wrong call": 3
+  },
+  "Haiku-4.5|api_argorder|none": {
+   "syntax": 6,
+   "wrong call": 230,
+   "import/name": 1,
+   "other runtime": 2,
+   "wrong result": 1
+  },
+  "Haiku-4.5|api_post_ok|W1": {
+   "wrong call": 2
+  },
+  "Haiku-4.5|api_post_ok|W1plus": {
+   "wrong result": 237,
+   "wrong call": 2,
+   "import/name": 1
+  },
+  "Haiku-4.5|api_post_ok|W2": {
+   "wrong call": 227,
+   "import/name": 13
+  },
+  "Haiku-4.5|enc_amount|W1": {
+   "wrong result": 164,
+   "wrong call": 76
+  },
+  "Haiku-4.5|enc_amount|W2": {
+   "syntax": 1,
+   "wrong call": 56
+  },
+  "Kimi-K2.6|api_argorder|W1plus": {
+   "wrong result": 239
+  },
+  "Kimi-K2.6|api_argorder|none": {
+   "wrong call": 125,
+   "other runtime": 22,
+   "import/name": 3
+  },
+  "Kimi-K2.6|api_post_ok|W1plus": {
+   "wrong result": 240
+  },
+  "Kimi-K2.6|api_post_ok|W2": {
+   "wrong call": 240
+  },
+  "Kimi-K2.6|enc_amount|W1": {
+   "truncated": 83,
+   "wrong result": 150,
+   "import/name": 6
+  },
+  "Kimi-K2.6|enc_amount|W2": {
+   "truncated": 11,
+   "wrong result": 2
+  },
+  "Opus-4.8|api_argorder|W1plus": {
+   "wrong result": 240
+  },
+  "Opus-4.8|api_argorder|none": {
+   "wrong call": 3
+  },
+  "Opus-4.8|api_post_ok|W1plus": {
+   "wrong result": 240
+  },
+  "Opus-4.8|api_post_ok|W2": {
+   "wrong call": 240
+  },
+  "Opus-4.8|enc_amount|W1": {
+   "refusal": 15,
+   "no code": 1,
+   "wrong result": 223,
+   "import/name": 1
+  },
+  "Sonnet-4.6|api_argorder|W1plus": {
+   "wrong result": 240
+  },
+  "Sonnet-4.6|api_argorder|none": {
+   "wrong call": 240
+  },
+  "Sonnet-4.6|api_post_ok|W1plus": {
+   "wrong result": 240
+  },
+  "Sonnet-4.6|api_post_ok|W2": {
+   "wrong call": 240
+  },
+  "Sonnet-4.6|enc_amount|W1": {
+   "syntax": 1,
+   "wrong result": 238,
+   "import/name": 1
+  }
+ }
+}

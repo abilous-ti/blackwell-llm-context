@@ -54,11 +54,9 @@ for _m, (_base, _over) in TABLE.items():
 
 MAPPING = [
     ("Table: per-cell PASS (tab:percell)", SIXMODEL),
-    ("Table: consolidated 6-model verdict (tab:consolidated)", ["<same as tab:percell>"]),
-    ("Table: anti-monotonicity (tab:interference)", ["<same as tab:percell>"]),
-    ("Figure: harm forest plot (fig:forest)", ["<same as tab:percell>"]),
+    ("Table: PASS-incomparability bounds (tab:incomp)", ["<same as tab:percell>"]),
+    ("Table: anti-monotonicity, marginal and joint bounds (tab:interference)", ["<same as tab:percell>"]),
     ("Table: selection policies (tab:policies)", ["<same as tab:percell>"]),
-    ("Figure: policy bars (fig:policies)", ["<same as tab:percell>"]),
     ("Figure: Hasse diagram (fig:hasse)", [TABLE["Haiku-4.5"][0] + ".json"]
      + sorted({f + ".json" for f in TABLE["Haiku-4.5"][1].values()})),
     ("Table: ranker spectrum (tab:rankers)", ["reranker_trap_api_n100.json", "dense_trap.json"]),
@@ -66,7 +64,7 @@ MAPPING = [
     # Section 7.4.5 and Table A2 are computed from the RETAINED completions of the API runs by
     # harness/diag/retained_text_checks.py. The row used to point at diag/, which is the older
     # command-line diagnostic and not what those numbers come from.
-    ("Raw-failure audit and retained-completions table (sec:results-audit, tab:retained)",
+    ("Screens of the original retained completions (sec:results-audit)",
      ["retain_api/haiku/", "retain_api/sonnet/", "retain_api/opus/",
       "<computed by harness/diag/retained_text_checks.py>"]),
     ("Command-line diagnostic record (historical)", ["diag/"]),
@@ -76,6 +74,50 @@ MAPPING = [
     ("LLM listwise reranker probe", ["reranker_trap_api_n100.json"]),
     # The base GPT-5.5 run logged an HTTP 500 on this one cell, so the published trap result is
     # bound to the clean retained re-measurement instead. The percentages are unchanged.
+    # The randomized replication (manuscript Sections 4.4 and 5.5-5.6). Its records are listed in
+    # the inventory below once they are tracked in git.
+    ("Replication design and contrasts (sec:replication, tab:contrasts, tab:protocols)",
+     ["replication/FREEZE.json", "replication/schedule.jsonl", "replication/schedule_manifest.json",
+      "<harness/replication/design.json, harness/replication/PROTOCOL.md>"]),
+    ("Replication results (tab:replication, sec:results-replication)",
+     ["replication/records/", "replication/analysis.json", "replication/analysis.md",
+      "<computed by harness/replication/analyze.py>"]),
+    ("Replication without the two amended windows (sec:results-replication)",
+     ["replication/sensitivity_windows.json", "<computed by harness/replication/sensitivity_windows.py>"]),
+    ("Replication failure types and response audit (tab:failures, sec:results-audit)",
+     ["replication/failure_types.json",
+      "<computed by harness/replication/failure_types.py and harness/replication/audit_responses.py>"]),
+    ("Replication planning simulation (tab:reppower)",
+     ["replication/power_sim.json", "<computed by harness/replication/power_sim.py>"]),
+    ("Replication window-boundary changes", ["replication/DEVIATIONS.md", "replication/FREEZE.json"]),
+    # Package 2 (manuscript Sections 4.5-4.7 and 5.7-5.9), collected 5 October 2026.
+    ("Independent pairs: certificates, freeze and pilot (sec:pairs)",
+     ["package2/certificates.json", "package2/FREEZE.json", "package2/pilot_pairs/",
+      "<harness/package2/PROTOCOL.md, PILOT.md, pairs.py, certify_pairs.py, run_pairs.py>"]),
+    ("Independent pairs and six-model controls (tab:pairs, sec:results-generality)",
+     ["package2/confirm_pairs/schedule.jsonl", "package2/confirm_pairs/records.jsonl",
+      "package2/confirm_pairs/analysis_pairs.json", "package2/confirm_pairs/analysis_pairs.md",
+      "<computed by harness/package2/analyze_pairs.py>"]),
+    ("Label decisions over hidden states (sec:labels, tab:labels, sec:results-labels)",
+     ["package2/FREEZE_labels.json", "package2/FREEZE_labels_amendment.json",
+      "package2/confirm_labels/schedule.jsonl", "package2/confirm_labels/records.jsonl",
+      "package2/confirm_labels/analysis_labels.json", "package2/confirm_labels/analysis_labels_amended.json",
+      "package2/smoke_labels/",
+      "<computed by harness/package2/analyze_labels.py and analyze_labels_amended.py; protocol and "
+      "amendment in harness/package2/PROTOCOL_LABELS.md and PROTOCOL_LABELS_AMENDMENT.md>"]),
+    ("Channel-matrix certificate: exact Le Cam deficiencies of the declared pair families (sec:pairs)",
+     ["package2/channel_certificate.json", "<computed by harness/package2/channel_certificate.py>"]),
+    ("Reply checks behind sec:results-generality and the verifier-enforcement limitation",
+     ["package2/failure_checks.json", "<computed by harness/package2/failure_checks.py>"]),
+    ("Clarified-contract run (sec:pairs, tab:clarify, sec:results-generality)",
+     ["package2/FREEZE_clarify.json", "package2/confirm_clarify/schedule.jsonl",
+      "package2/confirm_clarify/records.jsonl", "package2/smoke_clarify/",
+      "<analysis_clarify.json and .md computed by harness/package2/analyze_clarify.py; protocol in "
+      "harness/package2/PROTOCOL_CLARIFY.md>"]),
+    ("Natural-data benchmarks (sec:natural, tab:natural, tab:overhead, sec:results-natural)",
+     ["<natural_data/package2/confirm_qa/: records.jsonl, analysis_qa.json, analysis_qa.md; "
+      "items, splits and local rankings in natural_data/package2/; computed by "
+      "harness/package2/analyze_qa.py>"]),
     ("GPT-5.5 trap cell (transport-clean source)",
      ["audit/audit_gpt55_trap_store_wire_W1.json", "audit/audit_gpt55_trap_store_wire_W2.json",
       "audit/audit_gpt55_trap_store_wire_summary.json"]),

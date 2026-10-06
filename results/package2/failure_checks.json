@@ -1,0 +1,56 @@
+{
+ "pilot_regrade": {
+  "replies": 1140,
+  "changed": [
+   "GPT-5.5|audit|audit_code|003|none",
+   "GPT-5.5|cache|key_norm|002|none",
+   "GPT-5.5|cache|key_norm|004|none",
+   "GPT-5.5|inventory|inv_sku|003|none",
+   "GPT-5.5|inventory|inv_sku|004|none"
+  ],
+  "changed_published_pass_to_hardened_fail": 5
+ },
+ "replication_gaming_scan": {
+  "graded": 11516,
+  "passing_replies_with_gaming_patterns": [
+   {
+    "id": "d4-am|GPT-5.5|enc_amount|021|W1",
+    "model": "GPT-5.5",
+    "task": "enc_amount",
+    "condition": "W1"
+   }
+  ]
+ },
+ "deepseek_inventory_contract_failures": {
+  "failures": 29,
+  "without_inventory_import": 29
+ },
+ "haiku_audit_code_failures": {
+  "failures": 19,
+  "calling_a_language_model_api": 19
+ },
+ "superset_failures_cache_put_ok": {
+  "failures": 432,
+  "applying_other_source_transformation": 428,
+  "by_model": {
+   "Opus-4.8": 46,
+   "GPT-5.5": 80,
+   "DeepSeek-V4-Pro": 62,
+   "Sonnet-4.6": 80,
+   "Haiku-4.5": 80,
+   "Kimi-K2.6": 80
+  }
+ },
+ "superset_failures_inv_book": {
+  "failures": 400,
+  "applying_other_source_transformation": 400,
+  "by_model": {
+   "GPT-5.5": 80,
+   "DeepSeek-V4-Pro": 79,
+   "Sonnet-4.6": 80,
+   "Opus-4.8": 80,
+   "Kimi-K2.6": 80,
+   "Haiku-4.5": 1
+  }
+ }
+}

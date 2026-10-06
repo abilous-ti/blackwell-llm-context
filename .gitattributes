@@ -6,3 +6,6 @@
 *.pdf binary
 *.docx binary
 *.gz binary
+
+# Hashed by results/package2/FREEZE.json as written (CRLF); stored byte for byte so the freeze verifies in a clone.
+results/package2/certificates.json -text

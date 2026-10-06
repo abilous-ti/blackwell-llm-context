@@ -50,3 +50,14 @@ paper/
 
 # First replication pilot (30 Sep 2026): recorded before endpoint hashing, it names the Azure resource.
 results/replication/smoke/20260930T080346Z/
+
+# Natural-data validation (HotpotQA, TAT-QA, MuSiQue): downloaded datasets, not redistributed here.
+natural_data/
+
+# Package 2: mock test outputs and the unused code-based state runner (superseded by the label experiment).
+results/package2/_mock_states/
+results/package2/pilot_pairs_mock/
+harness/package2/run_states.py
+harness/package2/analyze_states.py
+harness/package2/freeze_states.py
+harness/package2/PROTOCOL_STATES.md

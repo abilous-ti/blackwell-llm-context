@@ -1,5 +1,17 @@
 # Prospective replication with randomized blocks: protocol
 
+> **Completion note (5 October 2026).** This protocol was frozen on 1 October 2026 at 14:14
+> Europe/Kyiv (`results/replication/FREEZE.json`). Collection ran from 1 to 4 October 2026 in six
+> windows; the final analysis (`results/replication/analysis.md`, status FINAL) graded 11,516 of
+> 11,520 scheduled observations, with four requests interrupted. Two window boundaries were
+> changed during collection: d2-pm's end (moved to 23:00 before any of its requests and to
+> midnight after 169 had been issued) and d4-am's start (moved from 10:00 to 09:00 before any of
+> its requests). `results/replication/DEVIATIONS.md` and the amendments in `FREEZE.json` record
+> their times and reasons; `sensitivity_windows.py` shows that excluding both windows changes no
+> decision. The text below is the protocol as frozen, kept unchanged apart from the deviation note
+> in Section 3 and the pilot record in Section 5; its "DRAFT" status line is the pre-freeze
+> original.
+
 **Status: DRAFT.** `freeze.py` freezes the protocol. It refuses to freeze without concrete window
 boundaries, interruption rules, a schedule within the call budget and its retry headroom, committed
 code, or if records already exist. It sets `status`, `frozen_at_utc` and `harness_commit` in
@@ -61,8 +73,9 @@ with its hash before any request.
 **Windows:** six windows of five hours, Europe/Kyiv (UTC+03:00): Thursday 1 October 16:00–21:00;
 Friday 2 and Saturday 3 October 10:00–15:00 and 16:00–21:00; Sunday 4 October 10:00–15:00. Each
 window is stored with its start and end as ISO 8601 times with the offset; windows may not overlap. *Deviations:* d2-pm (2 October), whose 16:00–21:00 slot passed with no request issued, had its end
-extended to midnight; d4-am (4 October) starts at 09:00 instead of 10:00, decided before any d4-am
-request was issued. See `results/replication/DEVIATIONS.md`.
+moved to 23:00 and then, after 169 of its requests had been issued, to midnight; d4-am (4 October)
+starts at 09:00 instead of 10:00, decided before any d4-am request was issued. See
+`results/replication/DEVIATIONS.md`.
 
 **Concurrency.** Each model has at most `max_in_flight_per_model` = 2 requests in flight: lane *j*
 takes the blocks whose position in the window is *j* modulo 2, so a block's requests stay back to

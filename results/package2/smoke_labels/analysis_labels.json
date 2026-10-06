@@ -1,0 +1,1651 @@
+{
+ "n": {
+  "scheduled": 72,
+  "received": 72,
+  "graded": 72,
+  "transport_failed": 0
+ },
+ "caps": {
+  "inv_contract_label": 0.125,
+  "inv_sku_label": 0.125,
+  "audit_code_label": 0.3333333333333333,
+  "audit_line_label": 0.125
+ },
+ "primary": [
+  {
+   "model": "Haiku-4.5",
+   "pair": "inventory",
+   "task": "inv_contract_label",
+   "own": "A",
+   "other": "B",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "pair": "inventory",
+   "task": "inv_sku_label",
+   "own": "B",
+   "other": "A",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "pair": "audit",
+   "task": "audit_code_label",
+   "own": "A",
+   "other": "B",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.3333333333333333,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "pair": "audit",
+   "task": "audit_line_label",
+   "own": "B",
+   "other": "A",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "pair": "inventory",
+   "task": "inv_contract_label",
+   "own": "A",
+   "other": "B",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "pair": "inventory",
+   "task": "inv_sku_label",
+   "own": "B",
+   "other": "A",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "pair": "audit",
+   "task": "audit_code_label",
+   "own": "A",
+   "other": "B",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.3333333333333333,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "pair": "audit",
+   "task": "audit_line_label",
+   "own": "B",
+   "other": "A",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "pair": "inventory",
+   "task": "inv_contract_label",
+   "own": "A",
+   "other": "B",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "pair": "inventory",
+   "task": "inv_sku_label",
+   "own": "B",
+   "other": "A",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "pair": "audit",
+   "task": "audit_code_label",
+   "own": "A",
+   "other": "B",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.3333333333333333,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "pair": "audit",
+   "task": "audit_line_label",
+   "own": "B",
+   "other": "A",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "pair": "inventory",
+   "task": "inv_contract_label",
+   "own": "A",
+   "other": "B",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "pair": "inventory",
+   "task": "inv_sku_label",
+   "own": "B",
+   "other": "A",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "pair": "audit",
+   "task": "audit_code_label",
+   "own": "A",
+   "other": "B",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.3333333333333333,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "pair": "audit",
+   "task": "audit_line_label",
+   "own": "B",
+   "other": "A",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "pair": "inventory",
+   "task": "inv_contract_label",
+   "own": "A",
+   "other": "B",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "pair": "inventory",
+   "task": "inv_sku_label",
+   "own": "B",
+   "other": "A",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "pair": "audit",
+   "task": "audit_code_label",
+   "own": "A",
+   "other": "B",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.3333333333333333,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "pair": "audit",
+   "task": "audit_line_label",
+   "own": "B",
+   "other": "A",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "pair": "inventory",
+   "task": "inv_contract_label",
+   "own": "A",
+   "other": "B",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "pair": "inventory",
+   "task": "inv_sku_label",
+   "own": "B",
+   "other": "A",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "pair": "audit",
+   "task": "audit_code_label",
+   "own": "A",
+   "other": "B",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.3333333333333333,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_B, E_A)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "pair": "audit",
+   "task": "audit_line_label",
+   "own": "B",
+   "other": "A",
+   "k": 1,
+   "n": 1,
+   "accuracy": 1.0,
+   "cp_lower": 0.0020833333333333346,
+   "cap": 0.125,
+   "verified": false,
+   "deficiency_lower_bound": 0.0,
+   "bound_direction": "delta(E_A, E_B)",
+   "worst_case": {
+    "k": 1,
+    "n": 1,
+    "cp_lower": 0.0020833333333333346,
+    "verified": false
+   }
+  }
+ ],
+ "certified_pairs": [
+  {
+   "model": "Haiku-4.5",
+   "pair": "inventory",
+   "certified_incomparable": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "pair": "audit",
+   "certified_incomparable": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "pair": "inventory",
+   "certified_incomparable": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "pair": "audit",
+   "certified_incomparable": false
+  },
+  {
+   "model": "Opus-4.8",
+   "pair": "inventory",
+   "certified_incomparable": false
+  },
+  {
+   "model": "Opus-4.8",
+   "pair": "audit",
+   "certified_incomparable": false
+  },
+  {
+   "model": "GPT-5.5",
+   "pair": "inventory",
+   "certified_incomparable": false
+  },
+  {
+   "model": "GPT-5.5",
+   "pair": "audit",
+   "certified_incomparable": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "pair": "inventory",
+   "certified_incomparable": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "pair": "audit",
+   "certified_incomparable": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "pair": "inventory",
+   "certified_incomparable": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "pair": "audit",
+   "certified_incomparable": false
+  }
+ ],
+ "diagnostics": [
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "arm": "B",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "arm": "A",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_code_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_code_label",
+   "arm": "B",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "arm": "A",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "arm": "none",
+   "k": 1,
+   "n": 1,
+   "cp_lower": 0.001041666666666666,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "arm": "B",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "arm": "A",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_code_label",
+   "arm": "none",
+   "k": 1,
+   "n": 1,
+   "cp_lower": 0.001041666666666666,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_code_label",
+   "arm": "B",
+   "k": 1,
+   "n": 1,
+   "cp_lower": 0.001041666666666666,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "arm": "A",
+   "k": 1,
+   "n": 1,
+   "cp_lower": 0.001041666666666666,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "arm": "none",
+   "k": 1,
+   "n": 1,
+   "cp_lower": 0.001041666666666666,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "arm": "B",
+   "k": 1,
+   "n": 1,
+   "cp_lower": 0.001041666666666666,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "arm": "A",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_code_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_code_label",
+   "arm": "B",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "arm": "A",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "arm": "B",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "arm": "A",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_code_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_code_label",
+   "arm": "B",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "arm": "A",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "arm": "B",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "arm": "A",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code_label",
+   "arm": "none",
+   "k": 1,
+   "n": 1,
+   "cp_lower": 0.001041666666666666,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code_label",
+   "arm": "B",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "arm": "A",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "arm": "B",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "arm": "A",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_code_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_code_label",
+   "arm": "B",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.3333333333333333,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "arm": "none",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "arm": "A",
+   "k": 0,
+   "n": 1,
+   "cp_lower": 0.0,
+   "cap": 0.125,
+   "flag": false
+  }
+ ],
+ "secondary": [
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_code_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_code_label",
+   "blocks": 1,
+   "estimate": 0.0,
+   "bound": -3.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "blocks": 1,
+   "estimate": 0.0,
+   "bound": -3.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "blocks": 1,
+   "estimate": 0.0,
+   "bound": -3.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_code_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_code_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_code_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "blocks": 1,
+   "estimate": 1.0,
+   "bound": -2.513911240740704,
+   "verified": false
+  }
+ ],
+ "per_state": [
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code_label",
+   "state": "table=t3",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=lower",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=hold|order=qty_first",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=6",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_code_label",
+   "state": "table=t1",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=lower",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "state": "exc=ReserveError|kw=lease|order=qty_first",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=5",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_code_label",
+   "state": "table=t3",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "state": "epoch=oct|sep=^|user=lower",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=qty_first",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=iv9.|width=5",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_code_label",
+   "state": "table=t1",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=upper",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=sku_first",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=6",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_code_label",
+   "state": "table=t3",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=^|user=upper",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=hold|order=sku_first",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=5",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_code_label",
+   "state": "table=t2",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "state": "epoch=hex|sep=~|user=lower",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "state": "exc=StockError|kw=lease|order=sku_first",
+   "k": 1,
+   "n": 1
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "state": "check=mod7:KMPRTWY|prefix=sk4-|width=6",
+   "k": 1,
+   "n": 1
+  }
+ ],
+ "none_choices": [
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_code_label",
+   "choices": {
+    "3": 1
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "audit_line_label",
+   "choices": {
+    "3": 1
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_contract_label",
+   "choices": {
+    "6": 1
+   }
+  },
+  {
+   "model": "DeepSeek-V4-Pro",
+   "task": "inv_sku_label",
+   "choices": {
+    "1": 1
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_code_label",
+   "choices": {
+    "2": 1
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "audit_line_label",
+   "choices": {
+    "3": 1
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_contract_label",
+   "choices": {
+    "5": 1
+   }
+  },
+  {
+   "model": "GPT-5.5",
+   "task": "inv_sku_label",
+   "choices": {
+    "6": 1
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_code_label",
+   "choices": {
+    "1": 1
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "audit_line_label",
+   "choices": {
+    "1": 1
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_contract_label",
+   "choices": {
+    "6": 1
+   }
+  },
+  {
+   "model": "Haiku-4.5",
+   "task": "inv_sku_label",
+   "choices": {
+    "8": 1
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_code_label",
+   "choices": {
+    "None": 1
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "audit_line_label",
+   "choices": {
+    "3": 1
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_contract_label",
+   "choices": {
+    "5": 1
+   }
+  },
+  {
+   "model": "Kimi-K2.6",
+   "task": "inv_sku_label",
+   "choices": {
+    "None": 1
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_code_label",
+   "choices": {
+    "1": 1
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "audit_line_label",
+   "choices": {
+    "1": 1
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_contract_label",
+   "choices": {
+    "5": 1
+   }
+  },
+  {
+   "model": "Opus-4.8",
+   "task": "inv_sku_label",
+   "choices": {
+    "8": 1
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_code_label",
+   "choices": {
+    "2": 1
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "audit_line_label",
+   "choices": {
+    "1": 1
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_contract_label",
+   "choices": {
+    "7": 1
+   }
+  },
+  {
+   "model": "Sonnet-4.6",
+   "task": "inv_sku_label",
+   "choices": {
+    "4": 1
+   }
+  }
+ ],
+ "invalid": [
+  {
+   "model": "Kimi-K2.6",
+   "own_source_arm": false,
+   "count": 5
+  }
+ ],
+ "certificate": {
+  "inv_contract_label": {
+   "pair": "inventory",
+   "source": "A",
+   "states": 8,
+   "max_acceptance_set": 1,
+   "cap_uniform_prior": 0.125,
+   "prompt_none_constant": true,
+   "other_prompt_depends_on_other_coordinate_only": true,
+   "own_rendering_injective": true,
+   "ideal_reader_value": 1.0
+  },
+  "inv_sku_label": {
+   "pair": "inventory",
+   "source": "B",
+   "states": 8,
+   "max_acceptance_set": 1,
+   "cap_uniform_prior": 0.125,
+   "prompt_none_constant": true,
+   "other_prompt_depends_on_other_coordinate_only": true,
+   "own_rendering_injective": true,
+   "ideal_reader_value": 1.0
+  },
+  "audit_code_label": {
+   "pair": "audit",
+   "source": "A",
+   "states": 3,
+   "max_acceptance_set": 1,
+   "cap_uniform_prior": 0.3333333333333333,
+   "prompt_none_constant": true,
+   "other_prompt_depends_on_other_coordinate_only": true,
+   "own_rendering_injective": true,
+   "ideal_reader_value": 1.0
+  },
+  "audit_line_label": {
+   "pair": "audit",
+   "source": "B",
+   "states": 8,
+   "max_acceptance_set": 1,
+   "cap_uniform_prior": 0.125,
+   "prompt_none_constant": true,
+   "other_prompt_depends_on_other_coordinate_only": true,
+   "own_rendering_injective": true,
+   "ideal_reader_value": 1.0
+  }
+ }
+}

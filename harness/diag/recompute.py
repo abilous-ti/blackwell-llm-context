@@ -4,7 +4,10 @@ own certify_harm / clopper_pearson rather than a reimplementation.
 Run it first in --mode cli to check it reproduces the numbers currently in the manuscript.
 Only once that check passes is it trustworthy for --mode api, which is the transport swap.
 
-Usage:  python recompute.py cli|api
+Usage:  python recompute.py [cli|api] [--eta 0.10]
+
+The default level is the manuscript's, eta = 0.05 (95% families); --eta 0.10 gives the
+harness default, which the manuscript reports as its sensitivity check.
 """
 import sys, io, json, os
 # Only rebind stdout when run as a script. Doing it at import time wraps the same buffer
@@ -19,7 +22,7 @@ from measure_blackwell import clopper_pearson, certify_harm  # noqa: E402
 RES = os.path.join(ROOT, "results")
 TASKS = ["api_post_ok", "api_argorder", "enc_amount", "trap_store_wire"]
 ARMS = ["none", "W1", "W2", "W1plus"]
-ETA, TAU = 0.10, 0.30
+ETA, TAU = 0.05, 0.30
 
 # base file per model, plus arm-only re-measurements that override single cells.
 # The overrides are how the published Opus/Haiku rows are actually built; ignoring them
@@ -139,7 +142,7 @@ def main(mode):
             print("%-17s %-8s %s" % (m if a == ARMS[0] else "", a, cells))
     print()
 
-    # ---- harm table (tab:interference / fig:forest) -------------------------
+    # ---- harm table (tab:interference: marginal and joint bounds) -----------
     print("HARM CONTRAST  Delta_T = PASS(W1plus)-PASS(W1);  tau=%.2f" % TAU)
     print("%-17s %-16s %10s %9s %10s %10s %s" %
           ("model", "cell", "W1->W1plus", "Delta", "upper@eta", "upper@eta/12", "verified"))
@@ -240,4 +243,10 @@ def main(mode):
 if __name__ == "__main__":
     # Default to the record the paper publishes. The historical command-line grid is
     # still reachable with an explicit "cli" argument.
-    main(sys.argv[1] if len(sys.argv) > 1 else "api")
+    args = sys.argv[1:]
+    if "--eta" in args:
+        i = args.index("--eta")
+        ETA = float(args[i + 1])
+        del args[i:i + 2]
+    print("eta = %.2f (%d%% families)" % (ETA, round(100 * (1 - ETA))))
+    main(args[0] if args else "api")

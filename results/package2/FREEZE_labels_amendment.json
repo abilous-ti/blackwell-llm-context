@@ -1,0 +1,12 @@
+{
+ "recorded_at_utc": "2026-10-05T17:45:47+00:00",
+ "confirmatory_lines_at_recording": {
+  "issued": 1185,
+  "received": 1161
+ },
+ "outcomes_viewed_before_recording": false,
+ "sha256": {
+  "harness/package2/PROTOCOL_LABELS_AMENDMENT.md": "f9b97ec6fabb8b4b0620ec58882464c463060fa9e3b1e33db2deb4ad7cfe5715",
+  "harness/package2/analyze_labels_amended.py": "262bb18813708eab9a7b5ab9bcf6aa10ece04013c4f61d3cda9de4c0cc94b005"
+ }
+}
