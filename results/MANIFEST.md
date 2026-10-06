@@ -29,19 +29,30 @@ Transport of the six-model record in this manifest: **HTTP API for all six model
 | Object in the manuscript | Computed from (paths relative to `results/`) |
 |---|---|
 | Table: per-cell PASS (tab:percell) | `blackwell_haiku_api_n40.json`<br>`blackwell_sonnet_api_n40.json`<br>`blackwell_opus_api_n40.json`<br>`blackwell_gpt55_n40.json`<br>`audit/audit_gpt55_trap_store_wire_summary.json`<br>`blackwell_deepseek_n40.json`<br>`blackwell_kimi_n40.json` |
-| Table: consolidated 6-model verdict (tab:consolidated) | <same as tab:percell> |
-| Table: anti-monotonicity (tab:interference) | <same as tab:percell> |
-| Figure: harm forest plot (fig:forest) | <same as tab:percell> |
+| Table: PASS-incomparability bounds (tab:incomp) | <same as tab:percell> |
+| Table: anti-monotonicity, marginal and joint bounds (tab:interference) | <same as tab:percell> |
 | Table: selection policies (tab:policies) | <same as tab:percell> |
-| Figure: policy bars (fig:policies) | <same as tab:percell> |
 | Figure: Hasse diagram (fig:hasse) | `blackwell_haiku_api_n40.json` |
 | Table: ranker spectrum (tab:rankers) | `reranker_trap_api_n100.json`<br>`dense_trap.json` |
 | Explicit-import condition | `audit/audit_impctl-*.json` |
-| Raw-failure audit and retained-completions table (sec:results-audit, tab:retained) | `retain_api/haiku/`<br>`retain_api/sonnet/`<br>`retain_api/opus/`<br><computed by harness/diag/retained_text_checks.py> |
+| Screens of the original retained completions (sec:results-audit) | `retain_api/haiku/`<br>`retain_api/sonnet/`<br>`retain_api/opus/`<br><computed by harness/diag/retained_text_checks.py> |
 | Command-line diagnostic record (historical) | `diag/` |
 | Behavioural controls: padding, order reversal, routing note, XML segmentation | `blackwell_controls_api_n40.json` |
 | Second source pair | `blackwell_pair2_api_n40.json` |
 | LLM listwise reranker probe | `reranker_trap_api_n100.json` |
+| Replication design and contrasts (sec:replication, tab:contrasts, tab:protocols) | `replication/FREEZE.json`<br>`replication/schedule.jsonl`<br>`replication/schedule_manifest.json`<br><harness/replication/design.json, harness/replication/PROTOCOL.md> |
+| Replication results (tab:replication, sec:results-replication) | `replication/records/`<br>`replication/analysis.json`<br>`replication/analysis.md`<br><computed by harness/replication/analyze.py> |
+| Replication without the two amended windows (sec:results-replication) | `replication/sensitivity_windows.json`<br><computed by harness/replication/sensitivity_windows.py> |
+| Replication failure types and response audit (tab:failures, sec:results-audit) | `replication/failure_types.json`<br><computed by harness/replication/failure_types.py and harness/replication/audit_responses.py> |
+| Replication planning simulation (tab:reppower) | `replication/power_sim.json`<br><computed by harness/replication/power_sim.py> |
+| Replication window-boundary changes | `replication/DEVIATIONS.md`<br>`replication/FREEZE.json` |
+| Independent pairs: certificates, freeze and pilot (sec:pairs) | `package2/certificates.json`<br>`package2/FREEZE.json`<br>`package2/pilot_pairs/`<br><harness/package2/PROTOCOL.md, PILOT.md, pairs.py, certify_pairs.py, run_pairs.py> |
+| Independent pairs and six-model controls (tab:pairs, sec:results-generality) | `package2/confirm_pairs/schedule.jsonl`<br>`package2/confirm_pairs/records.jsonl`<br>`package2/confirm_pairs/analysis_pairs.json`<br>`package2/confirm_pairs/analysis_pairs.md`<br><computed by harness/package2/analyze_pairs.py> |
+| Label decisions over hidden states (sec:labels, tab:labels, sec:results-labels) | `package2/FREEZE_labels.json`<br>`package2/FREEZE_labels_amendment.json`<br>`package2/confirm_labels/schedule.jsonl`<br>`package2/confirm_labels/records.jsonl`<br>`package2/confirm_labels/analysis_labels.json`<br>`package2/confirm_labels/analysis_labels_amended.json`<br>`package2/smoke_labels/`<br><computed by harness/package2/analyze_labels.py and analyze_labels_amended.py; protocol and amendment in harness/package2/PROTOCOL_LABELS.md and PROTOCOL_LABELS_AMENDMENT.md> |
+| Channel-matrix certificate: exact Le Cam deficiencies of the declared pair families (sec:pairs) | `package2/channel_certificate.json`<br><computed by harness/package2/channel_certificate.py> |
+| Reply checks behind sec:results-generality and the verifier-enforcement limitation | `package2/failure_checks.json`<br><computed by harness/package2/failure_checks.py> |
+| Clarified-contract run (sec:pairs, tab:clarify, sec:results-generality) | `package2/FREEZE_clarify.json`<br>`package2/confirm_clarify/schedule.jsonl`<br>`package2/confirm_clarify/records.jsonl`<br>`package2/smoke_clarify/`<br><analysis_clarify.json and .md computed by harness/package2/analyze_clarify.py; protocol in harness/package2/PROTOCOL_CLARIFY.md> |
+| Natural-data benchmarks (sec:natural, tab:natural, tab:overhead, sec:results-natural) | <natural_data/package2/confirm_qa/: records.jsonl, analysis_qa.json, analysis_qa.md; items, splits and local rankings in natural_data/package2/; computed by harness/package2/analyze_qa.py> |
 | GPT-5.5 trap cell (transport-clean source) | `audit/audit_gpt55_trap_store_wire_W1.json`<br>`audit/audit_gpt55_trap_store_wire_W2.json`<br>`audit/audit_gpt55_trap_store_wire_summary.json` |
 
 Arm-only re-runs supersede the corresponding cells of the base file. The verification
@@ -50,7 +61,7 @@ why each cell was re-measured.
 
 ## Inventory
 
-3256 files, 8.0 MB total.
+3415 files, 164.3 MB total.
 
 | File | Bytes | SHA-256 |
 |---|---|---|
@@ -266,6 +277,165 @@ why each cell was re-measured.
 | `diag/ctrl_api_post_ok_summary.json` | 675 | `7dbd1d147ef37c656558be9e93f22f57d255dabed8428f51f83990f0becb03c3` |
 | `incomparability_results.json` | 7509 | `3e00913dd01ad8e1346330df50d30b3527695680853262d5c03f9ec712f6883c` |
 | `moat_results.json` | 206 | `320b96ee4d07b6dd2dda80d3dd80f88a241d4ef7a8be799db803455a633e8ece` |
+| `package2/FREEZE.json` | 2045 | `4afda16d32a9ebbcd0efeed65d0d3dcc93e523461dfb72d5060222449166d77e` |
+| `package2/FREEZE_clarify.json` | 1469 | `0d877bc28f2bf202c609577ab6f3f9e311713630c65af91bfa3777bda382f4e8` |
+| `package2/FREEZE_labels.json` | 1583 | `2b7915e922d8061d5c291e09646e7f941fbde643bc8ff65a91325c56878def70` |
+| `package2/FREEZE_labels_amendment.json` | 426 | `7efb7143a0e6a6a3e82f3051925fe48756bb7134968324469f55a14c8b477615` |
+| `package2/certificates.json` | 2180 | `cf1ae894914fdaaa1558333c51d06bb4db9b8c8bcc27b0f70dabf62dc2b1449e` |
+| `package2/channel_certificate.json` | 691 | `8541730151bb105fd5a6d51cdb129c934505c06f73affd1d8dd2269f1ad602c6` |
+| `package2/confirm_clarify/analysis_clarify.json` | 23189 | `5303d191f87db7fae3ea40c273e548744525bccef4c35be3cab3823af6e89a31` |
+| `package2/confirm_clarify/analysis_clarify.md` | 6304 | `8ff97e5860ca4c890e6f671c6d064a8e24af2d4718802c479606f12629c38288` |
+| `package2/confirm_clarify/records.jsonl` | 12379427 | `a09a26d50bd9be09a7c0f034d12c4ebd0fbd70e88d20d16b98ec07cd502e37a8` |
+| `package2/confirm_clarify/schedule.jsonl` | 694640 | `7267ea2e76288dfb5ca397ee7ef78561d7b2eae1eb43348341c58aaa12e13972` |
+| `package2/confirm_labels/analysis_labels.json` | 50336 | `7626210c778f414f48f96907e948d0a717a212bc5468551d72acbd0ef9c0fa7f` |
+| `package2/confirm_labels/analysis_labels.md` | 23228 | `935c67c28ba314d824a5724af9c9c4cb242ac8a401e050387d8c64361d9f0b57` |
+| `package2/confirm_labels/analysis_labels_amended.json` | 23384 | `532f51b6238bcffda93b5264458e08782e93a7e5bdbb5c1fbd5442c7a18e2cbf` |
+| `package2/confirm_labels/analysis_labels_amended.md` | 3661 | `51f28a24505f6328d785e1bbf43759141d2114375db5a3c36ffcd0c24bae9c03` |
+| `package2/confirm_labels/records.jsonl` | 16736653 | `6ab62f34cb44d2ece31801d9d2c9a7a2e68c9b5112e849656f200c0afad54c25` |
+| `package2/confirm_labels/schedule.jsonl` | 1193418 | `e94cd6c97ad8b1d3256d2debf257eebb52032d925d59eba79d3675f51eb15943` |
+| `package2/confirm_pairs/analysis_pairs.json` | 62598 | `8c01be333ecbf74bafcccea36e75904ff116b6fbf4cae06f991869ca9d46b792` |
+| `package2/confirm_pairs/analysis_pairs.md` | 10682 | `3a3101b5bb960419f183bc7e2acfcaa3e2cf8140d2d1875d0ee5ff8700191fc9` |
+| `package2/confirm_pairs/records.jsonl` | 44582212 | `d972bb7421560416cd741c2bd1bde00c17fa9fb11a16cb2dd66eda2dfad1c15b` |
+| `package2/confirm_pairs/schedule.jsonl` | 1677622 | `6409598281fb0ca8a21b4df5f5ada7f09a0e196e1e7595413a0552b62ce2fd49` |
+| `package2/confirm_pairs/summary.txt` | 5361 | `7150c93216bb92a1962e590777a528a3818fe65df5234a1a19b1159bde8983dd` |
+| `package2/failure_checks.json` | 1221 | `054d322233ea70c60335724e993bb94ac29d2a9c8c8b306a7b0185a5ebbd7af7` |
+| `package2/pilot_pairs/analysis_pairs.json` | 60964 | `4681cac919cad5996c49cd41fad91bf322a310845fb5557e41c3e1e0f474bc22` |
+| `package2/pilot_pairs/analysis_pairs.md` | 10476 | `388f73f6070b95123bb88e77b46528b4bd5f4d629e59271fed713468de1ca3e2` |
+| `package2/pilot_pairs/records.jsonl` | 5506616 | `e4111fdcb7050b748d6a5d5f7ae8689fcae034ff550d8b1cb761f3cd16ab57e1` |
+| `package2/pilot_pairs/schedule.jsonl` | 207818 | `fb4456e4f2c61bc3fdd8b7f29f66d343a42887a32446ff7c77411dd096496136` |
+| `package2/pilot_pairs/summary.txt` | 5361 | `0802a67017ee1eedc44e75910bb84536893bb3ada204e51c95c4822d7da2d693` |
+| `package2/smoke_clarify/records.jsonl` | 316820 | `e56696e5eedfb4c31d8bed8a6674d73b3e0f5015d64d13a8f1916b0f12f08603` |
+| `package2/smoke_clarify/schedule.jsonl` | 17168 | `0c491ea4b2ad49f3d85cce38e12cb07e9e43d0a80ba51c35d32a2957eceb9fe6` |
+| `package2/smoke_labels/analysis_labels.json` | 30028 | `1d6ee8d8ee02c2aa37c382bf096a468ce2a952f88c04b7cc3e6c5c7ee2f9f78d` |
+| `package2/smoke_labels/analysis_labels.md` | 11101 | `f8e4e742009d485faa7f3f6fa5397c184ae7b41f5c2da33206280f7106e37b28` |
+| `package2/smoke_labels/analysis_labels_amended.json` | 22066 | `3a5975b0ad18f781682ba47174eeff76541c676aaa2876e375d6bcf4d194c2f1` |
+| `package2/smoke_labels/analysis_labels_amended.md` | 3650 | `ea73deee865ad8e808ca41d6dc717d4d81a142ed34e9b8ccc13993c21dc0e221` |
+| `package2/smoke_labels/records.jsonl` | 425408 | `5525fe919e80162f8a13ab806fe65e26a2f8a7f1af263f3fa0aea93e45b2c65c` |
+| `package2/smoke_labels/schedule.jsonl` | 29646 | `3ff544f83c3a58ceaa663dfabde677b96abd6d1f3378b5552037844fc509931b` |
+| `replication/DEVIATIONS.md` | 3781 | `d0a82e6ab5470950a8d3843d7c1e5a90097773a4e80f8b0b6352e2826ee90a91` |
+| `replication/FREEZE.json` | 3781 | `090929900dfacde721f7c8b7f03617be9d0e31953ae5630a92ca8e6a6cb1ac0c` |
+| `replication/analysis.json` | 79010 | `70ca3045b89b2a6466143d0aff9446997a702757f52536bb77e9ddced34a8b2f` |
+| `replication/analysis.md` | 3322 | `2c3f156d40079639df6a47a46e6bc671af7e88ed3998cb23ac0540ab6d4022e9` |
+| `replication/failure_types.json` | 3812 | `448cc441bf61ac2301bee61f6127670be94bd742e34cfeab450a96fcb98c768f` |
+| `replication/power_sim.json` | 6946 | `ccf4e21c8f75062822db1963495cb9f6a7dc67dcdeec337e91523f2ab9783d50` |
+| `replication/provenance_original.json` | 13275 | `4af6830bed8d30ec7971a904a6fc5250bca16aa6f7f21fbfebfde21d7cd59c1f` |
+| `replication/provenance_original.md` | 12236 | `ee024d5269397561b7bf41b2ee4685c0d7175293e4dfa89037f30cbbb29068c9` |
+| `replication/records/d1-pm.jsonl` | 11332477 | `76f4bba5055023bfda461966a0952aed19ca6da84bc40f79b7bbf58965a0913b` |
+| `replication/records/d2-am.jsonl` | 11510763 | `588c47ac19491d4e6120682c367525875e41b8694b56971c1a095e85312ea10b` |
+| `replication/records/d2-pm.jsonl` | 11315150 | `e50f81356dee0af6e710c83f997bc595fa0add0f0b20efd3fcff9a78788bd5a3` |
+| `replication/records/d3-am.jsonl` | 11358905 | `02091591bda3dec5995736e6f4514f00cdf5a526ca14e8fe3324237c75af4492` |
+| `replication/records/d3-pm.jsonl` | 11534148 | `6ecae1c24c970591cd29f09a75f5eab2f5abd6b1a8389ee783e5a872484ea6c3` |
+| `replication/records/d4-am.jsonl` | 11315147 | `d2f5c5793be06aaa7860bde27c221585ea2138bdabe0f2302d56c23d1950be93` |
+| `replication/replication_table.tex` | 1554 | `1ae0eabc8f07f1541d0dd3aa3dc60158bb6dc5117677e845815aff2deabb040d` |
+| `replication/replication_windows.tex` | 10113 | `46d166bde38d647c11ea06311bb0414d8bfda5363379aa4236006966a114ac4d` |
+| `replication/schedule.jsonl` | 2391235 | `2eeca486f2f944abe2c65bbe1c4ced47bb985e3a81e2aa53d9e90dbba9b932d8` |
+| `replication/schedule_manifest.json` | 397 | `26a0582616ce804f3f78057903a2798619cc8d9af8feb32c7924641e47fbf4a6` |
+| `replication/sensitivity_windows.json` | 7485 | `c6b596a98148190b4131696ed5ee087a8e289e5a5501e3f4dfe1abf2f6dd618c` |
+| `replication/smoke/20261001T073753Z-Haiku-4.5/FREEZE.json` | 1413 | `1f638582f43a8d4d64a8182ddfba75d2d8d1eb8a6434a6c70f26c673e0adf3d0` |
+| `replication/smoke/20261001T073753Z-Haiku-4.5/VERIFICATION.md` | 1501 | `9b31a48aec6fbc4556199c45b63783dd0b11723cdfb35bd59fb908e08585bf83` |
+| `replication/smoke/20261001T073753Z-Haiku-4.5/analysis.json` | 6609 | `389ab05b702befdeff95fe99edc27ce5ad719fdc855dde711697d7468e5fda84` |
+| `replication/smoke/20261001T073753Z-Haiku-4.5/analysis.md` | 880 | `0c4cfe8e53bf87ce020b99f1677b8f34b49fb523a9df8939518783b35f83743b` |
+| `replication/smoke/20261001T073753Z-Haiku-4.5/design.json` | 6904 | `ae19173e1585b4233a1619e5e2c1370eb434c8aa1905f8d1cf206532cb6c72a0` |
+| `replication/smoke/20261001T073753Z-Haiku-4.5/records/smoke.jsonl` | 68796 | `8ce6f2a0121558d9dcc8ac1b563e24916f665d69c60f59417a02f9efb25f661c` |
+| `replication/smoke/20261001T073753Z-Haiku-4.5/replication_table.tex` | 250 | `a64a5d6ba7024abf8cbd5b11a3ab5bd60b6255da3bb795050ef27292408efc24` |
+| `replication/smoke/20261001T073753Z-Haiku-4.5/replication_windows.tex` | 1300 | `d24c6b849dcba0d99777db7981c0ad0d0ed724aee6017a73bdac5ebf988ed79c` |
+| `replication/smoke/20261001T073753Z-Haiku-4.5/schedule.jsonl` | 3250 | `db43601cffbd4c20f78626a760c56efc674264ca526c9c27f4b44db5afb42c51` |
+| `replication/smoke/20261001T073753Z-Haiku-4.5/schedule_manifest.json` | 393 | `610113ebc01c7850a8a5635a65b66bca08f870b178554eed83ce16a3503e014e` |
+| `replication/smoke/20261001T073844Z-Sonnet-4.6/FREEZE.json` | 1414 | `a20bbb000596d9428367be453f33eba3b8ed8ff44099c81c109f16404efc2a41` |
+| `replication/smoke/20261001T073844Z-Sonnet-4.6/VERIFICATION.md` | 1497 | `f915af7a9acb1635a917437ec0125b325b145db850a3fa9cdd68ea06a7afc167` |
+| `replication/smoke/20261001T073844Z-Sonnet-4.6/analysis.json` | 6566 | `200c367cd5d7927de9c8aa5d38ee3d02674d1c3f7c473fc1b35e9ce033cd6e66` |
+| `replication/smoke/20261001T073844Z-Sonnet-4.6/analysis.md` | 885 | `9153ce5359540d00b538152a3dfde13c9a4e2fc2f245ad72f63e8870c2aa13e7` |
+| `replication/smoke/20261001T073844Z-Sonnet-4.6/design.json` | 6908 | `63ca3e573c402649dcb1f9070e7c67c35a3af1e4b08f4a78b0318ddf827a7532` |
+| `replication/smoke/20261001T073844Z-Sonnet-4.6/records/smoke.jsonl` | 50897 | `7d7a3adf42b2711074ef948999b96d8c0a05422739163665185cdc61472de1c2` |
+| `replication/smoke/20261001T073844Z-Sonnet-4.6/replication_table.tex` | 254 | `2a98f37af6fb59af152febb0679b8adb98d54a95f042c49a485eb4211c63a8fd` |
+| `replication/smoke/20261001T073844Z-Sonnet-4.6/replication_windows.tex` | 1304 | `7ccf7f0f1d23a1fc687807a6f8d31300c8f094d31f465f0ee5c39acfb336e15b` |
+| `replication/smoke/20261001T073844Z-Sonnet-4.6/schedule.jsonl` | 3282 | `260cba1bd5da0c40eba3ae84d8fbe099f486f5a778cea70ed461bcdb015af6f1` |
+| `replication/smoke/20261001T073844Z-Sonnet-4.6/schedule_manifest.json` | 393 | `5824766d3e9f2e2131bb49715800731ff3fb124701b9282780cc26df9d54a7ef` |
+| `replication/smoke/20261001T073924Z-Opus-4.8/FREEZE.json` | 1412 | `b60e4c22420fbeb8aadbc1f7f9854f78ab7bafd83dba2417e3e9197453f3fcad` |
+| `replication/smoke/20261001T073924Z-Opus-4.8/VERIFICATION.md` | 1488 | `06ad9a29fdfdf13371227f571afbafe9124b7afaa37a40a585fff3b07318f4d1` |
+| `replication/smoke/20261001T073924Z-Opus-4.8/analysis.json` | 6556 | `93d4379f403a0e276521313906fb1bc7d59604f6c6f677b1cbba2abacb752cc6` |
+| `replication/smoke/20261001T073924Z-Opus-4.8/analysis.md` | 875 | `e595ab0457b766c5235338c2debbdee05ea0ad03d95ce5ece00eb748bc4582c5` |
+| `replication/smoke/20261001T073924Z-Opus-4.8/design.json` | 6900 | `a9b0486645d7b69502d30ac9bb655f268f38d92c238274db84bd1ac25439cf7a` |
+| `replication/smoke/20261001T073924Z-Opus-4.8/records/smoke.jsonl` | 46091 | `a6c0ec0ff027e2693271a7a2c2b0a5c7550bdee8a5eed8677c08f688764904be` |
+| `replication/smoke/20261001T073924Z-Opus-4.8/replication_table.tex` | 246 | `68bf1aff7d1463287adf7e82dcf82275dfb93e473d3ae4ff7d7e593795dbb3f7` |
+| `replication/smoke/20261001T073924Z-Opus-4.8/replication_windows.tex` | 1296 | `49d828553046bb43c36cd47dd3e05492b32b834896cccf0dc26b57a98f31e4b6` |
+| `replication/smoke/20261001T073924Z-Opus-4.8/schedule.jsonl` | 3218 | `435d5e26b37d811dc2f276064ebbfb2e5b55c8c111249029770fdce15a6eb77d` |
+| `replication/smoke/20261001T073924Z-Opus-4.8/schedule_manifest.json` | 393 | `5317e33c0dc85a30fdd4fee6b18dac30574d11ddcf082109bd3fa924e1b359d5` |
+| `replication/smoke/20261001T073951Z-GPT-5.5/FREEZE.json` | 1411 | `9b5721ab97eead71504f7516b1f9731a0c842a6902e1e623acf3a05f5bac749a` |
+| `replication/smoke/20261001T073951Z-GPT-5.5/design.json` | 6893 | `780e16a88227f56ec3f280705b26480d17baf6c7e569549f81b1803ea741bd0d` |
+| `replication/smoke/20261001T073951Z-GPT-5.5/records/smoke.jsonl` | 6528 | `ed8c5adcd8d773f0e90cf819dea40b2458ce6b83dcec913f6d1af4b97870b44d` |
+| `replication/smoke/20261001T073951Z-GPT-5.5/schedule.jsonl` | 3186 | `9dd22d0068767c6d674e74be9485f7a414804ea81259f70c14ebfc0d62c6b357` |
+| `replication/smoke/20261001T073951Z-GPT-5.5/schedule_manifest.json` | 393 | `304c48757efb857a1b957ded590fe3449b06dc7c4798ade4ce607f3b2d8d8cc8` |
+| `replication/smoke/20261001T074006Z-Kimi-K2.6/FREEZE.json` | 1413 | `9560bc11d38dee78b9c24d9fdb2f5dc7ed2d09cf906ed5da38e0142c1e4bf9dc` |
+| `replication/smoke/20261001T074006Z-Kimi-K2.6/VERIFICATION.md` | 1445 | `ff33ebbd110a3c058919cb466b20062f40f8d8e24a7f0d21cdef53a4ade9e056` |
+| `replication/smoke/20261001T074006Z-Kimi-K2.6/analysis.json` | 6609 | `efe275e96055dbbbe1c607c80e5b2953f2769d2d7b90094320abef1f84963da5` |
+| `replication/smoke/20261001T074006Z-Kimi-K2.6/analysis.md` | 880 | `2a5da7509e95f6e282cf377db6a8d0f5077e3dd2efb7293e5874373ce5d21d67` |
+| `replication/smoke/20261001T074006Z-Kimi-K2.6/design.json` | 6895 | `6c79e4a41661b5e0bacd56ff483d2783fc8099630b863d4ab6bbfa920158a7ce` |
+| `replication/smoke/20261001T074006Z-Kimi-K2.6/records/smoke.jsonl` | 209220 | `8fe765509448ed99c69b0682cdfc952869c60d67355def11126d141e5b07f679` |
+| `replication/smoke/20261001T074006Z-Kimi-K2.6/replication_table.tex` | 250 | `b8b5c36a667293072725dd2916aee281539b3f10a64b61b283ab532a540149b1` |
+| `replication/smoke/20261001T074006Z-Kimi-K2.6/replication_windows.tex` | 1300 | `7e182141f6963e95f331154ddd74723421fe1a963e87dc0052fc23654f14c178` |
+| `replication/smoke/20261001T074006Z-Kimi-K2.6/schedule.jsonl` | 3250 | `dad3271716f090b18b708df25d6d9d4f61eabffe633bca7d92b9baa1b85c6bdd` |
+| `replication/smoke/20261001T074006Z-Kimi-K2.6/schedule_manifest.json` | 393 | `2dbb0940e155d846e33b628ef4ccb625cd23e0fbd6343a7f46641c3bd527b214` |
+| `replication/smoke/20261001T075422Z-Haiku-4.5/FREEZE.json` | 1413 | `af297dbba9764fb265e48861730e33597a38fa6057477cfe1c9d30b3e8c2bdbb` |
+| `replication/smoke/20261001T075422Z-Haiku-4.5/VERIFICATION.md` | 1501 | `ffd06e3e3f7f9ee73011dedfb040e0f88beed86becfd27b4f8311dac88d814d6` |
+| `replication/smoke/20261001T075422Z-Haiku-4.5/analysis.json` | 6603 | `bd9e1610a71f5ecb6c83b265767ad418706e6f0c1e3947148ad0c4809d84bc09` |
+| `replication/smoke/20261001T075422Z-Haiku-4.5/analysis.md` | 880 | `41fb30b6f72e87418b312e28bbbe68e0e6e2905878df2f6194187e38e66f8901` |
+| `replication/smoke/20261001T075422Z-Haiku-4.5/design.json` | 6904 | `824b58f81be1fbf097d29917f1f19ed66dff7517e0a757ddc77a505e4efc0943` |
+| `replication/smoke/20261001T075422Z-Haiku-4.5/records/smoke.jsonl` | 71009 | `c4ccd0f1277718e0c964b7a00696313ed7a47fb13ec0413964a96b43d8667c95` |
+| `replication/smoke/20261001T075422Z-Haiku-4.5/replication_table.tex` | 250 | `794c9064a2b19f8c6b8b6816a2281d1dd05fbf413fede41e25e7cdc3e9f60dfb` |
+| `replication/smoke/20261001T075422Z-Haiku-4.5/replication_windows.tex` | 1300 | `7b21f3787656e16e0b135f3a0396f9e3f9aa3f3da2ebe619e6528728cff7cf00` |
+| `replication/smoke/20261001T075422Z-Haiku-4.5/schedule.jsonl` | 3250 | `db43601cffbd4c20f78626a760c56efc674264ca526c9c27f4b44db5afb42c51` |
+| `replication/smoke/20261001T075422Z-Haiku-4.5/schedule_manifest.json` | 393 | `8f2d52e16e88c680486171975191d2d13fce12f63205838253c3ec4831fe1b38` |
+| `replication/smoke/20261001T075506Z-Sonnet-4.6/FREEZE.json` | 1414 | `512373774e09b1a28d76a63cb7eeeca8686ca6ace3ecddc31f0410d4253312f2` |
+| `replication/smoke/20261001T075506Z-Sonnet-4.6/VERIFICATION.md` | 1496 | `ca13b92be67a645c7eb5b65fc6c381c117c0d3d483149bcdb424fe001f40d545` |
+| `replication/smoke/20261001T075506Z-Sonnet-4.6/analysis.json` | 6566 | `200c367cd5d7927de9c8aa5d38ee3d02674d1c3f7c473fc1b35e9ce033cd6e66` |
+| `replication/smoke/20261001T075506Z-Sonnet-4.6/analysis.md` | 885 | `9153ce5359540d00b538152a3dfde13c9a4e2fc2f245ad72f63e8870c2aa13e7` |
+| `replication/smoke/20261001T075506Z-Sonnet-4.6/design.json` | 6908 | `417999bc68e19d59e4d6209e78c3305bd8e98ef2469f5c81027aaf52dd9beace` |
+| `replication/smoke/20261001T075506Z-Sonnet-4.6/records/smoke.jsonl` | 49881 | `248a2b426da79567d5f4fa6154857fd06cf8d925d6d3be9f46161a7951cc03d0` |
+| `replication/smoke/20261001T075506Z-Sonnet-4.6/replication_table.tex` | 254 | `2a98f37af6fb59af152febb0679b8adb98d54a95f042c49a485eb4211c63a8fd` |
+| `replication/smoke/20261001T075506Z-Sonnet-4.6/replication_windows.tex` | 1304 | `7ccf7f0f1d23a1fc687807a6f8d31300c8f094d31f465f0ee5c39acfb336e15b` |
+| `replication/smoke/20261001T075506Z-Sonnet-4.6/schedule.jsonl` | 3282 | `260cba1bd5da0c40eba3ae84d8fbe099f486f5a778cea70ed461bcdb015af6f1` |
+| `replication/smoke/20261001T075506Z-Sonnet-4.6/schedule_manifest.json` | 393 | `f9756d510609115bc6f316aec01f28d3f1871c648df97ebeee363d39ab0a57a5` |
+| `replication/smoke/20261001T075544Z-Opus-4.8/FREEZE.json` | 1412 | `583422f00456f106fc40cf0b54cd26b95b6744035e8037744b5a6b91a35b6e02` |
+| `replication/smoke/20261001T075544Z-Opus-4.8/VERIFICATION.md` | 1489 | `21d25f45e28e5b795a5f01dfae52cbd725b43d068e0bc19c657413465f3139a9` |
+| `replication/smoke/20261001T075544Z-Opus-4.8/analysis.json` | 6556 | `93d4379f403a0e276521313906fb1bc7d59604f6c6f677b1cbba2abacb752cc6` |
+| `replication/smoke/20261001T075544Z-Opus-4.8/analysis.md` | 875 | `e595ab0457b766c5235338c2debbdee05ea0ad03d95ce5ece00eb748bc4582c5` |
+| `replication/smoke/20261001T075544Z-Opus-4.8/design.json` | 6900 | `5388ed720f062cc49289f483e8f20be898d00a84f790b4a4ac7a67bfc32b9441` |
+| `replication/smoke/20261001T075544Z-Opus-4.8/records/smoke.jsonl` | 47606 | `e52562df2d7e2f5c8080eaeb8d0638b6681196458e61c30b6987826fa9ea73f2` |
+| `replication/smoke/20261001T075544Z-Opus-4.8/replication_table.tex` | 246 | `68bf1aff7d1463287adf7e82dcf82275dfb93e473d3ae4ff7d7e593795dbb3f7` |
+| `replication/smoke/20261001T075544Z-Opus-4.8/replication_windows.tex` | 1296 | `49d828553046bb43c36cd47dd3e05492b32b834896cccf0dc26b57a98f31e4b6` |
+| `replication/smoke/20261001T075544Z-Opus-4.8/schedule.jsonl` | 3218 | `435d5e26b37d811dc2f276064ebbfb2e5b55c8c111249029770fdce15a6eb77d` |
+| `replication/smoke/20261001T075544Z-Opus-4.8/schedule_manifest.json` | 393 | `7a5af27222d236b906b8e885160bd5f1b281c772171817d60621d4306523f3db` |
+| `replication/smoke/20261001T075614Z-GPT-5.5/FREEZE.json` | 1411 | `bb52152efaf6398bcc3c3ca4b033d94a5b86fd36def55325944b22e389c6f369` |
+| `replication/smoke/20261001T075614Z-GPT-5.5/VERIFICATION.md` | 1819 | `b69bfff9c79dc44c4d3a6845c8455a7be08fe2fd2663f5937e32b28b07507698` |
+| `replication/smoke/20261001T075614Z-GPT-5.5/analysis.json` | 6551 | `93b7a6ce7526757498ea6cc99d30d3f374400d0516802276c5073df47fa844f1` |
+| `replication/smoke/20261001T075614Z-GPT-5.5/analysis.md` | 870 | `7aa7791d2f5813c393a9f9d36af011aff81dff2efd6ae1f3fd912d1d2dd48129` |
+| `replication/smoke/20261001T075614Z-GPT-5.5/design.json` | 6893 | `61666603ca68fb59216ec9f76122c5b1b9a50010446ee44870e7a2bcac4644b3` |
+| `replication/smoke/20261001T075614Z-GPT-5.5/records/smoke.jsonl` | 194266 | `5fdc6cb6b20185f550912e113ba5cc9e0fc2e4036534399e6122ed2f54177c80` |
+| `replication/smoke/20261001T075614Z-GPT-5.5/replication_table.tex` | 242 | `a5aeac20b3e114d688b543eb0348d5c053b27aebeea690f19ce8c6e030fb9e9d` |
+| `replication/smoke/20261001T075614Z-GPT-5.5/replication_windows.tex` | 1292 | `eb83e652175d96153e4bd17b412e6962289b8a55e2d35e252ba0331b1a4c23d8` |
+| `replication/smoke/20261001T075614Z-GPT-5.5/schedule.jsonl` | 3186 | `9dd22d0068767c6d674e74be9485f7a414804ea81259f70c14ebfc0d62c6b357` |
+| `replication/smoke/20261001T075614Z-GPT-5.5/schedule_manifest.json` | 393 | `fdbaa50e653cc7be07ab41a1ef4dca40fc42053b6f2d821f008adc691e001f45` |
+| `replication/smoke/20261001T075903Z-Kimi-K2.6/FREEZE.json` | 1413 | `550999ee9bd89937033b20d2c01c58f233c0ceb20b7ba521a2be550f63f8b9c8` |
+| `replication/smoke/20261001T075903Z-Kimi-K2.6/VERIFICATION.md` | 1445 | `7c4db84ddb4b53c27bfd98a604c9e924ad4087442ad11faed24926bc47d467b7` |
+| `replication/smoke/20261001T075903Z-Kimi-K2.6/analysis.json` | 6561 | `dd4c8498a7808a57831f21321dc2cb1207bc9b9d11185cd16f6a62d4df961685` |
+| `replication/smoke/20261001T075903Z-Kimi-K2.6/analysis.md` | 880 | `a4beb2b40a458218236e784f37ec84eb4d2a8543f33db43f810fc7ddd4f2fb00` |
+| `replication/smoke/20261001T075903Z-Kimi-K2.6/design.json` | 6895 | `5d5542ff14e21fa2d1a88f4fa1d294ba40c390d08e1a2ca5cb98b09652434255` |
+| `replication/smoke/20261001T075903Z-Kimi-K2.6/records/smoke.jsonl` | 212815 | `764cc771bbe8bdec77f169c27b7859054b7502a863ee1db867a9c19ca3092b0b` |
+| `replication/smoke/20261001T075903Z-Kimi-K2.6/replication_table.tex` | 250 | `258f33116386ac844a2ca714d7580d7e237c3d72909f0ddaddca5ecd407c308e` |
+| `replication/smoke/20261001T075903Z-Kimi-K2.6/replication_windows.tex` | 1300 | `7ede99f91570e874660d9e17f60660eacd21b633c28b54c7949aaabed97a0f7e` |
+| `replication/smoke/20261001T075903Z-Kimi-K2.6/schedule.jsonl` | 3250 | `dad3271716f090b18b708df25d6d9d4f61eabffe633bca7d92b9baa1b85c6bdd` |
+| `replication/smoke/20261001T075903Z-Kimi-K2.6/schedule_manifest.json` | 393 | `63f89325bc4c14ec1f459dedb7729536fefc17846165e50c9c8cd5fa2bd30c5e` |
+| `replication/smoke/20261001T110811Z-GPT-5.5/FREEZE.json` | 1411 | `049161cb791d769294db26365ac18aae359a36160b9437366b8480017f283caa` |
+| `replication/smoke/20261001T110811Z-GPT-5.5/VERIFICATION.md` | 1819 | `46b99da8432a1df4e1263eb5dbc88f49dcdf50fc21c5f010d6102569b1cc982f` |
+| `replication/smoke/20261001T110811Z-GPT-5.5/analysis.json` | 6551 | `93b7a6ce7526757498ea6cc99d30d3f374400d0516802276c5073df47fa844f1` |
+| `replication/smoke/20261001T110811Z-GPT-5.5/analysis.md` | 870 | `7aa7791d2f5813c393a9f9d36af011aff81dff2efd6ae1f3fd912d1d2dd48129` |
+| `replication/smoke/20261001T110811Z-GPT-5.5/design.json` | 6893 | `9881a5304385352f83a71b681343ef71a3c9497ccc96b87b2e1737383c7a07c0` |
+| `replication/smoke/20261001T110811Z-GPT-5.5/records/smoke.jsonl` | 156798 | `69de5036a93d033ed9bc3e856e61ecd8fbc80248119bce0dbea334cab8cb81a0` |
+| `replication/smoke/20261001T110811Z-GPT-5.5/replication_table.tex` | 242 | `a5aeac20b3e114d688b543eb0348d5c053b27aebeea690f19ce8c6e030fb9e9d` |
+| `replication/smoke/20261001T110811Z-GPT-5.5/replication_windows.tex` | 1292 | `eb83e652175d96153e4bd17b412e6962289b8a55e2d35e252ba0331b1a4c23d8` |
+| `replication/smoke/20261001T110811Z-GPT-5.5/schedule.jsonl` | 3186 | `9dd22d0068767c6d674e74be9485f7a414804ea81259f70c14ebfc0d62c6b357` |
+| `replication/smoke/20261001T110811Z-GPT-5.5/schedule_manifest.json` | 393 | `2a6cb238fd9eea7a552fab781e6648ec9e57ddfd370959df6defc9e4c76c4c76` |
 | `reranker_trap_api_n100.json` | 4704 | `a5d07f0fdd15cabc00a71694fc89af034390f394c9eeb0584b02b3a5cc39da59` |
 | `reranker_trap_api_n100.log` | 964 | `0c84776d79fde3e614f93a50a2389229b71dbc01297fbc035d27a54192439016` |
 | `reranker_trap_n30.json` | 984 | `8b557bffdd70ab3d2cc180fcc73e48caa8927e954d26b82a1df9985e19f0dc6d` |
