@@ -1,6 +1,6 @@
 # Natural-data benchmarks: text-free records
 
-These files are the public record of the natural-data benchmarks in Sections 4.7 and 5.9 of the
+These files are the public record of the natural-data benchmarks in Sections 4.7 and 5.8 of the
 manuscript (Table 12, `tab:natural`; Table 13, `tab:overhead`). They cover the 420 confirmatory
 questions and all 9,240 requests collected on 5 October 2026, 08:57 to 13:27 UTC. The 420
 questions are 200 HotpotQA ranking questions, 100 HotpotQA augmentation questions, 100 MuSiQue
