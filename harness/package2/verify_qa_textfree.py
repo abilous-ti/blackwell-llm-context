@@ -18,6 +18,7 @@ Exit status 1 on any mismatch.
 import hashlib
 import io
 import json
+import math
 import sys
 from collections import Counter, defaultdict
 from decimal import ROUND_CEILING, ROUND_HALF_UP, Decimal
@@ -147,6 +148,20 @@ def recompute(items, rankings_rows, answers, overhead):
     return json.loads(json.dumps(res))
 
 
+# Floating-point results are compared with a tolerance: summation order can differ between
+# platforms and Python builds by a few units in the last place (5.3e-15 has been observed), which
+# is not a difference in any reported figure.
+TOL = 1e-12
+
+
+def same_num(a, b):
+    if isinstance(a, bool) or isinstance(b, bool):
+        return a == b
+    if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+        return math.isclose(a, b, rel_tol=TOL, abs_tol=TOL)
+    return a == b
+
+
 def diff(a, b, path="$", out=None):
     out = [] if out is None else out
     if isinstance(a, dict) and isinstance(b, dict):
@@ -158,7 +173,7 @@ def diff(a, b, path="$", out=None):
     elif isinstance(a, list) and isinstance(b, list) and len(a) == len(b):
         for i, (x, y) in enumerate(zip(a, b)):
             diff(x, y, "%s[%d]" % (path, i), out)
-    elif a != b:
+    elif not same_num(a, b):
         out.append("%s: shipped %r, recomputed %r" % (path, a, b))
     return out
 
@@ -211,7 +226,7 @@ def verify_confirm():
     res = recompute(items, rk, answers, overhead)
     d = diff(shipped, res)
     check(not d, "analysis_qa.json recomputed from the export: %s" % (
-        "identical (all %d numbers, bootstrap intervals included)" % n_numbers(shipped) if not d else "%d differences" % len(d)))
+        "agree within %g (all %d numbers, bootstrap intervals included)" % (TOL, n_numbers(shipped)) if not d else "%d differences" % len(d)))
     for line in d[:15]:
         print("         " + line)
 
@@ -226,8 +241,9 @@ def verify_confirm():
           "baselines all found: HotpotQA %.3f-%.3f, MuSiQue %.3f-%.3f (published 23-47%%, 7-32%%)" % (min(h), max(h), min(m), max(m)))
     cells = [k for k in res["answers"]]
     same = sum(1 for k in cells if k in shipped["answers"] and res["answers"][k]["n"] == shipped["answers"][k]["n"]
-               and res["answers"][k]["em"][0] == shipped["answers"][k]["em"][0] and res["answers"][k]["f1"][0] == shipped["answers"][k]["f1"][0])
-    check(len(cells) == 60 and same == 60, "answer cells (role x model x condition): %d recomputed, %d with identical n, EM and F1 means" % (len(cells), same))
+               and same_num(res["answers"][k]["em"][0], shipped["answers"][k]["em"][0])
+               and same_num(res["answers"][k]["f1"][0], shipped["answers"][k]["f1"][0]))
+    check(len(cells) == 60 and same == 60, "answer cells (role x model x condition): %d recomputed, %d with identical n and EM and F1 means (tolerance %g)" % (len(cells), same, TOL))
     miss = [x for x in answers if x["transport_failed"]]
     check(len(miss) == 13 and res["n"]["transport_failed"] == 13 and len({x["item"] for x in miss}) == 5
           and all(x["missing_reason"] == "content_filter" for x in miss),
