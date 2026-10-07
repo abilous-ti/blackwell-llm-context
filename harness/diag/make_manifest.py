@@ -56,7 +56,6 @@ MAPPING = [
     ("Table: per-cell PASS (tab:percell)", SIXMODEL),
     ("Table: PASS-incomparability bounds (tab:incomp)", ["<same as tab:percell>"]),
     ("Table: anti-monotonicity, marginal and joint bounds (tab:interference)", ["<same as tab:percell>"]),
-    ("Table: selection policies (tab:policies)", ["<same as tab:percell>"]),
     ("Figure: Hasse diagram (fig:hasse)", [TABLE["Haiku-4.5"][0] + ".json"]
      + sorted({f + ".json" for f in TABLE["Haiku-4.5"][1].values()})),
     ("Table: ranker spectrum (tab:rankers)", ["reranker_trap_api_n100.json", "dense_trap.json"]),

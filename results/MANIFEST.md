@@ -31,7 +31,6 @@ Transport of the six-model record in this manifest: **HTTP API for all six model
 | Table: per-cell PASS (tab:percell) | `blackwell_haiku_api_n40.json`<br>`blackwell_sonnet_api_n40.json`<br>`blackwell_opus_api_n40.json`<br>`blackwell_gpt55_n40.json`<br>`audit/audit_gpt55_trap_store_wire_summary.json`<br>`blackwell_deepseek_n40.json`<br>`blackwell_kimi_n40.json` |
 | Table: PASS-incomparability bounds (tab:incomp) | <same as tab:percell> |
 | Table: anti-monotonicity, marginal and joint bounds (tab:interference) | <same as tab:percell> |
-| Table: selection policies (tab:policies) | <same as tab:percell> |
 | Figure: Hasse diagram (fig:hasse) | `blackwell_haiku_api_n40.json` |
 | Table: ranker spectrum (tab:rankers) | `reranker_trap_api_n100.json`<br>`dense_trap.json` |
 | Explicit-import condition | `audit/audit_impctl-*.json` |
