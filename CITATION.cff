@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: "If you use these records or this code, please cite the manuscript below."
+title: "Context Selection as a Partial Order: code and records"
+type: software
+authors:
+  - family-names: Bilous
+    given-names: Andriy
+    orcid: "https://orcid.org/0009-0006-5467-7932"
+    affiliation: "Lviv Polytechnic National University"
+  - family-names: Lytvyn
+    given-names: Vasyl
+    orcid: "https://orcid.org/0000-0002-9676-0180"
+    affiliation: "Lviv Polytechnic National University"
+  - family-names: Pukach
+    given-names: Petro
+    orcid: "https://orcid.org/0000-0002-0359-5025"
+    affiliation: "Lviv Polytechnic National University"
+  - family-names: Rybchak
+    given-names: Zoriana
+    orcid: "https://orcid.org/0000-0002-5986-4618"
+    affiliation: "Lviv Polytechnic National University"
+repository-code: "https://github.com/abilous-ti/blackwell-llm-context"
+keywords:
+  - comparison of experiments
+  - Le Cam deficiency
+  - context selection
+  - retrieval-augmented generation
+  - distribution-free verification
+preferred-citation:
+  type: article
+  title: "Context Selection as a Partial Order: A Blackwell Framework and Verified LLM Evidence"
+  authors:
+    - family-names: Bilous
+      given-names: Andriy
+    - family-names: Lytvyn
+      given-names: Vasyl
+    - family-names: Pukach
+      given-names: Petro
+    - family-names: Rybchak
+      given-names: Zoriana
+  journal: "Machine Learning and Knowledge Extraction"
+  status: submitted
+  year: 2026

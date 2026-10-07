@@ -1,178 +1,167 @@
-# Context selection as a partial order — artifacts
+# Context selection as a partial order — code and records
 
-Measurement harness, executable verifiers, and complete run records for
-**"Context selection as a partial order: A Blackwell framework and verified LLM evidence"**
-(Andriy Bilous, Vasyl Lytvyn, Petro Pukach, Zoriana Rybchak — Lviv Polytechnic National University).
+Measurement code, executable verifiers and released records for the manuscript
+**"Context Selection as a Partial Order: A Blackwell Framework and Verified LLM Evidence"**
+(Andriy Bilous, Vasyl Lytvyn, Petro Pukach, Zoriana Rybchak — Lviv Polytechnic National University),
+revised in October 2026 for *Machine Learning and Knowledge Extraction* (MDPI). The manuscript itself is
+submitted to the journal and is not published here.
 
-Every number in the paper is an empirical PASS rate from live model calls graded by executable
-verifiers. This repository holds the code that produced them and the raw per-run records from
-which every verification can be recomputed.
+The branches `main` and `replication-2026-10` hold the revised version. The manuscript's Data Availability
+Statement pins the exact commit;
+`results/MANIFEST.md` pins every released record by SHA-256.
 
-## Verify the paper without spending anything
+## What the paper establishes, and which numbers are which
 
-Every published table, bound and figure is recomputed from the released counts by the scripts
-below. None of these makes a model call, and they need nothing but the Python standard
-library. All five run clean from a fresh clone of this repository.
+The paper keeps three kinds of statement apart:
+
+1. **Structural incomparability** of the declared source families is a property of the construction
+   (the projection sources of Lemma 1), not a measurement.
+2. **Fixed-model PASS relations** — PASS incomparability and superset harm — are measured for one fixed
+   model rule at a realized state. They do not establish the structural relation: even a structurally
+   comparable pair can cross in PASS.
+3. **Le Cam deficiency** is bounded from measurement only in the label experiment, where hidden states are
+   drawn from the task prior and the guessing caps are proved.
+
+Not every number is a PASS rate. The coding experiments report PASS (the share of completions that pass
+executable checks); the label experiment reports label accuracy and deficiency lower bounds; the
+natural-data benchmarks report answer F1 and exact match, support recall, latency and token use.
+
+## Experiments, code and records
+
+| Experiment (manuscript section) | Code | Records |
+|---|---|---|
+| Original coding battery: six models, four tasks, n = 40 per cell (4.1–4.3, 5.1–5.3, 5.5) | `harness/measure_blackwell.py`, `harness/diag/` | `results/blackwell_*_n40.*`, `results/audit/`, `results/retain_api/` |
+| Randomized replication: six collection windows, 1–4 October 2026 (4.4, 5.4) | `harness/replication/` | `results/replication/` |
+| Further constructed pairs and the clarified-contract run (4.5, 5.6) | `harness/package2/` | `results/package2/confirm_pairs/`, `results/package2/confirm_clarify/` |
+| Label decisions over hidden states (4.6, 5.7) | `harness/package2/` | `results/package2/confirm_labels/` |
+| Natural data, supplied pools: HotpotQA, MuSiQue, reranking overhead (4.7, 5.8) | `harness/package2/` | `results/package2/confirm_qa_textfree/` (text-free) |
+| Natural data, retrieved candidates: HotpotQA fullwiki (4.7, 5.8) | `harness/package3/` | `results/package3/` (text-free) |
+| Exploratory natural-data pilot, 2 October 2026 (development data; 6.4) | `harness/natural/` | `results/natural_pilot_textfree/` |
+
+Each experiment added in the revision has a protocol fixed and hashed before its first confirmatory request
+(`harness/replication/PROTOCOL.md`, `harness/package2/PROTOCOL*.md`, `harness/package3/PROTOCOL_FULLWIKI.md`)
+and a freeze record in `results/`. Deviations are recorded, not edited away: see
+`results/replication/DEVIATIONS.md`, the label-analysis amendment and `harness/package3/PROTOCOL_FULLWIKI_ERRATA.md`.
+
+## Verify the paper's numbers without model calls
+
+None of these makes a model call; all of them run on the Python standard library from a fresh clone.
 
 ```bash
-python harness/diag/recompute.py            # every per-cell rate, harm bound and verdict
-python harness/diag/check_printed_bounds.py # each printed bound is implied by the computed one
-python harness/diag/check_regimes.py        # each cited run's transport, derived from its log
-python harness/diag/retained_text_checks.py # the textual screens, each rule beside its result
-python harness/diag/make_manifest.py api    # regenerate the SHA-256 manifest
+python harness/diag/recompute.py                 # original grid: every per-cell rate, harm bound and verdict
+python harness/diag/check_regimes.py             # each cited original run's transport, read from its log
+python harness/diag/retained_text_checks.py      # the textual screens over retained completions
+python harness/replication/analyze.py            # randomized replication -> results/replication/analysis.json
+python harness/package2/analyze_pairs.py         # further pairs (default: results/package2/confirm_pairs)
+python harness/package2/analyze_clarify.py       # clarified contracts
+python harness/package2/analyze_labels.py        # label experiment (analysis frozen before collection)
+python harness/package2/analyze_labels_amended.py   # label experiment, drift-robust amendment
+python harness/package2/verify_qa_textfree.py    # supplied-pool natural data: recomputes all 807 outputs
+python harness/package3/verify_fullwiki_textfree.py # fullwiki: recomputes its outputs from the exports
+python harness/diag/make_manifest.py api         # regenerate the SHA-256 manifest
 ```
 
-`recompute.py` reads the published HTTP record by default; pass `cli` for the superseded
-command-line grid, which the manuscript discusses only as history.
+The analyses rewrite their output files. The rewritten files reproduce the committed ones; on Windows they are
+written with CRLF line endings, which `git diff --ignore-cr-at-eol` shows as no change but which alter their
+SHA-256, so regenerate the manifest from a fresh checkout rather than after re-running the analyses.
 
-The manuscript itself is submitted to the journal rather than published here: this
-repository is the artifact record -- measurement code, executable verifiers, every run
-record, the manifest that pins them, and these instructions. `check_printed_bounds.py`
-additionally checks the manuscript against the data when a local copy is present, and says
-so and skips when it is not.
+`harness/diag/check_printed_bounds.py` additionally compares the manuscript's printed bounds with the computed
+ones when a local copy of the manuscript is present, and says so and skips when it is not. The fullwiki
+verifier skips the checks that need the frozen input file, which is not public (see below).
 
-## What the paper claims
+## Statistical conventions of the current analysis
 
-- **Theory.** Context sources, modelled as statistical experiments on a task's latent requirement,
-  form a Blackwell *partial* order. Blackwell-incomparable sources cannot be ranked by any
-  query-independent scalar for all tasks, and topical query-conditioned scores fail on a
-  constructed trap.
-- **Verification.** A decision-restricted value-deficiency *surrogate* (deliberately not called a
-  Le Cam deficiency) with a distribution-free finite-sample verification: exact Clopper–Pearson
-  intervals, union bound over the task battery, η = 0.10.
-- **Evidence.** Verified incomparability on 6 models across 4 vendors; the trap mis-rank realized
-  by lexical, dense bi-encoder (BGE, E5) and cross-encoder rankers while an LLM listwise reranker
-  escapes; and verified anti-monotonicity — a strict superset of a sufficient source collapsing
-  PASS — with order, length-padding, routing-instruction and structured-context controls.
+- **Family level.** Every verified claim is reported at η = 0.05, a 95% family level, and names its coverage
+  family. The original measurements use exact Clopper–Pearson intervals; the replication and the further pairs
+  use one-sided Hoeffding bounds on independent block differences, which allow success probabilities to vary
+  across blocks and windows; the label experiment uses Clopper–Pearson and drift-robust Hoeffding bounds over
+  hidden states. Natural-data comparisons use approximate bootstrap intervals, reported as intervals, not as
+  verification.
+- **Harm** is the direct contrast Δ = PASS(W1+) − PASS(W1). The materiality margin τ = 0.30 applies only to
+  harm contrasts; PASS incomparability requires positive lower bounds on both gaps.
+- **Ψ is an interaction, not harm.** The four-term second difference
+  Ψ = PASS(W1+) − PASS(W1) − PASS(W2) + PASS(none) satisfies Ψ ≤ 0 exactly when the pair is submodular, so it
+  never evidenced harm. The harm criterion changed from Ψ to Δ on 7–8 September 2026; `certify_harm` computes
+  Δ, and `certify_interference` still computes Ψ as a descriptive quantity.
+- **The confidence budget is per endpoint.** Only two endpoints enter Δ's bound — an upper on the superset arm
+  and a lower on W1 — so each carries noncoverage η/2.
+- **Inputs of the original-grid numbers.** Every number of the original grid is computed by
+  `harness/diag/recompute.py` from the `counts` field of the run files named in the manifest, with one declared
+  substitution (both GPT-5.5 `trap_store_wire` conditions come from
+  `results/audit/audit_gpt55_trap_store_wire_summary.json`, because the base run logged an HTTP 500 there).
+  Other fields written at measurement time (`interference`, `estimator`, `dominance`,
+  `certificate_incomparable`) are historical harness outputs, some using Ψ or an earlier budget; they are not
+  inputs to the manuscript.
 
-## Two corrections worth knowing before reading the code
+## What is released, what is withheld, what was never kept
 
-**Ψ is an interaction, not harm.** The four-term second difference
-Ψ = PASS(W1+) − PASS(W1) − PASS(W2) + PASS(none) satisfies Ψ ≤ 0 *exactly* when the pair is
-submodular, so it never evidenced harm (take none = 0 and W1 = W2 = W1+ = 1: Ψ = −1 with zero
-degradation). Harm is the direct contrast Δ = PASS(W1+) − PASS(W1). `certify_harm` computes Δ;
-`certify_interference` still computes Ψ and is retained as a descriptive quantity.
-
-**The confidence budget is per endpoint.** Only two endpoints enter Δ's bound — an upper on the
-superset arm, a lower on W1 — so each carries noncoverage η/2 and the union bound delivers η. An
-earlier version used two-sided intervals at η/2, left two endpoints unused, delivered 1 − η/2, and
-widened every bound.
+- **Released** (every file listed in `results/MANIFEST.md`): the original run logs and result files; the raw
+  completions of the original Anthropic runs (`results/retain_api/`); every request, response and grade of the
+  randomized replication, the further pairs, the clarified-contract run and the label experiment, with their
+  schedules (including the hidden states of the label experiment) and freeze records; and text-free records of
+  the natural-data benchmarks — identifiers, splits, the indices each ranker selected, every ranking, answer
+  scores, missingness, resource use and SHA-256 digests of every input — from which every natural-data figure
+  is recomputed.
+- **Withheld, available on request:** records that reproduce benchmark text — natural-data questions,
+  paragraphs, gold answers and the model replies that quote them — and the frozen input file of the fullwiki
+  benchmark, which lists the candidate paragraph titles. The source datasets are licensed by their creators
+  (HotpotQA, CC BY-SA 4.0; MuSiQue and TAT-QA, CC BY 4.0); the released code rebuilds the inputs from the public
+  releases and the digests verify them. For the revision, these records are also provided to the journal's
+  reviewers as a confidential archive, so that the grading of individual answers can be checked.
+- **Never retained:** the raw completions of the June base runs of GPT-5.5, DeepSeek-V4-Pro and Kimi-K2.6
+  (only per-cell counts and logs were kept), and some metadata of the original runs: request times, the worker
+  count, the order of draws within a cell and any model identifier returned by the provider. No sampling seed
+  was set. `results/replication/provenance_original.md` records what is known about each original record.
+  The randomized replication records all of these for every request.
 
 ## Layout
 
 | Path | Contents |
 |---|---|
-| `harness/` | measurement code, Python standard library only; API keys are read from the environment and never written to disk |
-| `harness/diag/` | retention re-measurement, packaging audit, certificate recomputation, and the verification guards |
-| `results/` | raw result JSONs and run logs |
-| `results/audit/` | re-measurement with raw completions retained |
-| `docs/` | `EXPERIMENT-BLACKWELL.md` (per-cell record), `BLACKWELL.md` (formalization and proof sketches) |
-All six models are queried the same way: one HTTP request per draw, one turn, no tools. The
-harness has no command-line launcher.
+| `harness/` | measurement code; the API harness uses only the Python standard library, reads API keys from the environment and never writes them to disk |
+| `harness/diag/` | recomputation of the original grid, the verification guards, the retention re-measurement and audits |
+| `harness/replication/`, `harness/package2/`, `harness/package3/`, `harness/natural/` | protocols, runners and analyses of the experiments added in the revision |
+| `results/` | released records (see `results/MANIFEST.md`) |
+| `docs/` | working records from June–September 2026 (`BLACKWELL.md`, `EXPERIMENT-BLACKWELL.md`), revised to remove superseded claims; the manuscript is the authoritative account |
 
-### Harness
+## Rerunning measurements
 
-- `measure_blackwell.py` — pair-1 (`ledger`) harness: the surrogate, the uniform incomparability
-  verification, dominance and harm verification, the lexical-relevance scalar, the HTTP launchers
-  (Anthropic Messages, Azure Responses, OpenAI-compatible chat), and the ablation arms
-  (`W1pad`, `W1plus_instr`, `W1plus_xml`).
-- `measure_blackwell_pair2.py` — pair-2 (`cache` module) sources over the same machinery.
-- `measure_reranker_trap.py` — LLM listwise (RankGPT-style) reranker probe.
-- `measure_dense_trap.py` — dense bi-encoder / cross-encoder probe (open weights, local, no API).
-- `diag/audit_any.py` — re-runs any cell keeping every raw completion, scoring each draw under both
-  the published and an import-neutralized verifier, and recording the packaging signals.
-  `--import-instruction` removes the import confound at source instead of post hoc.
-- `diag/recompute.py` — recomputes every published per-cell rate, harm contrast and verdict from
-  the released counts using the harness's own `certify_harm` and `clopper_pearson`. Aborts rather
-  than fall back to a different record if a declared source file is missing.
-- `diag/retained_text_checks.py` — the textual screens over retained completions, each rule
-  printed beside its result.
-- `diag/check_regimes.py` — derives each cited run's transport from its log and fails if a
-  run's recorded regime disagrees.
-- `diag/check_printed_bounds.py` — verifies every confidence bound printed in the manuscript is
-  implied by the one computed from the released counts.
-- `diag/make_manifest.py` — regenerates `results/MANIFEST.md` from the tracked files; refuses to
-  write if it names a file that is not present.
-
-Historical diagnostics, kept because the manuscript's provenance appendix refers to the record
-they produced, not because they feed a published number: `diag/recompute_LD.py` (prints values
-from the superseded command-line grid), `diag/recompute_delta.py`, `diag/cell_rerun.py`.
-
-## File → paper mapping
-
-| Paper object | Files |
-|---|---|
-| Six-model record (per-cell, anti-monotonicity, policies, forest plot) | `blackwell_{haiku,sonnet,opus}_api_n40.*`, `blackwell_{gpt55,deepseek,kimi}_n40.*` |
-| GPT-5.5 trap cell (both arms, transport-clean source) | `audit/audit_gpt55_trap_store_wire_*` |
-| Behavioural controls (padding, order reversal, routing note, XML) | `blackwell_controls_api_n40.*` |
-| Second source pair | `blackwell_pair2_api_n40.*` |
-| Ranker spectrum | `reranker_trap_api_n100.*` (LLM listwise), `dense_trap.json` (BGE, E5, cross-encoder) |
-| Retained completions behind the audit | `retain_api/{haiku,sonnet,opus}/` |
-| Explicit-import condition | `audit/audit_impctl-*.json` |
-| Command-line record (superseded, retained as history) | `blackwell_*_ss_n40.*`, `blackwell_pair2_n{40,80}.*`, `blackwell_{pad,instr,xml}_*` |
-
-`results/MANIFEST.md` is authoritative: it pins every file by SHA-256 and maps each table and
-figure to the files it is computed from. It is generated by `harness/diag/make_manifest.py`,
-which refuses to write if it names a file that is not present.
-
-## Reproducing
+New measurements need API access; endpoints and keys are read from the environment.
 
 ```bash
-# pair-1 over HTTP, core arms (endpoint and key are read from the environment)
+# original pair over HTTP, core arms
 python harness/measure_blackwell.py --runs 40 --retain results/retain_api/haiku \
   --tasks api_post_ok,api_argorder --arms none,W1,W2,W1plus --workers 2 --out out.json
-```
 
-```bash
-# re-measure a cell keeping every raw completion, both verifiers, packaging signals
+# re-measure a cell, keeping every raw completion
 python harness/diag/audit_any.py --kind azure --model DeepSeek-V4-Pro \
   --task api_post_ok --arms W1,W1plus --n 40 --out results/audit
 ```
 
-```bash
-# dense / cross-encoder probe (local, no API)
-pip install sentence-transformers && python harness/measure_dense_trap.py
-```
+The experiments added in the revision have their own runners and protocols in `harness/replication/`,
+`harness/package2/` and `harness/package3/` (see `harness/package3/RUNBOOK.md`). Rebuilding the natural-data
+inputs and running the local rankers need the packages in `requirements-natural.txt`; the rebuild steps are in
+`results/package2/confirm_qa_textfree/README.md` and `results/package3/confirm_fullwiki_textfree/README.md`.
 
+A transport failure is not a model answer: the HTTP client makes up to three attempts (a 180-second timeout per
+attempt, delays of 2 s and 4 s) when the request or response parsing raises, and a draw whose attempts are
+exhausted is excluded rather than scored as a failure. A returned payload is never retried on content.
 
-## Scope of the numbers
+## The verifier is not a sandbox
 
-**Which fields are the analysis inputs.** Every published number is computed from the `counts`
-field of the run files named in the manifest mapping, with the one declared substitution (both
-GPT-5.5 `trap_store_wire` conditions from `audit/audit_gpt55_trap_store_wire_summary.json`),
-by `harness/diag/recompute.py`. The run files also carry derived fields written at measurement
-time -- `interference`, `estimator`, `dominance`, `certificate_incomparable` -- some of which
-use the older four-term statistic (see the note on Psi above) or a per-model rather than
-joint confidence budget. Those are historical outputs of the harness at the time of the run,
-not inputs to the manuscript, and a matching manifest hash certifies a file's integrity, not
-that every derived field in it belongs to the current analysis. `recompute.py` is the
-authoritative path from `counts` to what is printed.
+The verifier runs model-generated code in a subprocess with a minimal environment that carries no provider
+credentials, and signals completion by writing a per-run random token to a file the parent names, so code that
+exits before the checks fails. The subprocess still has the filesystem and the network, so this harness is not
+a safe place to run untrusted code; ruling out deliberate interference needs OS-level isolation, which it does
+not provide.
 
-Verification parameters match the paper: η = 0.10, exact Clopper–Pearson intervals at union-bound
-level over the battery, τ = 0.30 for harm. A transport failure is not a model answer: the HTTP
-client makes up to three attempts (180-second timeout per attempt, delays of 2 s and 4 s) when the
-request or response parsing raises, and a draw whose attempts are exhausted is marked with an error
-and excluded from the sample rather than scored as PASS = 0. A returned payload is not retried on
-content: empty text goes to extraction and verification like any other reply. By default the
-driver refuses to certify a cell left below the requested n; `--allow-incomplete` overrides that
-and certifies on the reduced denominators. Every published number is computed from transport-clean
-draws. The one base-run cell that logged an outage, GPT-5.5 `W2|trap_store_wire` (HTTP 500 after
-retries), resisted re-measurement until a GPT-5.5 deployment became available; both its `W1` and
-`W2` conditions are then read from that clean re-measurement, which reproduces the published grid
-exactly (`results/audit/audit_gpt55_*`), and the manifest records the substitution.
+## Scope
 
-The verifier runs model-generated code in a subprocess with a minimal environment carrying no
-provider credentials. It does not grade on the exit status: the checks run inside a
-`BaseException` handler, and completion is signalled by writing a per-run random token to a file
-the parent names, so a `SystemExit` during import fails and a printed marker cannot be forged.
+The intervals carry sampling error only. Re-measurements show between-run shifts wider than the nominal
+intervals, which is why the revision added the randomized replication. Every verified quantity is an inference
+about a (model snapshot, prompt, default decoder, run) tuple, not a property of a vendor's model line, and the
+experiments establish existence on constructed tasks, not prevalence.
 
-This is not a sandbox, and the harness is not a safe place to run untrusted code. The subprocess
-still has the filesystem and the network, and a candidate that deliberately read the token from
-its environment and wrote the marker file would pass. Ruling that out needs OS-level isolation —
-a separate user, a read-only filesystem — which this harness does not provide. What the design
-does rule out is the accidental case: generated code that exits before the assertions run.
+## Citation
 
-The intervals carry sampling error only. The re-measurement in `results/audit/` shows between-run
-shifts wider than the nominal intervals, and the raw-failure audit shows prompt wording moving one
-cell further still. Every verified quantity is an inference about a (model snapshot, prompt, default
-decoder) triple, not a property of a vendor's model line.
+See `CITATION.cff`.

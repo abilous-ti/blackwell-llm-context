@@ -1,0 +1,16 @@
+# Packages for rebuilding the natural-data inputs and running the local rankers and the channel certificate.
+# The API harness and every analysis and verification script need only the Python standard library
+# (tested with Python 3.11).
+#
+#   pip install -r requirements-natural.txt
+#
+# Lower bounds are the versions in the authors' environment. The version of sentence-transformers used for
+# the published rankings was not recorded; ranking orders should reproduce, while scores can differ in their
+# last digits across library versions and hardware.
+
+numpy>=2.1                 # harness/package2/rank_local.py, harness/package2/channel_certificate.py
+scipy>=1.15                # harness/package2/channel_certificate.py
+pandas>=3.0                # harness/natural/stage1_sample.py
+pyarrow>=25.0              # reading the HotpotQA parquet releases (qa_data.py, fullwiki_data.py)
+huggingface_hub>=1.24      # harness/package3/run_fullwiki.py
+sentence-transformers      # BGE-small, E5-small and the MiniLM cross-encoder (installs torch and transformers)
