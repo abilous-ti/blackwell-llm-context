@@ -22,10 +22,12 @@ authors:
 repository-code: "https://github.com/abilous-ti/blackwell-llm-context"
 keywords:
   - comparison of experiments
+  - context non-monotonicity
+  - finite-sample inference
+  - large language models
   - Le Cam deficiency
-  - context selection
+  - listwise reranking
   - retrieval-augmented generation
-  - distribution-free verification
 preferred-citation:
   type: article
   title: "Context selection as a partial order: A Blackwell framework and verified LLM evidence"
