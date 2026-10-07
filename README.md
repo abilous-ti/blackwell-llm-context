@@ -1,7 +1,7 @@
 # Context selection as a partial order — code and records
 
 Measurement code, executable verifiers and released records for the manuscript
-**"Context Selection as a Partial Order: A Blackwell Framework and Verified LLM Evidence"**
+**"Context selection as a partial order: A Blackwell framework and verified LLM evidence"**
 (Andriy Bilous, Vasyl Lytvyn, Petro Pukach, Zoriana Rybchak — Lviv Polytechnic National University),
 revised in October 2026 for *Machine Learning and Knowledge Extraction* (MDPI). The manuscript itself is
 submitted to the journal and is not published here.

@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use these records or this code, please cite the manuscript below."
-title: "Context Selection as a Partial Order: code and records"
+title: "Context selection as a partial order: code and records"
 type: software
 authors:
   - family-names: Bilous
@@ -28,7 +28,7 @@ keywords:
   - distribution-free verification
 preferred-citation:
   type: article
-  title: "Context Selection as a Partial Order: A Blackwell Framework and Verified LLM Evidence"
+  title: "Context selection as a partial order: A Blackwell framework and verified LLM evidence"
   authors:
     - family-names: Bilous
       given-names: Andriy
